@@ -47,12 +47,14 @@ end
 
 local function SetupMono()
   local monoDir = ''
+
   -- Find system-specific Mono include/library paths.
   -- For Windows, first search the default Mono install location.
-  local monoDefaultDir = "C:\\Program Files (x86)\\Mono"
-  if os.isdir(monoDefaultDir) then
-    monoDir = monoDefaultDir
+  local monoDefaultWindowsDir = "C:\\Program Files (x86)\\Mono"
+  if os.isdir(monoDefaultWindowsDir) then
+    monoDir = monoDefaultWindowsDir
   end
+
   if not os.isdir(monoDir) then
     error("Could not find Mono install location, please specify it manually")
   end
@@ -113,9 +115,17 @@ function SetupTestProjectsCSharp(name, depends, extraFiles)
     links(linktable)
 
   project(name .. ".Tests.Managed")
-    SetupManagedTestProject()
+    SetupNativeProject()
+    language "C++"
+    kind "ConsoleApp"
 
-    files { name .. ".Tests.cs" }
-    links { name .. ".Managed" }
-    dependson { name .. ".C" }
+    includedirs
+    {
+      path.join(gendir, name),
+      path.join(depsdir, "../catch/include")
+    }
+
+    files { name .. ".Tests.cpp" }
+    links { name .. ".C" }
+    dependson { name .. ".Managed" }
 end
