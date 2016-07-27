@@ -19,10 +19,35 @@ namespace MonoManagedToNative.Generators
 
             PushBlock(CBlockKind.Includes);
             WriteLine("#pragma once");
+            NewLine();
             WriteLine("#include <stdbool.h>");
+            WriteLine("#include <stdint.h>");
             PopBlock(NewLineKind.BeforeNextBlock);
 
+            GenerateDefines();
             VisitDeclContext(Unit);
+        }
+
+        public void GenerateDefines()
+        {
+            PushBlock();
+
+            WriteLine("#if defined(_MSC_VER)");
+            WriteLineIndent("#define MONO_API_EXPORT __declspec(dllexport)");
+            WriteLineIndent("#define MONO_API_IMPORT __declspec(dllimport)");
+            WriteLine("#else");
+            WriteLineIndent("#define MONO_API_EXPORT __attribute__ ((visibility (\"default\")))");
+            WriteLineIndent("#define MONO_API_IMPORT");
+            WriteLine("#endif");
+            NewLine();
+
+            WriteLine("#if defined(MONO_DLL_EXPORT)");
+            WriteLineIndent("#define MONO_API MONO_API_EXPORT");
+            WriteLine("#else");
+            WriteLineIndent("#define MONO_API MONO_API_IMPORT");
+            WriteLine("#endif");
+
+            PopBlock(NewLineKind.BeforeNextBlock);
         }
 
         public override bool VisitClassDecl(Class @class)

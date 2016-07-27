@@ -90,7 +90,8 @@ namespace MonoManagedToNative.Generators
             var @class = method.Namespace as Class;
             var retType = method.ReturnType.Visit(CTypePrinter);
 
-            Write("{0} {1}_{2}(", retType, @class.QualifiedName, method.Name);
+            Write("{0} {1} {2}_{3}(", "MONO_API", retType,
+                @class.QualifiedName, method.Name);
 
             Write(GenerateParametersList(method.Parameters));
 

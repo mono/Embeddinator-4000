@@ -75,6 +75,8 @@ function SetupTestNativeProject(name, depends)
     kind "SharedLib"
     language "C"
 
+    defines { "MONO_DLL_EXPORT" }
+
     flags { common_flags }
     files
     {
