@@ -116,7 +116,7 @@ function SetupTestProjectsCSharp(name, depends, extraFiles)
 
     links(linktable)
 
-  project(name .. ".Tests.Managed")
+  project(name .. ".Tests")
     SetupNativeProject()
     language "C++"
     kind "ConsoleApp"

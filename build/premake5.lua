@@ -14,7 +14,6 @@ solution "native-binder"
   objdir (path.join(builddir, "obj"))
   targetdir (libdir)
   libdirs { libdir }
-  debugdir (bindir)
 
   startproject "native-binder"
   
