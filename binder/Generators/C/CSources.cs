@@ -70,6 +70,8 @@ namespace MonoManagedToNative.Generators
             WriteLine("if ({0})", GeneratedIdentifier("mono_initialized"));
             WriteLineIndent("return;");
 
+            WriteLine("mono_config_parse(NULL);");
+
             var domainName = "mono_managed_to_native_binding";
             var version = "v4.0.30319";
             WriteLine("{0} = mono_jit_init_version(\"{1}\", \"{2}\");",
@@ -102,28 +104,38 @@ namespace MonoManagedToNative.Generators
 
         public void GenerateMethodLookup(Method method)
         {
-            var methodId = GeneratedIdentifier("method");
-            WriteLine("const char {0}[] = \"{1}\";", methodId, method.OriginalName);
+            var methodNameId = GeneratedIdentifier("method_name");
+            WriteLine("const char {0}[] = \"{1}\";", methodNameId, method.OriginalName);
             var descId = GeneratedIdentifier("desc");
 
             WriteLine("MonoMethodDesc* {0} = mono_method_desc_new({1}, /*include_namespace=*/true);",
-                descId, methodId);
+                descId, methodNameId);
 
-            var createInstanceId = GeneratedIdentifier("createInstance");
+            var methodId = GeneratedIdentifier("method");
 
             var @class = method.Namespace as Class;
             var classId = string.Format("{0}_class", @class.QualifiedName);
 
             WriteLine("MonoMethod* {0} = mono_method_desc_search_in_class({1}, {2});",
-                createInstanceId, descId, classId);
+                methodId, descId, classId);
 
             WriteLine("mono_method_desc_free({0});", descId);
         }
 
         public void GenerateMethodInvocation(Method method)
         {
-            //MonoObject* result;
-            //mono_runtime_invoke(lldbDebuggerCreateInstanceMethod, &result, args, nullptr);
+            var resultId = GeneratedIdentifier("result");
+            WriteLine("MonoObject {0};", resultId);
+
+            var argsId = GeneratedIdentifier("args");
+            WriteLine("void* {0} = 0;", argsId);
+
+            var exceptionId = GeneratedIdentifier("exception");
+            WriteLine("MonoObject* {0} = 0;", exceptionId);
+
+            var methodId = GeneratedIdentifier("method");
+            WriteLine("mono_runtime_invoke({0}, &{1}, {2}, &{3});", methodId, resultId,
+                argsId, exceptionId);
         }
 
         public override bool VisitMethodDecl(Method method)
@@ -140,6 +152,10 @@ namespace MonoManagedToNative.Generators
             var needsReturn = !retType.Type.IsPrimitiveType(PrimitiveType.Void);
 
             GenerateMethodInvocation(method);
+
+            var exceptionId = GeneratedIdentifier("exception");
+            //WriteLine("if ({0})", exceptionId);
+            //WriteLineIndent("return 0;");
 
             if (needsReturn)
                 WriteLine("return 0;");
