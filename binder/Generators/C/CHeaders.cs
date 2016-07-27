@@ -25,12 +25,30 @@ namespace MonoManagedToNative.Generators
             PopBlock(NewLineKind.BeforeNextBlock);
 
             GenerateDefines();
+
+            PushBlock();
+            WriteLine("MONO_BEGIN_DECLS");
+            PopBlock(NewLineKind.BeforeNextBlock);
+
             VisitDeclContext(Unit);
+
+            PushBlock();
+            WriteLine("MONO_END_DECLS");
+            PopBlock(NewLineKind.BeforeNextBlock);
         }
 
         public void GenerateDefines()
         {
             PushBlock();
+
+            WriteLine("#ifdef  __cplusplus");
+            WriteLineIndent("#define MONO_BEGIN_DECLS  extern \"C\" {");
+            WriteLineIndent("#define MONO_END_DECLS    }");
+            WriteLine("#else");
+            WriteLineIndent("#define MONO_BEGIN_DECLS");
+            WriteLineIndent("#define MONO_END_DECLS");
+            WriteLine("#endif");
+            NewLine();
 
             WriteLine("#if defined(_MSC_VER)");
             WriteLineIndent("#define MONO_API_EXPORT __declspec(dllexport)");
