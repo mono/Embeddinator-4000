@@ -1,5 +1,6 @@
 ﻿using CppSharp.AST;
 using CppSharp.AST.Extensions;
+using System.Linq;
 
 namespace MonoManagedToNative.Generators
 {
@@ -34,13 +35,15 @@ namespace MonoManagedToNative.Generators
             WriteLine("#include <mono/metadata/object.h>");
             WriteLine("#include <mono/metadata/mono-config.h>");
             WriteLine("#include <mono/metadata/debug-helpers.h>");
+            WriteLine("#include <stdlib.h>");
             PopBlock(NewLineKind.BeforeNextBlock);
 
             PushBlock();
-            WriteLine("extern MonoDomain* {0};", GeneratedIdentifier("mono_domain"));
-            WriteLine("extern bool {0};", GeneratedIdentifier("mono_initialized"));
+            WriteLine(" MonoDomain* {0};", GeneratedIdentifier("mono_domain"));
+            WriteLine("bool {0};", GeneratedIdentifier("mono_initialized"));
 
-            WriteLine("extern MonoAssembly* {0}_assembly;", AssemblyId);
+            WriteLine("MonoAssembly* {0}_assembly;", AssemblyId);
+            WriteLine("MonoImage* {0}_image;", AssemblyId);
             PopBlock(NewLineKind.BeforeNextBlock);
 
             GenerateMonoInitialization();
@@ -53,7 +56,17 @@ namespace MonoManagedToNative.Generators
         {
             PushBlock();
             WriteLine("static MonoClass* {0}_class = 0;", @class.QualifiedName);
-            WriteLine("static MonoObject* {0}_instance = 0;", @class.QualifiedName);
+            PopBlock(NewLineKind.BeforeNextBlock);
+
+            PushBlock();
+            WriteLine("struct {0}", @class.Name);
+            WriteStartBraceIndent();
+
+            WriteLine("MonoClass* _class;", @class.QualifiedName);
+            WriteLine("uint32_t _handle;", @class.QualifiedName);
+
+            PopIndent();
+            WriteLine("};");
             PopBlock(NewLineKind.BeforeNextBlock);
 
             VisitDeclContext(@class);
@@ -98,7 +111,40 @@ namespace MonoManagedToNative.Generators
             WriteLine("{0} = mono_domain_assembly_open({1}, \"{2}.dll\");",
                 monoAssemblyName, GeneratedIdentifier("mono_domain"), assemblyName);
 
+            var monoImageName = string.Format("{0}_image", AssemblyId);
+            WriteLine("{0} = mono_assembly_get_image({1});", monoImageName,
+                monoAssemblyName);
+
             WriteCloseBraceIndent();
+            PopBlock(NewLineKind.BeforeNextBlock);
+        }
+
+        public void GenerateClassLookup(Method method)
+        {
+            PushBlock();
+
+            var @class = method.Namespace as Class;
+            var classId = string.Format("{0}_class", @class.QualifiedName);
+
+            WriteLine("if ({0} == 0)", classId);
+            WriteStartBraceIndent();
+
+            WriteLine("{0}();", GeneratedIdentifier("initialize_mono"));
+
+            var assemblyName = Assembly.GetName().Name;
+            var assemblyLookupId = GeneratedIdentifier(string.Format("lookup_{0}_assembly",
+                assemblyName.Replace('.', '_')));
+            WriteLine("{0}();", assemblyLookupId);
+
+            var @namespace = string.Empty;
+            var ids = string.Join(", ",
+                @class.QualifiedName.Split('.').Select(n => string.Format("\"{0}\"", n)));
+
+            var monoImageName = string.Format("{0}_image", AssemblyId);
+            WriteLine("{0} = mono_class_from_name({1}, \"{2}\", \"{3}\");",
+                classId, monoImageName, @namespace, @class.OriginalName);
+            WriteCloseBraceIndent();
+
             PopBlock(NewLineKind.BeforeNextBlock);
         }
 
@@ -124,8 +170,23 @@ namespace MonoManagedToNative.Generators
 
         public void GenerateMethodInvocation(Method method)
         {
-            var resultId = GeneratedIdentifier("result");
-            WriteLine("MonoObject {0};", resultId);
+            var instanceId = GeneratedIdentifier("instance");
+
+            var @class = method.Namespace as Class;
+            var classId = string.Format("{0}_class", @class.QualifiedName);
+            if (method.IsConstructor)
+            {
+                WriteLine("{0}* object = ({0}*) malloc(sizeof({0}));", @class.Name);
+                WriteLine("MonoObject* {0} = mono_object_new({1}, {2});",
+                    instanceId, GeneratedIdentifier("mono_domain"), classId);
+                WriteLine("object->_handle = mono_gchandle_new({0}, /*pinned=*/false);",
+                    instanceId);
+            }
+            else
+            {
+                WriteLine("MonoObject* {0} = mono_gchandle_get_target(object->_handle);",
+                    instanceId);
+            }
 
             var argsId = GeneratedIdentifier("args");
             WriteLine("void* {0} = 0;", argsId);
@@ -133,9 +194,14 @@ namespace MonoManagedToNative.Generators
             var exceptionId = GeneratedIdentifier("exception");
             WriteLine("MonoObject* {0} = 0;", exceptionId);
 
+            var objectId = method.IsConstructor ? "NULL" : instanceId;
+
+            var resultId = GeneratedIdentifier("result");
+            WriteLine("MonoObject* {0};", resultId);
+
             var methodId = GeneratedIdentifier("method");
-            WriteLine("mono_runtime_invoke({0}, &{1}, {2}, &{3});", methodId, resultId,
-                argsId, exceptionId);
+            WriteLine("{0} = mono_runtime_invoke({1}, {2}, {3}, &{4});", resultId,
+                methodId, objectId, argsId, exceptionId);
         }
 
         public override bool VisitMethodDecl(Method method)
@@ -145,6 +211,9 @@ namespace MonoManagedToNative.Generators
             GenerateMethodSignature(method);
             NewLine();
             WriteStartBraceIndent();
+
+            if (method.IsConstructor)
+                GenerateClassLookup(method);
 
             GenerateMethodLookup(method);
 
@@ -157,8 +226,10 @@ namespace MonoManagedToNative.Generators
             //WriteLine("if ({0})", exceptionId);
             //WriteLineIndent("return 0;");
 
+            var returnVar = method.IsConstructor ? "object" : "0";
+
             if (needsReturn)
-                WriteLine("return 0;");
+                WriteLine("return {0};", returnVar);
 
             WriteCloseBraceIndent();
 
