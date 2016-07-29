@@ -17,7 +17,7 @@ namespace MonoManagedToNative.Generators
         {
             GenerateFilePreamble();
 
-            PushBlock(CBlockKind.Includes);
+            PushBlock();
             WriteLine("#pragma once");
             NewLine();
             WriteLine("#include <stdbool.h>");

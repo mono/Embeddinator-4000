@@ -31,7 +31,6 @@ namespace MonoManagedToNative.Generators
             WriteLine("#include \"{0}.h\"", Unit.Name);
             WriteLine("#include <mono/jit/jit.h>");
             WriteLine("#include <mono/metadata/assembly.h>");
-            //WriteLine("#include <mono/metadata/domain.h>");
             WriteLine("#include <mono/metadata/object.h>");
             WriteLine("#include <mono/metadata/mono-config.h>");
             WriteLine("#include <mono/metadata/debug-helpers.h>");
@@ -39,7 +38,7 @@ namespace MonoManagedToNative.Generators
             PopBlock(NewLineKind.BeforeNextBlock);
 
             PushBlock();
-            WriteLine(" MonoDomain* {0};", GeneratedIdentifier("mono_domain"));
+            WriteLine("MonoDomain* {0};", GeneratedIdentifier("mono_domain"));
             WriteLine("bool {0};", GeneratedIdentifier("mono_initialized"));
 
             WriteLine("MonoAssembly* {0}_assembly;", AssemblyId);
@@ -97,7 +96,7 @@ namespace MonoManagedToNative.Generators
         public void GenerateAssemblyLoad()
         {
             var assemblyName = Assembly.GetName().Name;
-            var assemblyLookupId = GeneratedIdentifier(string.Format("lookup_{0}_assembly",
+            var assemblyLookupId = GeneratedIdentifier(string.Format("lookup_assembly_{0}",
                 assemblyName.Replace('.', '_')));
 
             PushBlock();
@@ -132,7 +131,7 @@ namespace MonoManagedToNative.Generators
             WriteLine("{0}();", GeneratedIdentifier("initialize_mono"));
 
             var assemblyName = Assembly.GetName().Name;
-            var assemblyLookupId = GeneratedIdentifier(string.Format("lookup_{0}_assembly",
+            var assemblyLookupId = GeneratedIdentifier(string.Format("lookup_assembly_{0}",
                 assemblyName.Replace('.', '_')));
             WriteLine("{0}();", assemblyLookupId);
 
