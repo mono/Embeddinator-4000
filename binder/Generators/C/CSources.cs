@@ -165,6 +165,13 @@ namespace MonoManagedToNative.Generators
                 methodId, descId, classId);
 
             WriteLine("mono_method_desc_free({0});", descId);
+
+            var retType = method.ReturnType;
+            var needsReturn = !retType.Type.IsPrimitiveType(PrimitiveType.Void);
+
+            var @return = needsReturn ? " 0" : string.Empty;
+            WriteLine("if ({0} == 0)", methodId);
+                WriteLineIndent("return{0};", @return);
         }
 
         public void GenerateMethodInvocation(Method method)
