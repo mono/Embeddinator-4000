@@ -24,6 +24,11 @@ namespace MonoManagedToNative.Generators
 
             return templates;
         }
+
+        public static string GenId(string id)
+        {
+            return "__" + id;
+        }
     }
 
     public class CBlockKind
@@ -50,7 +55,7 @@ namespace MonoManagedToNative.Generators
 
         public string GeneratedIdentifier(string id)
         {
-            return "__" + id;
+            return CGenerator.GenId(id);
         }
 
         string PrintCILType(CILType type, TypeQualifiers quals)

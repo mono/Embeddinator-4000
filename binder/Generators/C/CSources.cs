@@ -225,13 +225,36 @@ namespace MonoManagedToNative.Generators
             //WriteLine("if ({0})", exceptionId);
             //WriteLineIndent("return 0;");
 
-            var returnVar = method.IsConstructor ? "object" : "0";
+            string returnCode = "0";
 
-            if (needsReturn)
-                WriteLine("return {0};", returnVar);
+            // Marshal the method result to native code.
+            if (!method.IsConstructor)
+            {
+                var resultId = GeneratedIdentifier("result");
+                var ctx = new MarshalContext(Driver)
+                {
+                    ArgName = resultId,
+                    ReturnVarName = resultId,
+                    ReturnType = retType
+                };
+
+                var marshal = new CMarshalManagedToNative(ctx);
+                retType.CMarshalToNative(marshal);
+
+                if (!string.IsNullOrWhiteSpace(marshal.Context.SupportBefore))
+                    Write(marshal.Context.SupportBefore);
+
+                returnCode = marshal.Context.Return.ToString();
+            }
+            else
+            {
+                returnCode = "object";
+            }
+
+            if (method.IsConstructor || needsReturn)
+                WriteLine("return {0};", returnCode);
 
             WriteCloseBraceIndent();
-
             PopBlock(NewLineKind.BeforeNextBlock);
 
             return true;
