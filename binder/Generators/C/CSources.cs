@@ -200,14 +200,12 @@ namespace MonoManagedToNative.Generators
             var exceptionId = GeneratedIdentifier("exception");
             WriteLine("MonoObject* {0} = 0;", exceptionId);
 
-            var objectId = method.IsConstructor ? "NULL" : instanceId;
-
             var resultId = GeneratedIdentifier("result");
             WriteLine("MonoObject* {0};", resultId);
 
             var methodId = GeneratedIdentifier("method");
             WriteLine("{0} = mono_runtime_invoke({1}, {2}, {3}, &{4});", resultId,
-                methodId, objectId, argsId, exceptionId);
+                methodId, instanceId, argsId, exceptionId);
         }
 
         public override bool VisitMethodDecl(Method method)
