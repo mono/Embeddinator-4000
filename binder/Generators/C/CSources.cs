@@ -175,7 +175,7 @@ namespace MonoManagedToNative.Generators
             var classId = string.Format("{0}_class", @class.QualifiedName);
             if (method.IsConstructor)
             {
-                WriteLine("{0}* object = ({0}*) malloc(sizeof({0}));", @class.Name);
+                WriteLine("{0}* object = ({0}*) calloc(1, sizeof({0}));", @class.Name);
                 WriteLine("MonoObject* {0} = mono_object_new({1}, {2});",
                     instanceId, GeneratedIdentifier("mono_domain"), classId);
                 WriteLine("object->_handle = mono_gchandle_new({0}, /*pinned=*/false);",
