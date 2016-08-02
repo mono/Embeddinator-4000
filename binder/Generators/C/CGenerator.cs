@@ -58,21 +58,12 @@ namespace MonoManagedToNative.Generators
             return CGenerator.GenId(id);
         }
 
-        string PrintCILType(CILType type, TypeQualifiers quals)
-        {
-            if (type.Type == typeof(string))
-                return "const char*";
-
-            throw new NotImplementedException();
-        }
-
         public CppTypePrinter CTypePrinter
         {
             get
             {
-                var cTypePrinter = new CppTypePrinter { PrintScopeKind = CppTypePrintScopeKind.Qualified };
-                cTypePrinter.CILTypePrinter += PrintCILType;
-                return cTypePrinter;
+                var typePrinter = new CppTypePrinter { PrintScopeKind = CppTypePrintScopeKind.Qualified };
+                return typePrinter;
             }
         }
 

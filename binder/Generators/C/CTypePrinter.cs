@@ -85,6 +85,17 @@ namespace CppSharp.Types
         Cpp,
     }
 
+    static class CLITypePrinter
+    {
+        public static string Visit(CILType type, TypeQualifiers quals)
+        {
+            if (type.Type == typeof(string))
+                return "char*";
+
+            throw new NotImplementedException();
+        }
+    }
+
     public class CppTypePrinter : ITypePrinter<string>, IDeclVisitor<string>
     {
         public CppTypePrintFlavorKind PrintFlavorKind;
@@ -268,14 +279,9 @@ namespace CppSharp.Types
             return string.Empty;
         }
 
-        public Func<CILType , TypeQualifiers, string> CILTypePrinter;
-
         public string VisitCILType(CILType type, TypeQualifiers quals)
         {
-            if (CILTypePrinter != null)
-                return CILTypePrinter(type, quals);
-
-            return string.Empty;
+            return CLITypePrinter.Visit(type, quals);
         }
 
         public string VisitPrimitiveType(PrimitiveType type, TypeQualifiers quals)
