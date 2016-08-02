@@ -87,7 +87,7 @@ namespace MonoManagedToNative.Generators
         {
             PushBlock(CBlockKind.Function);
 
-            GenerateMethodSignature(method);
+            GenerateMethodSignature(method, isSource: false);
             WriteLine(";");
 
             PopBlock();

@@ -81,13 +81,13 @@ namespace MonoManagedToNative.Generators
             WriteLine(" */");
         }
 
-        public void GenerateMethodSignature(Method method)
+        public void GenerateMethodSignature(Method method, bool isSource = true)
         {
             var @class = method.Namespace as Class;
             var retType = method.ReturnType.Visit(CTypePrinter);
 
-            Write("{0} {1} {2}_{3}(", "MONO_API", retType,
-                @class.QualifiedName, method.Name);
+            Write("{0}{1} {2}_{3}(", isSource ? string.Empty : "MONO_API ",
+                retType, @class.QualifiedName, method.Name);
 
             Write(GenerateParametersList(method.Parameters));
 
