@@ -174,12 +174,12 @@ namespace MonoManagedToNative.Generators
                 WriteLineIndent("return{0};", @return);
         }
 
-        public void GenerateMethodInvocation(Method method)
+        public void GenerateMethodGCHandleLookup(Method method)
         {
-            var instanceId = GeneratedIdentifier("instance");
-
             var @class = method.Namespace as Class;
             var classId = string.Format("{0}_class", @class.QualifiedName);
+            var instanceId = GeneratedIdentifier("instance");
+
             if (method.IsConstructor)
             {
                 WriteLine("{0}* object = ({0}*) calloc(1, sizeof({0}));", @class.Name);
@@ -193,6 +193,13 @@ namespace MonoManagedToNative.Generators
                 WriteLine("MonoObject* {0} = mono_gchandle_get_target(object->_handle);",
                     instanceId);
             }
+        }
+
+        public void GenerateMethodInvocation(Method method)
+        {
+            GenerateMethodGCHandleLookup(method);
+
+            var instanceId = GeneratedIdentifier("instance");
 
             var argsId = GeneratedIdentifier("args");
             WriteLine("void* {0} = 0;", argsId);
