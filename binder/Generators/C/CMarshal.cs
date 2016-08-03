@@ -19,6 +19,31 @@ namespace MonoManagedToNative.Generators
         {
         }
 
+        bool HandleSpecialCILType(CILType cilType)
+        {
+            var type = cilType.Type;
+
+            if (type == typeof(string))
+            {
+                var stringId = CGenerator.GenId("string");
+                Context.SupportBefore.WriteLine("char* {0} = mono_string_to_utf8(" +
+                    "(MonoString*) {1});", stringId, Context.ArgName);
+
+                Context.Return.Write("{0}", stringId);
+                return true;
+            }
+
+            return false;
+        }
+
+        public override bool VisitCILType(CILType type, TypeQualifiers quals)
+        {
+            if (HandleSpecialCILType(type))
+                return true;
+
+            return base.VisitCILType(type, quals);
+        }
+
         public override bool VisitBuiltinType(BuiltinType builtin,
             TypeQualifiers quals)
         {
