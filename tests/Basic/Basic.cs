@@ -13,7 +13,20 @@ public class BuiltinTypes
     public long ReturnsLong() { return -5; }
     public ulong ReturnsULong() { return 5; }
     public string ReturnsString() { return "Mono"; }
+
+    public bool PassAndReturnsBool(bool v) { return v; }
+    public sbyte PassAndReturnsSByte(sbyte v) { return v; }
+    public byte PassAndReturnsByte(byte v) { return v; }
+    public short PassAndReturnsShort(short v) { return v; }
+    public ushort PassAndReturnsUShort(ushort v) { return v; }
+    public int PassAndReturnsInt(int v) { return v; }
+    public uint PassAndReturnsUInt(uint v) { return v; }
+    public long PassAndReturnsLong(long v) { return v; }
+    public ulong PassAndReturnsULong(ulong v) { return v; }
+    public string PassAndReturnsString(string v) { return v; }
 }
+
+
 
 public static class StaticClass
 {

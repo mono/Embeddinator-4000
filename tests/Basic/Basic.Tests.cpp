@@ -15,5 +15,16 @@ TEST_CASE("BuiltinTypes", "[BuiltinTypes]") {
     REQUIRE(BuiltinTypes_ReturnsUInt(bt)   ==  5);
     REQUIRE(BuiltinTypes_ReturnsLong(bt)   == -5);
     REQUIRE(BuiltinTypes_ReturnsULong(bt)  ==  5);
-    //REQUIRE(BuiltinTypes_ReturnsString(bt) == "Mono");
+    REQUIRE(strcmp(BuiltinTypes_ReturnsString(bt), "Mono") == 0);
+
+    REQUIRE(BuiltinTypes_PassAndReturnsBool(bt, true) == true);
+    REQUIRE(BuiltinTypes_PassAndReturnsSByte(bt, -5) == -5);
+    REQUIRE(BuiltinTypes_PassAndReturnsByte(bt, 5) == 5);
+    REQUIRE(BuiltinTypes_PassAndReturnsShort(bt, -5) == -5);
+    REQUIRE(BuiltinTypes_PassAndReturnsUShort(bt, 5) == 5);
+    REQUIRE(BuiltinTypes_PassAndReturnsInt(bt, -5) == -5);
+    REQUIRE(BuiltinTypes_PassAndReturnsUInt(bt, 5) == 5);
+    REQUIRE(BuiltinTypes_PassAndReturnsLong(bt, -5) == -5);
+    REQUIRE(BuiltinTypes_PassAndReturnsULong(bt, 5) == 5);
+    REQUIRE(strcmp(BuiltinTypes_PassAndReturnsString(bt, "Mono") ,"Mono") == 0);
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using IKVM.Reflection;
 using CppSharp.AST;
+using System.Collections.Generic;
 
 namespace MonoManagedToNative.Generators
 {
@@ -98,12 +99,69 @@ namespace MonoManagedToNative.Generators
             return method;
         }
 
+        string GetInternalTypeName(IKVM.Reflection.Type type)
+        {
+            switch(IKVM.Reflection.Type.GetTypeCode(type))
+            {
+                case TypeCode.Object:
+                    if (type.FullName == "System.IntPtr")
+                        return "intptr";
+                    if (type.FullName == "System.UIntPtr")
+                        return "uintptr";
+                    return "object";
+                case TypeCode.Boolean:
+                    return "bool";
+                case TypeCode.Char:
+                    return "char";
+                case TypeCode.SByte:
+                    return "sbyte";
+                case TypeCode.Byte:
+                    return "byte";
+                case TypeCode.Int16:
+                    return "int16";
+                case TypeCode.UInt16:
+                    return "uint16";
+                case TypeCode.Int32:
+                    return "int";
+                case TypeCode.UInt32:
+                    return "uint";
+                case TypeCode.Int64:
+                    return "long";
+                case TypeCode.UInt64:
+                    return "ulong";
+                case TypeCode.Single:
+                    return "single";
+                case TypeCode.Double:
+                    return "double";
+                case TypeCode.String:
+                    return "string";
+                case TypeCode.Empty:
+                case TypeCode.DBNull:
+                case TypeCode.Decimal:
+                case TypeCode.DateTime:
+                    throw new NotSupportedException();
+            }
+
+            throw new NotSupportedException();
+        }
+
         string GetInternalMethodName(MethodBase method)
         {
-            var @params = string.Empty;
+            var @params = new List<string>();
+            foreach (var p in method.GetParameters())
+            {
+                var param = GetInternalTypeName(p.ParameterType);
+                if (p.IsOut)
+                    param += "&";
+                else if (p.ParameterType.IsPointer)
+                    param += "*";
+
+                @params.Add(param);
+            }
+
             var sig = method.ToString();
             return string.Format("{0}:{1}({2})", method.DeclaringType.FullName,
-                method.Name, @params);
+                method.Name, string.Join(", ", @params));
         }
 
         Method VisitMethod(MethodInfo methodInfo, Class @class)
@@ -115,7 +173,7 @@ namespace MonoManagedToNative.Generators
                 new PointerType(new QualifiedType(new TagType(@class))));
             var param = new Parameter { Name = "object", Namespace = @class,
                 QualifiedType = ptrType };
-            method.Parameters.Add(param);
+            method.Parameters.Insert(0, param);
 
             return method;
         }
@@ -191,7 +249,7 @@ namespace MonoManagedToNative.Generators
         /// Converts from a .NET member acccess mask to a C/C++ access specifier.
         /// </summary>
         /// <returns></returns>
-        AccessSpecifier ConvertToAccessSpecifier(MethodAttributes mask)
+        static AccessSpecifier ConvertToAccessSpecifier(MethodAttributes mask)
         {
             switch (mask)
             {
@@ -236,9 +294,31 @@ namespace MonoManagedToNative.Generators
             return method;
         }
 
-        public Parameter VisitParameter(ParameterInfo param)
+        /// <summary>
+        /// Converts from a .NET parameter to parameter usage specifier.
+        /// </summary>
+        /// <returns></returns>
+        static ParameterUsage ConvertToParameterUsage(ParameterInfo param)
         {
-            throw new NotImplementedException();
+            if (param.IsIn && param.IsOut)
+                return ParameterUsage.InOut;
+            else if (param.IsOut)
+                return ParameterUsage.Out;
+
+            return ParameterUsage.In;
+        }
+
+        public Parameter VisitParameter(ParameterInfo paramInfo)
+        {
+            var param = new Parameter()
+            {
+                Name = paramInfo.Name,
+                Usage = ConvertToParameterUsage(paramInfo),
+                HasDefaultValue = paramInfo.HasDefaultValue,
+                QualifiedType = VisitType(paramInfo.ParameterType)
+            };
+
+            return param;
         }
 
         public Field VisitField(FieldInfo field)
