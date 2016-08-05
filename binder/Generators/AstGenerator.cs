@@ -172,7 +172,7 @@ namespace MonoManagedToNative.Generators
             var ptrType = new QualifiedType(
                 new PointerType(new QualifiedType(new TagType(@class))));
             var param = new Parameter { Name = "object", Namespace = @class,
-                QualifiedType = ptrType };
+                QualifiedType = ptrType, IsImplicit = true };
             method.Parameters.Insert(0, param);
 
             return method;

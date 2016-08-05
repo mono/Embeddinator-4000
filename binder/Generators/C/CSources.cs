@@ -201,8 +201,35 @@ namespace MonoManagedToNative.Generators
 
             var instanceId = GeneratedIdentifier("instance");
 
-            var argsId = GeneratedIdentifier("args");
-            WriteLine("void* {0} = 0;", argsId);
+            var paramsToMarshal = method.Parameters.Where(p => !p.IsImplicit);
+            var numParamsToMarshal = paramsToMarshal.Count();
+
+            var argsId = "0";
+
+            if (numParamsToMarshal > 0)
+            {
+                argsId = GeneratedIdentifier("args");
+                WriteLine("void* {0}[{1}];", argsId, numParamsToMarshal);
+            }
+
+            int paramIndex = 0;
+            foreach (var param in paramsToMarshal)
+            {
+                var ctx = new MarshalContext(Driver)
+                {
+                    ArgName = param.Name,
+                    Parameter = param
+                };
+
+                var marshal = new CMarshalNativeToManaged(ctx);
+                param.QualifiedType.CMarshalToManaged(marshal);
+
+                if (!string.IsNullOrWhiteSpace(marshal.Context.SupportBefore))
+                    Write(marshal.Context.SupportBefore);
+
+                WriteLine("{0}[{1}] = {2};", argsId, paramIndex++,
+                    marshal.Context.Return.ToString());
+            }
 
             var exceptionId = GeneratedIdentifier("exception");
             WriteLine("MonoObject* {0} = 0;", exceptionId);
