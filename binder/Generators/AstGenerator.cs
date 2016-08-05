@@ -180,6 +180,31 @@ namespace MonoManagedToNative.Generators
 
         QualifiedType VisitType(IKVM.Reflection.Type managedType)
         {
+            // If true type is an array, a pointer, or is passed by reference.
+            if (managedType.HasElementType)
+            {
+                var elementType = managedType.GetElementType();
+
+                if (managedType.IsByRef || managedType.IsPointer)
+                {
+                    var ptrElementType = VisitType(elementType);
+                    var ptrType = new PointerType(ptrElementType)
+                    {
+                        Modifier = (options.Language == GeneratorKind.CPlusPlus) ?
+                            PointerType.TypeModifier.LVReference :
+                            PointerType.TypeModifier.Pointer
+                    };
+
+                    return new QualifiedType(ptrType);
+                }
+                else if (managedType.IsArray)
+                {
+                    throw new NotImplementedException();
+                }
+
+                throw new NotImplementedException();
+            }
+
             CppSharp.AST.Type type = null;
             switch (IKVM.Reflection.Type.GetTypeCode(managedType))
             {

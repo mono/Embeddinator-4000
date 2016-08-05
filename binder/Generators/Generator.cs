@@ -5,7 +5,8 @@ namespace MonoManagedToNative.Generators
 {
     public enum GeneratorKind
     {
-        C
+        C,
+        CPlusPlus
     }
 
     /// <summary>

@@ -24,9 +24,10 @@ public class BuiltinTypes
     public long PassAndReturnsLong(long v) { return v; }
     public ulong PassAndReturnsULong(ulong v) { return v; }
     public string PassAndReturnsString(string v) { return v; }
+
+    public void PassOutInt(out int v) { v = 5; }
+    public void PassRefInt(ref int v) { v = 5; }
 }
-
-
 
 public static class StaticClass
 {
