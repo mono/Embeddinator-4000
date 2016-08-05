@@ -128,6 +128,7 @@ namespace MonoManagedToNative.Generators
 
         public bool VisitPrimitiveType(PrimitiveType primitive)
         {
+            var param = Context.Parameter;
             switch (primitive)
             {
                 case PrimitiveType.Void:
@@ -147,7 +148,9 @@ namespace MonoManagedToNative.Generators
                 case PrimitiveType.Double:
                 case PrimitiveType.LongDouble:
                 case PrimitiveType.Null:
-                    Context.Return.Write("&{0}", Context.ArgName);
+                    Context.Return.Write("{0}{1}",
+                        (param.IsInOut || param.IsOut) ? string.Empty : "&",
+                        Context.ArgName);
                     return true;
             }
 

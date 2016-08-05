@@ -101,6 +101,13 @@ namespace MonoManagedToNative.Generators
 
         string GetInternalTypeName(IKVM.Reflection.Type type)
         {
+            // If true type is an array, a pointer, or is passed by reference.
+            if (type.HasElementType)
+            {
+                var elementType = type.GetElementType();
+                return GetInternalTypeName(elementType);
+            }
+
             switch(IKVM.Reflection.Type.GetTypeCode(type))
             {
                 case TypeCode.Object:
@@ -151,7 +158,7 @@ namespace MonoManagedToNative.Generators
             foreach (var p in method.GetParameters())
             {
                 var param = GetInternalTypeName(p.ParameterType);
-                if (p.IsOut)
+                if (p.IsOut || p.ParameterType.IsByRef)
                     param += "&";
                 else if (p.ParameterType.IsPointer)
                     param += "*";
@@ -325,7 +332,7 @@ namespace MonoManagedToNative.Generators
         /// <returns></returns>
         static ParameterUsage ConvertToParameterUsage(ParameterInfo param)
         {
-            if (param.IsIn && param.IsOut)
+            if (param.ParameterType.IsByRef)
                 return ParameterUsage.InOut;
             else if (param.IsOut)
                 return ParameterUsage.Out;

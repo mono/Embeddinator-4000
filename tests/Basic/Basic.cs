@@ -26,7 +26,7 @@ public class BuiltinTypes
     public string PassAndReturnsString(string v) { return v; }
 
     public void PassOutInt(out int v) { v = 5; }
-    public void PassRefInt(ref int v) { v = 5; }
+    public void PassRefInt(ref int v) { v = 10; }
 }
 
 public static class StaticClass
