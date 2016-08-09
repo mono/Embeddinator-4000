@@ -36,3 +36,9 @@ TEST_CASE("BuiltinTypes", "[BuiltinTypes]") {
     BuiltinTypes_PassRefInt(bt, &RefInt);
     REQUIRE(RefInt == 10);
 }
+
+TEST_CASE("StaticTypes", "[StaticTypes]") {
+    REQUIRE(NonStaticClass_StaticMethod() == 0);
+    REQUIRE(StaticClass_StaticMethod() == 0);
+}
+

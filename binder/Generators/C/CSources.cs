@@ -197,7 +197,7 @@ namespace MonoManagedToNative.Generators
                 WriteLine("object->_handle = mono_gchandle_new({0}, /*pinned=*/false);",
                     instanceId);
             }
-            else
+            else if (!method.IsStatic)
             {
                 WriteLine("MonoObject* {0} = mono_gchandle_get_target(object->_handle);",
                     instanceId);
@@ -207,8 +207,6 @@ namespace MonoManagedToNative.Generators
         public void GenerateMethodInvocation(Method method)
         {
             GenerateMethodGCHandleLookup(method);
-
-            var instanceId = GeneratedIdentifier("instance");
 
             var paramsToMarshal = method.Parameters.Where(p => !p.IsImplicit);
             var numParamsToMarshal = paramsToMarshal.Count();
@@ -247,6 +245,8 @@ namespace MonoManagedToNative.Generators
             WriteLine("MonoObject* {0};", resultId);
 
             var methodId = GeneratedIdentifier("method");
+            var instanceId = method.IsStatic ? "0" : GeneratedIdentifier("instance");
+
             WriteLine("{0} = mono_runtime_invoke({1}, {2}, {3}, &{4});", resultId,
                 methodId, instanceId, argsId, exceptionId);
         }

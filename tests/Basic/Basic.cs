@@ -35,9 +35,14 @@ public class BuiltinTypes
 
 #region Classes
 
+public class NonStaticClass
+{
+    public static int StaticMethod() { return 0; }
+}
+
 public static class StaticClass
 {
-    public static void ReturnsVoid() { }
+    public static int StaticMethod() { return 0; }
 }
 
 #endregion
