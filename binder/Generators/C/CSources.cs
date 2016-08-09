@@ -68,6 +68,8 @@ namespace MonoManagedToNative.Generators
             WriteLine("};");
             PopBlock(NewLineKind.BeforeNextBlock);
 
+            GenerateClassLookup(@class);
+
             VisitDeclContext(@class);
 
             return true;
@@ -79,7 +81,8 @@ namespace MonoManagedToNative.Generators
             WriteLine("static void {0}()", GeneratedIdentifier("initialize_mono"));
             WriteStartBraceIndent();
 
-            WriteLine("if ({0})", GeneratedIdentifier("mono_initialized"));
+            var initializedId = GeneratedIdentifier("mono_initialized");
+            WriteLine("if ({0})", initializedId);
             WriteLineIndent("return;");
 
             WriteLine("mono_config_parse(NULL);");
@@ -88,6 +91,7 @@ namespace MonoManagedToNative.Generators
             var version = "v4.0.30319";
             WriteLine("{0} = mono_jit_init_version(\"{1}\", \"{2}\");",
                 GeneratedIdentifier("mono_domain"), domainName, version);
+            WriteLine("{0} = true;", initializedId);
 
             WriteCloseBraceIndent();
             PopBlock(NewLineKind.BeforeNextBlock);
@@ -118,11 +122,15 @@ namespace MonoManagedToNative.Generators
             PopBlock(NewLineKind.BeforeNextBlock);
         }
 
-        public void GenerateClassLookup(Method method)
+        public void GenerateClassLookup(Class @class)
         {
             PushBlock();
 
-            var @class = method.Namespace as Class;
+            var classLookupId = GeneratedIdentifier(string.Format("lookup_class_{0}",
+                @class.QualifiedName.Replace('.', '_')));
+            WriteLine("static void {0}()", classLookupId);
+            WriteStartBraceIndent();
+
             var classId = string.Format("{0}_class", @class.QualifiedName);
 
             WriteLine("if ({0} == 0)", classId);
@@ -142,6 +150,7 @@ namespace MonoManagedToNative.Generators
             var monoImageName = string.Format("{0}_image", AssemblyId);
             WriteLine("{0} = mono_class_from_name({1}, \"{2}\", \"{3}\");",
                 classId, monoImageName, @namespace, @class.OriginalName);
+            WriteCloseBraceIndent();
             WriteCloseBraceIndent();
 
             PopBlock(NewLineKind.BeforeNextBlock);
@@ -250,8 +259,10 @@ namespace MonoManagedToNative.Generators
             NewLine();
             WriteStartBraceIndent();
 
-            if (method.IsConstructor)
-                GenerateClassLookup(method);
+            var @class = method.Namespace as Class;
+            var classLookupId = GeneratedIdentifier(string.Format("lookup_class_{0}",
+                @class.QualifiedName.Replace('.', '_')));
+            WriteLine("{0}();", classLookupId);
 
             GenerateMethodLookup(method);
 
