@@ -1,4 +1,6 @@
 ﻿using CppSharp.AST;
+using CppSharp.Types;
+using System.Linq;
 
 namespace MonoManagedToNative.Generators
 {
@@ -66,6 +68,45 @@ namespace MonoManagedToNative.Generators
             WriteLine("#endif");
 
             PopBlock(NewLineKind.BeforeNextBlock);
+        }
+
+        public override bool VisitEnumDecl(Enumeration @enum)
+        {
+            PushBlock();
+
+            Write("enum {0}", @enum.Name);
+
+            if (Options.Language == GeneratorKind.CPlusPlus)
+            {
+                var typePrinter = new CppTypePrinter();
+                var typeName = typePrinter.VisitPrimitiveType(
+                    @enum.BuiltinType.Type, new TypeQualifiers());
+
+                if (@enum.BuiltinType.Type != PrimitiveType.Int)
+                    Write(" : {0}", typeName);
+            }
+
+            NewLine();
+            WriteStartBraceIndent();
+
+            foreach (var item in @enum.Items)
+            {
+                Write(string.Format("{0}", item.Name));
+
+                if (item.ExplicitValue)
+                    Write(string.Format(" = {0}", @enum.GetItemValueAsString(item)));
+
+                if (item != @enum.Items.Last())
+                    WriteLine(",");
+            }
+
+            NewLine();
+            PopIndent();
+            WriteLine("};");
+
+            PopBlock(NewLineKind.BeforeNextBlock);
+
+            return true;
         }
 
         public override bool VisitClassDecl(Class @class)

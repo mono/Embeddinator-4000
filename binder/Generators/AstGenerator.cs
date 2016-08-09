@@ -32,10 +32,10 @@ namespace MonoManagedToNative.Generators
 
         public Declaration Visit(TypeInfo typeInfo)
         {
-            if (typeInfo.IsClass || typeInfo.IsInterface || typeInfo.IsValueType)
-                return VisitRecord(typeInfo);
-            else if (typeInfo.IsEnum)
+            if (typeInfo.IsEnum)
                 return VisitEnum(typeInfo);
+            else if (typeInfo.IsClass || typeInfo.IsInterface || typeInfo.IsValueType)
+                return VisitRecord(typeInfo);
 
             throw new Exception("Could not visit type: " + typeInfo.ToString());
         }
@@ -48,9 +48,39 @@ namespace MonoManagedToNative.Generators
             return @class;
         }
 
-        public Enumeration VisitEnum(TypeInfo @enum)
+        public Enumeration VisitEnum(TypeInfo type)
         {
-            return null;
+            var underlyingType = type.GetEnumUnderlyingType();
+            var @enum = new Enumeration
+            {
+                Name = type.Name,
+                Type = VisitType(underlyingType).Type
+            };
+
+            if (options.Language == GeneratorKind.CPlusPlus)
+                @enum.Modifiers = Enumeration.EnumModifiers.Scoped;
+
+            foreach (var item in type.DeclaredFields)
+            {
+                if (!item.IsLiteral)
+                    continue;
+
+                var @value = Convert.ToUInt64(item.GetRawConstantValue());
+                var enumItem = new Enumeration.Item
+                {
+                    Name = item.Name,
+                    Value = @value,
+                    ExplicitValue = true
+                };
+
+                if (options.Language == GeneratorKind.C)
+                    enumItem.Name = string.Format("{0}_{1}", @enum.Name,
+                        enumItem.Name);
+
+                @enum.AddItem(enumItem);
+            }
+
+            return @enum;
         }
 
         public void VisitMembers(TypeInfo type, Class @class)
@@ -107,6 +137,9 @@ namespace MonoManagedToNative.Generators
                 var elementType = type.GetElementType();
                 return GetInternalTypeName(elementType);
             }
+
+            if (type.IsEnum)
+                return type.FullName;
 
             switch(IKVM.Reflection.Type.GetTypeCode(type))
             {

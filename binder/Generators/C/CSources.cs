@@ -51,6 +51,11 @@ namespace MonoManagedToNative.Generators
             VisitDeclContext(Unit);
         }
 
+        public override bool VisitEnumDecl(Enumeration @enum)
+        {
+            return true;
+        }
+
         public override bool VisitClassDecl(Class @class)
         {
             PushBlock();

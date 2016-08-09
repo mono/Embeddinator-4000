@@ -42,3 +42,13 @@ TEST_CASE("StaticTypes", "[StaticTypes]") {
     REQUIRE(StaticClass_StaticMethod() == 0);
 }
 
+TEST_CASE("EnumTypes", "[EnumTypes]") {
+    REQUIRE(EnumTypes_PassEnum(Enum_Two) == 2);
+    REQUIRE(EnumTypes_PassEnum(Enum_Three) == 3);
+
+    REQUIRE(EnumTypes_PassEnumByte(EnumByte_Two) == 2);
+    REQUIRE(EnumTypes_PassEnumByte(EnumByte_Three) == 3);
+
+    REQUIRE(EnumTypes_PassEnumFlags(EnumFlags_FlagOne) == (1 << 0));
+    REQUIRE(EnumTypes_PassEnumFlags(EnumFlags_FlagTwo) == (1 << 2));
+}
