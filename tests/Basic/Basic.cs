@@ -1,5 +1,7 @@
 using System;
 
+#region Builtin types
+
 public class BuiltinTypes
 {
     public void ReturnsVoid() { }
@@ -29,7 +31,13 @@ public class BuiltinTypes
     public void PassRefInt(ref int v) { v = 10; }
 }
 
+#endregion
+
+#region Classes
+
 public static class StaticClass
 {
     public static void ReturnsVoid() { }
 }
+
+#endregion
