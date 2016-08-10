@@ -396,9 +396,42 @@ namespace MonoManagedToNative.Generators
             return param;
         }
 
-        public Field VisitField(FieldInfo field)
+        /// <summary>
+        /// Converts from a .NET field acccess mask to a C/C++ access specifier.
+        /// </summary>
+        /// <returns></returns>
+        static AccessSpecifier ConvertFieldAttributesToAccessSpecifier(
+            FieldAttributes mask)
         {
+            switch (mask)
+            {
+                case FieldAttributes.PrivateScope:
+                case FieldAttributes.Private:
+                    return AccessSpecifier.Private;
+                case FieldAttributes.FamANDAssem:
+                case FieldAttributes.Assembly:
+                case FieldAttributes.Family:
+                case FieldAttributes.FamORAssem:
+                    return AccessSpecifier.Internal;
+                case FieldAttributes.Public:
+                    return AccessSpecifier.Public;
+            }
+
             throw new NotImplementedException();
+        }
+
+        public Field VisitField(FieldInfo fieldInfo)
+        {
+            var field = new Field()
+            {
+                Name = fieldInfo.Name,
+                QualifiedType = VisitType(fieldInfo.FieldType)
+            };
+
+            var accessMask = (fieldInfo.Attributes & FieldAttributes.FieldAccessMask);
+            field.Access = ConvertFieldAttributesToAccessSpecifier(accessMask);
+
+            return field;
         }
 
         public Event VisitEvent(EventInfo @event)

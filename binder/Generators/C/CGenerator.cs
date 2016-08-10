@@ -141,7 +141,7 @@ namespace MonoManagedToNative.Generators
 
         public virtual bool VisitFieldDecl(Field field)
         {
-            throw new NotImplementedException();
+            return true;
         }
 
         public virtual bool VisitFriend(Friend friend)
