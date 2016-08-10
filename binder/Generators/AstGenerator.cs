@@ -323,7 +323,8 @@ namespace MonoManagedToNative.Generators
         /// Converts from a .NET member acccess mask to a C/C++ access specifier.
         /// </summary>
         /// <returns></returns>
-        static AccessSpecifier ConvertToAccessSpecifier(MethodAttributes mask)
+        static AccessSpecifier ConvertMemberAttributesToAccessSpecifier(
+            MethodAttributes mask)
         {
             switch (mask)
             {
@@ -362,8 +363,8 @@ namespace MonoManagedToNative.Generators
             method.IsVirtual = methodBase.IsVirtual;
             method.IsPure = methodBase.IsAbstract;
             //method.IsFinal = methodBase.IsFinal;
-            var memberAccessMask = (methodBase.Attributes & MethodAttributes.MemberAccessMask);
-            method.Access = ConvertToAccessSpecifier(memberAccessMask);
+            var accessMask = (methodBase.Attributes & MethodAttributes.MemberAccessMask);
+            method.Access = ConvertMemberAttributesToAccessSpecifier(accessMask);
 
             return method;
         }
