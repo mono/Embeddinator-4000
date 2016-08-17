@@ -26,9 +26,8 @@ install:
 
 script: |
   if [ "$TRAVIS_OS_NAME" = "linux" ]; then PREMAKE=premake5-linux-64; else PREMAKE=premake5-osx; fi &&
-  if [ "$TRAVIS_OS_NAME" = "linux" ]; then BUILD_CONF=release_x64; else BUILD_CONF=release_x32; fi &&
   CppSharp/build/$PREMAKE --file=build/premake5.lua gmake &&
-  config=$BUILD_CONF make -C build/gmake/ &&
+  config=release make -C build/gmake/ &&
   TEST_RESULT=0 &&
   for test in build/gmake/lib/Release_*/*.Tests*; do $test || TEST_RESULT=$?; done &&
   exit "$TEST_RESULT"

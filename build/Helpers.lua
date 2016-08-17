@@ -10,7 +10,7 @@ examplesdir = path.getabsolute("../examples");
 testsdir = path.getabsolute("../tests");
 
 builddir = path.getabsolute("./" .. action);
-libdir = path.join(builddir, "lib", "%{cfg.buildcfg}_%{cfg.platform}");
+libdir = path.join(builddir, "lib", "%{cfg.buildcfg}");
 gendir = path.join(builddir, "gen");
 
 function string.starts(str, start)

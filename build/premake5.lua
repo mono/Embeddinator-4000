@@ -8,6 +8,16 @@ dofile "Tests.lua"
 solution "native-binder"
 
   configurations { "Debug", "Release" }
+  architecture "x86_64"
+
+  filter "system:macosx"
+    architecture "x86"
+
+  filter "configurations:Release"
+    flags { "Optimize" }    
+
+  filter {}  
+
   characterset "Unicode"
   symbols "On"
   
@@ -17,11 +27,6 @@ solution "native-binder"
   libdirs { libdir }
 
   startproject "native-binder"
-  
-  configuration "Release"
-    flags { "Optimize" }
-
-  configuration {}
 
   project "native-binder"
     SetupManagedProject()
