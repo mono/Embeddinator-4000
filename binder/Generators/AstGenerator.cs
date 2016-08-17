@@ -255,6 +255,7 @@ namespace MonoManagedToNative.Generators
             }
 
             CppSharp.AST.Type type = null;
+            TypeQualifiers qualifiers = new TypeQualifiers();
             switch (IKVM.Reflection.Type.GetTypeCode(managedType))
             {
             case TypeCode.Empty:
@@ -313,10 +314,11 @@ namespace MonoManagedToNative.Generators
                 break;
             case TypeCode.String:
                 type = new CILType(typeof(string));
+                qualifiers.IsConst = true;
                 break;
             }
 
-            return new QualifiedType(type);
+            return new QualifiedType(type, qualifiers);
         }
 
         /// <summary>
