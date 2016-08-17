@@ -29,5 +29,5 @@ script: |
   CppSharp/build/$PREMAKE --file=build/premake5.lua gmake &&
   config=release make -C build/gmake/ &&
   TEST_RESULT=0 &&
-  for test in build/gmake/lib/Release_*/*.Tests*; do $test || TEST_RESULT=$?; done &&
+  for test in build/gmake/lib/Release/*.Tests*; do $test || TEST_RESULT=$?; done &&
   exit "$TEST_RESULT"
