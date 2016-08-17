@@ -9,7 +9,7 @@ end
 function SetupManagedTestProject()
     kind "SharedLib"
     language "C#"  
-    flags { "Unsafe" }
+    clr "Unsafe"
     SetupManagedProject()
 end
 

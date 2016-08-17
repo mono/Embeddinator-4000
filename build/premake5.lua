@@ -8,7 +8,8 @@ dofile "Tests.lua"
 solution "native-binder"
 
   configurations { "Debug", "Release" }
-  flags { "Unicode", "Symbols" }
+  characterset "Unicode"
+  symbols "On"
   
   location (builddir)
   objdir (path.join(builddir, "obj"))
