@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using IKVM.Reflection;
 using CppSharp.AST;
-using CppSharp.Types;
 
 namespace MonoManagedToNative.Generators
 {
@@ -159,6 +158,11 @@ namespace MonoManagedToNative.Generators
             throw new NotImplementedException();
         }
 
+        public virtual bool VisitFunctionTemplateSpecializationDecl(FunctionTemplateSpecialization spec)
+        {
+            throw new NotImplementedException();
+        }        
+
         public virtual bool VisitMacroDefinition(MacroDefinition macro)
         {
             throw new NotImplementedException();
@@ -218,6 +222,16 @@ namespace MonoManagedToNative.Generators
         {
             throw new NotImplementedException();
         }
+
+        public virtual bool VisitVarTemplateDecl(VarTemplate template)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual bool VisitVarTemplateSpecializationDecl(VarTemplateSpecialization spec)
+        {
+            throw new NotImplementedException();
+        }        
 
         #endregion
     }

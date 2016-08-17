@@ -1,5 +1,4 @@
 ﻿using CppSharp.AST;
-using CppSharp.Types;
 
 namespace MonoManagedToNative.Generators
 {
