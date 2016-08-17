@@ -31,4 +31,6 @@ src/generator/generator
 *.ilk
 *.manifest
 /build/vs2015
+/build/gmake
+/CppSharp
 /ikvm
