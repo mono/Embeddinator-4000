@@ -23,13 +23,11 @@ install:
   - if [ "$TRAVIS_OS_NAME" = "osx" ]; then wget -O mono.pkg http://download.mono-project.com/archive/4.2.1/macos-10-x86/MonoFramework-MDK-4.2.1.102.macos10.xamarin.x86.pkg; fi
   - if [ "$TRAVIS_OS_NAME" = "osx" ]; then sudo installer -pkg "mono.pkg" -target /; fi
   - if [ "$TRAVIS_OS_NAME" = "linux" ] && [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
-  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then wget -O premake https://dl.dropboxusercontent.com/u/194502/CppSharp/premake5-linux-64; fi
-  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then wget -O premake https://dl.dropboxusercontent.com/u/194502/CppSharp/premake5-osx; fi
-  - chmod +x premake
 
 script: |
+  if [ "$TRAVIS_OS_NAME" = "linux" ]; then PREMAKE=premake5-linux-64; else PREMAKE=premake5-osx; fi &&
   if [ "$TRAVIS_OS_NAME" = "linux" ]; then BUILD_CONF=release_x64; else BUILD_CONF=release_x32; fi &&
-  ./premake --file=build/premake5.lua gmake &&
+  CppSharp/build/$PREMAKE --file=build/premake5.lua gmake &&
   config=$BUILD_CONF make -C build/gmake/ &&
   TEST_RESULT=0 &&
   for test in build/gmake/lib/Release_*/*.Tests*; do $test || TEST_RESULT=$?; done &&
