@@ -4,3 +4,6 @@
 [submodule "catch"]
 	path = catch
 	url = https://github.com/philsquared/Catch.git
+[submodule "CppSharp"]
+	path = CppSharp
+	url = https://github.com/mono/CppSharp
