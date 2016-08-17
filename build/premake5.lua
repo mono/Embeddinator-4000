@@ -29,7 +29,7 @@ solution "native-binder"
     language "C#"
 
     location "../binder"
-    files   { "../binder/**.cs" }
+    files { "../binder/**.cs" }
 
     libdirs { "../deps" }
   
@@ -41,11 +41,25 @@ solution "native-binder"
       "CppSharp.AST"
     }
 
+  --include("../CppSharp/src/Core")
+  include("../CppSharp/src/AST")
+
+  --[[
   external "IKVM.Reflection"
     location ("../ikvm/reflect")
     uuid "4CB170EF-DFE6-4A56-9E1B-A85449E827A7"
     language "C#"
     kind "SharedLib"
+  ]]
+
+  project "IKVM.Reflection"
+    SetupManagedProject()
+
+    kind "SharedLib"
+    language "C#"
+
+    files { "../ikvm/reflect/**.cs" }
+    links { "System", "System.Core", "System.Security" }
 
   group "Examples"
 

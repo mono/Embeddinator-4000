@@ -22,7 +22,7 @@ function SafePath(path)
 end
 
 msvc_buildflags = {  }
-gcc_buildflags = { "-std=c++11 -fpermissive" }
+gcc_cpp_buildflags = { "-std=c++11 -fpermissive" }
 
 msvc_cpp_defines = { }
 
@@ -42,11 +42,11 @@ function SetupNativeProject()
     buildoptions { msvc_buildflags }
     defines { msvc_cpp_defines }
 
-  configuration { "gmake" }
-    buildoptions { gcc_buildflags }
+  filter { "action:gmake", "language:c++" }
+    buildoptions { gcc_cpp_buildflags }
     
-  configuration { "macosx" }
-    buildoptions { gcc_buildflags, "-stdlib=libc++" }
+  filter { "system:macosx", "language:c++" }
+    buildoptions { gcc_cpp_buildflags, "-stdlib=libc++" }
     links { "c++" }
   
   -- OS-specific options
