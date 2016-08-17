@@ -46,7 +46,7 @@ function SetupTestGeneratorBuildEvent(name)
 end
 
 local function SetupMono()
-  local monoDir = ''
+  local monoDir = nil
 
   -- Find system-specific Mono include/library paths.
   -- For Windows, first search the default Mono install location.
@@ -55,7 +55,14 @@ local function SetupMono()
     monoDir = monoDefaultWindowsDir
   end
 
-  if not os.isdir(monoDir) then
+  local monoDefaultOSXDir = "/Library/Frameworks/Mono.framework/Versions/Current/"
+  if os.isdir(monoDefaultOSXDir) then
+    monoDir = monoDefaultOSXDir
+  end
+
+  -- TODO: Use premake-pkgconfig for Linux
+
+  if not monoDir or not os.isdir(monoDir) then
     error("Could not find Mono install location, please specify it manually")
   end
 
