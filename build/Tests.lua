@@ -88,8 +88,12 @@ function SetupTestNativeProject(name, depends)
     files
     {
       path.join(gendir, name, name .. ".h"),
-      path.join(gendir, name, name .. ".c")
+      path.join(gendir, name, name .. ".c"),
+      path.join(supportdir, "*.h"),
+      path.join(supportdir, "*.c"),
     }
+
+    includedirs { supportdir }
 
     dependson { name .. ".Gen" }
 

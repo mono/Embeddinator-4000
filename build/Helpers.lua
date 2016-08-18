@@ -8,6 +8,7 @@ incdir = path.getabsolute("../include");
 bindir = path.getabsolute("../bin");
 examplesdir = path.getabsolute("../examples");
 testsdir = path.getabsolute("../tests");
+supportdir = path.getabsolute("../support");
 
 builddir = path.getabsolute("./" .. action);
 libdir = path.join(builddir, "lib", "%{cfg.buildcfg}");
