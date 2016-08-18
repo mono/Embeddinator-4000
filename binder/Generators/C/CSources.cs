@@ -35,6 +35,8 @@ namespace MonoManagedToNative.Generators
             WriteLine("#include <mono/metadata/mono-config.h>");
             WriteLine("#include <mono/metadata/debug-helpers.h>");
             WriteLine("#include <stdlib.h>");
+            WriteLine("#include \"mono_managed_to_native.h\"");
+
             PopBlock(NewLineKind.BeforeNextBlock);
 
             PushBlock();
@@ -116,8 +118,11 @@ namespace MonoManagedToNative.Generators
             WriteLine("if ({0})", monoAssemblyName);
             WriteLineIndent("return;");
 
-            WriteLine("{0} = mono_domain_assembly_open({1}, \"{2}.dll\");",
-                monoAssemblyName, GeneratedIdentifier("mono_domain"), assemblyName);
+            WriteLine("const char* assembly = mono_managed_to_native_search_assembly(\"{0}.dll\");",
+                assemblyName);
+
+            WriteLine("{0} = mono_domain_assembly_open({1}, assembly);",
+                monoAssemblyName, GeneratedIdentifier("mono_domain"));
 
             var monoImageName = string.Format("{0}_image", AssemblyId);
             WriteLine("{0} = mono_assembly_get_image({1});", monoImageName,
