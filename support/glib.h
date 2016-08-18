@@ -195,6 +195,14 @@ GString     *g_string_erase         (GString *string, gssize pos, gssize len);
 /*
  * Path
  */
+#ifdef _MSC_VER
+#define G_DIR_SEPARATOR          '\\'
+#define G_DIR_SEPARATOR_S        "\\"
+#else
+#define G_DIR_SEPARATOR          '/'
+#define G_DIR_SEPARATOR_S        "/"
+#endif
+
 gchar  *g_build_path           (const gchar *separator, const gchar *first_element, ...);
 #define g_build_filename(x, ...) g_build_path(G_DIR_SEPARATOR_S, x, __VA_ARGS__)
 gchar  *g_path_get_dirname     (const gchar *filename);

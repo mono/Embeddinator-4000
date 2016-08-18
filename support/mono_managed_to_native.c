@@ -27,10 +27,36 @@ static GString* get_current_executable_path()
 #endif
 }
 
-const char* mono_managed_to_native_search_assembly(const char* assembly)
+static gchar*
+strrchr_seperator (const gchar* filename)
 {
-	GString* current_exe_path = get_current_executable_path();
-	puts(current_exe_path->str);
+#ifdef G_OS_WIN32
+	char *p2;
+#endif
+	char *p;
 
-	return assembly;
+	p = strrchr (filename, G_DIR_SEPARATOR);
+#ifdef G_OS_WIN32
+	p2 = strrchr (filename, '/');
+	if (p2 > p)
+		p = p2;
+#endif
+
+	return p;
+}
+
+char* mono_managed_to_native_search_assembly(const char* assembly)
+{
+	GString* path = get_current_executable_path();
+
+	gchar* sep = strrchr_seperator(path->str);
+	g_string_truncate(path, sep - path->str);
+
+	g_string_append(path, G_DIR_SEPARATOR_S);
+	g_string_append(path, assembly);
+
+	char* data = path->str;
+	g_string_free(path, /*free_segment=*/ FALSE);
+
+	return data;
 }
