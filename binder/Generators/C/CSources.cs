@@ -118,11 +118,22 @@ namespace MonoManagedToNative.Generators
             WriteLine("if ({0})", monoAssemblyName);
             WriteLineIndent("return;");
 
-            WriteLine("const char* assembly = mono_managed_to_native_search_assembly(\"{0}.dll\");",
-                assemblyName);
+            var assemblyPathId = GeneratedIdentifier("path");
+            WriteLine("const char* {0} = mono_m2n_search_assembly(\"{1}.dll\");",
+                assemblyPathId, assemblyName);
 
-            WriteLine("{0} = mono_domain_assembly_open({1}, assembly);",
-                monoAssemblyName, GeneratedIdentifier("mono_domain"));
+            WriteLine("{0} = mono_domain_assembly_open({1}, {2});",
+                monoAssemblyName, GeneratedIdentifier("mono_domain"), assemblyPathId);
+
+            WriteLine("if ({0} == 0)", monoAssemblyName);
+            WriteStartBraceIndent();
+            var errorId = GeneratedIdentifier("error");
+            WriteLine("mono_m2n_error_t {0};", errorId);
+            WriteLine("{0}.type = MONO_M2N_ASSEMBLY_OPEN_FAILED;", errorId);
+            WriteLine("{0}.string = {1};", errorId, assemblyPathId);
+            WriteLine("mono_m2n_error({0});", errorId);
+            WriteCloseBraceIndent();
+            NewLine();
 
             var monoImageName = string.Format("{0}_image", AssemblyId);
             WriteLine("{0} = mono_assembly_get_image({1});", monoImageName,
