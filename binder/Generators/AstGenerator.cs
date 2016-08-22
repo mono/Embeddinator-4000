@@ -41,9 +41,14 @@ namespace MonoManagedToNative.Generators
             throw new Exception("Could not visit type: " + typeInfo.ToString());
         }
 
+        static string UnmangleTypeName(string name)
+        {
+            return name.Replace(new char[] {'`', '<', '>' }, "_");
+        }
+
         public Class VisitRecord(TypeInfo type)
         {
-            var @class = new Class { Name = type.Name };
+            var @class = new Class { Name = UnmangleTypeName(type.Name) };
             VisitMembers(type, @class);
 
             return @class;
@@ -54,7 +59,7 @@ namespace MonoManagedToNative.Generators
             var underlyingType = type.GetEnumUnderlyingType();
             var @enum = new Enumeration
             {
-                Name = type.Name,
+                Name = UnmangleTypeName(type.Name),
                 Type = VisitType(underlyingType).Type
             };
 
@@ -94,6 +99,9 @@ namespace MonoManagedToNative.Generators
 
             foreach (var method in type.DeclaredMethods)
             {
+                if (method.IsGenericMethod)
+                    continue;
+
                 var decl = VisitMethod(method, @class);
                 @class.Declarations.Add(decl);
             }
@@ -359,7 +367,7 @@ namespace MonoManagedToNative.Generators
                 Kind = methodBase.IsConstructor ?
                     CXXMethodKind.Constructor : CXXMethodKind.Normal
             };
-            method.Name = methodBase.Name;
+            method.Name = UnmangleTypeName(methodBase.Name);
             method.OriginalName = GetInternalMethodName(methodBase);
 
             foreach (var param in methodBase.GetParameters())
@@ -399,7 +407,7 @@ namespace MonoManagedToNative.Generators
         {
             var param = new Parameter()
             {
-                Name = paramInfo.Name,
+                Name = UnmangleTypeName(paramInfo.Name),
                 Usage = ConvertToParameterUsage(paramInfo),
                 HasDefaultValue = paramInfo.HasDefaultValue,
                 QualifiedType = VisitType(paramInfo.ParameterType)
@@ -441,7 +449,7 @@ namespace MonoManagedToNative.Generators
         {
             var field = new Field()
             {
-                Name = fieldInfo.Name,
+                Name = UnmangleTypeName(fieldInfo.Name),
                 QualifiedType = VisitType(fieldInfo.FieldType)
             };
 
