@@ -1,10 +1,10 @@
-native-binder
-==============
+MonoManagedToNative
+===================
 
 .NET assembly to Mono native C/C++ API bindings generator.
 
 * Create a native API to access some C# APIs
-* native-binder Xamarin.Foo.dll –type:Xamarin.Foo.Authenticator –language c –output outdir
+* MonoManagedToNative.exe Xamarin.Foo.dll –type:Xamarin.Foo.Authenticator –language c –output outdir
 * Allow for Obj-C binding, Java bindings
 * Start with desktop
 * Then work with products

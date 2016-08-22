@@ -24,7 +24,7 @@ function SetupTestGeneratorProject(name, depends)
 
     linktable = {
       "System.Core",
-      "native-binder",
+      "MonoManagedToNative",
     }
 
     if depends ~= nil then

@@ -5,7 +5,7 @@
 dofile "Helpers.lua"
 dofile "Tests.lua"
 
-solution "native-binder"
+solution "MonoManagedToNative"
 
   configurations { "Debug", "Release" }
   architecture "x86_64"
@@ -26,9 +26,9 @@ solution "native-binder"
   targetdir (libdir)
   libdirs { libdir }
 
-  startproject "native-binder"
+  startproject "MonoManagedToNative"
 
-  project "native-binder"
+  project "MonoManagedToNative"
     SetupManagedProject()
 
     kind "ConsoleApp"
