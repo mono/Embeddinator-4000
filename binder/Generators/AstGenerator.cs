@@ -1,6 +1,7 @@
 ﻿using System;
 using IKVM.Reflection;
 using CppSharp.AST;
+using CppSharp.AST.Extensions;
 using System.Collections.Generic;
 
 namespace MonoManagedToNative.Generators
@@ -105,14 +106,14 @@ namespace MonoManagedToNative.Generators
 
             foreach (var @event in type.DeclaredEvents)
             {
-                var decl = VisitEvent(@event);
-                @class.Declarations.Add(decl);
+                //var decl = VisitEvent(@event);
+                //@class.Declarations.Add(decl);
             }
 
             foreach (var property in type.DeclaredProperties)
             {
-                var decl = VisitProperty(property);
-                @class.Declarations.Add(decl);
+                //var decl = VisitProperty(property);
+                //@class.Declarations.Add(decl);
             }
 
             foreach (var decl in @class.Declarations)
@@ -125,6 +126,10 @@ namespace MonoManagedToNative.Generators
             var ptrType = new QualifiedType(
                 new PointerType(new QualifiedType(new TagType(@class))));
             method.ReturnType = ptrType;
+
+            if (method.ReturnType.Type == null)
+                method.Ignore = true;
+
             method.Name = "new";
             return method;
         }
@@ -209,6 +214,9 @@ namespace MonoManagedToNative.Generators
             var method = VisitMethodBase(methodInfo);
             method.ReturnType = VisitType(methodInfo.ReturnType);
 
+            if (method.ReturnType.Type == null)
+                method.Ignore = true;
+
             var ptrType = new QualifiedType(
                 new PointerType(new QualifiedType(new TagType(@class))));
 
@@ -267,7 +275,7 @@ namespace MonoManagedToNative.Generators
                     type = new BuiltinType(PrimitiveType.Void);
                     break;
                 }
-                throw new NotSupportedException();
+                return new QualifiedType();
             case TypeCode.DBNull:
                 throw new NotSupportedException();
             case TypeCode.Boolean:
@@ -359,6 +367,9 @@ namespace MonoManagedToNative.Generators
             {
                 var paramDecl = VisitParameter(param);
                 method.Parameters.Add(paramDecl);
+
+                if (paramDecl.Ignore)
+                    method.Ignore = true;
             }
 
             method.IsStatic = methodBase.IsStatic;
@@ -394,6 +405,11 @@ namespace MonoManagedToNative.Generators
                 HasDefaultValue = paramInfo.HasDefaultValue,
                 QualifiedType = VisitType(paramInfo.ParameterType)
             };
+
+            var type = param.QualifiedType.Type;
+
+            if (type == null || (type.IsPointer() && type.GetFinalPointee() == null))
+                param.Ignore = true;
 
             return param;
         }

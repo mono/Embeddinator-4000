@@ -69,7 +69,8 @@ namespace MonoManagedToNative.Generators
         public void VisitDeclContext(DeclarationContext ctx)
         {
             foreach (var decl in ctx.Declarations)
-                decl.Visit(this);
+                if (!decl.Ignore)
+                    decl.Visit(this);
         }
 
         public void GenerateFilePreamble()
