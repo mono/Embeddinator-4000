@@ -23,48 +23,25 @@ namespace MonoManagedToNative.Generators
             NewLine();
             WriteLine("#include <stdbool.h>");
             WriteLine("#include <stdint.h>");
+            WriteLine("#include <mono_managed_to_native.h>");
             PopBlock(NewLineKind.BeforeNextBlock);
 
             GenerateDefines();
 
             PushBlock();
-            WriteLine("MONO_BEGIN_DECLS");
+            WriteLine("MONO_M2N_BEGIN_DECLS");
             PopBlock(NewLineKind.BeforeNextBlock);
 
             VisitDeclContext(Unit);
 
             PushBlock();
-            WriteLine("MONO_END_DECLS");
+            WriteLine("MONO_M2N_END_DECLS");
             PopBlock(NewLineKind.BeforeNextBlock);
         }
 
         public void GenerateDefines()
         {
             PushBlock();
-
-            WriteLine("#ifdef  __cplusplus");
-            WriteLineIndent("#define MONO_BEGIN_DECLS  extern \"C\" {");
-            WriteLineIndent("#define MONO_END_DECLS    }");
-            WriteLine("#else");
-            WriteLineIndent("#define MONO_BEGIN_DECLS");
-            WriteLineIndent("#define MONO_END_DECLS");
-            WriteLine("#endif");
-            NewLine();
-
-            WriteLine("#if defined(_MSC_VER)");
-            WriteLineIndent("#define MONO_API_EXPORT __declspec(dllexport)");
-            WriteLineIndent("#define MONO_API_IMPORT __declspec(dllimport)");
-            WriteLine("#else");
-            WriteLineIndent("#define MONO_API_EXPORT __attribute__ ((visibility (\"default\")))");
-            WriteLineIndent("#define MONO_API_IMPORT");
-            WriteLine("#endif");
-            NewLine();
-
-            WriteLine("#if defined(MONO_DLL_EXPORT)");
-            WriteLineIndent("#define MONO_API MONO_API_EXPORT");
-            WriteLine("#else");
-            WriteLineIndent("#define MONO_API MONO_API_IMPORT");
-            WriteLine("#endif");
 
             PopBlock(NewLineKind.BeforeNextBlock);
         }

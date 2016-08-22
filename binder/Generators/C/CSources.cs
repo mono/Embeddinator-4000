@@ -35,7 +35,6 @@ namespace MonoManagedToNative.Generators
             WriteLine("#include <mono/metadata/mono-config.h>");
             WriteLine("#include <mono/metadata/debug-helpers.h>");
             WriteLine("#include <stdlib.h>");
-            WriteLine("#include \"mono_managed_to_native.h\"");
 
             PopBlock(NewLineKind.BeforeNextBlock);
 

@@ -135,7 +135,8 @@ function SetupTestProjectsCSharp(name, depends, extraFiles)
     includedirs
     {
       path.join(gendir, name),
-      path.join(depsdir, "../catch/include")
+      path.join(depsdir, "../catch/include"),
+      supportdir
     }
 
     files { name .. ".Tests.cpp" }

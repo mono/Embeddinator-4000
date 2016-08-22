@@ -27,8 +27,28 @@
  */
 
 #ifdef  __cplusplus
-extern "C" {
+    #define MONO_M2N_BEGIN_DECLS  extern "C" {
+    #define MONO_M2N_END_DECLS    }
+#else
+    #define MONO_M2N_BEGIN_DECLS
+    #define MONO_M2N_END_DECLS
 #endif
+
+#if defined(_MSC_VER)
+    #define MONO_M2N_API_EXPORT __declspec(dllexport)
+    #define MONO_M2N_API_IMPORT __declspec(dllimport)
+#else
+    #define MONO_M2N_API_EXPORT __attribute__ ((visibility ("default")))
+    #define MONO_M2N_API_IMPORT
+#endif
+
+#if defined(MONO_M2N_DLL_EXPORT)
+    #define MONO_M2N_API MONO_M2N_API_EXPORT
+#else
+    #define MONO_M2N_API MONO_M2N_API_IMPORT
+#endif
+
+MONO_M2N_BEGIN_DECLS
 
 /** 
  * Searches and returns the path to the given managed assembly.
@@ -76,6 +96,4 @@ typedef void (*mono_m2n_error_report_hook_t)(mono_m2n_error_t);
  */
 void* mono_m2n_install_error_report_hook(mono_m2n_error_report_hook_t hook);
 
-#ifdef  __cplusplus
-}
-#endif
+MONO_M2N_END_DECLS
