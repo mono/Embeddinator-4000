@@ -39,9 +39,7 @@ namespace MonoManagedToNative.Generators
             PopBlock(NewLineKind.BeforeNextBlock);
 
             PushBlock();
-            WriteLine("MonoDomain* {0};", GeneratedIdentifier("mono_domain"));
-            WriteLine("bool {0};", GeneratedIdentifier("mono_initialized"));
-
+            WriteLine("mono_m2n_context_t {0};", GeneratedIdentifier("mono_context"));
             WriteLine("MonoAssembly* {0}_assembly;", AssemblyId);
             WriteLine("MonoImage* {0}_image;", AssemblyId);
             PopBlock(NewLineKind.BeforeNextBlock);
@@ -87,17 +85,12 @@ namespace MonoManagedToNative.Generators
             WriteLine("static void {0}()", GeneratedIdentifier("initialize_mono"));
             WriteStartBraceIndent();
 
-            var initializedId = GeneratedIdentifier("mono_initialized");
-            WriteLine("if ({0})", initializedId);
+            var contextId = GeneratedIdentifier("mono_context");
+            WriteLine("if ({0}.domain)", contextId);
             WriteLineIndent("return;");
 
-            WriteLine("mono_config_parse(NULL);");
-
             var domainName = "mono_managed_to_native_binding";
-            var version = "v4.0.30319";
-            WriteLine("{0} = mono_jit_init_version(\"{1}\", \"{2}\");",
-                GeneratedIdentifier("mono_domain"), domainName, version);
-            WriteLine("{0} = true;", initializedId);
+            WriteLine("mono_m2n_init(&{0}, \"{1}\");", contextId, domainName);
 
             WriteCloseBraceIndent();
             PopBlock(NewLineKind.BeforeNextBlock);
@@ -121,8 +114,8 @@ namespace MonoManagedToNative.Generators
             WriteLine("const char* {0} = mono_m2n_search_assembly(\"{1}.dll\");",
                 assemblyPathId, assemblyName);
 
-            WriteLine("{0} = mono_domain_assembly_open({1}, {2});",
-                monoAssemblyName, GeneratedIdentifier("mono_domain"), assemblyPathId);
+            WriteLine("{0} = mono_domain_assembly_open({1}.domain, {2});",
+                monoAssemblyName, GeneratedIdentifier("mono_context"), assemblyPathId);
 
             WriteLine("if ({0} == 0)", monoAssemblyName);
             WriteStartBraceIndent();
@@ -212,8 +205,8 @@ namespace MonoManagedToNative.Generators
             if (method.IsConstructor)
             {
                 WriteLine("{0}* object = ({0}*) calloc(1, sizeof({0}));", @class.Name);
-                WriteLine("MonoObject* {0} = mono_object_new({1}, {2});",
-                    instanceId, GeneratedIdentifier("mono_domain"), classId);
+                WriteLine("MonoObject* {0} = mono_object_new({1}.domain, {2});",
+                    instanceId, GeneratedIdentifier("mono_context"), classId);
                 WriteLine("object->_handle = mono_gchandle_new({0}, /*pinned=*/false);",
                     instanceId);
             }

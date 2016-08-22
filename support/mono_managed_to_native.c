@@ -11,6 +11,20 @@
 #include <unistd.h>
 #endif
 
+#include <mono/jit/jit.h>
+#include <mono/metadata/mono-config.h>
+
+int mono_m2n_init(mono_m2n_context_t* ctx, const char* domain)
+{
+    if (ctx == 0 || ctx->domain != 0)
+        return false;
+
+    mono_config_parse(NULL);
+    ctx->domain = mono_jit_init_version(domain, "v4.0.30319");
+
+    return true;
+}
+
 static GString* get_current_executable_path()
 {
 #ifdef __APPLE__

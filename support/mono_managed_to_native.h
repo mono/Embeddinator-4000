@@ -51,6 +51,21 @@
 MONO_M2N_BEGIN_DECLS
 
 /** 
+ * Represents a managed-to-native binding context.
+ */
+typedef struct _MonoDomain MonoDomain;
+typedef struct
+{
+	MonoDomain* domain;
+} mono_m2n_context_t;
+
+/** 
+ * Initializes a managed-to-native binding context.
+ * Returns a boolean indicating success or failure.
+ */
+int mono_m2n_init(mono_m2n_context_t* ctx, const char* domain);
+
+/** 
  * Searches and returns the path to the given managed assembly.
  */
 char* mono_m2n_search_assembly(const char* assembly);

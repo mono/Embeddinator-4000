@@ -105,9 +105,9 @@ namespace MonoManagedToNative.Generators
             if (type == typeof(string))
             {
                 var argId = CGenerator.GenId(Context.ArgName);
-                var domainId = CGenerator.GenId("mono_domain");
-                Context.SupportBefore.WriteLine("MonoString* {0} = mono_string_new({1}, {2});",
-                    argId, domainId, Context.ArgName);
+                var contextId = CGenerator.GenId("mono_context");
+                Context.SupportBefore.WriteLine("MonoString* {0} = mono_string_new({1}.domain, {2});",
+                    argId, contextId, Context.ArgName);
                 Context.Return.Write("{0}", argId);
                 return true;
             }
