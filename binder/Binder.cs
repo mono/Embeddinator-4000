@@ -8,7 +8,6 @@ namespace MonoManagedToNative
     public class Binder
     {
         static string Generator;
-        static string MonoIncDir;
         static string OutputDir;
         static List<string> Assemblies;
 
@@ -19,7 +18,6 @@ namespace MonoManagedToNative
             var optionSet = new Mono.Options.OptionSet() {
                 { "gen=", "target generator (C, C++)", v => Generator = v },
                 { "o|out=", "output directory", v => OutputDir = v },
-                { "mono=", "Mono include directory", v => MonoIncDir = v },
                 { "h|help",  "show this message and exit",  v => showHelp = v != null },
             };
 

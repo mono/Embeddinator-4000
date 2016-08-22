@@ -30,7 +30,7 @@ namespace MonoManagedToNative
 
         bool Parse()
         {
-            var parser = new Parser(Options, Diagnostics);
+            var parser = new Parser();
             parser.OnAssemblyParsed += HandleAssemblyParsed;
 
             return parser.Parse(Options.Project);

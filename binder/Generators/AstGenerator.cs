@@ -204,7 +204,6 @@ namespace MonoManagedToNative.Generators
                 @params.Add(param);
             }
 
-            var sig = method.ToString();
             return string.Format("{0}:{1}({2})", method.DeclaringType.FullName,
                 method.Name, string.Join(", ", @params));
         }

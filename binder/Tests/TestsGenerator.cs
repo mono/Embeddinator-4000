@@ -11,16 +11,15 @@ namespace MonoManagedToNative.Tests
     public abstract class TestsGenerator
     {
         readonly string name;
-        readonly GeneratorKind languageKind;
         readonly Driver driver;
         readonly Options options;
 
         protected TestsGenerator(string name, GeneratorKind languageKind)
         {
             this.name = name;
-            this.languageKind = languageKind;
 
             options = new Options();
+            options.Language = languageKind;
             driver = new Driver(options);
 
             Setup();
@@ -38,7 +37,6 @@ namespace MonoManagedToNative.Tests
 
             var currentDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             options.Project.AssemblyDirs.Add(currentDir);
-            //options.Project.Assemblies.Add(Path.Combine(currentDir, name + ".Managed.dll"));
             options.Project.Assemblies.Add(name + ".Managed.dll");
         }
 

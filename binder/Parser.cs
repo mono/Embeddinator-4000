@@ -60,19 +60,14 @@ namespace MonoManagedToNative
 
     public class Parser
     {
-        private readonly Options Options;
-        private readonly IDiagnostics Diagnostics;
-
         public delegate void ParsedDelegate<T>(ParserResult<T> result);
 
         public ParsedDelegate<IKVM.Reflection.Assembly> OnAssemblyParsed = delegate { };
 
         IKVM.Reflection.Universe Universe;
 
-        public Parser(Options options, IDiagnostics diagostics)
+        public Parser()
         {
-            Options = options;
-            Diagnostics = diagostics;
             Universe = new IKVM.Reflection.Universe(IKVM.Reflection.UniverseOptions.MetadataOnly);
         }
 
