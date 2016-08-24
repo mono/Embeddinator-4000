@@ -28,7 +28,7 @@ namespace MonoManagedToNative.Generators
             GenerateFilePreamble();
 
             PushBlock();
-            WriteLine("#include \"{0}.h\"", Unit.Name);
+            WriteLine("#include \"{0}.h\"", Unit.FileName);
             WriteLine("#include <mono/jit/jit.h>");
             WriteLine("#include <mono/metadata/assembly.h>");
             WriteLine("#include <mono/metadata/object.h>");
