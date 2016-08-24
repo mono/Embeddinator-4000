@@ -1,3 +1,4 @@
+using CppSharp;
 using MonoManagedToNative.Generators;
 using System;
 using System.IO;

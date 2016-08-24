@@ -1,4 +1,5 @@
 ﻿using IKVM.Reflection;
+using CppSharp;
 
 namespace MonoManagedToNative.Generators
 {

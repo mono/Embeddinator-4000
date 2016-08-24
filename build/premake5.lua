@@ -28,35 +28,13 @@ solution "MonoManagedToNative"
 
   startproject "MonoManagedToNative"
 
-  project "MonoManagedToNative"
-    SetupManagedProject()
-
-    kind "ConsoleApp"
-    language "C#"
-
-    location "../binder"
-    files { "../binder/**.cs" }
-
-    libdirs { "../deps" }
-  
-    links
-    {
-      "System",
-      "System.Core",
-      "IKVM.Reflection",
-      "CppSharp.AST"
-    }
-
-  --include("../CppSharp/src/Core")
+  include ("../binder")
+  include("../CppSharp/src/Core")
   include("../CppSharp/src/AST")
-
-  --[[
-  external "IKVM.Reflection"
-    location ("../ikvm/reflect")
-    uuid "4CB170EF-DFE6-4A56-9E1B-A85449E827A7"
-    language "C#"
-    kind "SharedLib"
-  ]]
+  include("../CppSharp/src/Parser")
+  include("../CppSharp/src/CppParser/Bindings")
+  include("../CppSharp/src/Generator")
+  include("../CppSharp/src/Runtime")
 
   project "IKVM.Reflection"
     SetupManagedProject()

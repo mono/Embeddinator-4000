@@ -1,7 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using CppSharp;
 using MonoManagedToNative.Generators;
-using System;
 
 namespace MonoManagedToNative
 {

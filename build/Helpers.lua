@@ -59,6 +59,7 @@ function SetupNativeProject()
 end
 
 function SetupManagedProject()
+  language "C#"
   dotnetframework "4.6"
 
   location (path.join(builddir, "projects"))
