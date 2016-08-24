@@ -1,8 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using IKVM.Reflection;
 using CppSharp.AST;
 using CppSharp.AST.Extensions;
-using System.Collections.Generic;
 
 namespace MonoManagedToNative.Generators
 {
@@ -25,10 +26,7 @@ namespace MonoManagedToNative.Generators
             foreach (var type in assembly.ExportedTypes)
             {
                 var typeInfo = type.GetTypeInfo();
-                var decl = Visit(typeInfo);
-                var @namespace = VisitNamespace(typeInfo);
-                decl.Namespace = @namespace;
-                @namespace.Declarations.Add(decl);
+                Visit(typeInfo);
             }
 
             return unit;
@@ -51,12 +49,25 @@ namespace MonoManagedToNative.Generators
 
         public Declaration Visit(TypeInfo typeInfo)
         {
-            if (typeInfo.IsEnum)
-                return VisitEnum(typeInfo);
-            else if (typeInfo.IsClass || typeInfo.IsInterface || typeInfo.IsValueType)
-                return VisitRecord(typeInfo);
+            var @namespace = VisitNamespace(typeInfo);
+            var decl = @namespace.Declarations.FirstOrDefault(
+                d => d.Name == typeInfo.Name);
 
-            throw new Exception("Could not visit type: " + typeInfo.ToString());
+            // If we have already processed this declaration, return it.
+            if (decl != null)
+                return decl;
+
+            if (typeInfo.IsEnum)
+                decl = VisitEnum(typeInfo);
+            else if (typeInfo.IsClass || typeInfo.IsInterface || typeInfo.IsValueType)
+                decl = VisitRecord(typeInfo);
+            else
+                throw new Exception ("Could not visit type: " + typeInfo.ToString ());
+
+            decl.Namespace = @namespace;
+            @namespace.Declarations.Add (decl);
+
+            return decl;
         }
 
         static string UnmangleTypeName(string name)
