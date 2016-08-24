@@ -49,12 +49,20 @@ namespace MonoManagedToNative.Generators
 
         public override string Name
         {
-            get { return Unit.Name; }
+            get { return Unit.FileName; }
         }
 
         public string GeneratedIdentifier(string id)
         {
             return CGenerator.GenId(id);
+        }
+
+        public string QualifiedName(Declaration decl)
+        {
+            if (Options.Language == GeneratorKind.CPlusPlus)
+                return decl.Name;
+
+            return decl.QualifiedName;
         }
 
         public CppTypePrinter CTypePrinter
@@ -66,11 +74,13 @@ namespace MonoManagedToNative.Generators
             }
         }
 
-        public void VisitDeclContext(DeclarationContext ctx)
+        public bool VisitDeclContext(DeclarationContext ctx)
         {
             foreach (var decl in ctx.Declarations)
                 if (!decl.Ignore)
                     decl.Visit(this);
+
+            return true;
         }
 
         public void GenerateFilePreamble()
@@ -103,6 +113,11 @@ namespace MonoManagedToNative.Generators
         }
 
         #region IDeclVisitor methods
+
+        public virtual bool VisitNamespace (Namespace @namespace)
+        {
+            return VisitDeclContext(@namespace);
+        }
 
         public virtual bool VisitClassDecl(Class @class)
         {
@@ -170,11 +185,6 @@ namespace MonoManagedToNative.Generators
         }
 
         public virtual bool VisitMethodDecl(Method method)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual bool VisitNamespace(Namespace @namespace)
         {
             throw new NotImplementedException();
         }

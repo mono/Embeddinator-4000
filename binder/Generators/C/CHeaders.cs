@@ -90,7 +90,7 @@ namespace MonoManagedToNative.Generators
             PushBlock(CBlockKind.Class);
 
             PushBlock();
-            WriteLine("typedef struct {0} {0};", @class.Name);
+            WriteLine("typedef struct {0} {0};", @class.QualifiedName);
             PopBlock(NewLineKind.BeforeNextBlock);
 
             VisitDeclContext(@class);

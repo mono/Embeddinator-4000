@@ -62,11 +62,11 @@ namespace MonoManagedToNative.Generators
             PopBlock(NewLineKind.BeforeNextBlock);
 
             PushBlock();
-            WriteLine("struct {0}", @class.Name);
+            WriteLine("struct {0}", QualifiedName(@class));
             WriteStartBraceIndent();
 
-            WriteLine("MonoClass* _class;", @class.QualifiedName);
-            WriteLine("uint32_t _handle;", @class.QualifiedName);
+            WriteLine("MonoClass* _class;");
+            WriteLine("uint32_t _handle;");
 
             PopIndent();
             WriteLine("};");
@@ -204,7 +204,7 @@ namespace MonoManagedToNative.Generators
 
             if (method.IsConstructor)
             {
-                WriteLine("{0}* object = ({0}*) calloc(1, sizeof({0}));", @class.Name);
+                WriteLine("{0}* object = ({0}*) calloc(1, sizeof({0}));", @class.QualifiedName);
                 WriteLine("MonoObject* {0} = mono_object_new({1}.domain, {2});",
                     instanceId, GeneratedIdentifier("mono_context"), classId);
                 WriteLine("object->_handle = mono_gchandle_new({0}, /*pinned=*/false);",

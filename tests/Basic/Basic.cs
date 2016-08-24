@@ -75,4 +75,20 @@ public static class StaticClass
     public static int StaticMethod() { return 0; }
 }
 
+namespace NS1
+{
+    public class NamespacedClass
+    {
+
+    }
+}
+
+namespace NS2
+{
+    public class NamespacedClass
+    {
+        
+    }
+}
+
 #endregion

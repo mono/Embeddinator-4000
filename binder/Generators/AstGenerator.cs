@@ -20,15 +20,33 @@ namespace MonoManagedToNative.Generators
         public TranslationUnit Visit(Assembly assembly)
         {
             var name = options.LibraryName ?? assembly.GetName().Name;
-            unit.Name = name;
+            unit.FilePath = name;
 
             foreach (var type in assembly.ExportedTypes)
             {
-                var decl = Visit(type.GetTypeInfo());
-                unit.Declarations.Add(decl);
+                var typeInfo = type.GetTypeInfo();
+                var decl = Visit(typeInfo);
+                var @namespace = VisitNamespace(typeInfo);
+                decl.Namespace = @namespace;
+                @namespace.Declarations.Add(decl);
             }
 
             return unit;
+        }
+
+        public Namespace VisitNamespace(TypeInfo typeInfo)
+        {
+            if (string.IsNullOrWhiteSpace(typeInfo.Namespace))
+                return unit;
+
+            var namespaces = typeInfo.Namespace.Split('.');
+
+            Namespace currentNamespace = unit;
+
+            foreach (var @namespace in namespaces)
+                currentNamespace = currentNamespace.FindCreateNamespace(@namespace);
+
+            return currentNamespace;
         }
 
         public Declaration Visit(TypeInfo typeInfo)
