@@ -44,6 +44,7 @@ namespace MonoManagedToNative.Generators
 
         public CTemplate(Driver driver, TranslationUnit unit) : base(driver)
         {
+            Declaration.QualifiedNameSeparator = "_";
             Unit = unit;
         }
 
