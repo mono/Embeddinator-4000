@@ -41,6 +41,39 @@ namespace MonoManagedToNative
 
         }
 
+        public static string GetSupportDirectory()
+        {
+            var directory = Directory.GetParent(Directory.GetCurrentDirectory());
+
+            while (directory != null)
+            {
+                var path = Path.Combine(directory.FullName, "support");
+
+                if (Directory.Exists(path))
+                    return path;
+
+                directory = directory.Parent;
+            }
+
+            throw new Exception("Support directory was not found");
+        }        
+
+        void GenerateSupportFiles(ProjectOutput output)
+        {
+            // Search for the location of support directory and bundle files with output.
+            try
+            {
+                var path = GetSupportDirectory();
+
+                foreach (var file in Directory.EnumerateFiles(path))
+                    Output.WriteOutput(Path.GetFileName(file), File.ReadAllText(file));
+            }
+            catch (Exception exc)
+            {
+                Diagnostics.Warning("Could not find directory with support API.");
+            }
+        }
+
         void Generate()
         {
             Output = new ProjectOutput();
@@ -68,6 +101,8 @@ namespace MonoManagedToNative
                     Output.WriteOutput(path, text);
                 }
             }
+
+            GenerateSupportFiles(Output);
         }
 
         void WriteFiles()
