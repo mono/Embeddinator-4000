@@ -1,21 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
 using IKVM.Reflection;
+using CppSharp;
 using CppSharp.AST;
+using CppSharp.Generators;
 
 namespace MonoManagedToNative.Generators
 {
     public class CGenerator : Generator
     {
-        public CGenerator(Driver driver) : base(driver) { }
+        private Options Options { get; set; }
+
+        public CGenerator(BindingContext context, Options options) : base(context)
+        {
+            Options = options; 
+        }
 
         public override List<Template> Generate(Assembly assembly)
         {
-            var moduleGen = new AstGenerator(Driver.Options);
-            var module = moduleGen.Visit(assembly) as TranslationUnit;
+            var astGenerator = new AstGenerator(Options);
+            var astUnit = astGenerator.Visit(assembly) as TranslationUnit;
 
-            var headers = new CHeaders(Driver, module);
-            var sources = new CSources(Driver, module);
+            var headers = new CHeaders(Context, Options, astUnit);
+            var sources = new CSources(Context, Options, astUnit);
 
             var templates = new List<Template> { headers, sources };
             foreach (var template in templates)
@@ -42,7 +49,8 @@ namespace MonoManagedToNative.Generators
     {
         public TranslationUnit Unit;
 
-        public CTemplate(Driver driver, TranslationUnit unit) : base(driver)
+        public CTemplate(BindingContext context, Options options,
+            TranslationUnit unit) : base(context, options)
         {
             Declaration.QualifiedNameSeparator = "_";
             Unit = unit;

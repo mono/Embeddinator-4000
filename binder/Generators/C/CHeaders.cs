@@ -1,11 +1,13 @@
 ﻿using CppSharp.AST;
+using CppSharp.Generators;
 using System.Linq;
 
 namespace MonoManagedToNative.Generators
 {
     public class CHeaders : CTemplate
     {
-        public CHeaders(Driver driver, TranslationUnit unit) : base(driver, unit)
+        public CHeaders(BindingContext context, Options options, TranslationUnit unit)
+         : base(context, options, unit)
         {
         }
 

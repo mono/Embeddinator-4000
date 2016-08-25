@@ -1,12 +1,14 @@
 ﻿using CppSharp.AST;
 using CppSharp.AST.Extensions;
+using CppSharp.Generators;
 using System.Linq;
 
 namespace MonoManagedToNative.Generators
 {
     public class CSources : CTemplate
     {
-        public CSources(Driver driver, TranslationUnit unit) : base(driver, unit)
+        public CSources(BindingContext context, Options options, TranslationUnit unit)
+         : base(context, options, unit)
         {
         }
 
@@ -235,7 +237,7 @@ namespace MonoManagedToNative.Generators
             int paramIndex = 0;
             foreach (var param in paramsToMarshal)
             {
-                var ctx = new MarshalContext(Driver)
+                var ctx = new MarshalContext(Context)
                 {
                     ArgName = param.Name,
                     Parameter = param
@@ -294,7 +296,7 @@ namespace MonoManagedToNative.Generators
             if (!method.IsConstructor)
             {
                 var resultId = GeneratedIdentifier("result");
-                var ctx = new MarshalContext(Driver)
+                var ctx = new MarshalContext(Context)
                 {
                     ArgName = resultId,
                     ReturnVarName = resultId,

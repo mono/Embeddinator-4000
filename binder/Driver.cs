@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using CppSharp;
+using CppSharp.Generators;
+using CppSharp.Passes;
 using MonoManagedToNative.Generators;
 
 namespace MonoManagedToNative
@@ -10,6 +12,8 @@ namespace MonoManagedToNative
     {
         public Options Options { get; private set; }
         public IDiagnostics Diagnostics { get; private set; }
+
+        public BindingContext Context { get; private set; }
 
         public List<IKVM.Reflection.Assembly> Assemblies { get; private set; }
 
@@ -27,6 +31,7 @@ namespace MonoManagedToNative
                 Options.OutputDir = Directory.GetCurrentDirectory();
 
             Assemblies = new List<IKVM.Reflection.Assembly>();
+            Context = new BindingContext(Diagnostics, new DriverOptions());
         }
 
         bool Parse()
@@ -76,14 +81,14 @@ namespace MonoManagedToNative
         }
 
         void Generate()
-        {
+        {                        
             Output = new ProjectOutput();
 
-            Generator generator = null;
+            MonoManagedToNative.Generators.Generator generator = null;
             switch (Options.Language)
             {
-                case GeneratorKind.C:
-                    generator = new CGenerator(this);
+                case MonoManagedToNative.Generators.GeneratorKind.C:
+                    generator = new CGenerator(Context, Options);
                     break;
                 default:
                     throw new NotImplementedException();

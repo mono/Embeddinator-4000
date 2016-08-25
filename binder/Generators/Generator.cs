@@ -1,4 +1,5 @@
-﻿using IKVM.Reflection;
+﻿using CppSharp.Generators;
+using IKVM.Reflection;
 using System.Collections.Generic;
 
 namespace MonoManagedToNative.Generators
@@ -14,11 +15,11 @@ namespace MonoManagedToNative.Generators
     /// </summary>
     public abstract class Generator
     {
-        public Driver Driver { get; private set; }
+        public BindingContext Context { get; private set; }
 
-        protected Generator(Driver driver)
+        protected Generator(BindingContext context)
         {
-            Driver = driver;
+            Context = context;
         }
 
         /// <summary>

@@ -15,5 +15,6 @@
       "IKVM.Reflection",
       "CppSharp",
       "CppSharp.AST",
-      "CppSharp.Generator"
+      "CppSharp.Generator",
+      "CppSharp.Parser.CSharp"
     }

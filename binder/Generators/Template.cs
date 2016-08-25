@@ -1,24 +1,25 @@
 ﻿using IKVM.Reflection;
 using CppSharp;
+using CppSharp.Generators;
 
 namespace MonoManagedToNative.Generators
 {
     public abstract class Template : BlockGenerator
     {
-        public Driver Driver { get; private set; }
+        public BindingContext Context { get; private set; }
         public Options Options { get; private set; }
 
         public IDiagnostics Diagnostics
         {
-            get { return Driver.Diagnostics; }
+            get { return Context.Diagnostics; }
         }
 
         public Assembly Assembly { get; set; }
 
-        protected Template(Driver driver)
+        protected Template(BindingContext context, Options options)
         {
-            Driver = driver;
-            Options = driver.Options;
+            Context = context;
+            Options = options;
         }
 
         public abstract string Name { get; }

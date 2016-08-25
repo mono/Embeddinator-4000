@@ -1,18 +1,19 @@
 ﻿using CppSharp.AST;
+using CppSharp.Generators;
 
 namespace MonoManagedToNative.Generators
 {
     public class MarshalContext
     {
-        public MarshalContext(Driver driver)
+        public MarshalContext(BindingContext context)
         {
-            Driver = driver;
+            Context = context;
             SupportBefore = new TextGenerator();
             Return = new TextGenerator();
             MarshalVarPrefix = string.Empty;
         }
 
-        public Driver Driver { get; private set; }
+        public BindingContext Context { get; private set; }
 
         public MarshalPrinter<MarshalContext> MarshalToNative;
 

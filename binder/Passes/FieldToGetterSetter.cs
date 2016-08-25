@@ -72,7 +72,7 @@ namespace MonoManagedToNative.Passes
 
             @class.Methods.Add(setter);
 
-            Log.Debug("Getter/setter created from field: {0}::{1}",
+            Diagnostics.Debug("Getter/setter created from field: {0}::{1}",
                 @class.QualifiedOriginalName, field.Name);
 
             return false;
