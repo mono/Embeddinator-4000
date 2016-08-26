@@ -6,6 +6,7 @@ using CppSharp.AST;
 using CppSharp.Generators;
 using CppSharp.Passes;
 using MonoManagedToNative.Generators;
+using MonoManagedToNative.Passes;
 
 namespace MonoManagedToNative
 {
@@ -58,6 +59,9 @@ namespace MonoManagedToNative
             foreach (var assembly in Assemblies)
                 astGenerator.Visit(assembly);
 
+            Context.TranslationUnitPasses.AddPass(new RenameDuplicatedDeclsPass());
+            Context.TranslationUnitPasses.AddPass(new CheckDuplicatedNamesPass());
+            Context.RunPasses();
         }
 
         public static string GetSupportDirectory()
