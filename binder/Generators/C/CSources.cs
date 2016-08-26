@@ -21,7 +21,7 @@ namespace MonoManagedToNative.Generators
         {
             get
             {
-                return GeneratedIdentifier(Assembly.GetName().Name).Replace('.', '_');
+                return GeneratedIdentifier(Unit.FileName).Replace('.', '_');
             }
         }
 
@@ -100,7 +100,7 @@ namespace MonoManagedToNative.Generators
 
         public void GenerateAssemblyLoad()
         {
-            var assemblyName = Assembly.GetName().Name;
+            var assemblyName = Unit.FileName;
             var assemblyLookupId = GeneratedIdentifier(string.Format("lookup_assembly_{0}",
                 assemblyName.Replace('.', '_')));
 
@@ -153,7 +153,7 @@ namespace MonoManagedToNative.Generators
 
             WriteLine("{0}();", GeneratedIdentifier("initialize_mono"));
 
-            var assemblyName = Assembly.GetName().Name;
+            var assemblyName = Unit.FileName;
             var assemblyLookupId = GeneratedIdentifier(string.Format("lookup_assembly_{0}",
                 assemblyName.Replace('.', '_')));
             WriteLine("{0}();", assemblyLookupId);

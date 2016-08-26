@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using CppSharp;
+using CppSharp.AST;
 using CppSharp.Generators;
 using CppSharp.Passes;
 using MonoManagedToNative.Generators;
@@ -31,7 +32,15 @@ namespace MonoManagedToNative
                 Options.OutputDir = Directory.GetCurrentDirectory();
 
             Assemblies = new List<IKVM.Reflection.Assembly>();
+
             Context = new BindingContext(Diagnostics, new DriverOptions());
+            Context.ASTContext = new ASTContext();
+
+            CppSharp.AST.Type.TypePrinterDelegate = type =>
+            {
+                var typePrinter = new CppTypePrinter();
+                return type.Visit(typePrinter);
+            };
         }
 
         bool Parse()
@@ -44,6 +53,10 @@ namespace MonoManagedToNative
 
         void Process()
         {
+            var astGenerator = new ASTGenerator(Context.ASTContext, Options);
+
+            foreach (var assembly in Assemblies)
+                astGenerator.Visit(assembly);
 
         }
 
@@ -94,9 +107,9 @@ namespace MonoManagedToNative
                     throw new NotImplementedException();
             }
 
-            foreach (var assembly in Assemblies)
+            foreach (var unit in Context.ASTContext.TranslationUnits)
             {
-                var templates = generator.Generate(assembly);
+                var templates = generator.Generate(unit);
 
                 foreach (var template in templates)
                 {

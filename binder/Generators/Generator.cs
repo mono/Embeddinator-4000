@@ -1,5 +1,5 @@
-﻿using CppSharp.Generators;
-using IKVM.Reflection;
+﻿using CppSharp.AST;
+using CppSharp.Generators;
 using System.Collections.Generic;
 
 namespace MonoManagedToNative.Generators
@@ -25,6 +25,6 @@ namespace MonoManagedToNative.Generators
         /// <summary>
         /// Generates the outputs for a given translation unit.
         /// </summary>
-        public abstract List<Template> Generate(Assembly assembly);
+        public abstract List<Template> Generate(TranslationUnit unit);
     }
 }

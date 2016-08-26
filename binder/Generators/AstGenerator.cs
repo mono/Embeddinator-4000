@@ -7,21 +7,25 @@ using CppSharp.AST.Extensions;
 
 namespace MonoManagedToNative.Generators
 {
-    public class AstGenerator
+    public class ASTGenerator
     {
-        public TranslationUnit unit;
-        Options options;
+        ASTContext ASTContext { get; set; }
+        Options Options { get; set; }
 
-        public AstGenerator(Options options)
+        public TranslationUnit unit;
+
+        public ASTGenerator(ASTContext context, Options options)
         {
-            unit = new TranslationUnit();
-            this.options = options;
+            ASTContext = context;
+            Options = options;
         }
 
         public TranslationUnit Visit(Assembly assembly)
         {
-            var name = options.LibraryName ?? assembly.GetName().Name;
-            unit.FilePath = name;
+            var assemblyName = assembly.GetName().Name;;
+            var name = Options.LibraryName ?? assemblyName;
+            unit = ASTContext.FindOrCreateModule(name);
+            unit.FilePath = assemblyName;
 
             foreach (var type in assembly.ExportedTypes)
             {
@@ -92,7 +96,7 @@ namespace MonoManagedToNative.Generators
                 Type = VisitType(underlyingType).Type
             };
 
-            if (options.Language == GeneratorKind.CPlusPlus)
+            if (Options.Language == GeneratorKind.CPlusPlus)
                 @enum.Modifiers = Enumeration.EnumModifiers.Scoped;
 
             foreach (var item in type.DeclaredFields)
@@ -108,7 +112,7 @@ namespace MonoManagedToNative.Generators
                     ExplicitValue = true
                 };
 
-                if (options.Language == GeneratorKind.C)
+                if (Options.Language == GeneratorKind.C)
                     enumItem.Name = string.Format("{0}_{1}", @enum.Name,
                         enumItem.Name);
 
@@ -283,7 +287,7 @@ namespace MonoManagedToNative.Generators
                     var ptrElementType = VisitType(elementType);
                     var ptrType = new PointerType(ptrElementType)
                     {
-                        Modifier = (options.Language == GeneratorKind.CPlusPlus) ?
+                        Modifier = (Options.Language == GeneratorKind.CPlusPlus) ?
                             PointerType.TypeModifier.LVReference :
                             PointerType.TypeModifier.Pointer
                     };

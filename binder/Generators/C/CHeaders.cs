@@ -7,7 +7,7 @@ namespace MonoManagedToNative.Generators
     public class CHeaders : CTemplate
     {
         public CHeaders(BindingContext context, Options options, TranslationUnit unit)
-         : base(context, options, unit)
+            : base(context, options, unit)
         {
         }
 

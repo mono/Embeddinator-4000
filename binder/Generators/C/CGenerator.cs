@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using IKVM.Reflection;
 using CppSharp;
 using CppSharp.AST;
 using CppSharp.Generators;
@@ -16,19 +15,12 @@ namespace MonoManagedToNative.Generators
             Options = options; 
         }
 
-        public override List<Template> Generate(Assembly assembly)
+        public override List<Template> Generate(TranslationUnit unit)
         {
-            var astGenerator = new AstGenerator(Options);
-            var astUnit = astGenerator.Visit(assembly) as TranslationUnit;
+            var headers = new CHeaders(Context, Options, unit);
+            var sources = new CSources(Context, Options, unit);
 
-            var headers = new CHeaders(Context, Options, astUnit);
-            var sources = new CSources(Context, Options, astUnit);
-
-            var templates = new List<Template> { headers, sources };
-            foreach (var template in templates)
-                template.Assembly = assembly;
-
-            return templates;
+            return new List<Template> { headers, sources };
         }
 
         public static string GenId(string id)
