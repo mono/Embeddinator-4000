@@ -98,13 +98,13 @@ namespace MonoManagedToNative
         }
 
         void Generate()
-        {                        
+        {
             Output = new ProjectOutput();
 
-            MonoManagedToNative.Generators.Generator generator = null;
+            Generators.Generator generator = null;
             switch (Options.Language)
             {
-                case MonoManagedToNative.Generators.GeneratorKind.C:
+                case Generators.GeneratorKind.C:
                     generator = new CGenerator(Context, Options);
                     break;
                 default:
