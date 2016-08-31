@@ -125,7 +125,8 @@ namespace MonoManagedToNative
                 }
             }
 
-            GenerateSupportFiles(Output);
+            if (Options.GenerateSupportFiles)
+                GenerateSupportFiles(Output);
         }
 
         void WriteFiles()

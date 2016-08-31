@@ -7,6 +7,7 @@ namespace MonoManagedToNative
         public Options()
         {
             Project = new Project();
+            GenerateSupportFiles = true;
         }
 
         public Project Project;
@@ -29,5 +30,8 @@ namespace MonoManagedToNative
         // In this mode the JIT will generate specialized wrappers for marshaling
         // which will be faster but also lead to higher memory consumption.
         public bool UseUnmanagedThunks;
+
+        // If true, will generate support files alongside generated binding code.
+        public bool GenerateSupportFiles;
     }
 }
