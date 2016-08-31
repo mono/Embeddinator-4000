@@ -1,5 +1,5 @@
 /*
- * Mono managed-to-native support API.
+ * Mono managed-to-native support code.
  *
  * Author:
  *   Joao Matos (joao.matos@xamarin.com)
@@ -56,7 +56,7 @@ MONO_M2N_BEGIN_DECLS
 typedef struct _MonoDomain MonoDomain;
 typedef struct
 {
-	MonoDomain* domain;
+  MonoDomain* domain;
 } mono_m2n_context_t;
 
 /** 
@@ -64,6 +64,12 @@ typedef struct
  * Returns a boolean indicating success or failure.
  */
 int mono_m2n_init(mono_m2n_context_t* ctx, const char* domain);
+
+/** 
+ * Destroyes the managed-to-native binding context.
+ * Returns a boolean indicating success or failure.
+ */
+int mono_m2n_destroy(mono_m2n_context_t* ctx);
 
 /** 
  * Searches and returns the path to the given managed assembly.
