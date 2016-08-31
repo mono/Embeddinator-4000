@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using CppSharp;
 using CppSharp.AST;
 using CppSharp.Generators;
@@ -156,8 +158,49 @@ namespace MonoManagedToNative
             }
         }
 
+        static string FindMonoPath()
+        {
+            if (Platform.IsWindows)
+                return @"C:\\Program Files (x86)\\Mono";
+
+            throw new NotImplementedException();
+        }
+
         void CompileCode()
         {
+            if (Platform.IsWindows)
+            {
+                List<ToolchainVersion> vsSdks;
+                MSVCToolchain.GetVisualStudioSdks(out vsSdks);
+
+                if (vsSdks.Count == 0)
+                    throw new Exception("Visual Studio SDK was not found on your system.");
+
+                var vsSdk = vsSdks.FirstOrDefault();
+                var clBin = Path.GetFullPath(
+                    Path.Combine(vsSdk.Directory, "..", "..", "VC", "bin", "cl.exe"));
+
+                var monoPath = FindMonoPath();
+                var invocation = string.Format(
+                    "/nologo -I\"{0}\\include\\mono-2.0\" {1}\\*.c \"{0}\\lib\\monosgen-2.0.lib\"",
+                    monoPath, Path.GetFullPath(Options.OutputDir));
+
+                var process = new Process();
+                process.StartInfo.FileName = clBin;
+                process.StartInfo.Arguments = invocation;
+                process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                process.StartInfo.UseShellExecute = false;
+                process.StartInfo.RedirectStandardOutput = true;
+                process.OutputDataReceived += (sender, args) => Diagnostics.Message("{0}", args.Data);
+                Diagnostics.PushIndent();
+                process.Start();
+                process.BeginOutputReadLine();
+                process.WaitForExit();
+                Diagnostics.PopIndent();
+
+                return;
+            }
+
             throw new NotImplementedException();
         }
 
