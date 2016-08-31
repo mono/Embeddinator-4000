@@ -78,6 +78,25 @@ namespace MonoManagedToNative
 
         public void BuildInputs()
         {
+            foreach (var assembly in Assemblies)
+            {
+                var file = Path.GetFullPath(assembly);
+
+                if (!File.Exists(file))
+                    continue;
+
+                var input = new ProjectInput
+                {
+                    BasePath = Path.GetDirectoryName(file),
+                    FullPath = file
+                };
+
+                AssemblyInputs.Add(input);
+            }
+        }
+
+        public void SearchInputs()
+        {
             foreach (var path in AssemblyDirs)
             {
                 if (!Directory.Exists(path)) continue;
