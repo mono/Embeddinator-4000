@@ -2,8 +2,8 @@
 -- It defines the common build settings that all the projects share
 -- and calls the build scripts of all the sub-projects.
 
-dofile "Helpers.lua"
-dofile "Tests.lua"
+include "Helpers.lua"
+include "Tests.lua"
 
 solution "MonoManagedToNative"
 
@@ -20,11 +20,12 @@ solution "MonoManagedToNative"
 
   characterset "Unicode"
   symbols "On"
-  
-  location (builddir)
-  objdir (path.join(builddir, "obj"))
-  targetdir (libdir)
-  libdirs { libdir }
+
+  local action = _ACTION or ""
+  location (action)
+
+  objdir (path.join("./", action, "obj"))
+  targetdir (path.join("./", action, "lib", "%{cfg.buildcfg}"))
 
   startproject "MonoManagedToNative"
 
@@ -45,12 +46,7 @@ solution "MonoManagedToNative"
     files { "../ikvm/reflect/**.cs" }
     links { "System", "System.Core", "System.Security" }
 
-  group "Examples"
-
-    print("Searching for example projects...")
-    IncludeDir(examplesdir)
-
   group "Tests"
 
     print("Searching for tests projects...")
-    IncludeDir(testsdir)
+    IncludeDir("../tests")

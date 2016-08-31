@@ -16,5 +16,6 @@
       "CppSharp",
       "CppSharp.AST",
       "CppSharp.Generator",
+      "CppSharp.Parser",
       "CppSharp.Parser.CSharp"
     }
