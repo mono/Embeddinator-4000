@@ -31,7 +31,7 @@
 
 void g_free (void *ptr)
 {
-  return free(ptr);
+  free(ptr);
 }
 
 gpointer g_realloc (gpointer obj, gsize size)
