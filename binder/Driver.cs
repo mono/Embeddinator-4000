@@ -156,6 +156,11 @@ namespace MonoManagedToNative
             }
         }
 
+        void CompileCode()
+        {
+            throw new NotImplementedException();
+        }
+
         public void Run()
         {
             Options.Project.BuildInputs();
@@ -176,6 +181,14 @@ namespace MonoManagedToNative
             Generate();
             WriteFiles();
             Diagnostics.PopIndent();
+
+            if (Options.CompileCode)
+            {
+                Diagnostics.Message("Compiling binding code...");
+                Diagnostics.PushIndent();
+                CompileCode();
+                Diagnostics.PopIndent();
+            }
         }
 
         void HandleParserResult<T>(ParserResult<T> result)

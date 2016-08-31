@@ -10,6 +10,7 @@ namespace MonoManagedToNative
         static string Generator;
         static string OutputDir;
         static List<string> Assemblies;
+        static bool CompileCode;
 
         static void ParseCommandLineArgs(string[] args)
         {
@@ -18,6 +19,7 @@ namespace MonoManagedToNative
             var optionSet = new Mono.Options.OptionSet() {
                 { "gen=", "target generator (C, C++)", v => Generator = v },
                 { "o|out=", "output directory", v => OutputDir = v },
+                { "c|compile", "tries to compile generated output", v => CompileCode = true },
                 { "h|help",  "show this message and exit",  v => showHelp = v != null },
             };
 
@@ -70,6 +72,7 @@ namespace MonoManagedToNative
 
             var options = new Options();
             options.OutputDir = OutputDir;
+            options.CompileCode = CompileCode;
 
             var generator = ConvertToGeneratorKind(Generator);
             options.Language = generator;

@@ -33,5 +33,8 @@ namespace MonoManagedToNative
 
         // If true, will generate support files alongside generated binding code.
         public bool GenerateSupportFiles;
+
+        // If true, will try to compile the generated managed-to-native binding code.
+        public bool CompileCode;
     }
 }
