@@ -25,7 +25,7 @@ namespace MonoManagedToNative.Generators
             NewLine();
             WriteLine("#include <stdbool.h>");
             WriteLine("#include <stdint.h>");
-            WriteLine("#include <mono_managed_to_native.h>");
+            WriteInclude("mono_managed_to_native.h");
             PopBlock(NewLineKind.BeforeNextBlock);
 
             GenerateDefines();

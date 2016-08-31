@@ -84,6 +84,14 @@ namespace MonoManagedToNative.Generators
             return true;
         }
 
+        public void WriteInclude(string include)
+        {
+            if (Options.GenerateSupportFiles)
+                WriteLine("#include \"{0}\"", include);
+            else
+                WriteLine("#include <{0}>", include);
+        }
+
         public void GenerateFilePreamble()
         {
             WriteLine("/*");
