@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using MonoManagedToNative.Generators;
+using CppSharp;
 
 namespace MonoManagedToNative
 {
@@ -11,6 +12,7 @@ namespace MonoManagedToNative
         static string OutputDir;
         static List<string> Assemblies;
         static bool CompileCode;
+        static bool Verbose;
 
         static void ParseCommandLineArgs(string[] args)
         {
@@ -20,6 +22,7 @@ namespace MonoManagedToNative
                 { "gen=", "target generator (C, C++)", v => Generator = v },
                 { "o|out=", "output directory", v => OutputDir = v },
                 { "c|compile", "tries to compile generated output", v => CompileCode = true },
+                { "v|verbose", "generates diagnostic verbose output", v => Verbose = true },
                 { "h|help",  "show this message and exit",  v => showHelp = v != null },
             };
 
@@ -84,6 +87,10 @@ namespace MonoManagedToNative
                 options.Project.Assemblies.Add(assembly);
 
             var driver = new Driver(options);
+
+            if (Verbose)
+                driver.Diagnostics.Level = DiagnosticKind.Debug;
+
             driver.Run();
         }
     }
