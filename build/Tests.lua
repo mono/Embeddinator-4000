@@ -1,5 +1,9 @@
 -- Tests/examples helpers
 
+local gendir = "%{wks.location}/gen"
+local supportdir = path.getabsolute("../support")
+local catchdir = path.getabsolute("../catch")
+
 function SetupTestProject(name, extraFiles)
   SetupTestGeneratorProject(name)
   SetupTestNativeProject(name)  
@@ -84,14 +88,11 @@ function SetupTestNativeProject(name, depends)
 
     defines { "MONO_DLL_EXPORT" }
 
-    local gendir = path.join("./", _ACTION, "gen")
-    local supportdir = path.join("../support")
-
     flags { common_flags }
     files
     {
-      path.join(gendir, name, name .. ".h"),
-      path.join(gendir, name, name .. ".c"),
+      path.join(gendir, name, name .. ".Managed.h"),
+      path.join(gendir, name, name .. ".Managed.c"),
       path.join(supportdir, "*.h"),
       path.join(supportdir, "*.c"),
     }
@@ -138,7 +139,7 @@ function SetupTestProjectsCSharp(name, depends, extraFiles)
     includedirs
     {
       path.join(gendir, name),
-      path.join(depsdir, "../catch/include"),
+      path.join(catchdir, "include"),
       supportdir
     }
 

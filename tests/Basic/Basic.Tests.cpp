@@ -1,7 +1,7 @@
 ﻿#define CATCH_CONFIG_MAIN
 #include <catch.hpp>
 
-#include "Basic.h"
+#include "Basic.Managed.h"
 
 TEST_CASE("BuiltinTypes", "[BuiltinTypes]") {
     BuiltinTypes* bt = BuiltinTypes_new();

@@ -37,8 +37,7 @@ namespace MonoManagedToNative.Tests
                 options.LibraryName, options.Language.ToString());
 
             var currentDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            options.Project.AssemblyDirs.Add(currentDir);
-            options.Project.Assemblies.Add(name + ".Managed.dll");
+            options.Project.Assemblies.Add(Path.Combine(currentDir, name + ".Managed.dll"));
         }
 
         public virtual void Generate()
