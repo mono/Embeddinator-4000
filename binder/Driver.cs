@@ -162,8 +162,28 @@ namespace MonoManagedToNative
         {
             if (Platform.IsWindows)
                 return @"C:\\Program Files (x86)\\Mono";
+            else if (Platform.IsMacOS)
+                return "/Library/Frameworks/Mono.framework/Versions/Current";
 
             throw new NotImplementedException();
+        }
+
+        void InvokeCompiler(string compiler, string arguments)
+        {
+            Diagnostics.Debug("Invoking: {0} {1}", compiler, arguments);
+
+            var process = new Process();
+            process.StartInfo.FileName = compiler;
+            process.StartInfo.Arguments = arguments;
+            process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+            process.StartInfo.UseShellExecute = false;
+            process.StartInfo.RedirectStandardOutput = true;
+            process.OutputDataReceived += (sender, args) => Diagnostics.Message("{0}", args.Data);
+            Diagnostics.PushIndent();
+            process.Start();
+            process.BeginOutputReadLine();
+            process.WaitForExit();
+            Diagnostics.PopIndent();            
         }
 
         void CompileCode()
@@ -185,18 +205,24 @@ namespace MonoManagedToNative
                     "/nologo -I\"{0}\\include\\mono-2.0\" {1}\\*.c \"{0}\\lib\\monosgen-2.0.lib\"",
                     monoPath, Path.GetFullPath(Options.OutputDir));
 
-                var process = new Process();
-                process.StartInfo.FileName = clBin;
-                process.StartInfo.Arguments = invocation;
-                process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-                process.StartInfo.UseShellExecute = false;
-                process.StartInfo.RedirectStandardOutput = true;
-                process.OutputDataReceived += (sender, args) => Diagnostics.Message("{0}", args.Data);
-                Diagnostics.PushIndent();
-                process.Start();
-                process.BeginOutputReadLine();
-                process.WaitForExit();
-                Diagnostics.PopIndent();
+                InvokeCompiler(clBin, invocation);
+
+                return;
+            }
+            else if (Platform.IsMacOS)
+            {
+                var xcodePath = XcodeToolchain.GetXcodeToolchainPath();
+                var clangBin = Path.Combine(xcodePath, "usr/bin/clang");
+                var monoPath = FindMonoPath();
+
+                var files = Directory.EnumerateFiles(Options.OutputDir)
+                    .Where(file => file.EndsWith("c", StringComparison.OrdinalIgnoreCase));
+
+                var invocation = string.Format(
+                    "-I\"{0}/include/mono-2.0\" -L\"{0}/lib/\" -lmonosgen-2.0 {1}",
+                    monoPath, string.Join(" ", files.ToList()));
+
+                InvokeCompiler(clangBin, invocation);
 
                 return;
             }
