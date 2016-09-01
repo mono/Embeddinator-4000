@@ -84,6 +84,9 @@ function SetupTestNativeProject(name, depends)
 
     defines { "MONO_DLL_EXPORT" }
 
+    local gendir = path.join("./", _ACTION, "gen")
+    local supportdir = path.join("../support")
+
     flags { common_flags }
     files
     {
