@@ -8,7 +8,7 @@ namespace MonoManagedToNative.Generators
 {
     public class CGenerator : Generator
     {
-        private Options Options { get; set; }
+        internal Options Options { get; set; }
 
         public CGenerator(BindingContext context, Options options) : base(context)
         {
@@ -105,7 +105,7 @@ namespace MonoManagedToNative.Generators
             var @class = method.Namespace as Class;
             var retType = method.ReturnType.Visit(CTypePrinter);
 
-            Write("{0}{1} {2}_{3}(", isSource ? string.Empty : "MONO_M2N_API ",
+            Write("{0}{1} {2}_{3}(", isSource ? string.Empty : string.Empty, // "MONO_M2N_API ",
                 retType, @class.QualifiedName, method.Name);
 
             Write(GenerateParametersList(method.Parameters));

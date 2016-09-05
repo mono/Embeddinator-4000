@@ -63,7 +63,12 @@ namespace MonoManagedToNative
                 return GeneratorKind.C;
             case "c++":
             case "cpp":
-                return GeneratorKind.CPlusPlus; 
+                return GeneratorKind.CPlusPlus;
+            case "objc":
+            case "obj-c":
+            case "objectivec":
+            case "objective-c":
+                return GeneratorKind.ObjectiveC;
             }
 
             throw new NotSupportedException("Unknown target generator: " + gen);

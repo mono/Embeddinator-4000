@@ -7,7 +7,8 @@ namespace MonoManagedToNative.Generators
     public enum GeneratorKind
     {
         C,
-        CPlusPlus
+        CPlusPlus,
+        ObjectiveC
     }
 
     /// <summary>

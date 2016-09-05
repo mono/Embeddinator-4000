@@ -109,6 +109,9 @@ namespace MonoManagedToNative
                 case Generators.GeneratorKind.C:
                     generator = new CGenerator(Context, Options);
                     break;
+                case Generators.GeneratorKind.ObjectiveC:
+                    generator = new ObjCGenerator(Context, Options);
+                    break;
                 default:
                     throw new NotImplementedException();
             }
