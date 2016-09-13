@@ -6,7 +6,8 @@ namespace MonoManagedToNative.Generators
 {
     public class CHeaders : CTemplate
     {
-        public CHeaders(BindingContext context, Options options, TranslationUnit unit)
+        public CHeaders(BindingContext context, Options options,
+            TranslationUnit unit)
             : base(context, options, unit)
         {
         }
@@ -23,8 +24,12 @@ namespace MonoManagedToNative.Generators
             PushBlock();
             WriteLine("#pragma once");
             NewLine();
-            WriteLine("#include <stdbool.h>");
-            WriteLine("#include <stdint.h>");
+            var stdboolHeader = Options.Language == GeneratorKind.CPlusPlus ?
+                "cstdbool" : "stdbool.h";
+            WriteLine("#include <{0}>", stdboolHeader);
+            var stdintHeader = Options.Language == GeneratorKind.CPlusPlus ?
+                "cstdint" : "stdint.h";            
+            WriteLine("#include <{0}>", stdintHeader);
             WriteInclude("mono_managed_to_native.h");
             PopBlock(NewLineKind.BeforeNextBlock);
 
