@@ -25,19 +25,24 @@ namespace MonoManagedToNative.Generators
             }
         }
 
-        public override void Process()
+        public override void WriteHeaders()
         {
-            GenerateFilePreamble();
-
-            PushBlock();
             WriteLine("#include \"{0}.h\"", Unit.FileName);
             WriteLine("#include <mono/jit/jit.h>");
             WriteLine("#include <mono/metadata/assembly.h>");
             WriteLine("#include <mono/metadata/object.h>");
             WriteLine("#include <mono/metadata/mono-config.h>");
             WriteLine("#include <mono/metadata/debug-helpers.h>");
-            WriteLine("#include <stdlib.h>");
+            var stdlibHeader = Options.Language == GeneratorKind.CPlusPlus ?
+                "cstdlib" : "stdlib.h";
+        }
 
+        public override void Process()
+        {
+            GenerateFilePreamble();
+
+            PushBlock();
+            WriteHeaders();
             PopBlock(NewLineKind.BeforeNextBlock);
 
             PushBlock();

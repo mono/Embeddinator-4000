@@ -17,11 +17,8 @@ namespace MonoManagedToNative.Generators
             get { return "h"; }
         }
 
-        public override void Process()
+        public override void WriteHeaders()
         {
-            GenerateFilePreamble();
-
-            PushBlock();
             WriteLine("#pragma once");
             NewLine();
             var stdboolHeader = Options.Language == GeneratorKind.CPlusPlus ?
@@ -31,6 +28,14 @@ namespace MonoManagedToNative.Generators
                 "cstdint" : "stdint.h";            
             WriteLine("#include <{0}>", stdintHeader);
             WriteInclude("mono_managed_to_native.h");
+        }
+
+        public override void Process()
+        {
+            GenerateFilePreamble();
+
+            PushBlock();
+            WriteHeaders();
             PopBlock(NewLineKind.BeforeNextBlock);
 
             GenerateDefines();

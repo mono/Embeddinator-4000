@@ -27,5 +27,7 @@ namespace MonoManagedToNative.Generators
         public abstract string FileExtension { get; }
 
         public abstract void Process();
+
+        public abstract void WriteHeaders();
     }
 }
