@@ -5,10 +5,10 @@ using System.IO;
 using System.Linq;
 using CppSharp;
 using CppSharp.AST;
-using CppSharp.Generators;
 using CppSharp.Passes;
 using MonoManagedToNative.Generators;
 using MonoManagedToNative.Passes;
+using BindingContext = CppSharp.Generators.BindingContext;
 
 namespace MonoManagedToNative
 {
@@ -189,8 +189,26 @@ namespace MonoManagedToNative
             Diagnostics.PopIndent();            
         }
 
+        private IEnumerable<string> GetOutputFiles(string pattern)
+        {
+            return Directory.EnumerateFiles(Options.OutputDir)
+                    .Where(file => file.EndsWith(pattern, StringComparison.OrdinalIgnoreCase));
+        }
+
         void CompileCode()
         {
+            var files = GetOutputFiles("c");
+
+            switch (Options.Language)
+            {
+            case GeneratorKind.ObjectiveC:
+                files = files.Concat(GetOutputFiles("mm"));
+                break;
+            case GeneratorKind.CPlusPlus:
+                files = files.Concat(GetOutputFiles("cpp"));
+                break;           
+            }
+
             if (Platform.IsWindows)
             {
                 List<ToolchainVersion> vsSdks;
@@ -205,8 +223,8 @@ namespace MonoManagedToNative
 
                 var monoPath = FindMonoPath();
                 var invocation = string.Format(
-                    "/nologo -I\"{0}\\include\\mono-2.0\" {1}\\*.c \"{0}\\lib\\monosgen-2.0.lib\"",
-                    monoPath, Path.GetFullPath(Options.OutputDir));
+                    "/nologo -I\"{0}\\include\\mono-2.0\" {0} \"{1}\\lib\\monosgen-2.0.lib\"",
+                    files, monoPath);
 
                 InvokeCompiler(clBin, invocation);
 
@@ -217,9 +235,6 @@ namespace MonoManagedToNative
                 var xcodePath = XcodeToolchain.GetXcodeToolchainPath();
                 var clangBin = Path.Combine(xcodePath, "usr/bin/clang");
                 var monoPath = FindMonoPath();
-
-                var files = Directory.EnumerateFiles(Options.OutputDir)
-                    .Where(file => file.EndsWith("c", StringComparison.OrdinalIgnoreCase));
 
                 var invocation = string.Format(
                     "-I\"{0}/include/mono-2.0\" -L\"{0}/lib/\" -lmonosgen-2.0 {1}",
