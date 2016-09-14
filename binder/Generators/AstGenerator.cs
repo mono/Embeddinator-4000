@@ -112,10 +112,6 @@ namespace MonoManagedToNative.Generators
                     ExplicitValue = true
                 };
 
-                if (Options.Language == GeneratorKind.C)
-                    enumItem.Name = string.Format("{0}_{1}", @enum.Name,
-                        enumItem.Name);
-
                 @enum.AddItem(enumItem);
             }
 

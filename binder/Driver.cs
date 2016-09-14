@@ -61,6 +61,9 @@ namespace MonoManagedToNative
             foreach (var assembly in Assemblies)
                 astGenerator.Visit(assembly);
 
+            if (Options.Language != GeneratorKind.CPlusPlus)
+                Context.TranslationUnitPasses.AddPass(new RenameEnumItemsPass());
+
             Context.TranslationUnitPasses.AddPass(new RenameDuplicatedDeclsPass());
             Context.TranslationUnitPasses.AddPass(new CheckDuplicatedNamesPass());
             Context.RunPasses();
