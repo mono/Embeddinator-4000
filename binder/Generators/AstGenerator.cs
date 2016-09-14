@@ -362,7 +362,6 @@ namespace MonoManagedToNative.Generators
                 break;
             case TypeCode.String:
                 type = new CILType(typeof(string));
-                qualifiers.IsConst = true;
                 break;
             }
 
