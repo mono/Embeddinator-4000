@@ -66,11 +66,30 @@ namespace MonoManagedToNative.Generators
             return decl.QualifiedName;
         }
 
+        private static CppTypePrintFlavorKind GetTypePrinterFlavorKind(GeneratorKind kind)
+        {
+            switch(kind)
+            {
+            case GeneratorKind.C:
+                return CppTypePrintFlavorKind.C;
+            case GeneratorKind.CPlusPlus:
+                return CppTypePrintFlavorKind.Cpp;
+            case GeneratorKind.ObjectiveC:
+                return CppTypePrintFlavorKind.ObjC;                       
+            }
+
+            throw new NotImplementedException();
+        }
+
         public CppTypePrinter CTypePrinter
         {
             get
             {
-                var typePrinter = new CppTypePrinter { PrintScopeKind = CppTypePrintScopeKind.Qualified };
+                var typePrinter = new CppTypePrinter
+                {
+                    PrintScopeKind = CppTypePrintScopeKind.Qualified,
+                    PrintFlavorKind = GetTypePrinterFlavorKind(Options.Language)
+                };
                 return typePrinter;
             }
         }
@@ -100,7 +119,7 @@ namespace MonoManagedToNative.Generators
             WriteLine(" */");
         }
 
-        public void GenerateMethodSignature(Method method, bool isSource = true)
+        public virtual void GenerateMethodSignature(Method method, bool isSource = true)
         {
             var @class = method.Namespace as Class;
             var retType = method.ReturnType.Visit(CTypePrinter);
@@ -108,17 +127,9 @@ namespace MonoManagedToNative.Generators
             Write("{0}{1} {2}_{3}(", isSource ? string.Empty : string.Empty, // "MONO_M2N_API ",
                 retType, @class.QualifiedName, method.Name);
 
-            Write(GenerateParametersList(method.Parameters));
+            Write(CTypePrinter.VisitParameters(method.Parameters));
 
             Write(")");
-        }
-
-        public string GenerateParametersList(List<Parameter> parameters)
-        {
-            var types = new List<string>();
-            foreach (var param in parameters)
-                types.Add(CTypePrinter.VisitParameter(param));
-            return string.Join(", ", types);
         }
 
         #region IDeclVisitor methods
