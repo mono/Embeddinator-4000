@@ -29,14 +29,6 @@ namespace MonoManagedToNative.Generators
         }
     }
 
-    public class CBlockKind
-    {
-        public const int Includes = BlockKind.LAST + 11;
-        public const int Function = BlockKind.LAST + 12;
-        public const int Class = BlockKind.LAST + 13;
-        public const int Typedef = BlockKind.LAST + 13;
-    }
-
     public abstract class CTemplate : Template, IDeclVisitor<bool>
     {
         public TranslationUnit Unit;

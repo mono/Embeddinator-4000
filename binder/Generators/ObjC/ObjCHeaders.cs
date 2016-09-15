@@ -30,7 +30,7 @@ namespace MonoManagedToNative.Generators
 
         public override bool VisitClassDecl(Class @class)
         {
-            PushBlock(CBlockKind.Class);
+            PushBlock();
 
             WriteLine("@interface {0} : NSObject", @class.QualifiedName);
             NewLine();

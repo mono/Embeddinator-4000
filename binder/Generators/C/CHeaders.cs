@@ -99,7 +99,7 @@ namespace MonoManagedToNative.Generators
 
         public override bool VisitClassDecl(Class @class)
         {
-            PushBlock(CBlockKind.Class);
+            PushBlock();
 
             PushBlock();
             WriteLine("typedef struct {0} {0};", @class.QualifiedName);
@@ -114,7 +114,7 @@ namespace MonoManagedToNative.Generators
 
         public override bool VisitMethodDecl(Method method)
         {
-            PushBlock(CBlockKind.Function);
+            PushBlock();
 
             GenerateMethodSignature(method, isSource: false);
             WriteLine(";");
