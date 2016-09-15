@@ -293,7 +293,13 @@ namespace MonoManagedToNative.Generators
                 }
                 else if (managedType.IsArray)
                 {
-                    throw new NotImplementedException();
+                    var array = new ArrayType
+                    {
+                        SizeType = ArrayType.ArraySize.Variable,
+                        QualifiedType = VisitType(elementType)
+                    };
+
+                    return new QualifiedType(array);
                 }
 
                 throw new NotImplementedException();
