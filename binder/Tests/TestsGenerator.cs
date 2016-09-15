@@ -1,4 +1,5 @@
 using CppSharp;
+using CppSharp.Generators;
 using MonoManagedToNative.Generators;
 using System;
 using System.IO;

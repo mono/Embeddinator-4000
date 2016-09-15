@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using CppSharp;
 using CppSharp.AST;
+using CppSharp.Generators;
 using CppSharp.Passes;
 using MonoManagedToNative.Generators;
 using MonoManagedToNative.Passes;
@@ -109,10 +110,10 @@ namespace MonoManagedToNative
             Generators.Generator generator = null;
             switch (Options.Language)
             {
-                case Generators.GeneratorKind.C:
+                case GeneratorKind.C:
                     generator = new CGenerator(Context, Options);
                     break;
-                case Generators.GeneratorKind.ObjectiveC:
+                case GeneratorKind.ObjectiveC:
                     generator = new ObjCGenerator(Context, Options);
                     break;
                 default:

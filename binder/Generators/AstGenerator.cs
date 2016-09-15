@@ -4,6 +4,7 @@ using System.Linq;
 using IKVM.Reflection;
 using CppSharp.AST;
 using CppSharp.AST.Extensions;
+using CppSharp.Generators;
 
 namespace MonoManagedToNative.Generators
 {

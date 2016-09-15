@@ -28,6 +28,7 @@ function SetupTestGeneratorProject(name, depends)
 
     linktable = {
       "System.Core",
+      "CppSharp.Generator",
       "MonoManagedToNative",
     }
 

@@ -4,13 +4,6 @@ using System.Collections.Generic;
 
 namespace MonoManagedToNative.Generators
 {
-    public enum GeneratorKind
-    {
-        C,
-        CPlusPlus,
-        ObjectiveC
-    }
-
     /// <summary>
     /// Generators are the base class for each language backend.
     /// </summary>

@@ -1,4 +1,5 @@
 using MonoManagedToNative.Generators;
+using CppSharp.Generators;
 
 namespace MonoManagedToNative.Tests
 {

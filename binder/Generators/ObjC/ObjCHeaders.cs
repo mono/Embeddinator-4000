@@ -16,6 +16,31 @@ namespace MonoManagedToNative.Generators
         {
             base.Process();
         }
+
+        public override void WriteHeaders()
+        {
+            base.WriteHeaders();
+            WriteLine("#import <Foundation/Foundation.h>");
+        }
+
+        public override bool VisitClassDecl(Class @class)
+        {
+            PushBlock(CBlockKind.Class);
+
+            WriteLine("@interface {0} : NSObject", @class.QualifiedName);
+            WriteStartBraceIndent();
+
+            WriteCloseBraceIndent();
+            NewLine();
+
+            //VisitDeclContext(@class);
+
+            WriteLine("@end");
+
+            PopBlock(NewLineKind.BeforeNextBlock);
+
+            return true;
+        }        
     }
 
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using MonoManagedToNative.Generators;
 using CppSharp;
+using CppSharp.Generators;
 
 namespace MonoManagedToNative
 {
