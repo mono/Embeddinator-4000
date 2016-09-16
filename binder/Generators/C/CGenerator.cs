@@ -80,7 +80,8 @@ namespace MonoManagedToNative.Generators
                 var typePrinter = new CppTypePrinter
                 {
                     PrintScopeKind = CppTypePrintScopeKind.Qualified,
-                    PrintFlavorKind = GetTypePrinterFlavorKind(Options.Language)
+                    PrintFlavorKind = GetTypePrinterFlavorKind(Options.Language),
+                    PrintVariableArrayAsPointers = true
                 };
                 return typePrinter;
             }
