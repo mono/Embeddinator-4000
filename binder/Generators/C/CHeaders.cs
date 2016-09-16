@@ -17,16 +17,21 @@ namespace MonoManagedToNative.Generators
             get { return "h"; }
         }
 
+        public void WriteStandardHeader(string name)
+        {
+            var header = Options.Language == GeneratorKind.CPlusPlus ?
+                string.Format("c{0}", name) : string.Format("{0}.h", name);
+            WriteLine("#include <{0}>", header);            
+        }
+
         public override void WriteHeaders()
         {
             WriteLine("#pragma once");
             NewLine();
-            var stdboolHeader = Options.Language == GeneratorKind.CPlusPlus ?
-                "cstdbool" : "stdbool.h";
-            WriteLine("#include <{0}>", stdboolHeader);
-            var stdintHeader = Options.Language == GeneratorKind.CPlusPlus ?
-                "cstdint" : "stdint.h";            
-            WriteLine("#include <{0}>", stdintHeader);
+
+            WriteStandardHeader("stdbool");
+            WriteStandardHeader("stdint");
+
             WriteInclude("mono_managed_to_native.h");
         }
 
