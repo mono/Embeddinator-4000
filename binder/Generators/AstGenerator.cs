@@ -77,7 +77,8 @@ namespace MonoManagedToNative.Generators
 
         static string UnmangleTypeName(string name)
         {
-            return name.Replace(new char[] {'`', '<', '>' }, "_");
+            return string.IsNullOrEmpty(name) ? string.Empty :
+                         name.Replace(new char[] {'`', '<', '>' }, "_");
         }
 
         public Class VisitRecord(TypeInfo type)
@@ -318,7 +319,8 @@ namespace MonoManagedToNative.Generators
                     type = new BuiltinType(PrimitiveType.Void);
                     break;
                 }
-                return new QualifiedType();
+                type = new UnsupportedType { Description = managedType.FullName };
+                break;
             case TypeCode.DBNull:
                 throw new NotSupportedException();
             case TypeCode.Boolean:
