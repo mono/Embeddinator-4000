@@ -287,7 +287,7 @@ namespace MonoManagedToNative
         void HandleParserResult<T>(ParserResult<T> result)
         {
             var file = result.Input.FullPath;
-            if (file.StartsWith(result.Input.BasePath))
+            if (file.StartsWith(result.Input.BasePath, StringComparison.Ordinal))
             {
                 file = file.Substring(result.Input.BasePath.Length);
                 file = file.TrimStart('\\');
