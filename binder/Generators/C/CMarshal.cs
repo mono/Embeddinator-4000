@@ -138,6 +138,7 @@ namespace MonoManagedToNative.Generators
                     return true;
                 case PrimitiveType.Bool:
                 case PrimitiveType.Char:
+                case PrimitiveType.WideChar:
                 case PrimitiveType.UChar:
                 case PrimitiveType.Short:
                 case PrimitiveType.UShort:

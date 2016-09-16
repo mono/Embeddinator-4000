@@ -31,6 +31,7 @@ namespace MonoManagedToNative.Generators
 
             WriteStandardHeader("stdbool");
             WriteStandardHeader("stdint");
+            WriteStandardHeader("wchar");
 
             WriteInclude("mono_managed_to_native.h");
         }
