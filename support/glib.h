@@ -143,6 +143,29 @@ gchar **g_strdupv (gchar **str_array);
 #define g_return_val_if_fail(x,e)  G_STMT_START { if (!(x)) { g_critical ("%s:%d: assertion '%s' failed", __FILE__, __LINE__, #x); return (e); } } G_STMT_END
 
 /*
+ * Array
+ */
+
+typedef struct _GArray GArray;
+struct _GArray {
+	gchar *data;
+	gint len;
+};
+
+GArray *g_array_new               (gboolean zero_terminated, gboolean clear_, guint element_size);
+GArray *g_array_sized_new         (gboolean zero_terminated, gboolean clear_, guint element_size, guint reserved_size);
+gchar*  g_array_free              (GArray *array, gboolean free_segment);
+GArray *g_array_append_vals       (GArray *array, gconstpointer data, guint len);
+GArray* g_array_insert_vals       (GArray *array, guint index_, gconstpointer data, guint len);
+GArray* g_array_remove_index      (GArray *array, guint index_);
+GArray* g_array_remove_index_fast (GArray *array, guint index_);
+void    g_array_set_size          (GArray *array, gint length);
+
+#define g_array_append_val(a,v)   (g_array_append_vals((a),&(v),1))
+#define g_array_insert_val(a,i,v) (g_array_insert_vals((a),(i),&(v),1))
+#define g_array_index(a,t,i)      *(t*)(((a)->data) + sizeof(t) * (i))
+
+/*
  * String type
  */
 typedef struct {
