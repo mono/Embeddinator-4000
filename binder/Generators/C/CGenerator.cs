@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using CppSharp;
 using CppSharp.AST;
 using CppSharp.Generators;
 
@@ -26,6 +25,33 @@ namespace MonoManagedToNative.Generators
         public static string GenId(string id)
         {
             return "__" + id;
+        }
+
+        private static CppTypePrintFlavorKind GetTypePrinterFlavorKind(GeneratorKind kind)
+        {
+            switch (kind)
+            {
+                case GeneratorKind.C:
+                    return CppTypePrintFlavorKind.C;
+                case GeneratorKind.CPlusPlus:
+                    return CppTypePrintFlavorKind.Cpp;
+                case GeneratorKind.ObjectiveC:
+                    return CppTypePrintFlavorKind.ObjC;
+            }
+
+            throw new NotImplementedException();
+        }
+
+        public static CManagedToNativeTypePrinter GetCTypePrinter(GeneratorKind kind)
+        {
+            var typePrinter = new CManagedToNativeTypePrinter
+            {
+                PrintScopeKind = CppTypePrintScopeKind.Qualified,
+                PrintFlavorKind = GetTypePrinterFlavorKind(kind),
+                PrintVariableArrayAsPointers = true
+            };
+
+            return typePrinter;
         }
     }
 
@@ -58,32 +84,11 @@ namespace MonoManagedToNative.Generators
             return decl.QualifiedName;
         }
 
-        private static CppTypePrintFlavorKind GetTypePrinterFlavorKind(GeneratorKind kind)
-        {
-            switch(kind)
-            {
-            case GeneratorKind.C:
-                return CppTypePrintFlavorKind.C;
-            case GeneratorKind.CPlusPlus:
-                return CppTypePrintFlavorKind.Cpp;
-            case GeneratorKind.ObjectiveC:
-                return CppTypePrintFlavorKind.ObjC;                       
-            }
-
-            throw new NotImplementedException();
-        }
-
-        public CppTypePrinter CTypePrinter
+        public CManagedToNativeTypePrinter CTypePrinter
         {
             get
             {
-                var typePrinter = new CppTypePrinter
-                {
-                    PrintScopeKind = CppTypePrintScopeKind.Qualified,
-                    PrintFlavorKind = GetTypePrinterFlavorKind(Options.Language),
-                    PrintVariableArrayAsPointers = true
-                };
-                return typePrinter;
+                return CGenerator.GetCTypePrinter(Options.Language);
             }
         }
 
@@ -255,7 +260,7 @@ namespace MonoManagedToNative.Generators
         public virtual bool VisitVarTemplateSpecializationDecl(VarTemplateSpecialization spec)
         {
             throw new NotImplementedException();
-        }        
+        }
 
         #endregion
     }

@@ -2,6 +2,10 @@
 
 namespace MonoManagedToNative.Generators
 {
+    public class CManagedToNativeTypePrinter : CppTypePrinter
+    {
+    }
+
     public static class TypeExtensions
     {
         public static void CMarshalToNative(this QualifiedType type,
