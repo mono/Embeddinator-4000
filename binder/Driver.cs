@@ -229,8 +229,8 @@ namespace MonoManagedToNative
 
                 var monoPath = FindMonoPath();
                 var invocation = string.Format(
-                    "/nologo -I\"{0}\\include\\mono-2.0\" {0} \"{1}\\lib\\monosgen-2.0.lib\"",
-                    files, monoPath);
+                    "/nologo -I\"{0}\\include\\mono-2.0\" {1} \"{0}\\lib\\monosgen-2.0.lib\"",
+                    monoPath, string.Join(" ", files.ToList()));
 
                 InvokeCompiler(clBin, invocation);
 
