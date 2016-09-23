@@ -182,7 +182,7 @@ namespace MonoManagedToNative
             process.Start();
             process.BeginOutputReadLine();
             process.WaitForExit();
-            Diagnostics.PopIndent();            
+            Diagnostics.PopIndent();
         }
 
         private IEnumerable<string> GetOutputFiles(string pattern)
@@ -202,7 +202,7 @@ namespace MonoManagedToNative
                 break;
             case GeneratorKind.CPlusPlus:
                 files = files.Concat(GetOutputFiles("cpp"));
-                break;           
+                break;
             }
 
             if (Platform.IsWindows)
