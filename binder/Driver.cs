@@ -167,16 +167,6 @@ namespace MonoManagedToNative
             }
         }
 
-        static string FindMonoPath()
-        {
-            if (Platform.IsWindows)
-                return @"C:\\Program Files (x86)\\Mono";
-            else if (Platform.IsMacOS)
-                return "/Library/Frameworks/Mono.framework/Versions/Current";
-
-            throw new NotImplementedException();
-        }
-
         void InvokeCompiler(string compiler, string arguments)
         {
             Diagnostics.Debug("Invoking: {0} {1}", compiler, arguments);
@@ -227,7 +217,7 @@ namespace MonoManagedToNative
                 var clBin = Path.GetFullPath(
                     Path.Combine(vsSdk.Directory, "..", "..", "VC", "bin", "cl.exe"));
 
-                var monoPath = FindMonoPath();
+                var monoPath = ManagedToolchain.FindMonoPath();
                 var invocation = string.Format(
                     "/nologo -I\"{0}\\include\\mono-2.0\" {1} \"{0}\\lib\\monosgen-2.0.lib\"",
                     monoPath, string.Join(" ", files.ToList()));
@@ -240,7 +230,7 @@ namespace MonoManagedToNative
             {
                 var xcodePath = XcodeToolchain.GetXcodeToolchainPath();
                 var clangBin = Path.Combine(xcodePath, "usr/bin/clang");
-                var monoPath = FindMonoPath();
+                var monoPath = ManagedToolchain.FindMonoPath();
 
                 var invocation = string.Format(
                     "-I\"{0}/include/mono-2.0\" -L\"{0}/lib/\" -lmonosgen-2.0 {1}",
