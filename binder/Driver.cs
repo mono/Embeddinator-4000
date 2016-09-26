@@ -99,7 +99,7 @@ namespace MonoManagedToNative
                 foreach (var file in Directory.EnumerateFiles(path))
                     Output.WriteOutput(Path.GetFileName(file), File.ReadAllText(file));
             }
-            catch (Exception exc)
+            catch (Exception)
             {
                 Diagnostics.Warning("Could not find directory with support API.");
             }
