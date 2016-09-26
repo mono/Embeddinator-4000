@@ -48,12 +48,14 @@
     #define MONO_M2N_API MONO_M2N_API_IMPORT
 #endif
 
+typedef struct _MonoDomain MonoDomain;
+typedef struct _MonoException MonoException;
+
 MONO_M2N_BEGIN_DECLS
 
 /** 
  * Represents a managed-to-native binding context.
  */
-typedef struct _MonoDomain MonoDomain;
 typedef struct
 {
   MonoDomain* domain;
@@ -91,6 +93,8 @@ void* mono_m2n_install_assembly_search_hook(mono_m2n_assembly_search_hook_t hook
 typedef enum
 {
     MONO_M2N_OK = 0,
+    // Mono managed exception
+    MONO_M2N_EXCEPTION_THROWN,
     // Mono failed to load assembly
     MONO_M2N_ASSEMBLY_OPEN_FAILED,
     // Mono failed to lookup method
@@ -103,6 +107,8 @@ typedef enum
 typedef struct
 {
     mono_m2n_error_type_t type;
+    // Contains exception object if type is MONO_M2N_EXCEPTION_THROWN
+    MonoException* exception;
     const char* string;
 } mono_m2n_error_t;
 

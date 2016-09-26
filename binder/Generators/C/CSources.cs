@@ -275,6 +275,15 @@ namespace MonoManagedToNative.Generators
 
             WriteLine("{0} = mono_runtime_invoke({1}, {2}, {3}, &{4});", resultId,
                 methodId, instanceId, argsId, exceptionId);
+
+            WriteLine("if ({0} != 0)", exceptionId);
+            WriteStartBraceIndent();
+            var errorId = GeneratedIdentifier("error");
+            WriteLine("mono_m2n_error_t {0};", errorId);
+            WriteLine("{0}.type = MONO_M2N_EXCEPTION_THROWN;", errorId);
+            WriteLine("{0}.exception = (MonoException*) {1};", errorId, exceptionId);
+            WriteLine("mono_m2n_error({0});", errorId);
+            WriteCloseBraceIndent();
         }
 
         public override bool VisitMethodDecl(Method method)
@@ -296,10 +305,6 @@ namespace MonoManagedToNative.Generators
             var needsReturn = !retType.Type.IsPrimitiveType(PrimitiveType.Void);
 
             GenerateMethodInvocation(method);
-
-            var exceptionId = GeneratedIdentifier("exception");
-            //WriteLine("if ({0})", exceptionId);
-            //WriteLineIndent("return 0;");
 
             string returnCode = "0";
 
