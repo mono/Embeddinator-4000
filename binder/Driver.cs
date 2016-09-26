@@ -244,8 +244,27 @@ namespace MonoManagedToNative
             throw new NotImplementedException();
         }
 
+        bool ValidateAssemblies()
+        {
+            foreach (var assembly in Options.Project.Assemblies)
+            {
+                var file = Path.GetFullPath(assembly);
+
+                if (File.Exists(file))
+                    continue;
+
+                Diagnostics.Error("Could not find assembly '{0}'", assembly);
+                return false;
+            }
+
+            return true;
+        }
+
         public void Run()
         {
+            if (!ValidateAssemblies())
+                return;
+
             Options.Project.BuildInputs();
 
             Diagnostics.Message("Parsing assemblies...");
