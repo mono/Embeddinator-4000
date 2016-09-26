@@ -196,11 +196,17 @@ namespace MonoManagedToNative.Generators
             WriteLine("mono_method_desc_free({0});", descId);
 
             var retType = method.ReturnType;
-            var needsReturn = !retType.Type.IsPrimitiveType(PrimitiveType.Void);
 
-            var @return = needsReturn ? " 0" : string.Empty;
             WriteLine("if ({0} == 0)", methodId);
-                WriteLineIndent("return{0};", @return);
+            WriteStartBraceIndent();
+
+            var errorId = GeneratedIdentifier("error");
+            WriteLine("mono_m2n_error_t {0};", errorId);
+            WriteLine("{0}.type = MONO_M2N_METHOD_LOOKUP_FAILED;", errorId);
+            WriteLine("{0}.string = {1};", errorId, methodNameId);
+            WriteLine("mono_m2n_error({0});", errorId);
+
+            WriteCloseBraceIndent();
         }
 
         public void GenerateMethodGCHandleLookup(Method method)

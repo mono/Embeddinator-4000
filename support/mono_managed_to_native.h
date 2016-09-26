@@ -92,7 +92,9 @@ typedef enum
 {
     MONO_M2N_OK = 0,
     // Mono failed to load assembly
-    MONO_M2N_ASSEMBLY_OPEN_FAILED
+    MONO_M2N_ASSEMBLY_OPEN_FAILED,
+    // Mono failed to lookup method
+    MONO_M2N_METHOD_LOOKUP_FAILED
 } mono_m2n_error_type_t;
 
 /**
