@@ -136,6 +136,28 @@ void* mono_m2n_install_assembly_search_hook(mono_m2n_assembly_search_hook_t hook
     return prev;
 }
 
+MonoClass* mono_m2n_search_class(const char* assembly, const char* _namespace,
+    const char* name)
+{
+    mono_m2n_context_t* ctx = mono_m2n_get_context();
+
+    const char* path = mono_m2n_search_assembly(assembly);
+    MonoAssembly* assembly = mono_domain_assembly_open(ctx->domain, path);
+
+    if (assembly == 0)
+    {
+        mono_m2n_error_t error;
+        __error.type = MONO_M2N_ASSEMBLY_OPEN_FAILED;
+        __error.string = path;
+        mono_m2n_error(error);
+    }
+
+    MonoImage* image = mono_assembly_get_image(assembly);
+    MonoClass* klass = mono_class_from_name(image, _namespace, name);
+
+    return klass;
+}
+
 static mono_m2n_error_report_hook_t g_error_report_hook = 0;
 
 void* mono_m2n_install_error_report_hook(mono_m2n_error_report_hook_t hook)

@@ -50,7 +50,7 @@
 
 typedef struct _MonoDomain MonoDomain;
 typedef struct _MonoException MonoException;
-typedef struct _MonoClass _MonoClass;
+typedef struct _MonoClass MonoClass;
 
 MONO_M2N_BEGIN_DECLS
 
@@ -97,6 +97,12 @@ typedef const char* (*mono_m2n_assembly_search_hook_t)(const char*);
  * Returns the previous installed hook.
  */
 void* mono_m2n_install_assembly_search_hook(mono_m2n_assembly_search_hook_t hook);
+
+/** 
+ * Searches and returns for the Mono class in the given assembly.
+ */
+MonoClass* mono_m2n_search_class(const char* assembly, const char* _namespace,
+    const char* name);
 
 /**
  * Represents the different types of errors to be reported.
