@@ -50,6 +50,7 @@
 
 typedef struct _MonoDomain MonoDomain;
 typedef struct _MonoException MonoException;
+typedef struct _MonoClass _MonoClass;
 
 MONO_M2N_BEGIN_DECLS
 
@@ -68,10 +69,20 @@ typedef struct
 int mono_m2n_init(mono_m2n_context_t* ctx, const char* domain);
 
 /** 
- * Destroyes the managed-to-native binding context.
+ * Destroys the managed-to-native binding context.
  * Returns a boolean indicating success or failure.
  */
 int mono_m2n_destroy(mono_m2n_context_t* ctx);
+
+/** 
+ * Returns the current context.
+ */
+mono_m2n_context_t* mono_m2n_get_context();
+
+/** 
+ * Sets the current context.
+ */
+void mono_m2n_set_context(mono_m2n_context_t* ctx);
 
 /** 
  * Searches and returns the path to the given managed assembly.

@@ -43,6 +43,18 @@
 #include <mono/jit/jit.h>
 #include <mono/metadata/mono-config.h>
 
+mono_m2n_context_t* _current_context;
+
+mono_m2n_context_t* mono_m2n_get_context()
+{
+    return _current_context;
+}
+
+void mono_m2n_set_context(mono_m2n_context_t* ctx)
+{
+    _current_context = ctx;
+}
+
 int mono_m2n_init(mono_m2n_context_t* ctx, const char* domain)
 {
     if (ctx == 0 || ctx->domain != 0)
@@ -50,6 +62,8 @@ int mono_m2n_init(mono_m2n_context_t* ctx, const char* domain)
 
     mono_config_parse(NULL);
     ctx->domain = mono_jit_init_version(domain, "v4.0.30319");
+
+    mono_m2n_set_context(ctx);
 
     return true;
 }
