@@ -8,16 +8,16 @@ namespace MonoManagedToNative.Generators
 
     public static class TypeExtensions
     {
-        public static void CMarshalToNative(this QualifiedType type,
+        public static bool CMarshalToNative(this QualifiedType type,
             CMarshalManagedToNative printer)
         {
-            type.Visit(printer);
+            return type.Visit(printer);
         }
 
-        public static void CMarshalToManaged(this QualifiedType type,
+        public static bool CMarshalToManaged(this QualifiedType type,
             CMarshalNativeToManaged printer)
         {
-            type.Visit(printer);
+            return type.Visit(printer);
         }
     }
 
