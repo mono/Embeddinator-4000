@@ -27,6 +27,11 @@ namespace MonoManagedToNative.Generators
             return "__" + id;
         }
 
+        public static string AssemblyId(TranslationUnit unit)
+        {
+            return GenId(unit.FileName).Replace('.', '_');
+        }
+
         private static CppTypePrintFlavorKind GetTypePrinterFlavorKind(GeneratorKind kind)
         {
             switch (kind)

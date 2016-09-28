@@ -19,10 +19,7 @@ namespace MonoManagedToNative.Generators
 
         public string AssemblyId
         {
-            get
-            {
-                return GeneratedIdentifier(Unit.FileName).Replace('.', '_');
-            }
+            get { return CGenerator.AssemblyId(Unit); }
         }
 
         public override void WriteHeaders()
