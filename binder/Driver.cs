@@ -67,6 +67,8 @@ namespace MonoManagedToNative
             if (Options.Language != GeneratorKind.CPlusPlus)
                 Context.TranslationUnitPasses.AddPass(new RenameEnumItemsPass());
 
+            Context.TranslationUnitPasses.AddPass(new GenerateArrayTypes());
+
             Context.TranslationUnitPasses.AddPass(new RenameDuplicatedDeclsPass());
             Context.TranslationUnitPasses.AddPass(new CheckDuplicatedNamesPass());
             Context.RunPasses();
