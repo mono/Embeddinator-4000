@@ -249,7 +249,14 @@ namespace MonoManagedToNative.Generators
 
         public virtual bool VisitTypedefDecl(TypedefDecl typedef)
         {
-            throw new NotImplementedException();
+            PushBlock();
+
+            var typeName = typedef.Type.Visit(CTypePrinter);
+            WriteLine("typedef {0} {1};", typeName, typedef.Name);
+
+            PopBlock(NewLineKind.BeforeNextBlock);
+
+            return true;
         }
 
         public virtual bool VisitVariableDecl(Variable variable)
