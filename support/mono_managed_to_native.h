@@ -48,6 +48,7 @@
     #define MONO_M2N_API MONO_M2N_API_IMPORT
 #endif
 
+typedef struct _GArray GArray;
 typedef struct _MonoDomain MonoDomain;
 typedef struct _MonoException MonoException;
 typedef struct _MonoClass MonoClass;
@@ -141,5 +142,14 @@ typedef void (*mono_m2n_error_report_hook_t)(mono_m2n_error_t);
  * Installs an hook that is called for each error reported.
  */
 void* mono_m2n_install_error_report_hook(mono_m2n_error_report_hook_t hook);
+
+/** 
+ * Arrays
+ */
+
+typedef struct
+{
+    GArray* array;
+} MonoEmbedArray;
 
 MONO_M2N_END_DECLS
