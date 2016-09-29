@@ -25,6 +25,7 @@ namespace MonoManagedToNative.Generators
         public override void WriteHeaders()
         {
             WriteLine("#include \"{0}.h\"", Unit.FileName);
+            WriteLine("#include \"glib.h\"");
             WriteLine("#include <mono/jit/jit.h>");
             WriteLine("#include <mono/metadata/assembly.h>");
             WriteLine("#include <mono/metadata/object.h>");
@@ -252,7 +253,7 @@ namespace MonoManagedToNative.Generators
                 };
 
                 var marshal = new CMarshalNativeToManaged(ctx);
-                param.QualifiedType.CMarshalToManaged(marshal);
+                param.QualifiedType.Visit(marshal);
 
                 if (!string.IsNullOrWhiteSpace(marshal.Context.SupportBefore))
                     Write(marshal.Context.SupportBefore);
@@ -317,7 +318,7 @@ namespace MonoManagedToNative.Generators
                 };
 
                 var marshal = new CMarshalManagedToNative(ctx);
-                retType.CMarshalToNative(marshal);
+                retType.Visit(marshal);
 
                 if (!string.IsNullOrWhiteSpace(marshal.Context.SupportBefore))
                     Write(marshal.Context.SupportBefore);
