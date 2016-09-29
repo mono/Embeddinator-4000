@@ -42,7 +42,8 @@
 
 #include <mono/jit/jit.h>
 #include <mono/metadata/mono-config.h>
-
+#include <mono/metadata/assembly.h>
+ 
 mono_m2n_context_t* _current_context;
 
 mono_m2n_context_t* mono_m2n_get_context()
@@ -133,7 +134,7 @@ void* mono_m2n_install_assembly_search_hook(mono_m2n_assembly_search_hook_t hook
 {
     mono_m2n_assembly_search_hook_t prev = g_assembly_search_hook;
     g_assembly_search_hook = hook;
-    return prev;
+    return (void*)prev;
 }
 
 MonoClass* mono_m2n_search_class(const char* assembly, const char* _namespace,
@@ -142,17 +143,17 @@ MonoClass* mono_m2n_search_class(const char* assembly, const char* _namespace,
     mono_m2n_context_t* ctx = mono_m2n_get_context();
 
     const char* path = mono_m2n_search_assembly(assembly);
-    MonoAssembly* assembly = mono_domain_assembly_open(ctx->domain, path);
+    MonoAssembly* mono_assembly = mono_domain_assembly_open(ctx->domain, path);
 
-    if (assembly == 0)
+    if (mono_assembly == 0)
     {
         mono_m2n_error_t error;
-        __error.type = MONO_M2N_ASSEMBLY_OPEN_FAILED;
-        __error.string = path;
+        error.type = MONO_M2N_ASSEMBLY_OPEN_FAILED;
+        error.string = path;
         mono_m2n_error(error);
     }
 
-    MonoImage* image = mono_assembly_get_image(assembly);
+    MonoImage* image = mono_assembly_get_image(mono_assembly);
     MonoClass* klass = mono_class_from_name(image, _namespace, name);
 
     return klass;
