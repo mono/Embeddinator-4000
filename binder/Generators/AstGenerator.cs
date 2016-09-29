@@ -179,6 +179,10 @@ namespace MonoManagedToNative.Generators
             if (type.HasElementType)
             {
                 var elementType = type.GetElementType();
+
+                if (type.IsArray)
+                    return GetInternalTypeName(elementType) + "[]";
+
                 return GetInternalTypeName(elementType);
             }
 
