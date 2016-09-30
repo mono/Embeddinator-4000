@@ -44,6 +44,12 @@ gpointer g_malloc (gsize x)
   return malloc(x);
 }
 
+gpointer g_malloc0 (gsize x)
+{
+  return calloc(1, x);
+}
+
+
 #define INITIAL_CAPACITY 16
 
 #define element_offset(p,i) ((p)->array.data + (i) * (p)->element_size)
