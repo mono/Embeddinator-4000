@@ -347,8 +347,9 @@ namespace MonoManagedToNative.Generators
             var isValueType = IsValueType(elementType);
             if (isValueType)
             {
-                support.WriteLine("mono_array_set({0}, {1}, {2});",
-                    arrayId, iteratorId, marshal.Context.Return.ToString());
+                support.WriteLine("mono_array_set({0}, {1}, {2}, {3});",
+                    arrayId, elementTypeName, iteratorId,
+                    marshal.Context.Return.ToString());
             }
             else
             {
