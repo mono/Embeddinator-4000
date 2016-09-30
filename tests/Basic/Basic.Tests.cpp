@@ -55,9 +55,15 @@ TEST_CASE("EnumTypes", "[EnumTypes]") {
 }
 
 TEST_CASE("ArrayTypes", "[ArrayTypes]") {
-    _IntArray array = ArrayTypes_ReturnsIntArray();
-    REQUIRE(array.array->len == 3);
-    REQUIRE(g_array_index(array.array, int, 0) == 1);
-    REQUIRE(g_array_index(array.array, int, 1) == 2);
-    REQUIRE(g_array_index(array.array, int, 2) == 3);
+    _IntArray _int = ArrayTypes_ReturnsIntArray();
+    REQUIRE(_int.array->len == 3);
+    REQUIRE(g_array_index(_int.array, int, 0) == 1);
+    REQUIRE(g_array_index(_int.array, int, 1) == 2);
+    REQUIRE(g_array_index(_int.array, int, 2) == 3);
+
+    _CharArray _string = ArrayTypes_ReturnsStringArray();
+    REQUIRE(_string.array->len == 3);
+    REQUIRE(strcmp(g_array_index(_string.array, gchar*, 0), "1") == 0);
+    REQUIRE(strcmp(g_array_index(_string.array, gchar*, 1), "2") == 0);
+    REQUIRE(strcmp(g_array_index(_string.array, gchar*, 2), "3") == 0);
 }

@@ -38,6 +38,9 @@ public class BuiltinTypes
 public static class ArrayTypes
 {
     public static int[] ReturnsIntArray() { return new int[] { 1, 2, 3 }; }
+
+    public static string[] ReturnsStringArray() { return new string[] { "1", "2", "3" }; }
+
 }
 
 #endregion

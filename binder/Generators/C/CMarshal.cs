@@ -98,8 +98,11 @@ namespace MonoManagedToNative.Generators
             var elementId = CGenerator.GenId(string.Format("{0}_array_element",
                 Context.ArgName));
 
-            support.WriteLine("char* {0} = mono_array_addr_with_size({1}, {2}, {3});",
-                elementId, arrayId, elementSizeId, iteratorId);
+            var isValueType = CMarshalNativeToManaged.IsValueType(array.Array.Type);
+            support.WriteLine("{5} {0} = {4}mono_array_addr_with_size({1}, {2}, {3});",
+                elementId, arrayId, elementSizeId, iteratorId,
+                isValueType ? string.Empty : "*(MonoObject**)",
+                isValueType ? "char*" : "MonoObject*");
 
             var ctx = new MarshalContext(Context.Context)
             {
