@@ -135,6 +135,18 @@ namespace MonoManagedToNative.Generators
             Write(")");
         }
 
+        public virtual bool VisitTypedefDecl(TypedefDecl typedef)
+        {
+            PushBlock();
+
+            var typeName = typedef.Type.Visit(CTypePrinter);
+            WriteLine("typedef {0} {1};", typeName, typedef.Name);
+
+            PopBlock(NewLineKind.BeforeNextBlock);
+
+            return true;
+        }
+
         #region IDeclVisitor methods
 
         public virtual bool VisitNamespace (Namespace @namespace)
@@ -245,18 +257,6 @@ namespace MonoManagedToNative.Generators
         public virtual bool VisitTypeAliasTemplateDecl(TypeAliasTemplate typeAliasTemplate)
         {
             throw new NotImplementedException();
-        }
-
-        public virtual bool VisitTypedefDecl(TypedefDecl typedef)
-        {
-            PushBlock();
-
-            var typeName = typedef.Type.Visit(CTypePrinter);
-            WriteLine("typedef {0} {1};", typeName, typedef.Name);
-
-            PopBlock(NewLineKind.BeforeNextBlock);
-
-            return true;
         }
 
         public virtual bool VisitVariableDecl(Variable variable)
