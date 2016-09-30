@@ -40,6 +40,10 @@
 #include <unistd.h>
 #endif
 
+#ifdef _WIN32
+#include <Windows.h>
+#endif
+
 #include <mono/jit/jit.h>
 #include <mono/metadata/mono-config.h>
 #include <mono/metadata/assembly.h>
@@ -80,7 +84,7 @@ int mono_m2n_destroy(mono_m2n_context_t* ctx)
 
 static GString* get_current_executable_path()
 {
-#ifdef __APPLE__
+#if defined(__APPLE__)
     int ret;
     pid_t pid; 
     char pathbuf[PROC_PIDPATHINFO_MAXSIZE];
@@ -89,8 +93,14 @@ static GString* get_current_executable_path()
     ret = proc_pidpath (pid, pathbuf, sizeof(pathbuf));
 
    return (ret > 0) ? g_string_new(pathbuf) : 0;
+#elif defined(_WIN32)
+    HMODULE hModule = GetModuleHandleW(0);
+    CHAR pathbuf[MAX_PATH];
+    DWORD ret = GetModuleFileNameA(hModule, pathbuf, MAX_PATH);
+
+    return (ret > 0) ? g_string_new(pathbuf) : 0;
 #else
-   return 0;
+    g_assert_not_reached();
 #endif
 }
 
