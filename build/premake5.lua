@@ -10,6 +10,9 @@ solution "MonoManagedToNative"
   configurations { "Debug", "Release" }
   architecture "x86_64"
 
+  filter "system:windows"
+    architecture "x86"
+
   filter "system:macosx"
     architecture "x86"
 
