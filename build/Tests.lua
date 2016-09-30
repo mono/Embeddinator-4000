@@ -106,6 +106,11 @@ function SetupTestNativeProject(name, depends)
       links { depends .. ".C" }
     end
 
+    filter { "action:vs*" }
+      buildoptions { "/wd4018" } -- eglib signed/unsigned warnings
+
+    filter {}
+
     SetupTestGeneratorBuildEvent(name)
     SetupMono()
 end
