@@ -32,8 +32,8 @@ solution "MonoManagedToNative"
   include ("../binder")
   include("../CppSharp/src/Core")
   include("../CppSharp/src/AST")
+  include("../CppSharp/src/CppParser/Bindings/CSharp")
   include("../CppSharp/src/Parser")
-  include("../CppSharp/src/CppParser/Bindings")
   include("../CppSharp/src/Generator")
   include("../CppSharp/src/Runtime")
 
