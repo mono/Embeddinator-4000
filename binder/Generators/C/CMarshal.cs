@@ -44,9 +44,12 @@ namespace MonoManagedToNative.Generators
 
     public class CMarshalManagedToNative : CMarshalPrinter
     {
+        public bool UnboxPrimitiveValues { get; set; }
+
         public CMarshalManagedToNative(MarshalContext marshalContext)
             : base(marshalContext)
         {
+            UnboxPrimitiveValues = true;
         }
 
         public override bool VisitManagedArrayType(ManagedArrayType array,
@@ -105,7 +108,7 @@ namespace MonoManagedToNative.Generators
                 ReturnType = array.Array.QualifiedType
             };
 
-            var marshal = new CMarshalManagedToNative(ctx);
+            var marshal = new CMarshalManagedToNative(ctx) { UnboxPrimitiveValues = false };
             array.Array.QualifiedType.Visit(marshal);
 
             if (!string.IsNullOrWhiteSpace(marshal.Context.SupportBefore))
@@ -172,14 +175,20 @@ namespace MonoManagedToNative.Generators
                 case PrimitiveType.Double:
                 case PrimitiveType.LongDouble:
                 case PrimitiveType.Null:
-                    // Unbox MonoObject to get at the primitive value.
-                    var unboxId = CGenerator.GenId("unbox");
-                    Context.SupportBefore.WriteLine("void* {0} = mono_object_unbox({1});",
-                        unboxId, Context.ArgName);
                     var typePrinter = new CppTypePrinter();
-                    string typeName = Context.ReturnType.Visit(typePrinter);
+                    var typeName = Context.ReturnType.Visit(typePrinter);
 
-                    Context.Return.Write("*(({0}*){1})", typeName, unboxId);
+                    var valueId = Context.ArgName;
+
+                    if (UnboxPrimitiveValues)
+                    {
+                        var unboxId = CGenerator.GenId("unbox");
+                        Context.SupportBefore.WriteLine("void* {0} = mono_object_unbox({1});",
+                            unboxId, Context.ArgName);
+                        valueId = unboxId;
+                    }
+
+                    Context.Return.Write("*(({0}*){1})", typeName, valueId);
                     return true;
             }
 

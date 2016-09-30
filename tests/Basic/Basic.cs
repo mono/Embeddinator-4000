@@ -33,6 +33,15 @@ public class BuiltinTypes
 
 #endregion
 
+#region Arrays
+
+public static class ArrayTypes
+{
+    public static int[] ReturnsIntArray() { return new int[] { 1, 2, 3 }; }
+}
+
+#endregion
+
 #region Enums
 
 public enum Enum

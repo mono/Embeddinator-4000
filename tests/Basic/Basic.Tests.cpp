@@ -2,6 +2,7 @@
 #include <catch.hpp>
 
 #include "Basic.Managed.h"
+#include "glib.h"
 
 TEST_CASE("BuiltinTypes", "[BuiltinTypes]") {
     BuiltinTypes* bt = BuiltinTypes_new();
@@ -51,4 +52,12 @@ TEST_CASE("EnumTypes", "[EnumTypes]") {
 
     REQUIRE(EnumTypes_PassEnumFlags(EnumFlags_FlagOne) == (1 << 0));
     REQUIRE(EnumTypes_PassEnumFlags(EnumFlags_FlagTwo) == (1 << 2));
+}
+
+TEST_CASE("ArrayTypes", "[ArrayTypes]") {
+    _IntArray array = ArrayTypes_ReturnsIntArray();
+    REQUIRE(array.array->len == 3);
+    REQUIRE(g_array_index(array.array, int, 0) == 1);
+    REQUIRE(g_array_index(array.array, int, 1) == 2);
+    REQUIRE(g_array_index(array.array, int, 2) == 3);
 }
