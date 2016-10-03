@@ -233,7 +233,7 @@ namespace MonoManagedToNative.Generators
                     return type.FullName;
             }
 
-            throw new NotSupportedException();
+            throw new NotImplementedException("No implementation for " + type);
         }
 
         string GetInternalMethodName(MethodBase method)
