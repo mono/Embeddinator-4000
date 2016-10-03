@@ -207,6 +207,8 @@ namespace MonoManagedToNative
                 break;
             }
 
+            const string exportDefine = "MONO_M2N_DLL_EXPORT";
+
             if (Platform.IsWindows)
             {
                 List<ToolchainVersion> vsSdks;
@@ -221,8 +223,8 @@ namespace MonoManagedToNative
 
                 var monoPath = ManagedToolchain.FindMonoPath();
                 var invocation = string.Format(
-                    "/nologo -I\"{0}\\include\\mono-2.0\" {1} \"{0}\\lib\\monosgen-2.0.lib\"",
-                    monoPath, string.Join(" ", files.ToList()));
+                    "/nologo /D{0} -I\"{1}\\include\\mono-2.0\" {2} \"{1}\\lib\\monosgen-2.0.lib\"",
+                    exportDefine, monoPath, string.Join(" ", files.ToList()));
 
                 InvokeCompiler(clBin, invocation);
 
@@ -235,8 +237,8 @@ namespace MonoManagedToNative
                 var monoPath = ManagedToolchain.FindMonoPath();
 
                 var invocation = string.Format(
-                    "-I\"{0}/include/mono-2.0\" -L\"{0}/lib/\" -lmonosgen-2.0 {1}",
-                    monoPath, string.Join(" ", files.ToList()));
+                    "/D{0} -I\"{1}/include/mono-2.0\" -L\"{1}/lib/\" -lmonosgen-2.0 {2}",
+                    exportDefine, monoPath, string.Join(" ", files.ToList()));
 
                 InvokeCompiler(clangBin, invocation);
 
