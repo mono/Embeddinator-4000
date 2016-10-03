@@ -21,7 +21,7 @@ namespace MonoManagedToNative.Generators
         {
             var header = Options.Language == GeneratorKind.CPlusPlus ?
                 string.Format("c{0}", name) : string.Format("{0}.h", name);
-            WriteLine("#include <{0}>", header);            
+            WriteLine("#include <{0}>", header);
         }
 
         public override void WriteHeaders()
