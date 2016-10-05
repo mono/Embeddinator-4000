@@ -321,6 +321,8 @@ namespace MonoManagedToNative.Generators
                 type = new BuiltinType(PrimitiveType.Null);
                 break;
             case TypeCode.Object:
+            case TypeCode.Decimal:
+            case TypeCode.DateTime:
                 if (managedType.FullName == "System.Void")
                 {
                     type = new BuiltinType(PrimitiveType.Void);
@@ -365,12 +367,6 @@ namespace MonoManagedToNative.Generators
                 break;
             case TypeCode.Double:
                 type = new BuiltinType(PrimitiveType.Double);
-                break;
-            case TypeCode.Decimal:
-                type = new CILType(typeof(decimal));
-                break;
-            case TypeCode.DateTime:
-                type = new CILType(typeof(DateTime));
                 break;
             case TypeCode.String:
                 type = new CILType(typeof(string));
