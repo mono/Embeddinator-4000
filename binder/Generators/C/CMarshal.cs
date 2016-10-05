@@ -201,9 +201,12 @@ namespace MonoManagedToNative.Generators
 
     public class CMarshalNativeToManaged : CMarshalPrinter
     {
-        public CMarshalNativeToManaged(MarshalContext marshalContext)
-            : base(marshalContext)
+        public bool PrimitiveValuesByValue { get; set; }
+
+        public CMarshalNativeToManaged (MarshalContext marshalContext)
+            : base (marshalContext)
         {
+            PrimitiveValuesByValue = false;
         }
 
         public static string GetMonoClassForPrimitiveType(PrimitiveType type)
@@ -350,7 +353,8 @@ namespace MonoManagedToNative.Generators
                 ArgName = elementId,
             };
 
-            var marshal = new CMarshalNativeToManaged(ctx);
+
+            var marshal = new CMarshalNativeToManaged (ctx) { PrimitiveValuesByValue = true };
             elementType.Visit(marshal);
 
             if (!string.IsNullOrWhiteSpace(marshal.Context.SupportBefore))
@@ -430,9 +434,11 @@ namespace MonoManagedToNative.Generators
                 case PrimitiveType.Double:
                 case PrimitiveType.LongDouble:
                 case PrimitiveType.Null:
-                    Context.Return.Write("{0}{1}",
-                        (param != null && (param.IsInOut || param.IsOut)) ? string.Empty : "&",
-                        Context.ArgName);
+                    var prefix = "&";
+                    if ((param != null && (param.IsInOut || param.IsOut))
+                        || PrimitiveValuesByValue)
+                        prefix = string.Empty;
+                    Context.Return.Write ("{0}{1}", prefix, Context.ArgName);
                     return true;
             }
 

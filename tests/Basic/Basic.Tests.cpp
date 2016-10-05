@@ -55,6 +55,15 @@ TEST_CASE("EnumTypes", "[EnumTypes]") {
 }
 
 TEST_CASE("ArrayTypes", "[ArrayTypes]") {
+    char _byte_arr[] = { 1, 2, 3 };
+    _UnsignedcharArray _byte;
+    _byte.array = g_array_sized_new(/*zero_terminated=*/false,
+        /*clear=*/false, sizeof(char), G_N_ELEMENTS(_byte_arr));
+    g_array_append_vals (_byte.array, _byte_arr, G_N_ELEMENTS(_byte_arr));
+
+    int _sum = ArrayTypes_SumByteArray(_byte);
+    REQUIRE(_sum == 6);
+
     _IntArray _int = ArrayTypes_ReturnsIntArray();
     REQUIRE(_int.array->len == 3);
     REQUIRE(g_array_index(_int.array, int, 0) == 1);
