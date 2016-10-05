@@ -237,7 +237,7 @@ namespace MonoManagedToNative
                 var monoPath = ManagedToolchain.FindMonoPath();
 
                 var invocation = string.Format(
-                    "/D{0} -I\"{1}/include/mono-2.0\" -L\"{1}/lib/\" -lmonosgen-2.0 {2}",
+                    "-D{0} -I\"{1}/include/mono-2.0\" -L\"{1}/lib/\" -lmonosgen-2.0 {2}",
                     exportDefine, monoPath, string.Join(" ", files.ToList()));
 
                 InvokeCompiler(clangBin, invocation);
