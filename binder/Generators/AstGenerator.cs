@@ -196,7 +196,9 @@ namespace MonoManagedToNative.Generators
                         return "intptr";
                     if (type.FullName == "System.UIntPtr")
                         return "uintptr";
-                    return "object";
+                    if (type.FullName == "System.Object")
+                        return "object";
+                    return type.FullName;
                 case TypeCode.Boolean:
                     return "bool";
                 case TypeCode.Char:
@@ -224,10 +226,11 @@ namespace MonoManagedToNative.Generators
                 case TypeCode.String:
                     return "string";
                 case TypeCode.Empty:
+                    return "null";  
                 case TypeCode.DBNull:
                 case TypeCode.Decimal:
                 case TypeCode.DateTime:
-                    throw new NotSupportedException();
+                    return type.FullName;
             }
 
             throw new NotSupportedException();
