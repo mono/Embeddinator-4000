@@ -129,7 +129,7 @@ function SetupTestProjectsCSharp(name, depends, extraFiles)
       end
     end
 
-    linktable = { }
+    linktable = { "System", "System.Core" }
 
     if depends ~= nil then
       table.insert(linktable, depends .. ".Managed")
