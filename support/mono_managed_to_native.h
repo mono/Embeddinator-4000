@@ -49,6 +49,8 @@
 #endif
 
 typedef struct _GArray GArray;
+typedef struct _GString GString;
+
 typedef struct _MonoDomain MonoDomain;
 typedef struct _MonoException MonoException;
 typedef struct _MonoClass MonoClass;

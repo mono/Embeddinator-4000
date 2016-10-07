@@ -2,6 +2,7 @@
 using CppSharp.AST.Extensions;
 using CppSharp.Generators;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace MonoManagedToNative.Generators
 {
@@ -243,14 +244,18 @@ namespace MonoManagedToNative.Generators
                 WriteLine("void* {0}[{1}];", argsId, numParamsToMarshal);
             }
 
+            var contexts = new List<MarshalContext>();
+
             int paramIndex = 0;
             foreach (var param in paramsToMarshal)
             {
                 var ctx = new MarshalContext(Context)
                 {
                     ArgName = param.Name,
-                    Parameter = param
+                    Parameter = param,
+                    ParameterIndex = paramIndex
                 };
+                contexts.Add(ctx);
 
                 var marshal = new CMarshalNativeToManaged(ctx);
                 param.QualifiedType.Visit(marshal);
@@ -282,6 +287,12 @@ namespace MonoManagedToNative.Generators
             WriteLine("{0}.exception = (MonoException*) {1};", errorId, exceptionId);
             WriteLine("mono_m2n_error({0});", errorId);
             WriteCloseBraceIndent();
+
+            foreach (var marshalContext in contexts)
+            {
+                if (!string.IsNullOrWhiteSpace (marshalContext.SupportAfter))
+                    Write (marshalContext.SupportAfter);
+            }
         }
 
         public override bool VisitMethodDecl(Method method)

@@ -7,6 +7,8 @@ namespace MonoManagedToNative.Generators
 {
     public class CManagedToNativeTypePrinter : CppTypePrinter
     {
+        Parameter param;
+
         public override string VisitDecayedType(DecayedType decayed,
             TypeQualifiers quals)
         {
@@ -16,6 +18,29 @@ namespace MonoManagedToNative.Generators
 
             return base.VisitDecayedType(decayed, quals);
         }
+
+        public override string VisitCILType (CILType type, TypeQualifiers quals)
+        {
+            if (type.Type == typeof (string))
+            {
+                if (param != null && (param.IsOut || param.IsInOut))
+                    return "GString*";
+                
+                return quals.IsConst ? "const char*" : "char*";
+            }
+
+            throw new System.NotImplementedException(
+                string.Format ("Unhandled .NET type: {0}", type.Type));
+        }
+
+        public override string VisitParameter (Parameter arg, bool hasName = true)
+        {
+            Parameter prev = param;
+            param = arg;
+            var ret = base.VisitParameter (arg, hasName);
+            param = prev;
+            return ret;
+        }
     }
 
     public class CMarshalPrinter : MarshalPrinter<MarshalContext>
@@ -23,6 +48,15 @@ namespace MonoManagedToNative.Generators
         public CMarshalPrinter(MarshalContext marshalContext)
             : base(marshalContext)
         {
+        }
+
+        public CManagedToNativeTypePrinter CTypePrinter
+        {
+            get
+            {
+                return CGenerator.GetCTypePrinter(
+                    CppSharp.Generators.GeneratorKind.C);
+            }
         }
 
         public virtual bool VisitManagedArrayType(ManagedArrayType array,
@@ -67,7 +101,8 @@ namespace MonoManagedToNative.Generators
             support.WriteLine("uintptr_t {0} = mono_array_length({1});",
                                             arraySizeId, arrayId);
 
-            var typePrinter = new CppTypePrinter { PrintScopeKind = CppTypePrintScopeKind.Local };
+            var typePrinter = CTypePrinter;
+            typePrinter.PrintScopeKind = CppTypePrintScopeKind.Local;
             var arrayTypedefName = array.Typedef.Visit(typePrinter);
 
             var arrayElementName = array.Array.Type.Visit(typePrinter);
@@ -178,7 +213,7 @@ namespace MonoManagedToNative.Generators
                 case PrimitiveType.Double:
                 case PrimitiveType.LongDouble:
                 case PrimitiveType.Null:
-                    var typePrinter = new CppTypePrinter();
+                    var typePrinter = CTypePrinter;
                     var typeName = Context.ReturnType.Visit(typePrinter);
 
                     var valueId = Context.ArgName;
@@ -339,7 +374,7 @@ namespace MonoManagedToNative.Generators
                               iteratorId, Context.ArgName);
             support.WriteStartBraceIndent();
 
-            var typePrinter = new CppTypePrinter();
+            var typePrinter = CTypePrinter;
             string elementTypeName = elementType.Visit(typePrinter);
 
             var elementId = CGenerator.GenId(string.Format("{0}_array_element",
@@ -388,8 +423,22 @@ namespace MonoManagedToNative.Generators
             {
                 var argId = CGenerator.GenId(Context.ArgName);
                 var contextId = CGenerator.GenId("mono_context");
+                var stringText = Context.ArgName;
+
+                var param = Context.Parameter;
+                if (param != null && (param.IsOut || param.IsInOut))
+                {
+                    stringText = string.Format ("({0}->len != 0) ? {0}->str : \"\"",
+                        Context.ArgName);
+
+
+                    Context.SupportAfter.WriteLine ("g_string_truncate({0}, 0);", Context.ArgName);
+                    Context.SupportAfter.WriteLine ("g_string_append({0}, mono_string_to_utf8(" +
+                        "(MonoString*) {1}));", Context.ArgName, argId);
+                }
+
                 Context.SupportBefore.WriteLine("MonoString* {0} = mono_string_new({1}.domain, {2});",
-                    argId, contextId, Context.ArgName);
+                    argId, contextId, stringText);
                 Context.Return.Write("{0}", argId);
                 return true;
             }

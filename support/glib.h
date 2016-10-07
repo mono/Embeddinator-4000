@@ -168,7 +168,7 @@ void    g_array_set_size          (GArray *array, gint length);
 /*
  * String type
  */
-typedef struct {
+typedef struct _GString {
 	char *str;
 	gsize len;
 	gsize allocated_len;

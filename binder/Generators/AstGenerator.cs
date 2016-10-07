@@ -282,15 +282,21 @@ namespace MonoManagedToNative.Generators
 
         QualifiedType VisitType(IKVM.Reflection.Type managedType)
         {
+            var isString = managedType.HasElementType && IKVM.Reflection.Type.GetTypeCode(
+                managedType.GetElementType()) == TypeCode.String;
+
+            if (managedType.IsByRef && isString)
+                managedType = managedType.GetElementType();
+
             // If true type is an array, a pointer, or is passed by reference.
             if (managedType.HasElementType)
             {
-                var elementType = managedType.GetElementType();
+                var managedElementType = managedType.GetElementType();
+                var elementType = VisitType(managedElementType);
 
                 if (managedType.IsByRef || managedType.IsPointer)
                 {
-                    var ptrElementType = VisitType(elementType);
-                    var ptrType = new PointerType(ptrElementType)
+                    var ptrType = new PointerType(elementType)
                     {
                         Modifier = (Options.Language == GeneratorKind.CPlusPlus) ?
                             PointerType.TypeModifier.LVReference :
@@ -304,7 +310,7 @@ namespace MonoManagedToNative.Generators
                     var array = new ArrayType
                     {
                         SizeType = ArrayType.ArraySize.Variable,
-                        QualifiedType = VisitType(elementType)
+                        QualifiedType = elementType
                     };
 
                     return new QualifiedType(array);

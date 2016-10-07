@@ -30,6 +30,9 @@ public class BuiltinTypes
 
     public void PassOutInt(out int v) { v = 5; }
     public void PassRefInt(ref int v) { v = 10; }
+
+    public void PassOutString (out string v) { v = "Mono"; }
+    public void PassRefString (ref string v) { v = "Mono"; }
 }
 
 #endregion

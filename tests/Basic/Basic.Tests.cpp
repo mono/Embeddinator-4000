@@ -36,6 +36,14 @@ TEST_CASE("BuiltinTypes", "[BuiltinTypes]") {
     int RefInt = 0;
     BuiltinTypes_PassRefInt(bt, &RefInt);
     REQUIRE(RefInt == 10);
+
+    GString* RefOut = g_string_new("");
+    BuiltinTypes_PassOutString(bt, RefOut);
+    REQUIRE(strcmp(RefOut->str, "Mono") == 0);    
+
+    GString* RefStr = g_string_new("monomono");
+    BuiltinTypes_PassRefString(bt, RefStr);
+    REQUIRE(strcmp(RefStr->str, "Mono") == 0);
 }
 
 TEST_CASE("StaticTypes", "[StaticTypes]") {

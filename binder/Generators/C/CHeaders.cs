@@ -72,7 +72,7 @@ namespace MonoManagedToNative.Generators
 
             if (Options.Language == GeneratorKind.CPlusPlus)
             {
-                var typePrinter = new CppTypePrinter();
+                var typePrinter = CTypePrinter;
                 var typeName = typePrinter.VisitPrimitiveType(
                     @enum.BuiltinType.Type, new TypeQualifiers());
 

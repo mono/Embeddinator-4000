@@ -9,6 +9,7 @@ namespace MonoManagedToNative.Generators
         {
             Context = context;
             SupportBefore = new TextGenerator();
+            SupportAfter = new TextGenerator ();
             Return = new TextGenerator();
             MarshalVarPrefix = string.Empty;
         }
@@ -18,6 +19,7 @@ namespace MonoManagedToNative.Generators
         public MarshalPrinter<MarshalContext> MarshalToNative;
 
         public TextGenerator SupportBefore { get; private set; }
+        public TextGenerator SupportAfter { get; private set; }
         public TextGenerator Return { get; private set; }
 
         public Declaration Declaration { get; set; }
