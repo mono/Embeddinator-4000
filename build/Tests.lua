@@ -149,7 +149,17 @@ function SetupTestProjectsCSharp(name, depends, extraFiles)
       supportdir
     }
 
-    files { name .. ".Tests.cpp" }
+    files
+    {
+      name .. ".Tests.cpp",
+      path.join(supportdir, "glib.*"),
+    }
+
     links { name .. ".C" }
     dependson { name .. ".Managed" }
+
+    filter { "action:vs*" }
+      buildoptions { "/wd4018" } -- eglib signed/unsigned warnings
+
+    filter {}    
 end
