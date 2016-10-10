@@ -73,7 +73,12 @@ local function SetupMono()
 
   includedirs { path.join(monoDir, "include", "mono-2.0") }
   libdirs { path.join(monoDir, "lib") }
-  links { "monosgen-2.0", "CoreFoundation.framework" }
+  links { "monosgen-2.0" }
+
+  filter { "system:macosx" }
+    links { "CoreFoundation.framework" }
+
+  filter {}
 end
 
 function SetupTestNativeProject(name, depends)
