@@ -169,7 +169,7 @@ namespace MonoManagedToNative
             }
         }
 
-        void InvokeCompiler(string compiler, string arguments)
+        void InvokeCompiler(string compiler, string arguments, Dictionary<string, string> envVars = null)
         {
             Diagnostics.Debug("Invoking: {0} {1}", compiler, arguments);
 
@@ -179,6 +179,9 @@ namespace MonoManagedToNative
             process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
             process.StartInfo.UseShellExecute = false;
             process.StartInfo.RedirectStandardOutput = true;
+            if (envVars != null)
+                foreach (var kvp in envVars)
+                    process.StartInfo.EnvironmentVariables[kvp.Key] = kvp.Value;
             process.OutputDataReceived += (sender, args) => Diagnostics.Message("{0}", args.Data);
             Diagnostics.PushIndent();
             process.Start();
@@ -226,7 +229,21 @@ namespace MonoManagedToNative
                     "/nologo /D{0} -I\"{1}\\include\\mono-2.0\" {2} \"{1}\\lib\\monosgen-2.0.lib\"",
                     exportDefine, monoPath, string.Join(" ", files.ToList()));
 
-                InvokeCompiler(clBin, invocation);
+                var vsVersion = (VisualStudioVersion)(int)vsSdk.Version;
+                var includes = MSVCToolchain.GetSystemIncludes(vsVersion);
+
+                Dictionary<string, string> envVars = null;
+                if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("INCLUDE")))
+                {
+                    envVars = new Dictionary<string, string>();
+                    envVars["INCLUDE"] = string.Join(";", includes);
+
+                    var clLib = Path.GetFullPath(
+                        Path.Combine(vsSdk.Directory, "..", "..", "VC", "lib"));
+                    envVars["LIB"] = clLib;
+                }
+
+                InvokeCompiler(clBin, invocation, envVars);
 
                 return;
             }
