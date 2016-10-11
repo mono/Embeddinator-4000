@@ -39,7 +39,7 @@ TEST_CASE("BuiltinTypes", "[BuiltinTypes]") {
 
     GString* RefOut = g_string_new("");
     BuiltinTypes_PassOutString(bt, RefOut);
-    REQUIRE(strcmp(RefOut->str, "Mono") == 0);    
+    REQUIRE(strcmp(RefOut->str, "Mono") == 0);
 
     GString* RefStr = g_string_new("monomono");
     BuiltinTypes_PassRefString(bt, RefStr);
@@ -66,7 +66,7 @@ TEST_CASE("ArrayTypes", "[ArrayTypes]") {
     char _byte_arr[] = { 1, 2, 3 };
     _UnsignedcharArray _byte;
     _byte.array = g_array_sized_new(/*zero_terminated=*/false,
-        /*clear=*/false, sizeof(char), G_N_ELEMENTS(_byte_arr));
+        /*clear=*/true, sizeof(char), G_N_ELEMENTS(_byte_arr));
     g_array_append_vals (_byte.array, _byte_arr, G_N_ELEMENTS(_byte_arr));
 
     int _sum = ArrayTypes_SumByteArray(_byte);
