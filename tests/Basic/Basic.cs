@@ -83,6 +83,12 @@ public static class EnumTypes
 
 #region Classes
 
+public class ClassProperties
+{
+    public int Int { get; set; }
+    public int ReadOnlyInt { get; }
+}
+
 public class NonStaticClass
 {
     public static int StaticMethod() { return 0; }

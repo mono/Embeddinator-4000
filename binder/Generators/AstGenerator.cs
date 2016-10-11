@@ -151,8 +151,8 @@ namespace MonoManagedToNative.Generators
 
             foreach (var property in type.DeclaredProperties)
             {
-                //var decl = VisitProperty(property);
-                //@class.Declarations.Add(decl);
+                var decl = VisitProperty(property, @class);
+                @class.Declarations.Add(decl);
             }
 
             foreach (var decl in @class.Declarations)
@@ -510,9 +510,21 @@ namespace MonoManagedToNative.Generators
             throw new NotImplementedException();
         }
 
-        public Property VisitProperty(PropertyInfo @property)
+        public Property VisitProperty(PropertyInfo propertyInfo, Class @class)
         {
-            throw new NotImplementedException();
+            var property = new Property()
+            {
+                Name = UnmangleTypeName(propertyInfo.Name),
+                QualifiedType = VisitType(propertyInfo.PropertyType),
+            };
+
+            if (propertyInfo.GetMethod != null)
+                property.GetMethod = VisitMethod(propertyInfo.GetMethod, @class);
+
+            if (propertyInfo.SetMethod != null)
+                property.SetMethod = VisitMethod(propertyInfo.SetMethod, @class);
+
+            return property;
         }
     }
 }

@@ -236,7 +236,7 @@ namespace MonoManagedToNative.Generators
 
         public virtual bool VisitProperty(Property property)
         {
-            throw new NotImplementedException();
+            return true;
         }
 
         public virtual bool VisitTemplateParameterDecl(TypeTemplateParameter templateParameter)

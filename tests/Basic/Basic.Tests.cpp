@@ -46,6 +46,15 @@ TEST_CASE("BuiltinTypes", "[BuiltinTypes]") {
     REQUIRE(strcmp(RefStr->str, "Mono") == 0);
 }
 
+TEST_CASE("ClassTypes", "[ClassTypes]") {
+    ClassProperties* prop = ClassProperties_new();
+    REQUIRE(ClassProperties_get_Int(prop) == 0);
+    ClassProperties_set_Int(prop, 10);
+    REQUIRE(ClassProperties_get_Int(prop) == 10);
+
+    REQUIRE(ClassProperties_get_ReadOnlyInt(prop) == 0);
+}
+
 TEST_CASE("StaticTypes", "[StaticTypes]") {
     REQUIRE(NonStaticClass_StaticMethod() == 0);
     REQUIRE(StaticClass_StaticMethod() == 0);
