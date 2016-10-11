@@ -426,11 +426,11 @@ namespace MonoManagedToNative.Generators
                 var stringText = Context.ArgName;
 
                 var param = Context.Parameter;
-                if (param != null && (param.IsOut || param.IsInOut))
+                var isByRef = param != null && (param.IsOut || param.IsInOut);
+                if (isByRef)
                 {
                     stringText = string.Format ("({0}->len != 0) ? {0}->str : \"\"",
                         Context.ArgName);
-
 
                     Context.SupportAfter.WriteLine ("g_string_truncate({0}, 0);", Context.ArgName);
                     Context.SupportAfter.WriteLine ("g_string_append({0}, mono_string_to_utf8(" +
@@ -439,7 +439,7 @@ namespace MonoManagedToNative.Generators
 
                 Context.SupportBefore.WriteLine("MonoString* {0} = mono_string_new({1}.domain, {2});",
                     argId, contextId, stringText);
-                Context.Return.Write("{0}", argId);
+                Context.Return.Write("{0}{1}", isByRef ? "&" : string.Empty, argId);
                 return true;
             }
 
