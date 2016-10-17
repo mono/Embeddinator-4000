@@ -27,6 +27,14 @@
  */
 
 #ifdef  __cplusplus
+#include <cstdbool>
+#include <cstdint> 
+#else
+#include <stdbool.h>
+#include <stdint.h>
+#endif
+
+#ifdef  __cplusplus
     #define MONO_M2N_BEGIN_DECLS  extern "C" {
     #define MONO_M2N_END_DECLS    }
 #else

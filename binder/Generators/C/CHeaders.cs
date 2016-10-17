@@ -29,10 +29,6 @@ namespace MonoManagedToNative.Generators
             WriteLine("#pragma once");
             NewLine();
 
-            WriteStandardHeader("stdbool");
-            WriteStandardHeader("stdint");
-            WriteStandardHeader("wchar");
-
             WriteInclude("mono_managed_to_native.h");
         }
 
