@@ -1,47 +1,10 @@
-using CppSharp;
 using CppSharp.AST;
 using CppSharp.Passes;
+using MonoManagedToNative.Generators;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace MonoManagedToNative.Passes
 {
-    public class CArrayTypePrinter : CppTypePrinter
-    {
-        static string AsCIdentifier(string id)
-        {
-            return new string(id.Where(c => char.IsLetterOrDigit(c) || c == '_')
-                .ToArray());
-        }
-
-        public override string VisitArrayType(ArrayType array, TypeQualifiers quals)
-        {
-            var typeName = array.Type.Visit(this);
-            typeName = AsCIdentifier(typeName);
-            typeName = StringHelpers.Capitalize(typeName);
-
-            return string.Format("{0}Array", typeName);
-        }
-    }
-
-    public class ManagedArrayType : DecayedType
-    {
-        public ArrayType Array { get { return Decayed.Type as ArrayType; } }
-        public TypedefType Typedef { get { return Original.Type as TypedefType; } }
-
-        public ManagedArrayType(ArrayType array, TypedefType typedef)
-        {
-            Decayed = new QualifiedType(array);
-            Original = new QualifiedType(typedef); 
-        }
-    }
-
-    public struct PendingDeclaration
-    {
-        public Declaration NewDeclaration;
-        public Declaration ReferenceDeclaration;
-    }
-
     /// <summary>
     /// This pass is responsible for gathering a unique set of array types,
     /// and generating a struct to handle returning and passing them as return
