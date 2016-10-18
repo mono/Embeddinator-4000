@@ -162,9 +162,8 @@ namespace MonoManagedToNative.Generators
         public Method VisitConstructor(ConstructorInfo ctor, Class @class)
         {
             var method = VisitMethodBase(ctor);
-            var ptrType = new QualifiedType(
-                new PointerType(new QualifiedType(new TagType(@class))));
-            method.ReturnType = ptrType;
+            method.Kind = CXXMethodKind.Constructor;
+            method.ReturnType = new QualifiedType(new TagType(@class));
 
             if (method.ReturnType.Type == null)
                 method.Ignore = true;
@@ -261,21 +260,6 @@ namespace MonoManagedToNative.Generators
 
             if (method.ReturnType.Type == null)
                 method.Ignore = true;
-
-            var ptrType = new QualifiedType(
-                new PointerType(new QualifiedType(new TagType(@class))));
-
-            if (!(@class.IsStatic || method.IsStatic))
-            {
-                var param = new Parameter
-                {
-                    Name = "object",
-                    Namespace = @class,
-                    QualifiedType = ptrType,
-                    IsImplicit = true
-                };
-                method.Parameters.Insert(0, param);
-            }
 
             return method;
         }
