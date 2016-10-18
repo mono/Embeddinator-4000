@@ -56,6 +56,8 @@
     #define MONO_M2N_API MONO_M2N_API_IMPORT
 #endif
 
+typedef uint16_t gunichar2;
+
 typedef struct _GArray GArray;
 typedef struct _GString GString;
 

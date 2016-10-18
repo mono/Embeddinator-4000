@@ -15,6 +15,7 @@ public class BuiltinTypes
     public uint ReturnsUInt() { return 5; }
     public long ReturnsLong() { return -5; }
     public ulong ReturnsULong() { return 5; }
+    public char ReturnsChar() { return 'a'; }
     public string ReturnsString() { return "Mono"; }
 
     public bool PassAndReturnsBool(bool v) { return v; }
@@ -26,6 +27,7 @@ public class BuiltinTypes
     public uint PassAndReturnsUInt(uint v) { return v; }
     public long PassAndReturnsLong(long v) { return v; }
     public ulong PassAndReturnsULong(ulong v) { return v; }
+    public char PassAndReturnsChar(char v) { return v; }
     public string PassAndReturnsString(string v) { return v; }
 
     public void PassOutInt(out int v) { v = 5; }

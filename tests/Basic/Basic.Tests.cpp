@@ -16,6 +16,7 @@ TEST_CASE("BuiltinTypes", "[BuiltinTypes]") {
     REQUIRE(BuiltinTypes_ReturnsUInt(bt)   ==  5);
     REQUIRE(BuiltinTypes_ReturnsLong(bt)   == -5);
     REQUIRE(BuiltinTypes_ReturnsULong(bt)  ==  5);
+    REQUIRE(BuiltinTypes_ReturnsChar(bt) == 'a');
     REQUIRE(strcmp(BuiltinTypes_ReturnsString(bt), "Mono") == 0);
 
     REQUIRE(BuiltinTypes_PassAndReturnsBool(bt, true) == true);
@@ -27,6 +28,7 @@ TEST_CASE("BuiltinTypes", "[BuiltinTypes]") {
     REQUIRE(BuiltinTypes_PassAndReturnsUInt(bt, 5) == 5);
     REQUIRE(BuiltinTypes_PassAndReturnsLong(bt, -5) == -5);
     REQUIRE(BuiltinTypes_PassAndReturnsULong(bt, 5) == 5);
+    REQUIRE(BuiltinTypes_PassAndReturnsChar(bt, 'a') == 'a');
     REQUIRE(strcmp(BuiltinTypes_PassAndReturnsString(bt, "Mono"), "Mono") == 0);
 
     int OutInt = 0;

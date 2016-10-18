@@ -41,6 +41,14 @@ namespace MonoManagedToNative.Generators
             param = prev;
             return ret;
         }
+
+        public override string VisitPrimitiveType(PrimitiveType primitive)
+        {
+            if (primitive == PrimitiveType.WideChar)
+                return "gunichar2";
+
+            return base.VisitPrimitiveType(primitive);
+        }
     }
 
     public class CMarshalPrinter : MarshalPrinter<MarshalContext>
@@ -199,6 +207,7 @@ namespace MonoManagedToNative.Generators
                 case PrimitiveType.Void:
                     return true;
                 case PrimitiveType.Bool:
+                case PrimitiveType.WideChar:
                 case PrimitiveType.Char:
                 case PrimitiveType.UChar:
                 case PrimitiveType.Short:
