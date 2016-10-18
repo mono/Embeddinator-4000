@@ -40,6 +40,8 @@ namespace MonoManagedToNative
             Context = new BindingContext(Diagnostics, new DriverOptions());
             Context.ASTContext = new ASTContext();
 
+            Declaration.QualifiedNameSeparator = "_";
+
             CppSharp.AST.Type.TypePrinterDelegate = type =>
             {
                 var typePrinter = new CppTypePrinter();
