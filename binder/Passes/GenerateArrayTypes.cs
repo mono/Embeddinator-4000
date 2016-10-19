@@ -12,14 +12,10 @@ namespace MonoManagedToNative.Passes
     /// </summary>
     public class GenerateArrayTypes : TranslationUnitPass
     {
-        public Dictionary<string, QualifiedType> Arrays { get; private set; }
-        public List<PendingDeclaration> PendingDeclarations { get; private set; }
+        TranslationUnit TranslationUnit;
 
-        public GenerateArrayTypes()
-        {
-            Arrays = new Dictionary<string, QualifiedType>();
-            PendingDeclarations = new List<PendingDeclaration>();
-        }
+        Dictionary<string, QualifiedType> Arrays;
+        List<TypedefDecl> Declarations;
 
         static CArrayTypePrinter ArrayPrinter
         {
@@ -32,18 +28,23 @@ namespace MonoManagedToNative.Passes
             }
         }
 
+        public GenerateArrayTypes()
+        {
+            Arrays = new Dictionary<string, QualifiedType>();
+            Declarations = new List<TypedefDecl>();
+        }
+
         public override bool VisitTranslationUnit(TranslationUnit unit)
         {
+            TranslationUnit = unit;
+
             var ret = base.VisitTranslationUnit(unit);
 
-            foreach (var pending in PendingDeclarations)
-            {
-                var @namespace = pending.ReferenceDeclaration.Namespace;
-                var index = @namespace.Declarations.IndexOf(pending.ReferenceDeclaration);
-                @namespace.Declarations.Insert(index, pending.NewDeclaration);
-            }
+            unit.Declarations.InsertRange(0, Declarations);
 
-            PendingDeclarations.Clear();
+            Declarations.Clear();
+            Arrays.Clear();
+            TranslationUnit = null;
 
             return ret;
         }
@@ -53,20 +54,16 @@ namespace MonoManagedToNative.Passes
             var typeName = array.Visit(ArrayPrinter);
             var monoArrayType = new Class { Name = "MonoEmbedArray" };
 
-            var @namespace = decl.Namespace;
+            var @namespace = TranslationUnit;
 
             var typedef = new TypedefDecl
             {
                 Name = string.Format("_{0}", typeName),
-                QualifiedType = new QualifiedType { Type = new TagType(monoArrayType) }
+                Namespace = @namespace,
+                QualifiedType = new QualifiedType(new TagType(monoArrayType))
             };
 
-            var pending = new PendingDeclaration
-            {
-                NewDeclaration = typedef,
-                ReferenceDeclaration = decl
-            };
-            PendingDeclarations.Add(pending);
+            Declarations.Add(typedef);
 
             var typedefType = new TypedefType(typedef);
             var arrayType = new ManagedArrayType(array, typedefType);
