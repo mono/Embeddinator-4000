@@ -185,3 +185,11 @@ void mono_m2n_error(mono_m2n_error_t error)
 
     g_error_report_hook(error);
 }
+
+void* mono_m2n_create_object(MonoObject* instance)
+{
+    MonoEmbedObject* object = g_new(MonoEmbedObject, 1);
+    object->_class = mono_object_get_class(instance);
+    object->_handle = mono_gchandle_new(instance, /*pinned=*/false);
+    return object;
+}

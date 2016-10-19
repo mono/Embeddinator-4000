@@ -64,6 +64,7 @@ typedef struct _GString GString;
 typedef struct _MonoDomain MonoDomain;
 typedef struct _MonoException MonoException;
 typedef struct _MonoClass MonoClass;
+typedef struct _MonoObject MonoObject;
 
 MONO_M2N_BEGIN_DECLS
 
@@ -163,5 +164,20 @@ typedef struct
 {
     GArray* array;
 } MonoEmbedArray;
+
+/**
+ * Objects
+ */
+
+typedef struct
+{
+    MonoClass* _class;
+    uint32_t _handle;
+} MonoEmbedObject;
+
+/**
+ * Creates an support object from a Mono object instance.
+ */
+void* mono_m2n_create_object(MonoObject* instance);
 
 MONO_M2N_END_DECLS
