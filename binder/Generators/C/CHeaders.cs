@@ -103,9 +103,6 @@ namespace MonoManagedToNative.Generators
         {
             PushBlock();
 
-            PushBlock();
-            WriteLine("typedef struct {0} {0};", @class.QualifiedName);
-            PopBlock(NewLineKind.BeforeNextBlock);
 
             VisitDeclContext(@class);
 

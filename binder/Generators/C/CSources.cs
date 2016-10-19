@@ -67,17 +67,6 @@ namespace MonoManagedToNative.Generators
             WriteLine("static MonoClass* {0}_class = 0;", @class.QualifiedName);
             PopBlock(NewLineKind.BeforeNextBlock);
 
-            PushBlock();
-            WriteLine("struct {0}", QualifiedName(@class));
-            WriteStartBraceIndent();
-
-            WriteLine("MonoClass* _class;");
-            WriteLine("uint32_t _handle;");
-
-            PopIndent();
-            WriteLine("};");
-            PopBlock(NewLineKind.BeforeNextBlock);
-
             GenerateClassLookup(@class);
 
             VisitDeclContext(@class);

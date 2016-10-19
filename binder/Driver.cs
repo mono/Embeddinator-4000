@@ -65,13 +65,14 @@ namespace MonoManagedToNative
                 astGenerator.Visit(assembly);
 
             Context.TranslationUnitPasses.AddPass(new FixMethodParametersPass());
+            Context.TranslationUnitPasses.AddPass(new GenerateObjectTypesPass());
+            Context.TranslationUnitPasses.AddPass(new GenerateArrayTypes());
 
             Context.TranslationUnitPasses.AddPass(new CheckIgnoredDeclsPass());
 
             if (Options.Language != GeneratorKind.CPlusPlus)
                 Context.TranslationUnitPasses.AddPass(new RenameEnumItemsPass());
 
-            Context.TranslationUnitPasses.AddPass(new GenerateArrayTypes());
 
             Context.TranslationUnitPasses.AddPass(new RenameDuplicatedDeclsPass());
             Context.TranslationUnitPasses.AddPass(new CheckDuplicatedNamesPass());
