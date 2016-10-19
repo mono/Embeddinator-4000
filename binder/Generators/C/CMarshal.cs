@@ -140,6 +140,14 @@ namespace MonoManagedToNative.Generators
             return false;
         }
 
+        public override bool VisitClassDecl(Class @class)
+        {
+            var typeName = @class.Visit(CTypePrinter);
+            Context.Return.Write("({0}*) mono_m2n_create_object({1})",
+                typeName, Context.ArgName);
+            return true;
+        }
+
         public override bool VisitCILType(CILType type, TypeQualifiers quals)
         {
             if (HandleSpecialCILType(type))
@@ -375,6 +383,12 @@ namespace MonoManagedToNative.Generators
 
             Context.Return.Write("{0}", arrayId);
 
+            return true;
+        }
+
+        public override bool VisitClassDecl(Class @class)
+        {
+            Context.Return.Write("{0}->_class", Context.ArgName);
             return true;
         }
 
