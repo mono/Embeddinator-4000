@@ -13,7 +13,7 @@ namespace MonoManagedToNative.Generators
         ASTContext ASTContext { get; set; }
         Options Options { get; set; }
 
-        public TranslationUnit unit;
+        private Assembly CurrentAssembly;
 
         public ASTGenerator(ASTContext context, Options options)
         {
@@ -21,12 +21,32 @@ namespace MonoManagedToNative.Generators
             Options = options;
         }
 
+        TranslationUnit GetTranslationUnit(Assembly assembly)
+        {
+            var assemblyName = assembly.GetName().Name;
+            return GetTranslationUnit(assemblyName);
+        }
+
+        TranslationUnit GetTranslationUnit(string assemblyName)
+        {
+            var unit = ASTContext.TranslationUnits.Find(m => m.FileName.Equals(assemblyName));
+            if (unit != null)
+                return unit;
+
+            unit = ASTContext.FindOrCreateTranslationUnit(assemblyName);
+            unit.FilePath = assemblyName;
+
+            return unit;
+        }
+
         public TranslationUnit Visit(Assembly assembly)
         {
-            var assemblyName = assembly.GetName().Name;;
+            CurrentAssembly = assembly;
+
+            var assemblyName = assembly.GetName().Name;
             var name = Options.LibraryName ?? assemblyName;
-            unit = ASTContext.FindOrCreateModule(name);
-            unit.FilePath = assemblyName;
+
+            var unit = GetTranslationUnit(name);
 
             foreach (var type in assembly.ExportedTypes)
             {
@@ -34,11 +54,14 @@ namespace MonoManagedToNative.Generators
                 Visit(typeInfo);
             }
 
+            CurrentAssembly = null;
+
             return unit;
         }
 
         public Namespace VisitNamespace(TypeInfo typeInfo)
         {
+            var unit = GetTranslationUnit(typeInfo.Assembly);
             if (string.IsNullOrWhiteSpace(typeInfo.Namespace))
                 return unit;
 
@@ -328,7 +351,14 @@ namespace MonoManagedToNative.Generators
                     type = new BuiltinType(PrimitiveType.Void);
                     break;
                 }
-                type = new UnsupportedType { Description = managedType.FullName };
+                var currentUnit = GetTranslationUnit(CurrentAssembly);
+                if (managedType.Assembly.GetName().Name != currentUnit.FileName)
+                {
+                    type = new UnsupportedType { Description = managedType.FullName };
+                    break;
+                }
+                var decl = Visit(managedType.GetTypeInfo());
+                type = new TagType(decl);
                 break;
             case TypeCode.DBNull:
                 throw new NotSupportedException();
