@@ -69,8 +69,8 @@ namespace MonoManagedToNative.Generators
             else
                 throw new Exception ("Could not visit type: " + typeInfo.ToString ());
 
-            decl.Namespace = @namespace;
-            @namespace.Declarations.Add (decl);
+            if (decl.Namespace == null)
+                throw new Exception("Declaration should have a namespace");
 
             return decl;
         }
@@ -84,9 +84,18 @@ namespace MonoManagedToNative.Generators
         public Class VisitRecord(TypeInfo type)
         {
             var @class = new Class { Name = UnmangleTypeName(type.Name) };
+            HandleNamespace(type, @class);
             VisitMembers(type, @class);
 
             return @class;
+        }
+
+        private void HandleNamespace(TypeInfo type, Declaration decl)
+        {
+            var @namespace = VisitNamespace(type);
+
+            decl.Namespace = @namespace;
+            @namespace.Declarations.Add(decl);
         }
 
         public Enumeration VisitEnum(TypeInfo type)
@@ -97,6 +106,7 @@ namespace MonoManagedToNative.Generators
                 Name = UnmangleTypeName(type.Name),
                 Type = VisitType(underlyingType).Type
             };
+            HandleNamespace(type, @enum);
 
             if (Options.Language == GeneratorKind.CPlusPlus)
                 @enum.Modifiers = Enumeration.EnumModifiers.Scoped;
