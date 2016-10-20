@@ -32,8 +32,6 @@ namespace MonoManagedToNative.Generators
             WriteLine("#include <mono/metadata/object.h>");
             WriteLine("#include <mono/metadata/mono-config.h>");
             WriteLine("#include <mono/metadata/debug-helpers.h>");
-            var stdlibHeader = Options.Language == GeneratorKind.CPlusPlus ?
-                "cstdlib" : "stdlib.h";
         }
 
         public override void Process()

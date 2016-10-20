@@ -1,6 +1,5 @@
 ﻿using CppSharp.AST;
 using CppSharp.AST.Extensions;
-using MonoManagedToNative.Passes;
 using System.Linq;
 
 namespace MonoManagedToNative.Generators

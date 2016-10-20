@@ -67,7 +67,6 @@ namespace MonoManagedToNative.Generators
         public CTemplate(BindingContext context, Options options,
             TranslationUnit unit) : base(context, options)
         {
-            Declaration.QualifiedNameSeparator = "_";
             Unit = unit;
         }
 
