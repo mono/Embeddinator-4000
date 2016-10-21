@@ -138,6 +138,21 @@ char* mono_m2n_search_assembly(const char* assembly)
     return data;
 }
 
+MonoImage* mono_m2n_load_assembly(mono_m2n_context_t* ctx, const char* assembly)
+{
+    const char* path = mono_m2n_search_assembly(assembly);
+    MonoAssembly* mono_assembly = mono_domain_assembly_open(ctx->domain, path);
+    if (mono_assembly == 0)
+    {
+        mono_m2n_error_t __error;
+        __error.type = MONO_M2N_ASSEMBLY_OPEN_FAILED;
+        __error.string = path;
+        mono_m2n_error(__error);
+    }
+
+    return mono_assembly_get_image(mono_assembly);
+}
+
 static mono_m2n_assembly_search_hook_t g_assembly_search_hook = 0;
 
 void* mono_m2n_install_assembly_search_hook(mono_m2n_assembly_search_hook_t hook)

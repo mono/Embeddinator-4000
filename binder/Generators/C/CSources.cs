@@ -44,7 +44,6 @@ namespace MonoManagedToNative.Generators
 
             PushBlock();
             WriteLine("mono_m2n_context_t {0};", GeneratedIdentifier("mono_context"));
-            WriteLine("MonoAssembly* {0}_assembly;", AssemblyId);
             WriteLine("MonoImage* {0}_image;", AssemblyId);
             PopBlock(NewLineKind.BeforeNextBlock);
 
@@ -99,30 +98,12 @@ namespace MonoManagedToNative.Generators
             WriteLine("static void {0}()", assemblyLookupId);
             WriteStartBraceIndent();
 
-            var monoAssemblyName = string.Format("{0}_assembly", AssemblyId);
-            WriteLine("if ({0})", monoAssemblyName);
+            var monoImageName = string.Format("{0}_image", AssemblyId);
+            WriteLine("if ({0})", monoImageName);
             WriteLineIndent("return;");
 
-            var assemblyPathId = GeneratedIdentifier("path");
-            WriteLine("const char* {0} = mono_m2n_search_assembly(\"{1}.dll\");",
-                assemblyPathId, assemblyName);
-
-            WriteLine("{0} = mono_domain_assembly_open({1}.domain, {2});",
-                monoAssemblyName, GeneratedIdentifier("mono_context"), assemblyPathId);
-
-            WriteLine("if ({0} == 0)", monoAssemblyName);
-            WriteStartBraceIndent();
-            var errorId = GeneratedIdentifier("error");
-            WriteLine("mono_m2n_error_t {0};", errorId);
-            WriteLine("{0}.type = MONO_M2N_ASSEMBLY_OPEN_FAILED;", errorId);
-            WriteLine("{0}.string = {1};", errorId, assemblyPathId);
-            WriteLine("mono_m2n_error({0});", errorId);
-            WriteCloseBraceIndent();
-            NewLine();
-
-            var monoImageName = string.Format("{0}_image", AssemblyId);
-            WriteLine("{0} = mono_assembly_get_image({1});", monoImageName,
-                monoAssemblyName);
+            WriteLine("{0} = mono_m2n_load_assembly(&{1}, \"{2}.dll\");",
+                monoImageName, GeneratedIdentifier("mono_context"), assemblyName);
 
             WriteCloseBraceIndent();
             PopBlock(NewLineKind.BeforeNextBlock);

@@ -65,6 +65,7 @@ typedef struct _MonoDomain MonoDomain;
 typedef struct _MonoException MonoException;
 typedef struct _MonoClass MonoClass;
 typedef struct _MonoObject MonoObject;
+typedef struct _MonoImage MonoImage;
 
 MONO_M2N_BEGIN_DECLS
 
@@ -97,6 +98,13 @@ mono_m2n_context_t* mono_m2n_get_context();
  * Sets the current context.
  */
 void mono_m2n_set_context(mono_m2n_context_t* ctx);
+
+
+/** 
+ * Loads an assembly into the context.
+ */
+MonoImage* mono_m2n_load_assembly(mono_m2n_context_t* ctx,
+    const char* assembly);
 
 /** 
  * Searches and returns the path to the given managed assembly.
