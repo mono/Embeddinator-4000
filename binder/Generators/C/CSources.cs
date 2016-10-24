@@ -3,6 +3,7 @@ using CppSharp.AST.Extensions;
 using CppSharp.Generators;
 using System.Linq;
 using System.Collections.Generic;
+using MonoManagedToNative.Passes;
 
 namespace MonoManagedToNative.Generators
 {
@@ -47,6 +48,8 @@ namespace MonoManagedToNative.Generators
             WriteLine("MonoImage* {0}_image;", AssemblyId);
             PopBlock(NewLineKind.BeforeNextBlock);
 
+            GenerateObjectDeclarations();
+
             GenerateMonoInitialization();
             GenerateAssemblyLoad();
 
@@ -60,15 +63,26 @@ namespace MonoManagedToNative.Generators
 
         public override bool VisitClassDecl(Class @class)
         {
-            PushBlock();
-            WriteLine("static MonoClass* {0}_class = 0;", @class.QualifiedName);
-            PopBlock(NewLineKind.BeforeNextBlock);
-
             GenerateClassLookup(@class);
 
             VisitDeclContext(@class);
 
             return true;
+        }
+
+        public void GenerateObjectDeclarations()
+        {
+            var genObjectsPass = new GenerateObjectTypesPass();
+            Unit.Visit(genObjectsPass);
+
+            foreach (var @class in genObjectsPass.Classes)
+            {
+                PushBlock();
+                WriteLine("static MonoClass* {0}_class = 0;", @class.QualifiedName);
+                PopBlock(NewLineKind.Never);
+            }
+
+            NewLine();
         }
 
         public void GenerateMonoInitialization()
