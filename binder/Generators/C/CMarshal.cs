@@ -66,6 +66,7 @@ namespace MonoManagedToNative.Generators
             typePrinter.PrintScopeKind = CppTypePrintScopeKind.Local;
             var arrayTypedefName = array.Typedef.Visit(typePrinter);
 
+            typePrinter.PrintScopeKind = CppTypePrintScopeKind.Qualified;
             var arrayElementName = array.Array.Type.Visit(typePrinter);
             var elementSize = string.Format("sizeof({0})", arrayElementName);
 
