@@ -35,8 +35,15 @@ namespace MonoManagedToNative.Generators
             WriteLine("#include <mono/metadata/debug-helpers.h>");
         }
 
+        void RemoveTypedefNodes()
+        {
+            Unit.Declarations.RemoveAll(d => d is TypedefDecl);
+        }
+
         public override void Process()
         {
+            RemoveTypedefNodes();
+
             GenerateFilePreamble();
 
             PushBlock();
