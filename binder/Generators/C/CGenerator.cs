@@ -141,7 +141,17 @@ namespace MonoManagedToNative.Generators
             var typeName = typedef.Type.Visit(CTypePrinter);
             WriteLine("typedef {0} {1};", typeName, typedef.Name);
 
-            PopBlock(NewLineKind.BeforeNextBlock);
+            var newlineKind = NewLineKind.BeforeNextBlock;
+
+            var declarations = typedef.Namespace.Declarations;
+            var newIndex = declarations.FindIndex(d => d == typedef) + 1;
+            if (newIndex < declarations.Count)
+            {
+                if (declarations[newIndex] is TypedefDecl)
+                    newlineKind = NewLineKind.Never;
+            }
+
+            PopBlock(newlineKind);
 
             return true;
         }
