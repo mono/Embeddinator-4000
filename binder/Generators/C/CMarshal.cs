@@ -296,6 +296,11 @@ namespace MonoManagedToNative.Generators
 
                 return classId;
             }
+            else if (type is ArrayType)
+            {
+                var arrayType = type as ArrayType;
+                return "0";
+            }
 
             throw new System.NotImplementedException();
         }
