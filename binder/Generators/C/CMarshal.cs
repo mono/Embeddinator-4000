@@ -447,6 +447,19 @@ namespace MonoManagedToNative.Generators
             return VisitPrimitiveType(builtin.Type);
         }
 
+        public override bool VisitPointerType(PointerType pointer,
+            TypeQualifiers quals)
+        {
+            if (pointer.Pointee is ArrayType)
+            {
+                // TODO: Handle out/ref array types.
+                Context.Return.Write("0");
+                return true;
+            }
+
+            return base.VisitPointerType(pointer, quals);
+        }
+
         public bool VisitPrimitiveType(PrimitiveType primitive)
         {
             var param = Context.Parameter;
