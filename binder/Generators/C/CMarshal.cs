@@ -290,7 +290,7 @@ namespace MonoManagedToNative.Generators
                 var unit = decl.TranslationUnit;
 
                 var classId = string.Format("{0}_class", decl.QualifiedName);
-                var monoImageName = string.Format("{0}_image", unit.Name);
+                var monoImageName = string.Format("{0}_image", CGenerator.AssemblyId(unit));
                 gen.WriteLine("{0} = mono_class_from_name({1}, \"{2}\", \"{3}\");",
                     classId, monoImageName, @namespace, decl.OriginalName);
 
