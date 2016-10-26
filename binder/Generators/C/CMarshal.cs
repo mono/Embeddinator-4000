@@ -143,8 +143,10 @@ namespace MonoManagedToNative.Generators
         public override bool VisitClassDecl(Class @class)
         {
             var typeName = @class.Visit(CTypePrinter);
-            Context.Return.Write("({0}*) mono_m2n_create_object({1})",
-                typeName, Context.ArgName);
+            var objectId = string.Format("{0}_obj", Context.ArgName);
+            Context.SupportBefore.WriteLine("{1}* {0} = ({1}*) mono_m2n_create_object({2});",
+                objectId, typeName, Context.ArgName);
+            Context.Return.Write("{0}", objectId);
             return true;
         }
 
@@ -388,7 +390,10 @@ namespace MonoManagedToNative.Generators
 
         public override bool VisitClassDecl(Class @class)
         {
-            Context.Return.Write("{0}->_class", Context.ArgName);
+            var instanceId = CGenerator.GenId(string.Format("{0}_instance", Context.ArgName));
+            Context.SupportBefore.WriteLine("MonoObject* {0} = mono_gchandle_get_target({1}->_handle);",
+                instanceId, Context.ArgName);
+            Context.Return.Write("{0}", instanceId);
             return true;
         }
 
