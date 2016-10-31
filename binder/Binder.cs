@@ -13,6 +13,7 @@ namespace MonoManagedToNative
         static List<string> Assemblies;
         static bool CompileCode;
         static bool Verbose;
+        static bool SharedLibrary;
 
         static void ParseCommandLineArgs(string[] args)
         {
@@ -22,6 +23,7 @@ namespace MonoManagedToNative
                 { "gen=", "target generator (C, C++, Objective-C)", v => Generator = v },
                 { "o|out=", "output directory", v => OutputDir = v },
                 { "c|compile", "tries to compile generated output", v => CompileCode = true },
+                { "dll|shared", "compiles as a shared library / DLL", v => SharedLibrary = true },
                 { "v|verbose", "generates diagnostic verbose output", v => Verbose = true },
                 { "h|help",  "show this message and exit",  v => showHelp = v != null },
             };
@@ -81,6 +83,7 @@ namespace MonoManagedToNative
             var options = new Options();
             options.OutputDir = OutputDir;
             options.CompileCode = CompileCode;
+            options.CompileSharedLibrary = SharedLibrary;
 
             var generator = ConvertToGeneratorKind(Generator);
             options.Language = generator;

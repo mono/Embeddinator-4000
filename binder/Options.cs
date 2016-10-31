@@ -37,5 +37,8 @@ namespace MonoManagedToNative
 
         // If true, will try to compile the generated managed-to-native binding code.
         public bool CompileCode;
+
+        // If true, will compile the generated as a shared library / DLL.
+        public bool CompileSharedLibrary;
     }
 }

@@ -231,8 +231,9 @@ namespace MonoManagedToNative
 
                 var monoPath = ManagedToolchain.FindMonoPath();
                 var invocation = string.Format(
-                    "/nologo /D{0} -I\"{1}\\include\\mono-2.0\" {2} \"{1}\\lib\\monosgen-2.0.lib\"",
-                    exportDefine, monoPath, string.Join(" ", files.ToList()));
+                    "/nologo /D{0} -I\"{1}\\include\\mono-2.0\" {2} \"{1}\\lib\\monosgen-2.0.lib\" {3}",
+                    exportDefine, monoPath, string.Join(" ", files.ToList()),
+                    Options.CompileSharedLibrary ? "/LD" : string.Empty);
 
                 var vsVersion = (VisualStudioVersion)(int)vsSdk.Version;
                 var includes = MSVCToolchain.GetSystemIncludes(vsVersion);
