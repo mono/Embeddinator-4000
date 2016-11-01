@@ -230,10 +230,14 @@ namespace MonoManagedToNative
                     Path.Combine(vsSdk.Directory, "..", "..", "VC", "bin", "cl.exe"));
 
                 var monoPath = ManagedToolchain.FindMonoPath();
+                var output = Options.LibraryName ??
+                    Path.GetFileNameWithoutExtension(Options.Project.Assemblies[0]);
+                output = Path.Combine(Options.OutputDir, output);
                 var invocation = string.Format(
-                    "/nologo /D{0} -I\"{1}\\include\\mono-2.0\" {2} \"{1}\\lib\\monosgen-2.0.lib\" {3}",
+                    "/nologo /D{0} -I\"{1}\\include\\mono-2.0\" {2} \"{1}\\lib\\monosgen-2.0.lib\" {3} {4}",
                     exportDefine, monoPath, string.Join(" ", files.ToList()),
-                    Options.CompileSharedLibrary ? "/LD" : string.Empty);
+                    Options.CompileSharedLibrary ? "/LD" : string.Empty,
+                    output);
 
                 var vsVersion = (VisualStudioVersion)(int)vsSdk.Version;
                 var includes = MSVCToolchain.GetSystemIncludes(vsVersion);
