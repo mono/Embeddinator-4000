@@ -81,35 +81,35 @@ typedef struct
  * Initializes a managed-to-native binding context.
  * Returns a boolean indicating success or failure.
  */
-int mono_m2n_init(mono_m2n_context_t* ctx, const char* domain);
+MONO_M2N_API int mono_m2n_init(mono_m2n_context_t* ctx, const char* domain);
 
 /** 
  * Destroys the managed-to-native binding context.
  * Returns a boolean indicating success or failure.
  */
-int mono_m2n_destroy(mono_m2n_context_t* ctx);
+MONO_M2N_API int mono_m2n_destroy(mono_m2n_context_t* ctx);
 
 /** 
  * Returns the current context.
  */
-mono_m2n_context_t* mono_m2n_get_context();
+MONO_M2N_API mono_m2n_context_t* mono_m2n_get_context();
 
 /** 
  * Sets the current context.
  */
-void mono_m2n_set_context(mono_m2n_context_t* ctx);
+MONO_M2N_API void mono_m2n_set_context(mono_m2n_context_t* ctx);
 
 
 /** 
  * Loads an assembly into the context.
  */
-MonoImage* mono_m2n_load_assembly(mono_m2n_context_t* ctx,
+MONO_M2N_API MonoImage* mono_m2n_load_assembly(mono_m2n_context_t* ctx,
     const char* assembly);
 
 /** 
  * Searches and returns the path to the given managed assembly.
  */
-char* mono_m2n_search_assembly(const char* assembly);
+MONO_M2N_API char* mono_m2n_search_assembly(const char* assembly);
 
 /** Represents the assembly search hook function type. */
 typedef const char* (*mono_m2n_assembly_search_hook_t)(const char*);
@@ -118,12 +118,12 @@ typedef const char* (*mono_m2n_assembly_search_hook_t)(const char*);
  * Installs an hook that returns the path to the given managed assembly.
  * Returns the previous installed hook.
  */
-void* mono_m2n_install_assembly_search_hook(mono_m2n_assembly_search_hook_t hook);
+MONO_M2N_API void* mono_m2n_install_assembly_search_hook(mono_m2n_assembly_search_hook_t hook);
 
 /** 
  * Searches and returns for the Mono class in the given assembly.
  */
-MonoClass* mono_m2n_search_class(const char* assembly, const char* _namespace,
+MONO_M2N_API MonoClass* mono_m2n_search_class(const char* assembly, const char* _namespace,
     const char* name);
 
 /**
@@ -154,7 +154,7 @@ typedef struct
 /**
  * Fires an error and calls the installed error hook for handling.
  */
-void mono_m2n_error(mono_m2n_error_t error);
+MONO_M2N_API void mono_m2n_error(mono_m2n_error_t error);
 
 /** Represents the error report hook function type. */
 typedef void (*mono_m2n_error_report_hook_t)(mono_m2n_error_t);
@@ -162,7 +162,7 @@ typedef void (*mono_m2n_error_report_hook_t)(mono_m2n_error_t);
 /**
  * Installs an hook that is called for each error reported.
  */
-void* mono_m2n_install_error_report_hook(mono_m2n_error_report_hook_t hook);
+MONO_M2N_API void* mono_m2n_install_error_report_hook(mono_m2n_error_report_hook_t hook);
 
 /** 
  * Arrays
@@ -186,6 +186,6 @@ typedef struct
 /**
  * Creates an support object from a Mono object instance.
  */
-void* mono_m2n_create_object(MonoObject* instance);
+MONO_M2N_API void* mono_m2n_create_object(MonoObject* instance);
 
 MONO_M2N_END_DECLS
