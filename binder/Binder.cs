@@ -20,9 +20,9 @@ namespace MonoManagedToNative
             var showHelp = args.Length == 0;
 
             var optionSet = new Mono.Options.OptionSet() {
-                { "gen=", "target generator (C, C++, Objective-C)", v => Generator = v },
+                { "gen=", "target generator (C, C++, Obj-C)", v => Generator = v },
                 { "o|out=", "output directory", v => OutputDir = v },
-                { "c|compile", "tries to compile generated output", v => CompileCode = true },
+                { "c|compile", "compiles the generated output", v => CompileCode = true },
                 { "dll|shared", "compiles as a shared library / DLL", v => SharedLibrary = true },
                 { "v|verbose", "generates diagnostic verbose output", v => Verbose = true },
                 { "h|help",  "show this message and exit",  v => showHelp = v != null },
