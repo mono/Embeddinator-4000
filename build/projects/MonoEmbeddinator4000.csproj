@@ -125,6 +125,9 @@
     <Compile Include="../../binder/Utils/Utils.cs">
       <Link>binder/Utils/Utils.cs</Link>
     </Compile>
+    <Compile Include="..\..\binder\Passes\CheckKeywordsPass.cs">
+      <Link>binder\Passes\CheckKeywordsPass.cs</Link>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="IKVM.Reflection.csproj">
