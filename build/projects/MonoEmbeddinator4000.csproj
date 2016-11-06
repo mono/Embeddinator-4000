@@ -1,0 +1,163 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProjectGuid>{509699E3-3C25-23AD-E543-37A8D1B13353}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>MonoEmbeddinator4000</RootNamespace>
+    <AssemblyName>MonoEmbeddinator4000</AssemblyName>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>../vs2015/lib/Debug\</OutputPath>
+    <BaseIntermediateOutputPath>../vs2015/obj/Debug/MonoEmbeddinator4000\</BaseIntermediateOutputPath>
+    <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
+    <DefineConstants></DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>../vs2015/lib/Release\</OutputPath>
+    <BaseIntermediateOutputPath>../vs2015/obj/Release/MonoEmbeddinator4000\</BaseIntermediateOutputPath>
+    <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
+    <DefineConstants></DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="../../binder/Binder.cs">
+      <Link>binder/Binder.cs</Link>
+    </Compile>
+    <Compile Include="../../binder/Driver.cs">
+      <Link>binder/Driver.cs</Link>
+    </Compile>
+    <Compile Include="../../binder/Generators/AstGenerator.cs">
+      <Link>binder/Generators/AstGenerator.cs</Link>
+    </Compile>
+    <Compile Include="../../binder/Generators/C/CGenerator.cs">
+      <Link>binder/Generators/C/CGenerator.cs</Link>
+    </Compile>
+    <Compile Include="../../binder/Generators/C/CHeaders.cs">
+      <Link>binder/Generators/C/CHeaders.cs</Link>
+    </Compile>
+    <Compile Include="../../binder/Generators/C/CMarshal.cs">
+      <Link>binder/Generators/C/CMarshal.cs</Link>
+    </Compile>
+    <Compile Include="../../binder/Generators/C/CSources.cs">
+      <Link>binder/Generators/C/CSources.cs</Link>
+    </Compile>
+    <Compile Include="../../binder/Generators/C/CTypes.cs">
+      <Link>binder/Generators/C/CTypes.cs</Link>
+    </Compile>
+    <Compile Include="../../binder/Generators/Generator.cs">
+      <Link>binder/Generators/Generator.cs</Link>
+    </Compile>
+    <Compile Include="../../binder/Generators/Marshal.cs">
+      <Link>binder/Generators/Marshal.cs</Link>
+    </Compile>
+    <Compile Include="../../binder/Generators/ObjC/ObjCGenerator.cs">
+      <Link>binder/Generators/ObjC/ObjCGenerator.cs</Link>
+    </Compile>
+    <Compile Include="../../binder/Generators/ObjC/ObjCHeaders.cs">
+      <Link>binder/Generators/ObjC/ObjCHeaders.cs</Link>
+    </Compile>
+    <Compile Include="../../binder/Generators/ObjC/ObjCSources.cs">
+      <Link>binder/Generators/ObjC/ObjCSources.cs</Link>
+    </Compile>
+    <Compile Include="../../binder/Generators/Template.cs">
+      <Link>binder/Generators/Template.cs</Link>
+    </Compile>
+    <Compile Include="../../binder/Generators/Types.cs">
+      <Link>binder/Generators/Types.cs</Link>
+    </Compile>
+    <Compile Include="../../binder/Options.cs">
+      <Link>binder/Options.cs</Link>
+    </Compile>
+    <Compile Include="../../binder/Parser.cs">
+      <Link>binder/Parser.cs</Link>
+    </Compile>
+    <Compile Include="../../binder/Passes/FieldToGetterSetter.cs">
+      <Link>binder/Passes/FieldToGetterSetter.cs</Link>
+    </Compile>
+    <Compile Include="../../binder/Passes/FixMethodParametersPass.cs">
+      <Link>binder/Passes/FixMethodParametersPass.cs</Link>
+    </Compile>
+    <Compile Include="../../binder/Passes/GenerateArrayTypes.cs">
+      <Link>binder/Passes/GenerateArrayTypes.cs</Link>
+    </Compile>
+    <Compile Include="../../binder/Passes/GenerateObjectTypes.cs">
+      <Link>binder/Passes/GenerateObjectTypes.cs</Link>
+    </Compile>
+    <Compile Include="../../binder/Passes/RenameDuplicatedDecls.cs">
+      <Link>binder/Passes/RenameDuplicatedDecls.cs</Link>
+    </Compile>
+    <Compile Include="../../binder/Passes/RenameEnumItemsPass.cs">
+      <Link>binder/Passes/RenameEnumItemsPass.cs</Link>
+    </Compile>
+    <Compile Include="../../binder/Project.cs">
+      <Link>binder/Project.cs</Link>
+    </Compile>
+    <Compile Include="../../binder/Tests/TestsGenerator.cs">
+      <Link>binder/Tests/TestsGenerator.cs</Link>
+    </Compile>
+    <Compile Include="../../binder/Utils/BlocksGenerator.cs">
+      <Link>binder/Utils/BlocksGenerator.cs</Link>
+    </Compile>
+    <Compile Include="../../binder/Utils/TextGenerator.cs">
+      <Link>binder/Utils/TextGenerator.cs</Link>
+    </Compile>
+    <Compile Include="../../binder/Utils/Utils.cs">
+      <Link>binder/Utils/Utils.cs</Link>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="IKVM.Reflection.csproj">
+      <Project>{95A93EAD-0135-AC71-0A46-2F6676500872}</Project>
+      <Name>IKVM.Reflection</Name>
+    </ProjectReference>
+    <ProjectReference Include="CppSharp.csproj">
+      <Project>{C600C309-B2CD-1D15-DBE6-0BBDC71253A3}</Project>
+      <Name>CppSharp</Name>
+    </ProjectReference>
+    <ProjectReference Include="CppSharp.AST.csproj">
+      <Project>{BC4C5C41-A8AF-EBE5-5135-249C3D77B768}</Project>
+      <Name>CppSharp.AST</Name>
+    </ProjectReference>
+    <ProjectReference Include="CppSharp.Generator.csproj">
+      <Project>{1BD1FEC4-07B5-BF1A-7015-BA6D5C18AA9C}</Project>
+      <Name>CppSharp.Generator</Name>
+    </ProjectReference>
+    <ProjectReference Include="CppSharp.Parser.csproj">
+      <Project>{C105FD61-2D91-6A26-36A2-ED1AA2ACC626}</Project>
+      <Name>CppSharp.Parser</Name>
+    </ProjectReference>
+    <ProjectReference Include="CppSharp.Parser.CSharp.csproj">
+      <Project>{70148081-5C0E-A9D3-457B-3FE431140F40}</Project>
+      <Name>CppSharp.Parser.CSharp</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

@@ -1,0 +1,329 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProjectGuid>{95A93EAD-0135-AC71-0A46-2F6676500872}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>IKVM.Reflection</RootNamespace>
+    <AssemblyName>IKVM.Reflection</AssemblyName>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>../vs2015/lib/Debug\</OutputPath>
+    <BaseIntermediateOutputPath>../vs2015/obj/Debug/IKVM.Reflection\</BaseIntermediateOutputPath>
+    <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
+    <DefineConstants></DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>../vs2015/lib/Release\</OutputPath>
+    <BaseIntermediateOutputPath>../vs2015/obj/Release/IKVM.Reflection\</BaseIntermediateOutputPath>
+    <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
+    <DefineConstants></DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Security" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="../../ikvm/reflect/AmbiguousMatchException.cs">
+      <Link>ikvm/reflect/AmbiguousMatchException.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/Assembly.cs">
+      <Link>ikvm/reflect/Assembly.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/AssemblyName.cs">
+      <Link>ikvm/reflect/AssemblyName.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/BadImageFormatException.cs">
+      <Link>ikvm/reflect/BadImageFormatException.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/Binder.cs">
+      <Link>ikvm/reflect/Binder.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/ConstructorInfo.cs">
+      <Link>ikvm/reflect/ConstructorInfo.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/CustomAttributeData.cs">
+      <Link>ikvm/reflect/CustomAttributeData.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/CustomAttributeNamedArgument.cs">
+      <Link>ikvm/reflect/CustomAttributeNamedArgument.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/CustomAttributeTypedArgument.cs">
+      <Link>ikvm/reflect/CustomAttributeTypedArgument.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/CustomModifiers.cs">
+      <Link>ikvm/reflect/CustomModifiers.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/Emit/AssemblyBuilder.cs">
+      <Link>ikvm/reflect/Emit/AssemblyBuilder.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/Emit/ConstructorBuilder.cs">
+      <Link>ikvm/reflect/Emit/ConstructorBuilder.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/Emit/CustomAttributeBuilder.cs">
+      <Link>ikvm/reflect/Emit/CustomAttributeBuilder.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/Emit/CustomModifiersBuilder.cs">
+      <Link>ikvm/reflect/Emit/CustomModifiersBuilder.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/Emit/EnumBuilder.cs">
+      <Link>ikvm/reflect/Emit/EnumBuilder.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/Emit/Enums.cs">
+      <Link>ikvm/reflect/Emit/Enums.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/Emit/EventBuilder.cs">
+      <Link>ikvm/reflect/Emit/EventBuilder.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/Emit/ExceptionHandler.cs">
+      <Link>ikvm/reflect/Emit/ExceptionHandler.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/Emit/FieldBuilder.cs">
+      <Link>ikvm/reflect/Emit/FieldBuilder.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/Emit/ILGenerator.cs">
+      <Link>ikvm/reflect/Emit/ILGenerator.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/Emit/MethodBuilder.cs">
+      <Link>ikvm/reflect/Emit/MethodBuilder.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/Emit/ModuleBuilder.cs">
+      <Link>ikvm/reflect/Emit/ModuleBuilder.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/Emit/OpCode.cs">
+      <Link>ikvm/reflect/Emit/OpCode.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/Emit/OpCodes.cs">
+      <Link>ikvm/reflect/Emit/OpCodes.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/Emit/ParameterBuilder.cs">
+      <Link>ikvm/reflect/Emit/ParameterBuilder.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/Emit/PropertyBuilder.cs">
+      <Link>ikvm/reflect/Emit/PropertyBuilder.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/Emit/SignatureHelper.cs">
+      <Link>ikvm/reflect/Emit/SignatureHelper.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/Emit/Tokens.cs">
+      <Link>ikvm/reflect/Emit/Tokens.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/Emit/TypeBuilder.cs">
+      <Link>ikvm/reflect/Emit/TypeBuilder.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/Enums.cs">
+      <Link>ikvm/reflect/Enums.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/EventInfo.cs">
+      <Link>ikvm/reflect/EventInfo.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/ExceptionHandlingClause.cs">
+      <Link>ikvm/reflect/ExceptionHandlingClause.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/FieldInfo.cs">
+      <Link>ikvm/reflect/FieldInfo.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/FieldSignature.cs">
+      <Link>ikvm/reflect/FieldSignature.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/Fusion.cs">
+      <Link>ikvm/reflect/Fusion.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/GenericWrappers.cs">
+      <Link>ikvm/reflect/GenericWrappers.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/Impl/ITypeOwner.cs">
+      <Link>ikvm/reflect/Impl/ITypeOwner.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/Impl/MdbWriter.cs">
+      <Link>ikvm/reflect/Impl/MdbWriter.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/Impl/PdbWriter.cs">
+      <Link>ikvm/reflect/Impl/PdbWriter.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/Impl/SymbolSupport.cs">
+      <Link>ikvm/reflect/Impl/SymbolSupport.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/InterfaceMapping.cs">
+      <Link>ikvm/reflect/InterfaceMapping.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/LocalVariableInfo.cs">
+      <Link>ikvm/reflect/LocalVariableInfo.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/ManifestResourceInfo.cs">
+      <Link>ikvm/reflect/ManifestResourceInfo.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/MarshalSpec.cs">
+      <Link>ikvm/reflect/MarshalSpec.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/MemberInfo.cs">
+      <Link>ikvm/reflect/MemberInfo.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/Metadata/CliHeader.cs">
+      <Link>ikvm/reflect/Metadata/CliHeader.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/Metadata/MetadataRW.cs">
+      <Link>ikvm/reflect/Metadata/MetadataRW.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/Metadata/Tables.cs">
+      <Link>ikvm/reflect/Metadata/Tables.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/MethodBase.cs">
+      <Link>ikvm/reflect/MethodBase.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/MethodBody.cs">
+      <Link>ikvm/reflect/MethodBody.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/MethodImplMap.cs">
+      <Link>ikvm/reflect/MethodImplMap.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/MethodInfo.cs">
+      <Link>ikvm/reflect/MethodInfo.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/MethodSignature.cs">
+      <Link>ikvm/reflect/MethodSignature.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/Missing.cs">
+      <Link>ikvm/reflect/Missing.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/Module.cs">
+      <Link>ikvm/reflect/Module.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/ParameterInfo.cs">
+      <Link>ikvm/reflect/ParameterInfo.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/ParameterModifier.cs">
+      <Link>ikvm/reflect/ParameterModifier.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/Projection.cs">
+      <Link>ikvm/reflect/Projection.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/Properties/AssemblyInfo.cs">
+      <Link>ikvm/reflect/Properties/AssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/PropertyInfo.cs">
+      <Link>ikvm/reflect/PropertyInfo.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/PropertySignature.cs">
+      <Link>ikvm/reflect/PropertySignature.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/Reader/AssemblyReader.cs">
+      <Link>ikvm/reflect/Reader/AssemblyReader.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/Reader/Authenticode.cs">
+      <Link>ikvm/reflect/Reader/Authenticode.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/Reader/ByteReader.cs">
+      <Link>ikvm/reflect/Reader/ByteReader.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/Reader/EventInfoImpl.cs">
+      <Link>ikvm/reflect/Reader/EventInfoImpl.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/Reader/Field.cs">
+      <Link>ikvm/reflect/Reader/Field.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/Reader/GenericTypeParameter.cs">
+      <Link>ikvm/reflect/Reader/GenericTypeParameter.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/Reader/MetadataReader.cs">
+      <Link>ikvm/reflect/Reader/MetadataReader.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/Reader/Method.cs">
+      <Link>ikvm/reflect/Reader/Method.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/Reader/ModuleReader.cs">
+      <Link>ikvm/reflect/Reader/ModuleReader.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/Reader/PEReader.cs">
+      <Link>ikvm/reflect/Reader/PEReader.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/Reader/PropertyInfoImpl.cs">
+      <Link>ikvm/reflect/Reader/PropertyInfoImpl.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/Reader/ResourceModule.cs">
+      <Link>ikvm/reflect/Reader/ResourceModule.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/Reader/TypeDefImpl.cs">
+      <Link>ikvm/reflect/Reader/TypeDefImpl.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/Signature.cs">
+      <Link>ikvm/reflect/Signature.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/StandAloneMethodSig.cs">
+      <Link>ikvm/reflect/StandAloneMethodSig.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/StrongNameKeyPair.cs">
+      <Link>ikvm/reflect/StrongNameKeyPair.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/Type.cs">
+      <Link>ikvm/reflect/Type.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/TypeInfo.cs">
+      <Link>ikvm/reflect/TypeInfo.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/TypeNameParser.cs">
+      <Link>ikvm/reflect/TypeNameParser.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/Universe.cs">
+      <Link>ikvm/reflect/Universe.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/Util.cs">
+      <Link>ikvm/reflect/Util.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/Writer/ByteBuffer.cs">
+      <Link>ikvm/reflect/Writer/ByteBuffer.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/Writer/Heaps.cs">
+      <Link>ikvm/reflect/Writer/Heaps.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/Writer/MetadataWriter.cs">
+      <Link>ikvm/reflect/Writer/MetadataWriter.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/Writer/ModuleWriter.cs">
+      <Link>ikvm/reflect/Writer/ModuleWriter.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/Writer/PEWriter.cs">
+      <Link>ikvm/reflect/Writer/PEWriter.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/Writer/ResourceSection.cs">
+      <Link>ikvm/reflect/Writer/ResourceSection.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/Writer/TextSection.cs">
+      <Link>ikvm/reflect/Writer/TextSection.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/Writer/VersionInfo.cs">
+      <Link>ikvm/reflect/Writer/VersionInfo.cs</Link>
+    </Compile>
+    <Compile Include="../../ikvm/reflect/coreclr.cs">
+      <Link>ikvm/reflect/coreclr.cs</Link>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

@@ -1,0 +1,68 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProjectGuid>{70148081-5C0E-A9D3-457B-3FE431140F40}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>CppSharp.Parser.CSharp</RootNamespace>
+    <AssemblyName>CppSharp.Parser.CSharp</AssemblyName>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>../vs2015/lib/Debug\</OutputPath>
+    <BaseIntermediateOutputPath>../vs2015/obj/Debug/CppSharp.Parser.CSharp\</BaseIntermediateOutputPath>
+    <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
+    <DefineConstants></DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>../vs2015/lib/Release\</OutputPath>
+    <BaseIntermediateOutputPath>../vs2015/obj/Release/CppSharp.Parser.CSharp\</BaseIntermediateOutputPath>
+    <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
+    <DefineConstants></DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="../../CppSharp/src/CppParser/Bindings/CSharp/i686-apple-darwin12.4.0/CppSharp.CppParser.cs">
+      <Link>CppSharp/src/CppParser/Bindings/CSharp/i686-apple-darwin12.4.0/CppSharp.CppParser.cs</Link>
+    </Compile>
+    <Compile Include="../../CppSharp/src/CppParser/Bindings/CSharp/i686-apple-darwin12.4.0/Std.cs">
+      <Link>CppSharp/src/CppParser/Bindings/CSharp/i686-apple-darwin12.4.0/Std.cs</Link>
+    </Compile>
+    <None Include="../../CppSharp/src/CppParser/Bindings/CSharp/premake5.lua">
+      <Link>CppSharp/src/CppParser/Bindings/CSharp/premake5.lua</Link>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="CppSharp.Runtime.csproj">
+      <Project>{189FF169-0498-10BC-2DCA-F5401922F0C7}</Project>
+      <Name>CppSharp.Runtime</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

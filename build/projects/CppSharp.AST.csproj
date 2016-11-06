@@ -1,0 +1,172 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProjectGuid>{BC4C5C41-A8AF-EBE5-5135-249C3D77B768}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>CppSharp.AST</RootNamespace>
+    <AssemblyName>CppSharp.AST</AssemblyName>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>../vs2015/lib/Debug\</OutputPath>
+    <BaseIntermediateOutputPath>../vs2015/obj/Debug/CppSharp.AST\</BaseIntermediateOutputPath>
+    <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
+    <DefineConstants></DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>../vs2015/lib/Release\</OutputPath>
+    <BaseIntermediateOutputPath>../vs2015/obj/Release/CppSharp.AST\</BaseIntermediateOutputPath>
+    <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
+    <DefineConstants></DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="../../CppSharp/src/AST/ASTContext.cs">
+      <Link>CppSharp/src/AST/ASTContext.cs</Link>
+    </Compile>
+    <Compile Include="../../CppSharp/src/AST/ASTVisitor.cs">
+      <Link>CppSharp/src/AST/ASTVisitor.cs</Link>
+    </Compile>
+    <Compile Include="../../CppSharp/src/AST/Attribute.cs">
+      <Link>CppSharp/src/AST/Attribute.cs</Link>
+    </Compile>
+    <Compile Include="../../CppSharp/src/AST/Class.cs">
+      <Link>CppSharp/src/AST/Class.cs</Link>
+    </Compile>
+    <Compile Include="../../CppSharp/src/AST/ClassExtensions.cs">
+      <Link>CppSharp/src/AST/ClassExtensions.cs</Link>
+    </Compile>
+    <Compile Include="../../CppSharp/src/AST/ClassLayout.cs">
+      <Link>CppSharp/src/AST/ClassLayout.cs</Link>
+    </Compile>
+    <Compile Include="../../CppSharp/src/AST/Comment.cs">
+      <Link>CppSharp/src/AST/Comment.cs</Link>
+    </Compile>
+    <Compile Include="../../CppSharp/src/AST/Conversions.cs">
+      <Link>CppSharp/src/AST/Conversions.cs</Link>
+    </Compile>
+    <Compile Include="../../CppSharp/src/AST/CppTypePrinter.cs">
+      <Link>CppSharp/src/AST/CppTypePrinter.cs</Link>
+    </Compile>
+    <Compile Include="../../CppSharp/src/AST/DeclIterator.cs">
+      <Link>CppSharp/src/AST/DeclIterator.cs</Link>
+    </Compile>
+    <Compile Include="../../CppSharp/src/AST/Declaration.cs">
+      <Link>CppSharp/src/AST/Declaration.cs</Link>
+    </Compile>
+    <Compile Include="../../CppSharp/src/AST/Delegate.cs">
+      <Link>CppSharp/src/AST/Delegate.cs</Link>
+    </Compile>
+    <Compile Include="../../CppSharp/src/AST/Enumeration.cs">
+      <Link>CppSharp/src/AST/Enumeration.cs</Link>
+    </Compile>
+    <Compile Include="../../CppSharp/src/AST/Event.cs">
+      <Link>CppSharp/src/AST/Event.cs</Link>
+    </Compile>
+    <Compile Include="../../CppSharp/src/AST/Expression.cs">
+      <Link>CppSharp/src/AST/Expression.cs</Link>
+    </Compile>
+    <Compile Include="../../CppSharp/src/AST/Field.cs">
+      <Link>CppSharp/src/AST/Field.cs</Link>
+    </Compile>
+    <Compile Include="../../CppSharp/src/AST/Friend.cs">
+      <Link>CppSharp/src/AST/Friend.cs</Link>
+    </Compile>
+    <Compile Include="../../CppSharp/src/AST/Function.cs">
+      <Link>CppSharp/src/AST/Function.cs</Link>
+    </Compile>
+    <Compile Include="../../CppSharp/src/AST/FunctionExtensions.cs">
+      <Link>CppSharp/src/AST/FunctionExtensions.cs</Link>
+    </Compile>
+    <Compile Include="../../CppSharp/src/AST/IExpressionPrinter.cs">
+      <Link>CppSharp/src/AST/IExpressionPrinter.cs</Link>
+    </Compile>
+    <Compile Include="../../CppSharp/src/AST/ITypePrinter.cs">
+      <Link>CppSharp/src/AST/ITypePrinter.cs</Link>
+    </Compile>
+    <Compile Include="../../CppSharp/src/AST/LayoutBase.cs">
+      <Link>CppSharp/src/AST/LayoutBase.cs</Link>
+    </Compile>
+    <Compile Include="../../CppSharp/src/AST/LayoutField.cs">
+      <Link>CppSharp/src/AST/LayoutField.cs</Link>
+    </Compile>
+    <Compile Include="../../CppSharp/src/AST/Method.cs">
+      <Link>CppSharp/src/AST/Method.cs</Link>
+    </Compile>
+    <Compile Include="../../CppSharp/src/AST/Module.cs">
+      <Link>CppSharp/src/AST/Module.cs</Link>
+    </Compile>
+    <Compile Include="../../CppSharp/src/AST/Namespace.cs">
+      <Link>CppSharp/src/AST/Namespace.cs</Link>
+    </Compile>
+    <Compile Include="../../CppSharp/src/AST/Preprocessor.cs">
+      <Link>CppSharp/src/AST/Preprocessor.cs</Link>
+    </Compile>
+    <Compile Include="../../CppSharp/src/AST/Property.cs">
+      <Link>CppSharp/src/AST/Property.cs</Link>
+    </Compile>
+    <Compile Include="../../CppSharp/src/AST/PropertyExtensions.cs">
+      <Link>CppSharp/src/AST/PropertyExtensions.cs</Link>
+    </Compile>
+    <Compile Include="../../CppSharp/src/AST/Reference.cs">
+      <Link>CppSharp/src/AST/Reference.cs</Link>
+    </Compile>
+    <Compile Include="../../CppSharp/src/AST/SourceLocation.cs">
+      <Link>CppSharp/src/AST/SourceLocation.cs</Link>
+    </Compile>
+    <Compile Include="../../CppSharp/src/AST/Statement.cs">
+      <Link>CppSharp/src/AST/Statement.cs</Link>
+    </Compile>
+    <Compile Include="../../CppSharp/src/AST/SymbolContext.cs">
+      <Link>CppSharp/src/AST/SymbolContext.cs</Link>
+    </Compile>
+    <Compile Include="../../CppSharp/src/AST/Template.cs">
+      <Link>CppSharp/src/AST/Template.cs</Link>
+    </Compile>
+    <Compile Include="../../CppSharp/src/AST/TranslationUnit.cs">
+      <Link>CppSharp/src/AST/TranslationUnit.cs</Link>
+    </Compile>
+    <Compile Include="../../CppSharp/src/AST/Type.cs">
+      <Link>CppSharp/src/AST/Type.cs</Link>
+    </Compile>
+    <Compile Include="../../CppSharp/src/AST/TypeExtensions.cs">
+      <Link>CppSharp/src/AST/TypeExtensions.cs</Link>
+    </Compile>
+    <Compile Include="../../CppSharp/src/AST/Typedef.cs">
+      <Link>CppSharp/src/AST/Typedef.cs</Link>
+    </Compile>
+    <Compile Include="../../CppSharp/src/AST/Variable.cs">
+      <Link>CppSharp/src/AST/Variable.cs</Link>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
