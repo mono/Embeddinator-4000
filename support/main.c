@@ -26,12 +26,12 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include "mono_managed_to_native.h"
+#include "mono_embeddinator.h"
 
 int main()
 {
   mono_m2n_context_t ctx;
-  mono_m2n_init(&ctx, "mono_managed_to_native");
+  mono_m2n_init(&ctx, "mono_embeddinnator");
 
   /* YOUR CODE HERE */
   

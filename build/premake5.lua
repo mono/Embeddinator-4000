@@ -5,7 +5,7 @@
 include "Helpers.lua"
 include "Tests.lua"
 
-solution "MonoManagedToNative"
+solution "MonoEmbeddinator4000"
 
   configurations { "Debug", "Release" }
   architecture "x86_64"

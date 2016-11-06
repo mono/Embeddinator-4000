@@ -29,7 +29,7 @@ namespace MonoManagedToNative.Generators
             WriteLine("#pragma once");
             NewLine();
 
-            WriteInclude("mono_managed_to_native.h");
+            WriteInclude("mono_embeddinator.h");
         }
 
         public override void Process()

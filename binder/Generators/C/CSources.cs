@@ -102,7 +102,7 @@ namespace MonoManagedToNative.Generators
             WriteLine("if ({0}.domain)", contextId);
             WriteLineIndent("return;");
 
-            var domainName = "mono_managed_to_native_binding";
+            var domainName = "mono_embeddinator_binding";
             WriteLine("mono_m2n_init(&{0}, \"{1}\");", contextId, domainName);
 
             WriteCloseBraceIndent();

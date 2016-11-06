@@ -26,7 +26,7 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include "mono_managed_to_native.h"
+#include "mono_embeddinator.h"
 #include "glib.h"
 
 #include <stdbool.h>

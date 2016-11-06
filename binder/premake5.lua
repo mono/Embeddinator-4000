@@ -1,4 +1,4 @@
-  project "MonoManagedToNative"
+  project "MonoEmbeddinator4000"
     SetupManagedProject()
 
     kind "ConsoleApp"
