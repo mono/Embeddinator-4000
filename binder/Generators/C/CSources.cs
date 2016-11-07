@@ -26,7 +26,7 @@ namespace MonoManagedToNative.Generators
 
         public override void WriteHeaders()
         {
-            WriteLine("#include \"{0}.h\"", Unit.FileName);
+            WriteLine("#include \"{0}.h\"", Unit.FileNameWithoutExtension);
             WriteLine("#include \"glib.h\"");
             WriteLine("#include <mono/jit/jit.h>");
             WriteLine("#include <mono/metadata/assembly.h>");
@@ -123,7 +123,7 @@ namespace MonoManagedToNative.Generators
             WriteLine("if ({0})", monoImageName);
             WriteLineIndent("return;");
 
-            WriteLine("{0} = mono_m2n_load_assembly(&{1}, \"{2}.dll\");",
+            WriteLine("{0} = mono_m2n_load_assembly(&{1}, \"{2}\");",
                 monoImageName, GeneratedIdentifier("mono_context"), assemblyName);
 
             WriteCloseBraceIndent();

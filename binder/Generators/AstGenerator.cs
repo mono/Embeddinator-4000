@@ -5,6 +5,7 @@ using IKVM.Reflection;
 using CppSharp.AST;
 using CppSharp.AST.Extensions;
 using CppSharp.Generators;
+using System.IO;
 
 namespace MonoManagedToNative.Generators
 {
@@ -23,7 +24,7 @@ namespace MonoManagedToNative.Generators
 
         TranslationUnit GetTranslationUnit(Assembly assembly)
         {
-            var assemblyName = assembly.GetName().Name;
+            var assemblyName = Path.GetFileName(assembly.Location);
             return GetTranslationUnit(assemblyName);
         }
 
@@ -43,7 +44,7 @@ namespace MonoManagedToNative.Generators
         {
             CurrentAssembly = assembly;
 
-            var assemblyName = assembly.GetName().Name;
+            var assemblyName = Path.GetFileName (assembly.Location);
             var name = Options.LibraryName ?? assemblyName;
 
             var unit = GetTranslationUnit(name);
@@ -352,7 +353,7 @@ namespace MonoManagedToNative.Generators
                     break;
                 }
                 var currentUnit = GetTranslationUnit(CurrentAssembly);
-                if (managedType.Assembly.GetName().Name != currentUnit.FileName)
+                if (managedType.Assembly.GetName().Name != currentUnit.FileNameWithoutExtension)
                 {
                     type = new UnsupportedType { Description = managedType.FullName };
                     break;

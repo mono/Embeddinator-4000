@@ -72,7 +72,7 @@ namespace MonoManagedToNative.Generators
 
         public override string Name
         {
-            get { return Unit.FileName; }
+            get { return Unit.FileNameWithoutExtension; }
         }
 
         public string GeneratedIdentifier(string id)
