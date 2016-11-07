@@ -148,6 +148,7 @@ MonoImage* mono_m2n_load_assembly(mono_m2n_context_t* ctx, const char* assembly)
         __error.type = MONO_M2N_ASSEMBLY_OPEN_FAILED;
         __error.string = path;
         mono_m2n_error(__error);
+        return 0;
     }
 
     return mono_assembly_get_image(mono_assembly);
