@@ -82,7 +82,7 @@ namespace MonoManagedToNative
 
         public static string GetSupportDirectory()
         {
-            var directory = Directory.GetParent(Directory.GetCurrentDirectory());
+            var directory = new DirectoryInfo (Directory.GetCurrentDirectory());
 
             while (directory != null)
             {
