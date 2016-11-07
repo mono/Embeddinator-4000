@@ -230,6 +230,9 @@
     <Compile Include="../../CppSharp/src/Generator/Passes/SortDeclarationsPass.cs">
       <Link>CppSharp/src/Generator/Passes/SortDeclarationsPass.cs</Link>
     </Compile>
+    <Compile Include="../../CppSharp/src/Generator/Passes/StripUnusedSystemTypesPass.cs">
+      <Link>CppSharp/src/Generator/Passes/StripUnusedSystemTypesPass.cs</Link>
+    </Compile>
     <Compile Include="../../CppSharp/src/Generator/Passes/TrimSpecializationsPass.cs">
       <Link>CppSharp/src/Generator/Passes/TrimSpecializationsPass.cs</Link>
     </Compile>

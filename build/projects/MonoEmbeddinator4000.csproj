@@ -92,6 +92,9 @@
     <Compile Include="../../binder/Parser.cs">
       <Link>binder/Parser.cs</Link>
     </Compile>
+    <Compile Include="../../binder/Passes/CheckKeywordsPass.cs">
+      <Link>binder/Passes/CheckKeywordsPass.cs</Link>
+    </Compile>
     <Compile Include="../../binder/Passes/FieldToGetterSetter.cs">
       <Link>binder/Passes/FieldToGetterSetter.cs</Link>
     </Compile>
@@ -124,9 +127,6 @@
     </Compile>
     <Compile Include="../../binder/Utils/Utils.cs">
       <Link>binder/Utils/Utils.cs</Link>
-    </Compile>
-    <Compile Include="..\..\binder\Passes\CheckKeywordsPass.cs">
-      <Link>binder\Passes\CheckKeywordsPass.cs</Link>
     </Compile>
   </ItemGroup>
   <ItemGroup>
