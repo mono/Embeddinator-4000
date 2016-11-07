@@ -353,7 +353,8 @@ namespace MonoManagedToNative.Generators
                     break;
                 }
                 var currentUnit = GetTranslationUnit(CurrentAssembly);
-                if (managedType.Assembly.GetName().Name != currentUnit.FileNameWithoutExtension)
+                if (managedType.Assembly.GetName().Name != currentUnit.FileNameWithoutExtension
+                    || managedType.IsGenericType)
                 {
                     type = new UnsupportedType { Description = managedType.FullName };
                     break;
