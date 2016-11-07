@@ -151,7 +151,11 @@ namespace MonoManagedToNative.Generators
                 assemblyName.Replace('.', '_')));
             WriteLine("{0}();", assemblyLookupId);
 
-            var @namespace = string.Empty;
+            var namespaces = Declaration.GatherNamespaces(@class.Namespace);
+            namespaces.Reverse();
+            namespaces.Remove(namespaces.First());
+
+            var @namespace = string.Join(".", namespaces);
             var ids = string.Join(", ",
                 @class.QualifiedName.Split('.').Select(n => string.Format("\"{0}\"", n)));
 
