@@ -1,5 +1,7 @@
 # MonoEmbeddinator-4000
 
+![Embeddinator-4000 Logo](https://raw.githubusercontent.com/mono/mono-embeddinator4000/master/e4000-logo.png)
+
 ## Introduction
 
 Embeddinator-4000 is a binding technology that acts as a bridge
