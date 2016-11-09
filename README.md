@@ -1,6 +1,6 @@
 # MonoEmbeddinator-4000
 
-![Embeddinator-4000 Logo](https://raw.githubusercontent.com/mono/mono-embeddinator4000/master/e4000-logo.png)
+![Embeddinator-4000 Logo](e4000-logo.png)
 
 ## Introduction
 
