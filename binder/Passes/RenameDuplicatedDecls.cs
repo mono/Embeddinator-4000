@@ -3,7 +3,7 @@ using CppSharp.AST;
 using CppSharp.Passes;
 using System.Linq;
 
-namespace MonoManagedToNative.Passes
+namespace MonoEmbeddinator4000.Passes
 {
     public class RenameDuplicatedDeclsPass : TranslationUnitPass
     {

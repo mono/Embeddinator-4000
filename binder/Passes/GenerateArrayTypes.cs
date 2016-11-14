@@ -1,9 +1,9 @@
 using CppSharp.AST;
 using CppSharp.Passes;
-using MonoManagedToNative.Generators;
+using MonoEmbeddinator4000.Generators;
 using System.Collections.Generic;
 
-namespace MonoManagedToNative.Passes
+namespace MonoEmbeddinator4000.Passes
 {
     /// <summary>
     /// This pass is responsible for gathering a unique set of array types,

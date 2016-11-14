@@ -2,7 +2,7 @@
 using CppSharp.AST.Extensions;
 using System.Linq;
 
-namespace MonoManagedToNative.Generators
+namespace MonoEmbeddinator4000.Generators
 {
     public class CMarshalPrinter : MarshalPrinter<MarshalContext>
     {

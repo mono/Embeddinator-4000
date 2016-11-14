@@ -2,7 +2,7 @@
 using CppSharp;
 using CppSharp.Generators;
 
-namespace MonoManagedToNative.Generators
+namespace MonoEmbeddinator4000.Generators
 {
     public abstract class Template : BlockGenerator
     {

@@ -7,7 +7,7 @@ using CppSharp.AST.Extensions;
 using CppSharp.Generators;
 using System.IO;
 
-namespace MonoManagedToNative.Generators
+namespace MonoEmbeddinator4000.Generators
 {
     public class ASTGenerator
     {

@@ -4,7 +4,7 @@ using CppSharp.AST.Extensions;
 using CppSharp.Passes;
 using System.Linq;
 
-namespace MonoManagedToNative.Passes
+namespace MonoEmbeddinator4000.Passes
 {
     public class FieldToGetterSetterPass : TranslationUnitPass
     {

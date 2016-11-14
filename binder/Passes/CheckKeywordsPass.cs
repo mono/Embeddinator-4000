@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using CppSharp.AST;
 using CppSharp.Passes;
 
-namespace MonoManagedToNative
+namespace MonoEmbeddinator4000
 {
     public class CheckKeywordsPass : TranslationUnitPass
     {

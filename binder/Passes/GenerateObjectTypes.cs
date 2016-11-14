@@ -2,7 +2,7 @@ using CppSharp.AST;
 using CppSharp.Passes;
 using System.Collections.Generic;
 
-namespace MonoManagedToNative.Passes
+namespace MonoEmbeddinator4000.Passes
 {
     public class GenerateObjectTypesPass : TranslationUnitPass
     {

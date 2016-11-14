@@ -4,7 +4,7 @@ using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace MonoManagedToNative
+namespace MonoEmbeddinator4000
 {
     /// <summary>
     /// Represents an input file in the binding project.

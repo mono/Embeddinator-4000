@@ -2,7 +2,7 @@ using CppSharp;
 using CppSharp.AST;
 using System.Linq;
 
-namespace MonoManagedToNative.Generators
+namespace MonoEmbeddinator4000.Generators
 {
     public class CManagedToNativeTypePrinter : CppTypePrinter
     {

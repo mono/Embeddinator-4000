@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace MonoManagedToNative
+namespace MonoEmbeddinator4000
 {
     public static class StringExtensions
     {

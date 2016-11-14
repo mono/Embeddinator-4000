@@ -1,7 +1,7 @@
 using CppSharp.AST;
 using CppSharp.Passes;
 
-namespace MonoManagedToNative.Passes
+namespace MonoEmbeddinator4000.Passes
 {
     public class FixMethodParametersPass : TranslationUnitPass
     {

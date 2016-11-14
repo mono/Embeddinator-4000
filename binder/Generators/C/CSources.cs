@@ -3,9 +3,9 @@ using CppSharp.AST.Extensions;
 using CppSharp.Generators;
 using System.Linq;
 using System.Collections.Generic;
-using MonoManagedToNative.Passes;
+using MonoEmbeddinator4000.Passes;
 
-namespace MonoManagedToNative.Generators
+namespace MonoEmbeddinator4000.Generators
 {
     public class CSources : CTemplate
     {

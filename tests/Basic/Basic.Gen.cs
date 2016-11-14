@@ -1,7 +1,7 @@
-using MonoManagedToNative.Generators;
+using MonoEmbeddinator4000.Generators;
 using CppSharp.Generators;
 
-namespace MonoManagedToNative.Tests
+namespace MonoEmbeddinator4000.Tests
 {
     public class BasicTestsGenerator : TestsGenerator
     {

@@ -1,11 +1,11 @@
 using CppSharp;
 using CppSharp.Generators;
-using MonoManagedToNative.Generators;
+using MonoEmbeddinator4000.Generators;
 using System;
 using System.IO;
 using System.Reflection;
 
-namespace MonoManagedToNative.Tests
+namespace MonoEmbeddinator4000.Tests
 {
     /// <summary>
     /// The main base class for a generator-based tests project.

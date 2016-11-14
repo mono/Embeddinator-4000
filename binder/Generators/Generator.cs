@@ -2,7 +2,7 @@
 using CppSharp.Generators;
 using System.Collections.Generic;
 
-namespace MonoManagedToNative.Generators
+namespace MonoEmbeddinator4000.Generators
 {
     /// <summary>
     /// Generators are the base class for each language backend.

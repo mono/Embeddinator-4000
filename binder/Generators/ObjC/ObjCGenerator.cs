@@ -5,7 +5,7 @@ using CppSharp.AST;
 using CppSharp.Generators;
 using CppSharp.Types;
 
-namespace MonoManagedToNative.Generators
+namespace MonoEmbeddinator4000.Generators
 {
     public class ObjCGenerator : CGenerator
     {

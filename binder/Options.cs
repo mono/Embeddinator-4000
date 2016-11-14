@@ -1,7 +1,7 @@
-﻿using MonoManagedToNative.Generators;
+﻿using MonoEmbeddinator4000.Generators;
 using CppSharp.Generators;
 
-namespace MonoManagedToNative
+namespace MonoEmbeddinator4000
 {
     public class Options
     {
