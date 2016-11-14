@@ -24,6 +24,8 @@ namespace MonoEmbeddinator4000
         public string LibraryName;
         public GeneratorKind Language;
 
+        public TargetPlatform Platform;
+
         public string OutputNamespace;
         public string OutputDir;
 

@@ -5,6 +5,16 @@ using System.Text;
 
 namespace MonoEmbeddinator4000
 {
+    public enum TargetPlatform
+    {
+        Windows,
+        Android,
+        MacOS,
+        iOS,
+        WatchOS,
+        TVOS
+    }
+
     public static class StringExtensions
     {
         public static string Repeat(this char chatToRepeat, int repeat)

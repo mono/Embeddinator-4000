@@ -4,11 +4,12 @@ using System.IO;
 using CppSharp;
 using CppSharp.Generators;
 
-namespace MonoManagedToNative
+namespace MonoEmbeddinator4000
 {
     public class Binder
     {
         static string Generator;
+        static string Platform;
         static string OutputDir;
         static List<string> Assemblies;
         static bool CompileCode;
@@ -21,6 +22,7 @@ namespace MonoManagedToNative
 
             var optionSet = new Mono.Options.OptionSet() {
                 { "gen=", "target generator (C, C++, Obj-C)", v => Generator = v },
+                { "p|platform=", "target platform (iOS, macOS, Android)", v => Platform = v },
                 { "o|out=", "output directory", v => OutputDir = v },
                 { "c|compile", "compiles the generated output", v => CompileCode = true },
                 { "dll|shared", "compiles as a shared library / DLL", v => SharedLibrary = true },
@@ -76,6 +78,28 @@ namespace MonoManagedToNative
             throw new NotSupportedException("Unknown target generator: " + gen);
         }
 
+        static TargetPlatform ConvertToTargetPlatform (string platform)
+        {
+            switch (platform.ToLower ()) {
+            case "windows":
+                return TargetPlatform.Windows;                
+            case "android":
+                return TargetPlatform.Android;
+            case "osx":    
+            case "macosx":
+            case "macos":
+                return TargetPlatform.MacOS;
+            case "ios":
+                return TargetPlatform.iOS;
+            case "watchos":
+                return TargetPlatform.WatchOS;
+            case "tvos":
+                return TargetPlatform.TVOS;
+            }
+
+            throw new NotSupportedException ("Unknown target platform: " + platform);
+        }
+
         static void Main(string[] args)
         {
             ParseCommandLineArgs(args);
@@ -87,6 +111,9 @@ namespace MonoManagedToNative
 
             var generator = ConvertToGeneratorKind(Generator);
             options.Language = generator;
+
+            var targetPlatform = ConvertToTargetPlatform(Platform);
+            options.Platform = targetPlatform;
 
             var currentDir = Directory.GetCurrentDirectory();
             options.Project.AssemblyDirs.Add(currentDir);
