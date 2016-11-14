@@ -7,3 +7,6 @@
 [submodule "CppSharp"]
 	path = CppSharp
 	url = https://github.com/mono/CppSharp
+[submodule "Xamarin.MacDev"]
+	path = Xamarin.MacDev
+	url = https://github.com/xamarin/Xamarin.MacDev.git

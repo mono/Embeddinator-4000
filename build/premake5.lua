@@ -49,6 +49,23 @@ solution "MonoEmbeddinator4000"
     files { "../ikvm/reflect/**.cs" }
     links { "System", "System.Core", "System.Security" }
 
+  project "Xamarin.MacDev"
+    SetupManagedProject()
+
+    kind "SharedLib"
+    language "C#"
+    clr "Unsafe"
+
+    files { "../Xamarin.MacDev/Xamarin.MacDev/**.cs" }
+    links
+    {
+      "System",
+      "System.Core",
+      "System.Xml",
+      "System.Xml.Linq",
+      "Mono.Posix"
+    }    
+
   group "Tests"
 
     print("Searching for tests projects...")

@@ -17,5 +17,6 @@
       "CppSharp.AST",
       "CppSharp.Generator",
       "CppSharp.Parser",
-      "CppSharp.Parser.CSharp"
+      "CppSharp.Parser.CSharp",
+      "Xamarin.MacDev"
     }
