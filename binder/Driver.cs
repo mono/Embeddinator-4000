@@ -202,6 +202,41 @@ namespace MonoEmbeddinator4000
                     .Where(file => file.EndsWith(pattern, StringComparison.OrdinalIgnoreCase));
         }
 
+        public static string GetAppleTargetFrameworkIdentifier(TargetPlatform platform)
+        {
+            switch (platform) {
+            case TargetPlatform.MacOS:
+                return "Xamarin.Mac";
+            case TargetPlatform.iOS:
+                return "Xamarin.iOS";
+            case TargetPlatform.WatchOS:
+                return "Xamarin.WatchOS";
+            case TargetPlatform.TVOS:
+                return "Xamarin.TVOS";
+            }
+
+            throw new InvalidOperationException ("Unknown Apple target platform: " + platform);
+
+        }
+
+        public static string GetAppleAotCompiler(TargetPlatform platform, string cross_prefix, bool is64bits)
+        {
+            switch (platform) {
+            case TargetPlatform.iOS:
+                if (is64bits) {
+                    return Path.Combine (cross_prefix, "bin", "arm64-darwin-mono-sgen");
+                } else {
+                    return Path.Combine (cross_prefix, "bin", "arm-darwin-mono-sgen");
+                }
+            case TargetPlatform.WatchOS:
+                return Path.Combine (cross_prefix, "bin", "armv7k-unknown-darwin-mono-sgen");
+            case TargetPlatform.TVOS:
+                return Path.Combine (cross_prefix, "bin", "aarch64-unknown-darwin-mono-sgen");
+            }
+
+            throw new InvalidOperationException ("Unknown Apple target platform: " + platform);
+        }
+
         void CompileCode()
         {
             var files = GetOutputFiles("c");
@@ -260,17 +295,42 @@ namespace MonoEmbeddinator4000
             }
             else if (Platform.IsMacOS)
             {
-                var xcodePath = XcodeToolchain.GetXcodeToolchainPath();
-                var clangBin = Path.Combine(xcodePath, "usr/bin/clang");
-                var monoPath = ManagedToolchain.FindMonoPath();
+                switch (Options.Platform)
+                {
+                case TargetPlatform.iOS:
+                case TargetPlatform.TVOS:
+                case TargetPlatform.WatchOS:
+                    var detectAppleSdks = new Xamarin.iOS.Tasks.DetectIPhoneSdks() {
+                        TargetFrameworkIdentifier = GetAppleTargetFrameworkIdentifier(Options.Platform)
+                    };
 
-                var invocation = string.Format(
-                    "-D{0} -framework CoreFoundation -I\"{1}/include/mono-2.0\" " +
-                    "-L\"{1}/lib/\" -lmonosgen-2.0 {2}",
-                    exportDefine, monoPath, string.Join(" ", files.ToList()));
+                    if (!detectAppleSdks.Execute())
+                        throw new Exception("Error detecting Xamarin.iOS SDK.");
 
-                InvokeCompiler(clangBin, invocation);
+                    string aotCompiler = GetAppleAotCompiler(Options.Platform,
+                        detectAppleSdks.XamarinSdkRoot, is64bits: false);
 
+                    // TODO: Call the AOT cross compiler for all compiled assemblies.
+
+                    break;
+                case TargetPlatform.Windows:
+                case TargetPlatform.Android:
+                    throw new NotSupportedException(string.Format(
+                        "Cross compilation to target platform '{0}' is not supported.",
+                        Options.Platform));
+                case TargetPlatform.MacOS:
+                    var xcodePath = XcodeToolchain.GetXcodeToolchainPath();
+                    var clangBin = Path.Combine(xcodePath, "usr/bin/clang");
+                    var monoPath = ManagedToolchain.FindMonoPath();
+    
+                    var invocation = string.Format(
+                        "-D{0} -framework CoreFoundation -I\"{1}/include/mono-2.0\" " +
+                        "-L\"{1}/lib/\" -lmonosgen-2.0 {2}",
+                        exportDefine, monoPath, string.Join(" ", files.ToList()));
+    
+                    InvokeCompiler(clangBin, invocation);       
+                    break;
+                }
                 return;
             }
 

@@ -59,6 +59,7 @@ namespace Xamarin.iOS.Tasks
         internal static void LogError(MessageImportance level, string text, params object[] args)
         {
             WriteLog(level, text, args);
+            HasLoggedErrors = true;
         }
 
         internal static void LogMessage(string text, params object[] args)
