@@ -333,6 +333,7 @@ namespace MonoEmbeddinator4000
             {
                 file = file.Substring(result.Input.BasePath.Length);
                 file = file.TrimStart('\\');
+                file = file.TrimStart('/');
             }
 
             switch (result.Kind)
