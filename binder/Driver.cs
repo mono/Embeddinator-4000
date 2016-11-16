@@ -7,11 +7,11 @@ using CppSharp;
 using CppSharp.AST;
 using CppSharp.Generators;
 using CppSharp.Passes;
-using MonoManagedToNative.Generators;
-using MonoManagedToNative.Passes;
+using MonoEmbeddinator4000.Generators;
+using MonoEmbeddinator4000.Passes;
 using BindingContext = CppSharp.Generators.BindingContext;
 
-namespace MonoManagedToNative
+namespace MonoEmbeddinator4000
 {
     public class Driver
     {
