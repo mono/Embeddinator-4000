@@ -32,18 +32,22 @@ namespace Xamarin.iOS.Tasks
 
     static class Log
     {
+        static bool Verbose;
+
         internal static void LogTaskName(string text)
         {
         }
 
         internal static void LogTaskProperty(string text, params object[] args)
         {
-            WriteLog(MessageImportance.Low, text + ": {0}", args);
+            if (Verbose)
+                WriteLog(MessageImportance.Low, text + ": {0}", args);
         }
 
         internal static void WriteLog(MessageImportance level, string text, params object[] args)
         {
-            Console.WriteLine(text, args);
+			if (Verbose || level == MessageImportance.High)
+                Console.WriteLine(text, args);
         }
 
         internal static void LogMessage(MessageImportance level, string text, params object[] args)
