@@ -3,11 +3,68 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text;
 using CppSharp;
 using CppSharp.Generators;
 
 namespace MonoEmbeddinator4000
 {
+    public enum BitCodeMode
+    {
+        None = 0,
+        ASMOnly = 1,
+        LLVMOnly = 2,
+        MarkerOnly = 3,
+    }
+
+    [Flags]
+    public enum Abi
+    {
+        None   =   0,
+        i386   =   1,
+        ARMv6  =   2,
+        ARMv7  =   4,
+        ARMv7s =   8,
+        ARM64 =   16,
+        x86_64 =  32,
+        Thumb  =  64,
+        LLVM   = 128,
+        ARMv7k = 256,
+        SimulatorArchMask = i386 | x86_64,
+        DeviceArchMask = ARMv6 | ARMv7 | ARMv7s | ARMv7k | ARM64,
+        ArchMask = SimulatorArchMask | DeviceArchMask,
+        Arch64Mask = x86_64 | ARM64,
+        Arch32Mask = i386 | ARMv6 | ARMv7 | ARMv7s | ARMv7k,
+    }
+
+    public static class AbiExtensions 
+    {
+        public static string AsString (this Abi self)
+        {
+            var rv = (self & Abi.ArchMask).ToString ();
+            if ((self & Abi.LLVM) == Abi.LLVM)
+                rv += "+LLVM";
+            if ((self & Abi.Thumb) == Abi.Thumb)
+                rv += "+Thumb";
+            return rv;
+        }
+
+        public static string AsArchString (this Abi self)
+        {
+            return (self & Abi.ArchMask).ToString ().ToLowerInvariant ();
+        }
+    }
+
+    public class Application
+    {
+        public bool EnableDebug;
+        public bool PackageMdb;
+        public bool EnableLLVMOnlyBitCode;
+        public bool EnableMSym;
+
+        public bool UseDlsym(string aname) { return false; }
+    }
+
     public partial class Driver
     {
         public static string GetAppleTargetFrameworkIdentifier(TargetPlatform platform)
@@ -44,6 +101,98 @@ namespace MonoEmbeddinator4000
             throw new InvalidOperationException ("Unknown Apple target platform: " + platform);
         }
 
+        public static string Quote (string f)
+        {
+            if (f.IndexOf (' ') == -1 && f.IndexOf ('\'') == -1 && f.IndexOf (',') == -1)
+                return f;
+
+            var s = new StringBuilder ();
+
+            s.Append ('"');
+            foreach (var c in f) {
+                if (c == '"' || c == '\\')
+                    s.Append ('\\');
+
+                s.Append (c);
+            }
+            s.Append ('"');
+
+            return s.ToString ();
+        }
+
+        public static string GetAotArguments (Application app, string filename, Abi abi,
+            string outputDir, string outputFile, string llvmOutputFile, string dataFile)
+        {
+            string aot_args = string.Empty;
+            string aot_other_args = string.Empty;
+            bool debug_all = false;
+            var debug_assemblies = new List<string>();
+
+            string fname = Path.GetFileName (filename);
+            var args = new StringBuilder ();
+            bool enable_llvm = (abi & Abi.LLVM) != 0;
+            bool enable_thumb = (abi & Abi.Thumb) != 0;
+            bool enable_debug = app.EnableDebug;
+            bool enable_mdb = app.PackageMdb;
+            bool llvm_only = app.EnableLLVMOnlyBitCode;
+            string arch = abi.AsArchString ();
+
+            args.Append ("--debug ");
+
+            if (enable_llvm)
+                args.Append ("--llvm ");
+
+            if (!llvm_only)
+                args.Append ("-O=gsharedvt ");
+            args.Append (aot_other_args).Append (" ");
+            args.Append ("--aot=mtriple=");
+            args.Append (enable_thumb ? arch.Replace ("arm", "thumb") : arch);
+            args.Append ("-ios,");
+            args.Append ("data-outfile=").Append (Quote (dataFile)).Append (",");
+            args.Append (aot_args);
+            if (llvm_only)
+                args.Append ("llvmonly,");
+            else
+                args.Append ("full,");
+
+            var aname = Path.GetFileNameWithoutExtension (fname);
+            //var sdk_or_product = Profile.IsSdkAssembly (aname) || Profile.IsProductAssembly (aname);
+            var sdk_or_product = false;
+
+            if (enable_llvm)
+                args.Append ("nodebug,");
+            else if (!(enable_debug || enable_mdb))
+                args.Append ("nodebug,");
+            else if (debug_all || debug_assemblies.Contains (fname) || !sdk_or_product)
+                args.Append ("soft-debug,");
+
+            args.Append ("dwarfdebug,");
+
+            /* Needed for #4587 */
+            if (enable_debug && !enable_llvm)
+                args.Append ("no-direct-calls,");
+
+            if (!app.UseDlsym (filename))
+                args.Append ("direct-pinvoke,");
+
+            if (app.EnableMSym) {
+                var msymdir = Quote (Path.Combine (outputDir, "Msym"));
+                args.Append ($"msym-dir={msymdir},");
+            }
+
+            //if (enable_llvm)
+                //args.Append ("llvm-path=").Append (MonoTouchDirectory).Append ("/LLVM/bin/,");
+
+            if (!llvm_only)
+                args.Append ("outfile=").Append (Quote (outputFile));
+            if (!llvm_only && enable_llvm)
+                args.Append (",");
+            if (enable_llvm)
+                args.Append ("llvm-outfile=").Append (Quote (llvmOutputFile));
+            args.Append (" \"").Append (filename).Append ("\"");
+            return args.ToString ();
+        }    
+
         void InvokeCompiler(string compiler, string arguments, Dictionary<string, string> envVars = null)
         {
             Diagnostics.Debug("Invoking: {0} {1}", compiler, arguments);
@@ -69,6 +218,51 @@ namespace MonoEmbeddinator4000
         {
             return Directory.EnumerateFiles(Options.OutputDir)
                     .Where(file => file.EndsWith(pattern, StringComparison.OrdinalIgnoreCase));
+        }
+
+        void AotAssemblies()
+        {
+            switch (Options.Platform)
+            {
+            case TargetPlatform.iOS:
+            case TargetPlatform.TVOS:
+            case TargetPlatform.WatchOS:
+			{
+				var detectAppleSdks = new Xamarin.iOS.Tasks.DetectIPhoneSdks()
+				{
+					TargetFrameworkIdentifier = GetAppleTargetFrameworkIdentifier(Options.Platform)
+				};
+
+				if (!detectAppleSdks.Execute())
+					throw new Exception("Error detecting Xamarin.iOS SDK.");
+
+                var monoTouchSdk = Xamarin.iOS.Tasks.IPhoneSdks.MonoTouch;
+                if (monoTouchSdk.ExtendedVersion.Version.Major < 10)
+                    throw new Exception("Unsupported Xamarin.iOS version, upgrade to 10 or newer.");
+
+				string aotCompiler = GetAppleAotCompiler(Options.Platform,
+					detectAppleSdks.XamarinSdkRoot, is64bits: false);
+
+				var app = new Application();
+
+				// Call the Mono AOT cross compiler for all input assemblies.
+				foreach (var assembly in Options.Project.Assemblies)
+				{
+					var args = GetAotArguments(app, assembly, Abi.ARMv7, Path.GetFullPath(Options.OutputDir),
+						assembly + ".o", assembly + ".llvm.o", assembly + ".data");
+
+					Console.WriteLine("{0} {1}", aotCompiler, args);
+				}
+				break;
+			}
+            case TargetPlatform.Windows:
+            case TargetPlatform.Android:
+                throw new NotSupportedException(string.Format(
+                    "AOT cross compilation to target platform '{0}' is not supported.",
+                    Options.Platform));
+            case TargetPlatform.MacOS:
+                break;
+            }
         }
 
         void CompileCode()
@@ -134,18 +328,7 @@ namespace MonoEmbeddinator4000
                 case TargetPlatform.iOS:
                 case TargetPlatform.TVOS:
                 case TargetPlatform.WatchOS:
-                    var detectAppleSdks = new Xamarin.iOS.Tasks.DetectIPhoneSdks() {
-                        TargetFrameworkIdentifier = GetAppleTargetFrameworkIdentifier(Options.Platform)
-                    };
-
-                    if (!detectAppleSdks.Execute())
-                        throw new Exception("Error detecting Xamarin.iOS SDK.");
-
-                    string aotCompiler = GetAppleAotCompiler(Options.Platform,
-                        detectAppleSdks.XamarinSdkRoot, is64bits: false);
-
-                    // TODO: Call the AOT cross compiler for all compiled assemblies.
-
+                    AotAssemblies();
                     break;
                 case TargetPlatform.Windows:
                 case TargetPlatform.Android:
@@ -162,7 +345,7 @@ namespace MonoEmbeddinator4000
                         "-L\"{1}/lib/\" -lmonosgen-2.0 {2}",
                         exportDefine, monoPath, string.Join(" ", files.ToList()));
     
-                    InvokeCompiler(clangBin, invocation);       
+                    InvokeCompiler(clangBin, invocation);
                     break;
                 }
                 return;
