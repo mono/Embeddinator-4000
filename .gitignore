@@ -12,8 +12,6 @@ missing
 *.exe
 bin/
 *.userprefs
-tests/output
-src/generator/generator
 *.pc
 .DS_Store
 *.user
@@ -23,11 +21,8 @@ src/generator/generator
 *.opensdf
 *.pdb
 *.config
-*.vcxproj
 *.filters
-*.sln
 *.metagen
-*.csproj
 *.ilk
 *.manifest
 /build/vs2015
