@@ -29,7 +29,7 @@ function SetupTestGeneratorProject(name, depends)
     linktable = {
       "System.Core",
       "CppSharp.Generator",
-      "MonoManagedToNative",
+      "MonoEmbeddinator4000",
     }
 
     if depends ~= nil then

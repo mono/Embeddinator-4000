@@ -40,7 +40,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System.Core" />
-    <Reference Include="MonoManagedToNative" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="../../tests/Basic/Basic.Gen.cs">
@@ -51,6 +50,10 @@
     <ProjectReference Include="CppSharp.Generator.csproj">
       <Project>{1BD1FEC4-07B5-BF1A-7015-BA6D5C18AA9C}</Project>
       <Name>CppSharp.Generator</Name>
+    </ProjectReference>
+    <ProjectReference Include="MonoEmbeddinator4000.csproj">
+      <Project>{509699E3-3C25-23AD-E543-37A8D1B13353}</Project>
+      <Name>MonoEmbeddinator4000</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
