@@ -5,6 +5,12 @@
 include "Helpers.lua"
 include "Tests.lua"
 
+newoption {
+   trigger     = "outdir",
+   value       = "path",
+   description = "Output directory for the generated project files"
+}
+
 solution "MonoEmbeddinator4000"
 
   configurations { "Debug", "Release" }
@@ -24,7 +30,7 @@ solution "MonoEmbeddinator4000"
   characterset "Unicode"
   symbols "On"
 
-  local action = _ACTION or ""
+  local action = _OPTIONS["outdir"] or _ACTION
   location (action)
 
   objdir (path.join("./", action, "obj"))
