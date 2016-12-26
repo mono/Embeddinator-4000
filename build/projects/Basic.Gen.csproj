@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
-    <ProjectGuid>{70148081-5C0E-A9D3-457B-3FE431140F40}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <ProjectGuid>{AF39940F-1BA4-4886-64E2-F92BD08B26DB}</ProjectGuid>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>CppSharp.Parser.CSharp</RootNamespace>
-    <AssemblyName>CppSharp.Parser.CSharp</AssemblyName>
+    <RootNamespace>Basic.Gen</RootNamespace>
+    <AssemblyName>Basic.Gen</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -18,7 +18,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>../lib/Debug\</OutputPath>
-    <BaseIntermediateOutputPath>../obj/Debug/CppSharp.Parser.CSharp\</BaseIntermediateOutputPath>
+    <BaseIntermediateOutputPath>../obj/Debug/Basic.Gen\</BaseIntermediateOutputPath>
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
     <DefineConstants></DefineConstants>
     <ErrorReport>prompt</ErrorReport>
@@ -31,7 +31,7 @@
     <DebugType>full</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>../lib/Release\</OutputPath>
-    <BaseIntermediateOutputPath>../obj/Release/CppSharp.Parser.CSharp\</BaseIntermediateOutputPath>
+    <BaseIntermediateOutputPath>../obj/Release/Basic.Gen\</BaseIntermediateOutputPath>
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
     <DefineConstants></DefineConstants>
     <ErrorReport>prompt</ErrorReport>
@@ -39,22 +39,18 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="System.Core" />
+    <Reference Include="MonoManagedToNative" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="../../CppSharp/src/CppParser/Bindings/CSharp/i686-apple-darwin12.4.0/CppSharp.CppParser.cs">
-      <Link>CppSharp/src/CppParser/Bindings/CSharp/i686-apple-darwin12.4.0/CppSharp.CppParser.cs</Link>
+    <Compile Include="../../tests/Basic/Basic.Gen.cs">
+      <Link>tests/Basic/Basic.Gen.cs</Link>
     </Compile>
-    <Compile Include="../../CppSharp/src/CppParser/Bindings/CSharp/i686-apple-darwin12.4.0/Std.cs">
-      <Link>CppSharp/src/CppParser/Bindings/CSharp/i686-apple-darwin12.4.0/Std.cs</Link>
-    </Compile>
-    <None Include="../../CppSharp/src/CppParser/Bindings/CSharp/premake5.lua">
-      <Link>CppSharp/src/CppParser/Bindings/CSharp/premake5.lua</Link>
-    </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="CppSharp.Runtime.csproj">
-      <Project>{189FF169-0498-10BC-2DCA-F5401922F0C7}</Project>
-      <Name>CppSharp.Runtime</Name>
+    <ProjectReference Include="CppSharp.Generator.csproj">
+      <Project>{1BD1FEC4-07B5-BF1A-7015-BA6D5C18AA9C}</Project>
+      <Name>CppSharp.Generator</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

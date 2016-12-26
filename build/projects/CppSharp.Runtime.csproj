@@ -17,8 +17,8 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>../vs2015/lib/Debug\</OutputPath>
-    <BaseIntermediateOutputPath>../vs2015/obj/Debug/CppSharp.Runtime\</BaseIntermediateOutputPath>
+    <OutputPath>../lib/Debug\</OutputPath>
+    <BaseIntermediateOutputPath>../obj/Debug/CppSharp.Runtime\</BaseIntermediateOutputPath>
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
     <DefineConstants>MSVC</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
@@ -30,8 +30,8 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>../vs2015/lib/Release\</OutputPath>
-    <BaseIntermediateOutputPath>../vs2015/obj/Release/CppSharp.Runtime\</BaseIntermediateOutputPath>
+    <OutputPath>../lib/Release\</OutputPath>
+    <BaseIntermediateOutputPath>../obj/Release/CppSharp.Runtime\</BaseIntermediateOutputPath>
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
     <DefineConstants>MSVC</DefineConstants>
     <ErrorReport>prompt</ErrorReport>

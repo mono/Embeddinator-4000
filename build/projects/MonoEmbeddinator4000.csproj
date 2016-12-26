@@ -17,8 +17,8 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>../vs2015/lib/Debug\</OutputPath>
-    <BaseIntermediateOutputPath>../vs2015/obj/Debug/MonoEmbeddinator4000\</BaseIntermediateOutputPath>
+    <OutputPath>../lib/Debug\</OutputPath>
+    <BaseIntermediateOutputPath>../obj/Debug/MonoEmbeddinator4000\</BaseIntermediateOutputPath>
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
     <DefineConstants></DefineConstants>
     <ErrorReport>prompt</ErrorReport>
@@ -29,8 +29,8 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>../vs2015/lib/Release\</OutputPath>
-    <BaseIntermediateOutputPath>../vs2015/obj/Release/MonoEmbeddinator4000\</BaseIntermediateOutputPath>
+    <OutputPath>../lib/Release\</OutputPath>
+    <BaseIntermediateOutputPath>../obj/Release/MonoEmbeddinator4000\</BaseIntermediateOutputPath>
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
     <DefineConstants></DefineConstants>
     <ErrorReport>prompt</ErrorReport>
@@ -43,6 +43,9 @@
   <ItemGroup>
     <Compile Include="../../binder/Binder.cs">
       <Link>binder/Binder.cs</Link>
+    </Compile>
+    <Compile Include="../../binder/Compilation.cs">
+      <Link>binder/Compilation.cs</Link>
     </Compile>
     <Compile Include="../../binder/Driver.cs">
       <Link>binder/Driver.cs</Link>
@@ -122,6 +125,12 @@
     <Compile Include="../../binder/Utils/BlocksGenerator.cs">
       <Link>binder/Utils/BlocksGenerator.cs</Link>
     </Compile>
+    <Compile Include="../../binder/Utils/DetectIPhoneSdks.cs">
+      <Link>binder/Utils/DetectIPhoneSdks.cs</Link>
+    </Compile>
+    <Compile Include="../../binder/Utils/IPhoneSdks.cs">
+      <Link>binder/Utils/IPhoneSdks.cs</Link>
+    </Compile>
     <Compile Include="../../binder/Utils/TextGenerator.cs">
       <Link>binder/Utils/TextGenerator.cs</Link>
     </Compile>
@@ -153,6 +162,10 @@
     <ProjectReference Include="CppSharp.Parser.CSharp.csproj">
       <Project>{70148081-5C0E-A9D3-457B-3FE431140F40}</Project>
       <Name>CppSharp.Parser.CSharp</Name>
+    </ProjectReference>
+    <ProjectReference Include="Xamarin.MacDev.csproj">
+      <Project>{F329EB84-DFF7-DE8A-C88B-4FB1B4F8BAEF}</Project>
+      <Name>Xamarin.MacDev</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

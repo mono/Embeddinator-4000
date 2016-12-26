@@ -17,8 +17,8 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>../vs2015/lib/Debug\</OutputPath>
-    <BaseIntermediateOutputPath>../vs2015/obj/Debug/CppSharp.AST\</BaseIntermediateOutputPath>
+    <OutputPath>../lib/Debug\</OutputPath>
+    <BaseIntermediateOutputPath>../obj/Debug/CppSharp.AST\</BaseIntermediateOutputPath>
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
     <DefineConstants></DefineConstants>
     <ErrorReport>prompt</ErrorReport>
@@ -29,8 +29,8 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>../vs2015/lib/Release\</OutputPath>
-    <BaseIntermediateOutputPath>../vs2015/obj/Release/CppSharp.AST\</BaseIntermediateOutputPath>
+    <OutputPath>../lib/Release\</OutputPath>
+    <BaseIntermediateOutputPath>../obj/Release/CppSharp.AST\</BaseIntermediateOutputPath>
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
     <DefineConstants></DefineConstants>
     <ErrorReport>prompt</ErrorReport>

@@ -1,0 +1,159 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProjectGuid>{F329EB84-DFF7-DE8A-C88B-4FB1B4F8BAEF}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Xamarin.MacDev</RootNamespace>
+    <AssemblyName>Xamarin.MacDev</AssemblyName>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>../lib/Debug\</OutputPath>
+    <BaseIntermediateOutputPath>../obj/Debug/Xamarin.MacDev\</BaseIntermediateOutputPath>
+    <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
+    <DefineConstants></DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>../lib/Release\</OutputPath>
+    <BaseIntermediateOutputPath>../obj/Release/Xamarin.MacDev\</BaseIntermediateOutputPath>
+    <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
+    <DefineConstants></DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="Mono.Posix" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="../../Xamarin.MacDev/Xamarin.MacDev/AnalyticsService.cs">
+      <Link>Xamarin.MacDev/Xamarin.MacDev/AnalyticsService.cs</Link>
+    </Compile>
+    <Compile Include="../../Xamarin.MacDev/Xamarin.MacDev/AppleCodeSigningIdentity.cs">
+      <Link>Xamarin.MacDev/Xamarin.MacDev/AppleCodeSigningIdentity.cs</Link>
+    </Compile>
+    <Compile Include="../../Xamarin.MacDev/Xamarin.MacDev/AppleIPhoneSdk.cs">
+      <Link>Xamarin.MacDev/Xamarin.MacDev/AppleIPhoneSdk.cs</Link>
+    </Compile>
+    <Compile Include="../../Xamarin.MacDev/Xamarin.MacDev/AppleSdk.cs">
+      <Link>Xamarin.MacDev/Xamarin.MacDev/AppleSdk.cs</Link>
+    </Compile>
+    <Compile Include="../../Xamarin.MacDev/Xamarin.MacDev/AppleSdkSettings.cs">
+      <Link>Xamarin.MacDev/Xamarin.MacDev/AppleSdkSettings.cs</Link>
+    </Compile>
+    <Compile Include="../../Xamarin.MacDev/Xamarin.MacDev/AppleTVOSSdk.cs">
+      <Link>Xamarin.MacDev/Xamarin.MacDev/AppleTVOSSdk.cs</Link>
+    </Compile>
+    <Compile Include="../../Xamarin.MacDev/Xamarin.MacDev/AppleWatchSdk.cs">
+      <Link>Xamarin.MacDev/Xamarin.MacDev/AppleWatchSdk.cs</Link>
+    </Compile>
+    <Compile Include="../../Xamarin.MacDev/Xamarin.MacDev/EntitlementExtensions.cs">
+      <Link>Xamarin.MacDev/Xamarin.MacDev/EntitlementExtensions.cs</Link>
+    </Compile>
+    <Compile Include="../../Xamarin.MacDev/Xamarin.MacDev/ExtendedVersion.cs">
+      <Link>Xamarin.MacDev/Xamarin.MacDev/ExtendedVersion.cs</Link>
+    </Compile>
+    <Compile Include="../../Xamarin.MacDev/Xamarin.MacDev/HttpMessageHandler.cs">
+      <Link>Xamarin.MacDev/Xamarin.MacDev/HttpMessageHandler.cs</Link>
+    </Compile>
+    <Compile Include="../../Xamarin.MacDev/Xamarin.MacDev/IMonoMacSdk.cs">
+      <Link>Xamarin.MacDev/Xamarin.MacDev/IMonoMacSdk.cs</Link>
+    </Compile>
+    <Compile Include="../../Xamarin.MacDev/Xamarin.MacDev/IPhoneArchitecture.cs">
+      <Link>Xamarin.MacDev/Xamarin.MacDev/IPhoneArchitecture.cs</Link>
+    </Compile>
+    <Compile Include="../../Xamarin.MacDev/Xamarin.MacDev/IPhoneCertificate.cs">
+      <Link>Xamarin.MacDev/Xamarin.MacDev/IPhoneCertificate.cs</Link>
+    </Compile>
+    <Compile Include="../../Xamarin.MacDev/Xamarin.MacDev/IPhoneDeviceCapabilities.cs">
+      <Link>Xamarin.MacDev/Xamarin.MacDev/IPhoneDeviceCapabilities.cs</Link>
+    </Compile>
+    <Compile Include="../../Xamarin.MacDev/Xamarin.MacDev/IPhoneDeviceType.cs">
+      <Link>Xamarin.MacDev/Xamarin.MacDev/IPhoneDeviceType.cs</Link>
+    </Compile>
+    <Compile Include="../../Xamarin.MacDev/Xamarin.MacDev/IPhoneImageSizes.cs">
+      <Link>Xamarin.MacDev/Xamarin.MacDev/IPhoneImageSizes.cs</Link>
+    </Compile>
+    <Compile Include="../../Xamarin.MacDev/Xamarin.MacDev/IPhoneSdkVersion.cs">
+      <Link>Xamarin.MacDev/Xamarin.MacDev/IPhoneSdkVersion.cs</Link>
+    </Compile>
+    <Compile Include="../../Xamarin.MacDev/Xamarin.MacDev/Keychain.cs">
+      <Link>Xamarin.MacDev/Xamarin.MacDev/Keychain.cs</Link>
+    </Compile>
+    <Compile Include="../../Xamarin.MacDev/Xamarin.MacDev/LoggingService.cs">
+      <Link>Xamarin.MacDev/Xamarin.MacDev/LoggingService.cs</Link>
+    </Compile>
+    <Compile Include="../../Xamarin.MacDev/Xamarin.MacDev/MacOSXSdk.cs">
+      <Link>Xamarin.MacDev/Xamarin.MacDev/MacOSXSdk.cs</Link>
+    </Compile>
+    <Compile Include="../../Xamarin.MacDev/Xamarin.MacDev/MacOSXSdkVersion.cs">
+      <Link>Xamarin.MacDev/Xamarin.MacDev/MacOSXSdkVersion.cs</Link>
+    </Compile>
+    <Compile Include="../../Xamarin.MacDev/Xamarin.MacDev/ManifestExtensions.cs">
+      <Link>Xamarin.MacDev/Xamarin.MacDev/ManifestExtensions.cs</Link>
+    </Compile>
+    <Compile Include="../../Xamarin.MacDev/Xamarin.MacDev/MobileProvision.cs">
+      <Link>Xamarin.MacDev/Xamarin.MacDev/MobileProvision.cs</Link>
+    </Compile>
+    <Compile Include="../../Xamarin.MacDev/Xamarin.MacDev/MobileProvisionIndex.cs">
+      <Link>Xamarin.MacDev/Xamarin.MacDev/MobileProvisionIndex.cs</Link>
+    </Compile>
+    <Compile Include="../../Xamarin.MacDev/Xamarin.MacDev/MonoMacSdk.cs">
+      <Link>Xamarin.MacDev/Xamarin.MacDev/MonoMacSdk.cs</Link>
+    </Compile>
+    <Compile Include="../../Xamarin.MacDev/Xamarin.MacDev/MonoTouchSdk.cs">
+      <Link>Xamarin.MacDev/Xamarin.MacDev/MonoTouchSdk.cs</Link>
+    </Compile>
+    <Compile Include="../../Xamarin.MacDev/Xamarin.MacDev/PListObject.cs">
+      <Link>Xamarin.MacDev/Xamarin.MacDev/PListObject.cs</Link>
+    </Compile>
+    <Compile Include="../../Xamarin.MacDev/Xamarin.MacDev/PlatformAvailability.cs">
+      <Link>Xamarin.MacDev/Xamarin.MacDev/PlatformAvailability.cs</Link>
+    </Compile>
+    <Compile Include="../../Xamarin.MacDev/Xamarin.MacDev/ProcessArgumentBuilder.cs">
+      <Link>Xamarin.MacDev/Xamarin.MacDev/ProcessArgumentBuilder.cs</Link>
+    </Compile>
+    <Compile Include="../../Xamarin.MacDev/Xamarin.MacDev/Properties/AssemblyInfo.cs">
+      <Link>Xamarin.MacDev/Xamarin.MacDev/Properties/AssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="../../Xamarin.MacDev/Xamarin.MacDev/SQLite.cs">
+      <Link>Xamarin.MacDev/Xamarin.MacDev/SQLite.cs</Link>
+    </Compile>
+    <Compile Include="../../Xamarin.MacDev/Xamarin.MacDev/TlsProvider.cs">
+      <Link>Xamarin.MacDev/Xamarin.MacDev/TlsProvider.cs</Link>
+    </Compile>
+    <Compile Include="../../Xamarin.MacDev/Xamarin.MacDev/XamMacSdk.cs">
+      <Link>Xamarin.MacDev/Xamarin.MacDev/XamMacSdk.cs</Link>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

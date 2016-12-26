@@ -17,6 +17,24 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CppSharp.Runtime", "project
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IKVM.Reflection", "projects/IKVM.Reflection.csproj", "{95A93EAD-0135-AC71-0A46-2F6676500872}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xamarin.MacDev", "projects/Xamarin.MacDev.csproj", "{F329EB84-DFF7-DE8A-C88B-4FB1B4F8BAEF}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{1FCE6517-8B83-DE0C-1478-D8E3802CD510}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Basic", "Basic", "{1098D970-7CAE-D706-C525-6328317BA88E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Basic.Gen", "projects/Basic.Gen.csproj", "{AF39940F-1BA4-4886-64E2-F92BD08B26DB}"
+	ProjectSection(ProjectDependencies) = postProject
+		{82372792-EEF7-A2C8-B732-EC4523B2E7A4} = {82372792-EEF7-A2C8-B732-EC4523B2E7A4}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Basic.Managed", "projects/Basic.Managed.csproj", "{82372792-EEF7-A2C8-B732-EC4523B2E7A4}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Basic.Tests", "projects/Basic.Tests.vcxproj", "{A8C47446-147A-ED3B-9D6E-E7120923E43F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{82372792-EEF7-A2C8-B732-EC4523B2E7A4} = {82372792-EEF7-A2C8-B732-EC4523B2E7A4}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -55,8 +73,30 @@ Global
 		{95A93EAD-0135-AC71-0A46-2F6676500872}.Debug|x86.Build.0 = Debug|x86
 		{95A93EAD-0135-AC71-0A46-2F6676500872}.Release|x86.ActiveCfg = Release|x86
 		{95A93EAD-0135-AC71-0A46-2F6676500872}.Release|x86.Build.0 = Release|x86
+		{F329EB84-DFF7-DE8A-C88B-4FB1B4F8BAEF}.Debug|x86.ActiveCfg = Debug|x86
+		{F329EB84-DFF7-DE8A-C88B-4FB1B4F8BAEF}.Debug|x86.Build.0 = Debug|x86
+		{F329EB84-DFF7-DE8A-C88B-4FB1B4F8BAEF}.Release|x86.ActiveCfg = Release|x86
+		{F329EB84-DFF7-DE8A-C88B-4FB1B4F8BAEF}.Release|x86.Build.0 = Release|x86
+		{AF39940F-1BA4-4886-64E2-F92BD08B26DB}.Debug|x86.ActiveCfg = Debug|x86
+		{AF39940F-1BA4-4886-64E2-F92BD08B26DB}.Debug|x86.Build.0 = Debug|x86
+		{AF39940F-1BA4-4886-64E2-F92BD08B26DB}.Release|x86.ActiveCfg = Release|x86
+		{AF39940F-1BA4-4886-64E2-F92BD08B26DB}.Release|x86.Build.0 = Release|x86
+		{82372792-EEF7-A2C8-B732-EC4523B2E7A4}.Debug|x86.ActiveCfg = Debug|x86
+		{82372792-EEF7-A2C8-B732-EC4523B2E7A4}.Debug|x86.Build.0 = Debug|x86
+		{82372792-EEF7-A2C8-B732-EC4523B2E7A4}.Release|x86.ActiveCfg = Release|x86
+		{82372792-EEF7-A2C8-B732-EC4523B2E7A4}.Release|x86.Build.0 = Release|x86
+		{A8C47446-147A-ED3B-9D6E-E7120923E43F}.Debug|x86.ActiveCfg = Debug|Win32
+		{A8C47446-147A-ED3B-9D6E-E7120923E43F}.Debug|x86.Build.0 = Debug|Win32
+		{A8C47446-147A-ED3B-9D6E-E7120923E43F}.Release|x86.ActiveCfg = Release|Win32
+		{A8C47446-147A-ED3B-9D6E-E7120923E43F}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{1098D970-7CAE-D706-C525-6328317BA88E} = {1FCE6517-8B83-DE0C-1478-D8E3802CD510}
+		{AF39940F-1BA4-4886-64E2-F92BD08B26DB} = {1098D970-7CAE-D706-C525-6328317BA88E}
+		{82372792-EEF7-A2C8-B732-EC4523B2E7A4} = {1098D970-7CAE-D706-C525-6328317BA88E}
+		{A8C47446-147A-ED3B-9D6E-E7120923E43F} = {1098D970-7CAE-D706-C525-6328317BA88E}
 	EndGlobalSection
 EndGlobal

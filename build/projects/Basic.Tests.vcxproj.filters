@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="support">
+      <UniqueIdentifier>{E2833EB1-4E63-BD4C-577B-4823C3D923AE}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="tests">
+      <UniqueIdentifier>{78756B10-E489-93C1-AD0B-372119DF8FF2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="tests/Basic">
+      <UniqueIdentifier>{299E3F5A-9553-B84F-1E48-B2268AFCAE53}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="../../support/glib.h">
+      <Filter>support</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="../../support/glib.c">
+      <Filter>support</Filter>
+    </ClCompile>
+    <ClCompile Include="../../tests/Basic/Basic.Tests.cpp">
+      <Filter>tests/Basic</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
