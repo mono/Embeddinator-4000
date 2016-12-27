@@ -70,7 +70,30 @@ solution "MonoEmbeddinator4000"
       "System.Xml",
       "System.Xml.Linq",
       "Mono.Posix"
-    }    
+    }
+
+    local xamarinMacios = "../../xamarin-macios"
+    if os.isdir(xamarinMacios) then
+
+      externalproject "mtouch"
+        SetupManagedProject()
+        location (path.join(xamarinMacios, "tools/mtouch"))
+        uuid "A737EFCC-4348-4EB1-9C14-4FDC0975388D"
+        kind "ConsoleApp"
+
+      externalproject "Mono.Cecil"
+        SetupManagedProject()
+        location (path.join(xamarinMacios, "external/mono/external/cecil/"))
+        uuid "D68133BD-1E63-496E-9EDE-4FBDBF77B486"
+        kind "SharedLib"
+
+      externalproject "Mono.Cecil.Mdb"
+        SetupManagedProject()
+        location (path.join(xamarinMacios, "external/mono/external/cecil/symbols/mdb"))
+        uuid "8559DD7F-A16F-46D0-A05A-9139FAEBA8FD"
+        kind "SharedLib"
+
+    end
 
   group "Tests"
 
