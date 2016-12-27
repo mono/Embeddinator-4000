@@ -251,7 +251,7 @@ namespace MonoEmbeddinator4000
 					var args = GetAotArguments(app, assembly, Abi.ARMv7, Path.GetFullPath(Options.OutputDir),
 						assembly + ".o", assembly + ".llvm.o", assembly + ".data");
 
-					Console.WriteLine("{0} {1}", aotCompiler, args);
+					Diagnostics.Debug("{0} {1}", aotCompiler, args);
 				}
 				break;
 			}

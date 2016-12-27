@@ -25,6 +25,8 @@ bin/
 *.metagen
 *.ilk
 *.manifest
+/build/lib
+/build/obj
 /build/vs2015
 /build/gmake
 /CppSharp

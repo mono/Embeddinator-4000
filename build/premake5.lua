@@ -11,7 +11,7 @@ newoption {
    description = "Output directory for the generated project files"
 }
 
-solution "MonoEmbeddinator4000"
+workspace "MonoEmbeddinator4000"
 
   configurations { "Debug", "Release" }
   architecture "x86_64"
@@ -23,9 +23,9 @@ solution "MonoEmbeddinator4000"
     architecture "x86"
 
   filter "configurations:Release"
-    flags { "Optimize" }    
+    flags { "Optimize" }
 
-  filter {}  
+  filter {}
 
   characterset "Unicode"
   symbols "On"
