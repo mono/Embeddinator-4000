@@ -23,7 +23,7 @@ namespace MonoEmbeddinator4000
             var optionSet = new Mono.Options.OptionSet() {
                 { "gen=", "target generator (C, C++, Obj-C)", v => Generator = v },
                 { "p|platform=", "target platform (iOS, macOS, Android)", v => Platform = v },
-                { "o|out=", "output directory", v => OutputDir = v },
+                { "o|out|outdir=", "output directory", v => OutputDir = v },
                 { "c|compile", "compiles the generated output", v => CompileCode = true },
                 { "dll|shared", "compiles as a shared library / DLL", v => SharedLibrary = true },
                 { "v|verbose", "generates diagnostic verbose output", v => Verbose = true },
