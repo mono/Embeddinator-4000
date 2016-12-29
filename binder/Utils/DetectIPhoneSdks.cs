@@ -32,7 +32,7 @@ namespace Xamarin.iOS.Tasks
 
     static class Log
     {
-        static bool Verbose;
+		static bool Verbose = false;
 
         internal static void LogTaskName(string text)
         {
