@@ -11,6 +11,7 @@
     <AssemblyName>MonoEmbeddinator4000</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <BaseIntermediateOutputPath>..\obj\Debug\MonoEmbeddinator4000</BaseIntermediateOutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -130,6 +131,9 @@
     </Compile>
     <Compile Include="../../binder/Utils/IPhoneSdks.cs">
       <Link>binder/Utils/IPhoneSdks.cs</Link>
+    </Compile>
+    <Compile Include="../../binder/Utils/TargetFramework.cs">
+      <Link>binder/Utils/TargetFramework.cs</Link>
     </Compile>
     <Compile Include="../../binder/Utils/TextGenerator.cs">
       <Link>binder/Utils/TextGenerator.cs</Link>
