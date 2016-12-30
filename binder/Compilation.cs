@@ -388,14 +388,13 @@ namespace MonoEmbeddinator4000
                     break;
                 case TargetPlatform.Windows:
                 case TargetPlatform.Android:
-                    throw new NotSupportedException(string.Format(
-                        "Cross compilation to target platform '{0}' is not supported.",
-                        Options.Platform));
+                    throw new NotSupportedException(
+                        $"Cross compilation to target platform '{Options.Platform}' is not supported.");
                 case TargetPlatform.MacOS:
                     var xcodePath = XcodeToolchain.GetXcodeToolchainPath();
                     var clangBin = Path.Combine(xcodePath, "usr/bin/clang");
                     var monoPath = ManagedToolchain.FindMonoPath();
-    
+
                     var invocation = string.Format(
                         "-D{0} -framework CoreFoundation -I\"{1}/include/mono-2.0\" " +
                         "-L\"{1}/lib/\" -lmonosgen-2.0 {2}",
