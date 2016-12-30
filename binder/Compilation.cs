@@ -319,6 +319,37 @@ namespace MonoEmbeddinator4000
                 App.Abi.ToString(), appName);
         }
 
+        void MTouch()
+        {
+            var sdk = AppleSdk.InstalledSdkVersions.First();
+
+            var args = new List<string> {
+                $"--embeddinator {Options.OutputDir}",
+                $"--sdkroot {AppleSdk.DeveloperRoot}",
+                $"--sdk {sdk}",
+                $"--targetver {sdk}",
+                $"--target-framework {Xamarin.Utils.TargetFramework.Xamarin_iOS_1_0}"
+            };
+
+            var targetArg = App.Abi.IsSimulator() ? "--sim" : "--dev";
+            args.Add($"{targetArg} {GetOutputFolder()}");
+
+            var xamarinAppleFramework = GetXamarinTargetFrameworkName(Options.Platform);
+            var references = new List<string> {
+                Path.Combine(MonoTouchSdk.LibDir, "mono", xamarinAppleFramework, $"{xamarinAppleFramework}.dll"),
+                Path.Combine(MonoTouchSdk.LibDir, "mono", xamarinAppleFramework, "mscorlib.dll")
+            };
+
+            foreach (var @ref in references)
+                args.Add($"--r {@ref}");
+
+            foreach (var assembly in Options.Project.Assemblies)
+                args.Add(assembly);
+ 
+            var mtouchPath = Path.Combine(MonoTouchSdk.BinDir, "mtouch");
+            var expandedArgs = string.Join(" ", args);
+
+            Invoke(mtouchPath, expandedArgs);
         }
 
         void CompileCode()
@@ -384,7 +415,7 @@ namespace MonoEmbeddinator4000
                 case TargetPlatform.iOS:
                 case TargetPlatform.TVOS:
                 case TargetPlatform.WatchOS:
-                    AotAssemblies();
+                    MTouch();
                     break;
                 case TargetPlatform.Windows:
                 case TargetPlatform.Android:
