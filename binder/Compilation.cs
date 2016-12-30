@@ -201,12 +201,12 @@ namespace MonoEmbeddinator4000
             return args.ToString ();
         }    
 
-        void InvokeCompiler(string compiler, string arguments, Dictionary<string, string> envVars = null)
+        void Invoke(string program, string arguments, Dictionary<string, string> envVars = null)
         {
-            Diagnostics.Debug("Invoking: {0} {1}", compiler, arguments);
+            Diagnostics.Debug("Invoking: {0} {1}", program, arguments);
 
             var process = new Process();
-            process.StartInfo.FileName = compiler;
+            process.StartInfo.FileName = program;
             process.StartInfo.Arguments = arguments;
             process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
             process.StartInfo.UseShellExecute = false;
@@ -373,7 +373,7 @@ namespace MonoEmbeddinator4000
                     envVars["LIB"] = clLib;
                 }
 
-                InvokeCompiler(clBin, invocation, envVars);
+                Invoke(clBin, invocation, envVars);
 
                 return;
             }
@@ -400,8 +400,8 @@ namespace MonoEmbeddinator4000
                         "-D{0} -framework CoreFoundation -I\"{1}/include/mono-2.0\" " +
                         "-L\"{1}/lib/\" -lmonosgen-2.0 {2}",
                         exportDefine, monoPath, string.Join(" ", files.ToList()));
-    
-                    InvokeCompiler(clangBin, invocation);
+
+                    Invoke(clangBin, invocation);
                     break;
                 }
                 return;
