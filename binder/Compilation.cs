@@ -53,10 +53,17 @@ namespace MonoEmbeddinator4000
         {
             return (self & Abi.ArchMask).ToString ().ToLowerInvariant ();
         }
+
+        public static bool IsSimulator(this Abi self)
+        {
+            return (self & Abi.SimulatorArchMask) != 0;
+        }
     }
 
     public class Application
     {
+        public Abi Abi;
+
         public bool EnableDebug;
         public bool PackageMdb;
         public bool EnableLLVMOnlyBitCode;
@@ -67,7 +74,9 @@ namespace MonoEmbeddinator4000
 
     public partial class Driver
     {
-        public static string GetAppleTargetFrameworkIdentifier(TargetPlatform platform)
+        public Application App { get; } = new Application();
+        
+        public static string GetXamarinTargetFrameworkName(TargetPlatform platform)
         {
             switch (platform) {
             case TargetPlatform.MacOS:
@@ -155,7 +164,6 @@ namespace MonoEmbeddinator4000
             else
                 args.Append ("full,");
 
-            var aname = Path.GetFileNameWithoutExtension (fname);
             //var sdk_or_product = Profile.IsSdkAssembly (aname) || Profile.IsProductAssembly (aname);
             var sdk_or_product = false;
 
@@ -227,34 +235,21 @@ namespace MonoEmbeddinator4000
             case TargetPlatform.iOS:
             case TargetPlatform.TVOS:
             case TargetPlatform.WatchOS:
-			{
-				var detectAppleSdks = new Xamarin.iOS.Tasks.DetectIPhoneSdks()
-				{
-					TargetFrameworkIdentifier = GetAppleTargetFrameworkIdentifier(Options.Platform)
-				};
+            {
+                string aotCompiler = GetAppleAotCompiler(Options.Platform,
+                    XamarinSdkRoot, is64bits: false);
 
-				if (!detectAppleSdks.Execute())
-					throw new Exception("Error detecting Xamarin.iOS SDK.");
-
-                var monoTouchSdk = Xamarin.iOS.Tasks.IPhoneSdks.MonoTouch;
-                if (monoTouchSdk.ExtendedVersion.Version.Major < 10)
-                    throw new Exception("Unsupported Xamarin.iOS version, upgrade to 10 or newer.");
-
-				string aotCompiler = GetAppleAotCompiler(Options.Platform,
-					detectAppleSdks.XamarinSdkRoot, is64bits: false);
-
-				var app = new Application();
-
-				// Call the Mono AOT cross compiler for all input assemblies.
-				foreach (var assembly in Options.Project.Assemblies)
-				{
-					var args = GetAotArguments(app, assembly, Abi.ARMv7, Path.GetFullPath(Options.OutputDir),
-						assembly + ".o", assembly + ".llvm.o", assembly + ".data");
-
-					Diagnostics.Debug("{0} {1}", aotCompiler, args);
-				}
-				break;
-			}
+                // Call the Mono AOT cross compiler for all input assemblies.
+                foreach (var assembly in Options.Project.Assemblies)
+                {
+                    var args = GetAotArguments(App, assembly, Abi.ARMv7,
+                        Path.GetFullPath(Options.OutputDir), assembly + ".o",
+                        assembly + ".llvm.o", assembly + ".data");
+                
+                    Diagnostics.Debug("{0} {1}", aotCompiler, args);
+                }
+                break;
+            }
             case TargetPlatform.Windows:
             case TargetPlatform.Android:
                 throw new NotSupportedException(string.Format(
@@ -263,6 +258,67 @@ namespace MonoEmbeddinator4000
             case TargetPlatform.MacOS:
                 break;
             }
+        }
+
+        Xamarin.iOS.Tasks.DetectIPhoneSdks DetectIPhoneSdks
+        {
+            get
+            {
+                var detectAppleSdks = new Xamarin.iOS.Tasks.DetectIPhoneSdks {
+                    TargetFrameworkIdentifier = GetXamarinTargetFrameworkName(Options.Platform)
+                };
+                
+                if (!detectAppleSdks.Execute())
+                    throw new Exception("Error detecting Xamarin.iOS SDK.");
+                
+                return detectAppleSdks;
+            }
+        }
+
+        Xamarin.MacDev.MonoTouchSdk MonoTouchSdk
+        {
+            get
+            {
+                var monoTouchSdk = Xamarin.iOS.Tasks.IPhoneSdks.MonoTouch;
+                if (monoTouchSdk.ExtendedVersion.Version.Major < 10)
+                    throw new Exception("Unsupported Xamarin.iOS version, upgrade to 10 or newer.");
+                
+                return monoTouchSdk;
+            }
+        }
+
+        Xamarin.MacDev.AppleSdk AppleSdk
+        {
+            get { return DetectIPhoneSdks.CurrentSdk; }
+        }
+        
+        string XamarinSdkRoot
+        {
+            get { return DetectIPhoneSdks.XamarinSdkRoot; }
+        }
+
+        string GetOutputFolder()
+        {
+            var appName = $"{Path.GetFileNameWithoutExtension(Options.Project.Assemblies[0])}.app";
+
+            switch (Options.Platform)
+            {
+            case TargetPlatform.iOS:
+            case TargetPlatform.TVOS:
+            case TargetPlatform.WatchOS:
+                var sdkName = App.Abi.IsSimulator() ? "Simulator" : string.Empty;
+                return Path.Combine(Options.OutputDir, $"{Options.Platform}{sdkName}",
+                    appName);
+            case TargetPlatform.Windows:
+            case TargetPlatform.Android:
+            case TargetPlatform.MacOS:
+                break;
+            }
+
+            return Path.Combine(Options.OutputDir, Options.Platform.ToString(),
+                App.Abi.ToString(), appName);
+        }
+
         }
 
         void CompileCode()
