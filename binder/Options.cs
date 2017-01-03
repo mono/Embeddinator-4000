@@ -12,13 +12,6 @@ namespace MonoEmbeddinator4000
 
         public Project Project;
 
-        // General options
-        public bool ShowHelpText;
-        public bool OutputDebug;
-
-        // Parser options
-        public bool IgnoreParseErrors;
-
         // Generator options
         public string LibraryName;
         public GeneratorKind Language;
