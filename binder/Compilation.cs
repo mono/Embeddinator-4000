@@ -331,6 +331,9 @@ namespace MonoEmbeddinator4000
                 $"--target-framework {Xamarin.Utils.TargetFramework.Xamarin_iOS_1_0}"
             };
 
+            if (Options.DebugMode)
+                args.Add("--debug");
+
             var targetArg = App.Abi.IsSimulator() ? "--sim" : "--dev";
             args.Add($"{targetArg} {GetOutputFolder()}");
 

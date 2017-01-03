@@ -15,6 +15,7 @@ namespace MonoEmbeddinator4000
         static bool CompileCode;
         static bool Verbose;
         static bool SharedLibrary;
+        static bool DebugMode;
 
         static void ParseCommandLineArgs(string[] args)
         {
@@ -25,6 +26,7 @@ namespace MonoEmbeddinator4000
                 { "p|platform=", "target platform (iOS, macOS, Android)", v => Platform = v },
                 { "o|out|outdir=", "output directory", v => OutputDir = v },
                 { "c|compile", "compiles the generated output", v => CompileCode = true },
+                { "d|debug", "enables debug mode for generated native and managed code", v => DebugMode = true },
                 { "dll|shared", "compiles as a shared library / DLL", v => SharedLibrary = true },
                 { "v|verbose", "generates diagnostic verbose output", v => Verbose = true },
                 { "h|help",  "show this message and exit",  v => showHelp = v != null },
@@ -108,6 +110,7 @@ namespace MonoEmbeddinator4000
             options.OutputDir = OutputDir;
             options.CompileCode = CompileCode;
             options.CompileSharedLibrary = SharedLibrary;
+            options.DebugMode = DebugMode;
 
             var generator = ConvertToGeneratorKind(Generator);
             options.Language = generator;

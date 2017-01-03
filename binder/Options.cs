@@ -28,6 +28,10 @@ namespace MonoEmbeddinator4000
         public string OutputNamespace;
         public string OutputDir;
 
+        // If true, will force the generation of debug metadata for the native
+        // and managed code.
+        public bool DebugMode;
+
         // If true, will use unmanaged->managed thunks to call managed methods.
         // In this mode the JIT will generate specialized wrappers for marshaling
         // which will be faster but also lead to higher memory consumption.
