@@ -4,11 +4,19 @@
 
 ## Introduction
 
-Embeddinator-4000 is a binding technology that acts as a bridge
-between managed .NET libraries and other languages / platforms.
+Embeddinator-4000 is a tool to turn existing .NET libraries into
+libraries that can be consumed by other languages.   
 
-It is a tool that takes a .NET assembly and generates Mono
-native C/C++ API bindings.
+It is a tool that takes a .NET assembly and generates the necessary
+glue to surface the .NET API as a native API.   The goal is to surface
+.NET libraries to all ecosystems where Mono/Xamarin run, and for each
+platform we provide an interface that is native to that platform as well
+as the tools needed to turn a .NET library into something that can be 
+consumed on that platform.
+
+This is a work in progress, the initial goals for this project are to
+surface .NET to C, C++, Objective-C (across the various Apple platforms)
+and Java (Android and regular Java).
 
 * Create a native API to access some C# APIs
 * For now C bindings, in the future Obj-C binding, Java bindings
