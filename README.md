@@ -35,7 +35,8 @@ If you do not pass any arguments, you will get a list of the tool options:
 MonoEmbeddinator4000.exe [options]+ ManagedAssembly.dll
 Generates target language bindings for interop with managed code.
 
-      --gen=VALUE            target generator (C, C++, Obj-C)
+      --gen=VALUE            target language: c, c++, obj-c (defaults to c)
+      --platform=VALUE       target platform: android, windows, macos, ios, watchos, tvos
   -o, --out=VALUE            output directory
   -c, --compile              compiles the generated output
       --dll, --shared        compiles as a shared library / DLL
