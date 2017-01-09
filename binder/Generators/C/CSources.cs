@@ -55,7 +55,8 @@ namespace MonoEmbeddinator4000.Generators
             WriteLine("MonoImage* {0}_image;", AssemblyId);
             PopBlock(NewLineKind.BeforeNextBlock);
 
-            GenerateObjectDeclarations();
+            if (Options.Language == GeneratorKind.C)
+                GenerateObjectDeclarations();
 
             GenerateMonoInitialization();
             GenerateAssemblyLoad();

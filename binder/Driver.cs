@@ -65,7 +65,10 @@ namespace MonoEmbeddinator4000
 
             Context.TranslationUnitPasses.AddPass(new CheckKeywordsPass());
             Context.TranslationUnitPasses.AddPass(new FixMethodParametersPass());
-            Context.TranslationUnitPasses.AddPass(new GenerateObjectTypesPass());
+
+            if (Options.Language == GeneratorKind.C)
+                Context.TranslationUnitPasses.AddPass(new GenerateObjectTypesPass());
+
             Context.TranslationUnitPasses.AddPass(new GenerateArrayTypes());
 
             Context.TranslationUnitPasses.AddPass(new CheckIgnoredDeclsPass());
