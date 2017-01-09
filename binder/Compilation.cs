@@ -296,10 +296,18 @@ namespace MonoEmbeddinator4000
         {
             get { return DetectIPhoneSdks.XamarinSdkRoot; }
         }
+        
+        string OutputName
+        {
+            get
+            {
+                return Path.GetFileNameWithoutExtension(Options.Project.Assemblies[0]);
+            }
+        }
 
         string GetOutputFolder()
         {
-            var appName = $"{Path.GetFileNameWithoutExtension(Options.Project.Assemblies[0])}.app";
+            var appName = $"{OutputName}.app";
 
             switch (Options.Platform)
             {
@@ -325,10 +333,12 @@ namespace MonoEmbeddinator4000
 
             var args = new List<string> {
                 $"--embeddinator {Options.OutputDir}",
+                $"--nostrip",
                 $"--sdkroot {AppleSdk.DeveloperRoot}",
                 $"--sdk {sdk}",
                 $"--targetver {sdk}",
-                $"--target-framework {Xamarin.Utils.TargetFramework.Xamarin_iOS_1_0}"
+                $"--target-framework {Xamarin.Utils.TargetFramework.Xamarin_iOS_1_0}",
+                $"--assembly-build-target=@all=framework={OutputName}.framework"
             };
 
             if (Options.DebugMode)
