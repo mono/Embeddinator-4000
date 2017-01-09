@@ -445,6 +445,16 @@ namespace MonoEmbeddinator4000
                         string.Join(" ", files.ToList())
                     };
 
+                    switch (Options.Language)
+                    {
+                    case GeneratorKind.ObjectiveC:
+                        args.Add("-ObjC");
+                        break;
+                    case GeneratorKind.CPlusPlus:
+                        args.Add("-x c++");
+                        break;
+                    }
+                        
                     var invocation = string.Join(" ", args);                    
 
                     Invoke(clangBin, invocation);
