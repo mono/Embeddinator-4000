@@ -26,7 +26,7 @@ namespace MonoEmbeddinator4000.Generators
         public override void GenerateMethodSignature(Method method, bool isSource)
         {
             this.GenerateObjCMethodSignature(method);
-        }        
+        }
 
         public override bool VisitClassDecl(Class @class)
         {
@@ -43,7 +43,7 @@ namespace MonoEmbeddinator4000.Generators
             PopBlock(NewLineKind.BeforeNextBlock);
 
             return true;
-        }        
+        }
     }
 
 }

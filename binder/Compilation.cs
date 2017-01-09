@@ -465,7 +465,7 @@ namespace MonoEmbeddinator4000
                         break;
                     }
                         
-                    var invocation = string.Join(" ", args);                    
+                    var invocation = string.Join(" ", args);
 
                     Invoke(clangBin, invocation);
                     break;

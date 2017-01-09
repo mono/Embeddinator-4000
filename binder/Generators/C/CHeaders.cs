@@ -103,7 +103,6 @@ namespace MonoEmbeddinator4000.Generators
         {
             PushBlock();
 
-
             VisitDeclContext(@class);
 
             PopBlock(NewLineKind.BeforeNextBlock);
