@@ -384,14 +384,21 @@ namespace MonoEmbeddinator4000
                     Path.Combine(vsSdk.Directory, "..", "..", "VC", "bin", "cl.exe"));
 
                 var monoPath = ManagedToolchain.FindMonoPath();
-                var output = Options.LibraryName ??
-                    Path.GetFileNameWithoutExtension(Options.Project.Assemblies[0]);
-                output = Path.Combine(Options.OutputDir, output);
-                var invocation = string.Format(
-                    "/nologo /D{0} -I\"{1}\\include\\mono-2.0\" {2} \"{1}\\lib\\monosgen-2.0.lib\" {3} {4}",
-                    exportDefine, monoPath, string.Join(" ", files.ToList()),
+                var output = Path.Combine(Options.OutputDir, Options.LibraryName ??
+                    Path.GetFileNameWithoutExtension(Options.Project.Assemblies[0]));
+
+                var args = new List<string>
+                {
+                    "/nologo",
+                    $"-D{exportDefine}",
+                    $"-I\"{monoPath}\\include\\mono-2.0\"",
+                    string.Join(" ", files.ToList()),
+                    $"\"{monoPath}\\lib\\monosgen-2.0.lib\"",
                     Options.CompileSharedLibrary ? "/LD" : string.Empty,
-                    output);
+                    output
+                };
+
+                var invocation = string.Join(" ", args);
 
                 var vsVersion = (VisualStudioVersion)(int)vsSdk.Version;
                 var includes = MSVCToolchain.GetSystemIncludes(vsVersion);
@@ -428,11 +435,17 @@ namespace MonoEmbeddinator4000
                     var xcodePath = XcodeToolchain.GetXcodeToolchainPath();
                     var clangBin = Path.Combine(xcodePath, "usr/bin/clang");
                     var monoPath = ManagedToolchain.FindMonoPath();
+                    
+                    var args = new List<string>
+                    {
+                        $"-D{exportDefine}",
+                        "-framework CoreFoundation",
+                        $"-I\"{monoPath}/include/mono-2.0\"",
+                        $"-L\"{monoPath}/lib/\" -lmonosgen-2.0",
+                        string.Join(" ", files.ToList())
+                    };
 
-                    var invocation = string.Format(
-                        "-D{0} -framework CoreFoundation -I\"{1}/include/mono-2.0\" " +
-                        "-L\"{1}/lib/\" -lmonosgen-2.0 {2}",
-                        exportDefine, monoPath, string.Join(" ", files.ToList()));
+                    var invocation = string.Join(" ", args);                    
 
                     Invoke(clangBin, invocation);
                     break;
