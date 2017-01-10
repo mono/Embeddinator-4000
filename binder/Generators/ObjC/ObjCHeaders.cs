@@ -1,6 +1,5 @@
 ﻿using CppSharp.AST;
 using CppSharp.Generators;
-using System.Linq;
 
 namespace MonoEmbeddinator4000.Generators
 {
@@ -46,5 +45,4 @@ namespace MonoEmbeddinator4000.Generators
             return true;
         }
     }
-
 }

@@ -1,7 +1,5 @@
 ﻿using CppSharp.AST;
-using CppSharp.AST.Extensions;
 using CppSharp.Generators;
-using System.Linq;
 
 namespace MonoEmbeddinator4000.Generators
 {

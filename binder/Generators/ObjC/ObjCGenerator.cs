@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using CppSharp;
+﻿using System.Collections.Generic;
 using CppSharp.AST;
 using CppSharp.Generators;
-using CppSharp.Types;
 
 namespace MonoEmbeddinator4000.Generators
 {
