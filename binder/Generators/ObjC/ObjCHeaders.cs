@@ -23,7 +23,8 @@ namespace MonoEmbeddinator4000.Generators
             WriteLine("#import <Foundation/Foundation.h>");
         }
 
-        public override void GenerateMethodSignature(Method method, bool isSource)
+        public override void GenerateMethodSignature(Method method,
+            bool isSource)
         {
             this.GenerateObjCMethodSignature(method);
         }

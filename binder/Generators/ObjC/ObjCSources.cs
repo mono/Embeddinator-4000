@@ -22,5 +22,28 @@ namespace MonoEmbeddinator4000.Generators
         {
             base.Process();
         }
+        
+        public override void GenerateMethodSignature(Method method,
+            bool isSource)
+        {
+            this.GenerateObjCMethodSignature(method);
+        }
+        
+        public override bool VisitClassDecl(Class @class)
+        {
+            PushBlock();
+
+            WriteLine($"@implementation {@class.QualifiedName}");
+            NewLine();
+
+            VisitDeclContext(@class);
+
+            NewLine();
+            WriteLine("@end");
+
+            PopBlock(NewLineKind.BeforeNextBlock);
+
+            return true;
+        }
     }
 }
