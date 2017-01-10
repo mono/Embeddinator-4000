@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -36,7 +36,8 @@ namespace MonoEmbeddinator4000
 
             Assemblies = new List<IKVM.Reflection.Assembly>();
 
-            Context = new BindingContext(Diagnostics, new DriverOptions());
+            var driverOptions = new DriverOptions { GeneratorKind = options.Language };
+            Context = new BindingContext(Diagnostics, driverOptions);
             Context.ASTContext = new ASTContext();
 
             Declaration.QualifiedNameSeparator = "_";
@@ -65,17 +66,12 @@ namespace MonoEmbeddinator4000
 
             Context.TranslationUnitPasses.AddPass(new CheckKeywordsPass());
             Context.TranslationUnitPasses.AddPass(new FixMethodParametersPass());
-
-            if (Options.Language == GeneratorKind.C)
-                Context.TranslationUnitPasses.AddPass(new GenerateObjectTypesPass());
-
+            Context.TranslationUnitPasses.AddPass(new GenerateObjectTypesPass());
             Context.TranslationUnitPasses.AddPass(new GenerateArrayTypes());
-
             Context.TranslationUnitPasses.AddPass(new CheckIgnoredDeclsPass());
 
             if (Options.Language != GeneratorKind.CPlusPlus)
                 Context.TranslationUnitPasses.AddPass(new RenameEnumItemsPass());
-
 
             Context.TranslationUnitPasses.AddPass(new RenameDuplicatedDeclsPass());
             Context.TranslationUnitPasses.AddPass(new CheckDuplicatedNamesPass());

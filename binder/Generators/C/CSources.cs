@@ -79,10 +79,10 @@ namespace MonoEmbeddinator4000.Generators
 
         public void GenerateObjectDeclarations()
         {
-            var genObjectsPass = new GenerateObjectTypesPass();
-            Unit.Visit(genObjectsPass);
+            var referencedClasses = new GetReferencedClasses();
+            Unit.Visit(referencedClasses);
 
-            foreach (var @class in genObjectsPass.Classes)
+            foreach (var @class in referencedClasses.Classes)
             {
                 PushBlock();
                 WriteLine("static MonoClass* {0}_class = 0;", @class.QualifiedName);
