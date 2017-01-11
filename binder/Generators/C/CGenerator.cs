@@ -200,6 +200,7 @@ namespace MonoEmbeddinator4000.Generators
 
         public virtual bool VisitFieldDecl(Field field)
         {
+            WriteLine("{0} {1};", field.Type, field.Name);
             return true;
         }
 

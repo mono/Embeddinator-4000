@@ -32,12 +32,23 @@ namespace MonoEmbeddinator4000.Generators
         {
             PushBlock();
 
-            WriteLine("@interface {0} : NSObject", @class.QualifiedName);
-            NewLine();
+            Write("@interface {0} : NSObject", @class.QualifiedName);
 
+            var hasFields = @class.Fields.Count != 0;
+            if (hasFields)
+            {
+                Write(" ");
+                WriteStartBraceIndent();
+
+                foreach (var field in @class.Fields)
+                    field.Visit(this);
+
+                WriteCloseBraceIndent();
+                NewLine();
+            }
+            
             VisitDeclContext(@class);
 
-            NewLine();
             WriteLine("@end");
 
             PopBlock(NewLineKind.BeforeNextBlock);
