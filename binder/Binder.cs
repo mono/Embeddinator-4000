@@ -84,10 +84,10 @@ namespace MonoEmbeddinator4000
         {
             switch (platform.ToLower ()) {
             case "windows":
-                return TargetPlatform.Windows;                
+                return TargetPlatform.Windows;
             case "android":
                 return TargetPlatform.Android;
-            case "osx":    
+            case "osx":
             case "macosx":
             case "macos":
                 return TargetPlatform.MacOS;
