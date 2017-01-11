@@ -41,9 +41,25 @@ namespace MonoEmbeddinator4000
 
             Declaration.QualifiedNameSeparator = "_";
 
+            SetupTypePrinter();
+        }
+
+        void SetupTypePrinter()
+        {
             CppSharp.AST.Type.TypePrinterDelegate = type =>
             {
-                var typePrinter = new CppTypePrinter();
+                CppTypePrintFlavorKind kind = CppTypePrintFlavorKind.Cpp;
+                switch (Options.Language)
+                {
+                case GeneratorKind.C:
+                    kind = CppTypePrintFlavorKind.C;
+                    break;
+                case GeneratorKind.ObjectiveC:
+                    kind = CppTypePrintFlavorKind.ObjC;
+                    break;
+                }
+
+                var typePrinter = new CppTypePrinter { PrintFlavorKind = kind };
                 return type.Visit(typePrinter);
             };
         }
