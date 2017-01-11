@@ -174,7 +174,9 @@ namespace MonoEmbeddinator4000.Generators
             foreach (var field in type.DeclaredFields)
             {
                 var decl = VisitField(field);
-                @class.Declarations.Add(decl);
+                
+                // TODO: Ignore fields until we implement usage of FieldToPropertyPass
+                //@class.Declarations.Add(decl);
             }
 
             foreach (var @event in type.DeclaredEvents)
