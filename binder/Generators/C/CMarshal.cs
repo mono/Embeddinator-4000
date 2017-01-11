@@ -39,11 +39,13 @@ namespace MonoEmbeddinator4000.Generators
 
     public class CMarshalManagedToNative : CMarshalPrinter
     {
+        public Options Options { get; private set; }
         public bool UnboxPrimitiveValues { get; set; }
 
-        public CMarshalManagedToNative(MarshalContext marshalContext)
+        public CMarshalManagedToNative(Options options, MarshalContext marshalContext)
             : base(marshalContext)
         {
+            Options = options;
             UnboxPrimitiveValues = true;
         }
 
@@ -108,7 +110,7 @@ namespace MonoEmbeddinator4000.Generators
                 ReturnType = array.Array.QualifiedType
             };
 
-            var marshal = new CMarshalManagedToNative(ctx) { UnboxPrimitiveValues = false };
+            var marshal = new CMarshalManagedToNative(Options, ctx) { UnboxPrimitiveValues = false };
             array.Array.QualifiedType.Visit(marshal);
 
             if (!string.IsNullOrWhiteSpace(marshal.Context.SupportBefore))
@@ -209,11 +211,13 @@ namespace MonoEmbeddinator4000.Generators
 
     public class CMarshalNativeToManaged : CMarshalPrinter
     {
+        public Options Options { get; private set; }
         public bool PrimitiveValuesByValue { get; set; }
 
-        public CMarshalNativeToManaged (MarshalContext marshalContext)
+        public CMarshalNativeToManaged (Options options, MarshalContext marshalContext)
             : base (marshalContext)
         {
+            Options = options;
             PrimitiveValuesByValue = false;
         }
 
@@ -367,7 +371,7 @@ namespace MonoEmbeddinator4000.Generators
             };
 
 
-            var marshal = new CMarshalNativeToManaged (ctx) { PrimitiveValuesByValue = true };
+            var marshal = new CMarshalNativeToManaged (Options, ctx) { PrimitiveValuesByValue = true };
             elementType.Visit(marshal);
 
             if (!string.IsNullOrWhiteSpace(marshal.Context.SupportBefore))
@@ -395,9 +399,9 @@ namespace MonoEmbeddinator4000.Generators
 
         public override bool VisitClassDecl(Class @class)
         {
-            var instanceId = CGenerator.GenId(string.Format("{0}_instance", Context.ArgName));
-            Context.SupportBefore.WriteLine("MonoObject* {0} = mono_gchandle_get_target({1}->_handle);",
-                instanceId, Context.ArgName);
+            var instanceId = CGenerator.GenId($"{Context.ArgName}_instance");
+            var handle = CSources.GetMonoObjectField(Options, Context.ArgName, "_handle");
+            Context.SupportBefore.WriteLine($"MonoObject* {instanceId} = mono_gchandle_get_target({handle});");
             Context.Return.Write("{0}", instanceId);
             return true;
         }

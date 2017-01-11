@@ -204,24 +204,35 @@ namespace MonoEmbeddinator4000.Generators
             WriteCloseBraceIndent();
         }
 
+        public static string GetMonoObjectField(Options options, string @object, string field)
+        {
+            switch (options.Language)
+            {
+            case GeneratorKind.C:
+                return $"{@object}->{field}";
+            default:
+                return $"{@object}->_object->{field}";
+            }
+        }
+
         public void GenerateMethodGCHandleLookup(Method method)
         {
             var @class = method.Namespace as Class;
             var classId = string.Format("{0}_class", @class.QualifiedName);
             var instanceId = GeneratedIdentifier("instance");
+            var handle = GetMonoObjectField(Options, "object", "_handle");
 
             if (method.IsConstructor)
             {
                 WriteLine("{0}* object = ({0}*) calloc(1, sizeof({0}));", @class.QualifiedName);
                 WriteLine("MonoObject* {0} = mono_object_new({1}.domain, {2});",
                     instanceId, GeneratedIdentifier("mono_context"), classId);
-                WriteLine("object->_handle = mono_gchandle_new({0}, /*pinned=*/false);",
-                    instanceId);
+
+                WriteLine($"{handle} = mono_gchandle_new({instanceId}, /*pinned=*/false);");
             }
             else if (!method.IsStatic)
             {
-                WriteLine("MonoObject* {0} = mono_gchandle_get_target(object->_handle);",
-                    instanceId);
+                WriteLine($"MonoObject* {instanceId} = mono_gchandle_get_target({handle});");
             }
         }
 
@@ -253,7 +264,7 @@ namespace MonoEmbeddinator4000.Generators
                 };
                 contexts.Add(ctx);
 
-                var marshal = new CMarshalNativeToManaged(ctx);
+                var marshal = new CMarshalNativeToManaged(Options, ctx);
                 param.QualifiedType.Visit(marshal);
 
                 if (!string.IsNullOrWhiteSpace(marshal.Context.SupportBefore))
@@ -324,7 +335,7 @@ namespace MonoEmbeddinator4000.Generators
                     ReturnType = retType
                 };
 
-                var marshal = new CMarshalManagedToNative(ctx);
+                var marshal = new CMarshalManagedToNative(Options, ctx);
                 retType.Visit(marshal);
 
                 if (!string.IsNullOrWhiteSpace(marshal.Context.SupportBefore))
