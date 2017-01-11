@@ -49,10 +49,11 @@ namespace MonoEmbeddinator4000.Passes
             return ret;
         }
 
+        public static Class MonoEmbedArray = new Class { Name = "MonoEmbedArray" };
+
         QualifiedType GenerateArrayType(ArrayType array, Declaration decl)
         {
             var typeName = array.Visit(ArrayPrinter);
-            var monoArrayType = new Class { Name = "MonoEmbedArray" };
 
             var @namespace = TranslationUnit;
 
@@ -60,7 +61,7 @@ namespace MonoEmbeddinator4000.Passes
             {
                 Name = string.Format("_{0}", typeName),
                 Namespace = @namespace,
-                QualifiedType = new QualifiedType(new TagType(monoArrayType))
+                QualifiedType = new QualifiedType(new TagType(MonoEmbedArray))
             };
 
             Declarations.Add(typedef);
