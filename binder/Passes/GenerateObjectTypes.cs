@@ -1,7 +1,7 @@
-using CppSharp.AST;
-using CppSharp.Passes;
 using System.Collections.Generic;
+using CppSharp.AST;
 using CppSharp.Generators;
+using CppSharp.Passes;
 using CppSharp.Utils;
 
 namespace MonoEmbeddinator4000.Passes
@@ -57,7 +57,8 @@ namespace MonoEmbeddinator4000.Passes
                 HandleClass(@class);
 
             unit.Declarations.InsertRange(0, Declarations);
-
+            Declarations.Clear();
+            
             TranslationUnit = null;
             Classes.Clear();
 
@@ -66,27 +67,27 @@ namespace MonoEmbeddinator4000.Passes
 
         void HandleClass(Class @class)
         {
-            // If we are generating C, there are no classes, so for each C# class we a struct
-            // representing the object by creating a new typedef for the MonoEmbedObject type.
+            // If we are generating C, there are no classes, so for each C# class create a
+            // struct representing the object with a typedef for the MonoEmbedObject type.
 
             // For other languages we generate a class in the target language, so generate a 
-            // MonoEmbedObject field directly to the object representation.
+            // MonoEmbedObject field directly in the object representation.
 
             if (Options.GeneratorKind == GeneratorKind.C)
                 CreateTypedefObjectForClass(@class);
             else
                 AddObjectFieldsToClass(@class);
         }
+        
+        public static Class MonoEmbedObject = new Class { Name = "MonoEmbedObject" };
 
         void CreateTypedefObjectForClass(Class @class)
         {
-            var monoObjectType = new Class { Name = "MonoEmbedObject" };
-
             var typedef = new TypedefDecl
             {
                 Name = @class.QualifiedName,
                 Namespace = TranslationUnit,
-                QualifiedType = new QualifiedType(new TagType(monoObjectType))
+                QualifiedType = new QualifiedType(new TagType(MonoEmbedObject))
             };
 
             Declarations.Add(typedef);
@@ -94,12 +95,10 @@ namespace MonoEmbeddinator4000.Passes
 
         void AddObjectFieldsToClass(Class @class)
         {
-            var monoObjectType = new Class { Name = "MonoEmbedObject" };
-
             var field = new Field
             {
                 Name = "_object",
-                QualifiedType = new QualifiedType(new TagType(monoObjectType)),
+                QualifiedType = new QualifiedType(new TagType(MonoEmbedObject)),
                 Access = AccessSpecifier.Internal,
                 Namespace = @class
             };

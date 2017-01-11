@@ -84,6 +84,9 @@ namespace MonoEmbeddinator4000.Generators
 
             foreach (var @class in referencedClasses.Classes)
             {
+                if (@class == GenerateObjectTypesPass.MonoEmbedObject)
+                    continue;
+
                 PushBlock();
                 WriteLine("static MonoClass* {0}_class = 0;", @class.QualifiedName);
                 PopBlock(NewLineKind.Never);
