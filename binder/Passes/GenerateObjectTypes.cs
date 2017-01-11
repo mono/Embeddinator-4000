@@ -95,10 +95,12 @@ namespace MonoEmbeddinator4000.Passes
 
         void AddObjectFieldsToClass(Class @class)
         {
+            var ptrType = new PointerType(new QualifiedType(new TagType(MonoEmbedObject)));
+
             var field = new Field
             {
                 Name = "_object",
-                QualifiedType = new QualifiedType(new TagType(MonoEmbedObject)),
+                QualifiedType = new QualifiedType(ptrType),
                 Access = AccessSpecifier.Internal,
                 Namespace = @class
             };
