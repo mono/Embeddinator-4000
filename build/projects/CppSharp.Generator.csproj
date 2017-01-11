@@ -251,12 +251,6 @@
     <Compile Include="../../CppSharp/src/Generator/Types/Types.cs">
       <Link>CppSharp/src/Generator/Types/Types.cs</Link>
     </Compile>
-    <Compile Include="../../CppSharp/src/Generator/Utils/FileHashes.cs">
-      <Link>CppSharp/src/Generator/Utils/FileHashes.cs</Link>
-    </Compile>
-    <Compile Include="../../CppSharp/src/Generator/Utils/Glob.cs">
-      <Link>CppSharp/src/Generator/Utils/Glob.cs</Link>
-    </Compile>
     <Compile Include="../../CppSharp/src/Generator/Utils/HtmlEncoder.cs">
       <Link>CppSharp/src/Generator/Utils/HtmlEncoder.cs</Link>
     </Compile>
