@@ -11,10 +11,7 @@ namespace MonoEmbeddinator4000.Generators
         {
         }
 
-        public override string FileExtension
-        {
-            get { return "mm"; }
-        }
+        public override string FileExtension => "mm";
 
         public override void Process()
         {

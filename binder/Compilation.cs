@@ -297,13 +297,7 @@ namespace MonoEmbeddinator4000
             get { return DetectIPhoneSdks.XamarinSdkRoot; }
         }
         
-        string OutputName
-        {
-            get
-            {
-                return Path.GetFileNameWithoutExtension(Options.Project.Assemblies[0]);
-            }
-        }
+        string OutputName => Path.GetFileNameWithoutExtension(Options.Project.Assemblies[0]);
 
         string GetOutputFolder()
         {
