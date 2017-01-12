@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using CppSharp.AST;
 using CppSharp.Generators;
 
@@ -33,6 +34,30 @@ namespace MonoEmbeddinator4000.Generators
             template.Write(" ({0}){1}", retType, method.Name);
 
             template.Write(template.CTypePrinter.VisitParameters(method.Parameters));
+        }
+
+        public static string GetObjCAccessKeyword(AccessSpecifier access)
+        {
+            switch (access)
+            {
+            case AccessSpecifier.Private:
+                return "@private";
+            case AccessSpecifier.Protected:
+                return "@protected";
+            case AccessSpecifier.Public:
+                return "@public";
+            case AccessSpecifier.Internal:
+                throw new Exception($"Unmappable Objective-C access specifier: {access}");
+            }
+
+            throw new NotSupportedException();
+        }
+
+        public static bool GenerateObjCField(this CTemplate template,
+            Field field)
+        {
+            template.WriteLine($"{GetObjCAccessKeyword(field.Access)} {field.Type} {field.Name};");
+            return true;
         }
     }
 }

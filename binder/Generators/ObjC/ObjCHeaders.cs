@@ -55,5 +55,10 @@ namespace MonoEmbeddinator4000.Generators
 
             return true;
         }
+
+        public override bool VisitFieldDecl(Field field)
+        {
+            return this.GenerateObjCField(field);
+        }
     }
 }
