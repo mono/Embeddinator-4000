@@ -161,12 +161,23 @@ namespace MonoEmbeddinator4000.Generators
             return true;
         }
 
-        #region IDeclVisitor methods
-
         public virtual bool VisitNamespace (Namespace @namespace)
         {
             return VisitDeclContext(@namespace);
         }
+
+        public virtual bool VisitFieldDecl(Field field)
+        {
+            WriteLine("{0} {1};", field.Type, field.Name);
+            return true;
+        }
+
+        public virtual bool VisitProperty(Property property)
+        {
+            return true;
+        }
+
+        #region IDeclVisitor methods
 
         public virtual bool VisitClassDecl(Class @class)
         {
@@ -201,12 +212,6 @@ namespace MonoEmbeddinator4000.Generators
         public virtual bool VisitEvent(Event @event)
         {
             throw new NotImplementedException();
-        }
-
-        public virtual bool VisitFieldDecl(Field field)
-        {
-            WriteLine("{0} {1};", field.Type, field.Name);
-            return true;
         }
 
         public virtual bool VisitFriend(Friend friend)
@@ -247,11 +252,6 @@ namespace MonoEmbeddinator4000.Generators
         public virtual bool VisitParameterDecl(Parameter parameter)
         {
             throw new NotImplementedException();
-        }
-
-        public virtual bool VisitProperty(Property property)
-        {
-            return true;
         }
 
         public virtual bool VisitTemplateParameterDecl(TypeTemplateParameter templateParameter)
