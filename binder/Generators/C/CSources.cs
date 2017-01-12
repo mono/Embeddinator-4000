@@ -1,8 +1,8 @@
-﻿using CppSharp.AST;
+﻿using System.Collections.Generic;
+using System.Linq;
+using CppSharp.AST;
 using CppSharp.AST.Extensions;
 using CppSharp.Generators;
-using System.Linq;
-using System.Collections.Generic;
 using MonoEmbeddinator4000.Passes;
 
 namespace MonoEmbeddinator4000.Generators
