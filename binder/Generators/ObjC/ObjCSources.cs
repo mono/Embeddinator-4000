@@ -33,6 +33,8 @@ namespace MonoEmbeddinator4000.Generators
         {
             PushBlock();
 
+            GenerateClassLookup(@class);
+
             WriteLine($"@implementation {@class.QualifiedName}");
             NewLine();
 
