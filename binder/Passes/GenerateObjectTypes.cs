@@ -42,7 +42,7 @@ namespace MonoEmbeddinator4000.Passes
         TranslationUnit TranslationUnit;
 
         public List<TypedefDecl> Declarations;
-        
+
         public GenerateObjectTypesPass()
         {
             Declarations = new List<TypedefDecl>();
