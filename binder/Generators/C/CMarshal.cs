@@ -11,14 +11,8 @@ namespace MonoEmbeddinator4000.Generators
         {
         }
 
-        public CManagedToNativeTypePrinter CTypePrinter
-        {
-            get
-            {
-                return CGenerator.GetCTypePrinter(
-                    CppSharp.Generators.GeneratorKind.C);
-            }
-        }
+        public CManagedToNativeTypePrinter CTypePrinter =>
+            CGenerator.GetCTypePrinter(CppSharp.Generators.GeneratorKind.C);
 
         public virtual bool VisitManagedArrayType(ManagedArrayType array,
             TypeQualifiers quals)
