@@ -101,7 +101,7 @@ namespace MonoEmbeddinator4000.Passes
             {
                 Name = "_object",
                 QualifiedType = new QualifiedType(ptrType),
-                Access = AccessSpecifier.Internal,
+                Access = AccessSpecifier.Public,
                 Namespace = @class
             };
 
