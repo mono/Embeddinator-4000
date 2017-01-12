@@ -14,15 +14,9 @@ namespace MonoEmbeddinator4000.Generators
         {
         }
 
-        public override string FileExtension
-        {
-            get { return "c"; }
-        }
+        public override string FileExtension => "c";
 
-        public string AssemblyId
-        {
-            get { return CGenerator.AssemblyId(Unit); }
-        }
+        public string AssemblyId => CGenerator.AssemblyId(Unit);
 
         public override void WriteHeaders()
         {

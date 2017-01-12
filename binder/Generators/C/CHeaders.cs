@@ -12,10 +12,7 @@ namespace MonoEmbeddinator4000.Generators
         {
         }
 
-        public override string FileExtension
-        {
-            get { return "h"; }
-        }
+        public override string FileExtension => "h";
 
         public void WriteStandardHeader(string name)
         {
