@@ -459,6 +459,7 @@ namespace MonoEmbeddinator4000
                     {
                     case GeneratorKind.ObjectiveC:
                         args.Add("-ObjC");
+                        args.Add("-lobjc");
                         break;
                     case GeneratorKind.CPlusPlus:
                         args.Add("-x c++");
