@@ -134,6 +134,11 @@ namespace MonoEmbeddinator4000.Generators
             Write(")");
         }
 
+        public virtual string GenerateClassObjectAlloc(string type)
+        {
+            return $"({type}*) calloc(1, sizeof({type}))";
+        }
+
         public virtual bool VisitTypedefDecl(TypedefDecl typedef)
         {
             PushBlock();

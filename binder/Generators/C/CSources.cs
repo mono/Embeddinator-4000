@@ -218,7 +218,8 @@ namespace MonoEmbeddinator4000.Generators
 
             if (method.IsConstructor)
             {
-                WriteLine("{0}* object = ({0}*) calloc(1, sizeof({0}));", @class.QualifiedName);
+                var alloc = GenerateClassObjectAlloc(@class.QualifiedName);
+                WriteLine($"{@class.QualifiedName}* object = {alloc};");
                 WriteLine("MonoObject* {0} = mono_object_new({1}.domain, {2});",
                     instanceId, GeneratedIdentifier("mono_context"), classId);
 

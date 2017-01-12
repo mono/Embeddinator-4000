@@ -26,7 +26,12 @@ namespace MonoEmbeddinator4000.Generators
         {
             this.GenerateObjCMethodSignature(method);
         }
-        
+
+        public override string GenerateClassObjectAlloc(string type)
+        {
+            return $"[[{type} alloc]init]";
+        }
+
         public override bool VisitClassDecl(Class @class)
         {
             PushBlock();
