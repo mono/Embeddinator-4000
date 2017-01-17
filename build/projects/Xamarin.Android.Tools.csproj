@@ -1,0 +1,107 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProjectGuid>{83A10A50-EF0D-C64A-B801-5EA8242DE8B2}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Xamarin.Android.Tools</RootNamespace>
+    <AssemblyName>Xamarin.Android.Tools</AssemblyName>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>../lib/Debug\</OutputPath>
+    <BaseIntermediateOutputPath>../obj/Debug/Xamarin.Android.Tools\</BaseIntermediateOutputPath>
+    <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
+    <DefineConstants></DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>../lib/Release\</OutputPath>
+    <BaseIntermediateOutputPath>../obj/Release/Xamarin.Android.Tools\</BaseIntermediateOutputPath>
+    <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
+    <DefineConstants></DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="../../Xamarin.Android.Tools/src/Xamarin.Android.Tools/AndroidLogger.cs">
+      <Link>Xamarin.Android.Tools/src/Xamarin.Android.Tools/AndroidLogger.cs</Link>
+    </Compile>
+    <Compile Include="../../Xamarin.Android.Tools/src/Xamarin.Android.Tools/AndroidSdk.cs">
+      <Link>Xamarin.Android.Tools/src/Xamarin.Android.Tools/AndroidSdk.cs</Link>
+    </Compile>
+    <Compile Include="../../Xamarin.Android.Tools/src/Xamarin.Android.Tools/AndroidTargetArch.cs">
+      <Link>Xamarin.Android.Tools/src/Xamarin.Android.Tools/AndroidTargetArch.cs</Link>
+    </Compile>
+    <Compile Include="../../Xamarin.Android.Tools/src/Xamarin.Android.Tools/AndroidVersion.cs">
+      <Link>Xamarin.Android.Tools/src/Xamarin.Android.Tools/AndroidVersion.cs</Link>
+    </Compile>
+    <Compile Include="../../Xamarin.Android.Tools/src/Xamarin.Android.Tools/MonoDroidSdk.cs">
+      <Link>Xamarin.Android.Tools/src/Xamarin.Android.Tools/MonoDroidSdk.cs</Link>
+    </Compile>
+    <Compile Include="../../Xamarin.Android.Tools/src/Xamarin.Android.Tools/OS.cs">
+      <Link>Xamarin.Android.Tools/src/Xamarin.Android.Tools/OS.cs</Link>
+    </Compile>
+    <Compile Include="../../Xamarin.Android.Tools/src/Xamarin.Android.Tools/ProcessUtils.cs">
+      <Link>Xamarin.Android.Tools/src/Xamarin.Android.Tools/ProcessUtils.cs</Link>
+    </Compile>
+    <Compile Include="../../Xamarin.Android.Tools/src/Xamarin.Android.Tools/Properties/AssemblyInfo.cs">
+      <Link>Xamarin.Android.Tools/src/Xamarin.Android.Tools/Properties/AssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="../../Xamarin.Android.Tools/src/Xamarin.Android.Tools/Sdks/AndroidSdkBase.cs">
+      <Link>Xamarin.Android.Tools/src/Xamarin.Android.Tools/Sdks/AndroidSdkBase.cs</Link>
+    </Compile>
+    <Compile Include="../../Xamarin.Android.Tools/src/Xamarin.Android.Tools/Sdks/AndroidSdkUnix.cs">
+      <Link>Xamarin.Android.Tools/src/Xamarin.Android.Tools/Sdks/AndroidSdkUnix.cs</Link>
+    </Compile>
+    <Compile Include="../../Xamarin.Android.Tools/src/Xamarin.Android.Tools/Sdks/AndroidSdkWindows.cs">
+      <Link>Xamarin.Android.Tools/src/Xamarin.Android.Tools/Sdks/AndroidSdkWindows.cs</Link>
+    </Compile>
+    <Compile Include="../../Xamarin.Android.Tools/src/Xamarin.Android.Tools/Sdks/MonoDroidSdkBase.cs">
+      <Link>Xamarin.Android.Tools/src/Xamarin.Android.Tools/Sdks/MonoDroidSdkBase.cs</Link>
+    </Compile>
+    <Compile Include="../../Xamarin.Android.Tools/src/Xamarin.Android.Tools/Sdks/MonoDroidSdkUnix.cs">
+      <Link>Xamarin.Android.Tools/src/Xamarin.Android.Tools/Sdks/MonoDroidSdkUnix.cs</Link>
+    </Compile>
+    <Compile Include="../../Xamarin.Android.Tools/src/Xamarin.Android.Tools/Sdks/MonoDroidSdkWindows.cs">
+      <Link>Xamarin.Android.Tools/src/Xamarin.Android.Tools/Sdks/MonoDroidSdkWindows.cs</Link>
+    </Compile>
+    <Compile Include="../../Xamarin.Android.Tools/src/Xamarin.Android.Tools/obj/Debug/TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs">
+      <Link>Xamarin.Android.Tools/src/Xamarin.Android.Tools/obj/Debug/TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs</Link>
+    </Compile>
+    <Compile Include="../../Xamarin.Android.Tools/src/Xamarin.Android.Tools/obj/Debug/TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs">
+      <Link>Xamarin.Android.Tools/src/Xamarin.Android.Tools/obj/Debug/TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs</Link>
+    </Compile>
+    <Compile Include="../../Xamarin.Android.Tools/src/Xamarin.Android.Tools/obj/Debug/TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs">
+      <Link>Xamarin.Android.Tools/src/Xamarin.Android.Tools/obj/Debug/TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs</Link>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

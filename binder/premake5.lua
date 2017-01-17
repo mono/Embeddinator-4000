@@ -18,5 +18,6 @@
       "CppSharp.Generator",
       "CppSharp.Parser",
       "CppSharp.Parser.CSharp",
+      "Xamarin.Android.Tools",
       "Xamarin.MacDev"
     }

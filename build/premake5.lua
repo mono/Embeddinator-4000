@@ -72,6 +72,20 @@ workspace "MonoEmbeddinator4000"
       "Mono.Posix"
     }
 
+  project "Xamarin.Android.Tools"
+    SetupManagedProject()
+
+    kind "SharedLib"
+    language "C#"
+
+    files { "../Xamarin.Android.Tools/src/Xamarin.Android.Tools/**.cs" }
+    links
+    {
+      "System",
+      "System.Xml",
+      "System.Xml.Linq"
+    }
+
     local xamarinMacios = "../../xamarin-macios"
     if os.isdir(xamarinMacios) then
 
