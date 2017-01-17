@@ -10,3 +10,6 @@
 [submodule "Xamarin.MacDev"]
 	path = Xamarin.MacDev
 	url = https://github.com/xamarin/Xamarin.MacDev.git
+[submodule "Xamarin.Android.Tools"]
+	path = Xamarin.Android.Tools
+	url = git@github.com:xamarin/xamarin-android-tools.git
