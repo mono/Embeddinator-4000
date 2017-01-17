@@ -399,7 +399,7 @@ namespace MonoEmbeddinator4000
                     string.Join(" ", files.ToList()),
                     $"\"{monoPath}\\lib\\monosgen-2.0.lib\"",
                     Options.CompileSharedLibrary ? "/LD" : string.Empty,
-                    output
+                    $"/Fe{output}"
                 };
 
                 var invocation = string.Join(" ", args);
