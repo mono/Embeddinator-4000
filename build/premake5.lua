@@ -36,7 +36,7 @@ workspace "MonoEmbeddinator4000"
   objdir (path.join("./", action, "obj"))
   targetdir (path.join("./", action, "lib", "%{cfg.buildcfg}"))
 
-  startproject "MonoManagedToNative"
+  startproject "MonoEmbeddinator4000"
 
   include ("../binder")
   include("../CppSharp/src/Core")

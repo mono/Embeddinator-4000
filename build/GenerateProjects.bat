@@ -20,7 +20,7 @@ if "%C%"=="0" goto clean
 goto quit
 
 :vs2015
-"..\CppSharp\build\premake5" --file=premake5.lua vs2015
+"..\CppSharp\build\premake5" --file=premake5.lua --outdir=. --os=macosx vs2015
 goto quit
 
 :gmake
