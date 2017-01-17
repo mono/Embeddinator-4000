@@ -49,6 +49,27 @@ gpointer g_malloc0 (gsize x)
   return calloc(1, x);
 }
 
+gpointer
+g_memdup (gconstpointer mem, guint byte_size)
+{
+  gpointer ptr;
+
+  if (mem == NULL)
+    return NULL;
+
+  ptr = g_malloc (byte_size);
+  if (ptr != NULL)
+    memcpy (ptr, mem, byte_size);
+
+  return ptr;
+}
+
+gchar   *
+g_strdup (const gchar *str)
+{
+  if (str) { return (gchar*) g_memdup (str, (guint)strlen (str) + 1); }
+  return NULL;
+}
 
 #define INITIAL_CAPACITY 16
 

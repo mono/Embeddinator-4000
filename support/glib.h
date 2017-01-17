@@ -132,7 +132,7 @@ gpointer g_try_realloc (gpointer obj, gsize size);
 #define g_alloca(size)		alloca (size)
 
 gpointer g_memdup (gconstpointer mem, guint byte_size);
-static inline gchar   *g_strdup (const gchar *str) { if (str) { return (gchar*) g_memdup (str, (guint)strlen (str) + 1); } return NULL; }
+gchar   *g_strdup (const gchar *str);
 gchar **g_strdupv (gchar **str_array);
 
 /*
