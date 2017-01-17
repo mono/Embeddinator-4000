@@ -2,6 +2,13 @@
 
 namespace MonoEmbeddinator4000
 {
+    public enum CompilationTarget
+    {
+        SharedLibrary,
+        StaticLibrary,
+        Application
+    }
+
     public class Options
     {
         public Options()
@@ -17,6 +24,9 @@ namespace MonoEmbeddinator4000
         public GeneratorKind Language;
 
         public TargetPlatform Platform;
+
+        // If code compilation is enabled, then sets the compilation target.
+        public CompilationTarget Target;
 
         public string OutputNamespace;
         public string OutputDir;
@@ -37,6 +47,6 @@ namespace MonoEmbeddinator4000
         public bool CompileCode;
 
         // If true, will compile the generated as a shared library / DLL.
-        public bool CompileSharedLibrary;
+        public bool CompileSharedLibrary => Target == CompilationTarget.SharedLibrary;
     }
 }
