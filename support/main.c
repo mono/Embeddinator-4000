@@ -28,9 +28,10 @@
 
 #include "mono_embeddinator.h"
 
+mono_m2n_context_t ctx;
+
 int main()
 {
-  mono_m2n_context_t ctx = {};
   mono_m2n_init(&ctx, "mono_embeddinnator");
 
   /* YOUR CODE HERE */
