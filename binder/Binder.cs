@@ -76,6 +76,8 @@ namespace MonoEmbeddinator4000
             case "objectivec":
             case "objective-c":
                 return GeneratorKind.ObjectiveC;
+            case "java":
+                return GeneratorKind.Java;
             }
 
             throw new NotSupportedException("Unknown target generator: " + gen);

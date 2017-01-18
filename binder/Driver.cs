@@ -139,6 +139,9 @@ namespace MonoEmbeddinator4000
                 case GeneratorKind.ObjectiveC:
                     generator = new ObjCGenerator(Context, Options);
                     break;
+                case GeneratorKind.Java:
+                    generator = new JavaGenerator(Context, Options);
+                    break;
                 default:
                     throw new NotImplementedException();
             }
