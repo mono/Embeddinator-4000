@@ -84,15 +84,6 @@
     <Compile Include="../../Xamarin.Android.Tools/src/Xamarin.Android.Tools/Sdks/MonoDroidSdkWindows.cs">
       <Link>Xamarin.Android.Tools/src/Xamarin.Android.Tools/Sdks/MonoDroidSdkWindows.cs</Link>
     </Compile>
-    <Compile Include="../../Xamarin.Android.Tools/src/Xamarin.Android.Tools/obj/Debug/TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs">
-      <Link>Xamarin.Android.Tools/src/Xamarin.Android.Tools/obj/Debug/TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs</Link>
-    </Compile>
-    <Compile Include="../../Xamarin.Android.Tools/src/Xamarin.Android.Tools/obj/Debug/TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs">
-      <Link>Xamarin.Android.Tools/src/Xamarin.Android.Tools/obj/Debug/TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs</Link>
-    </Compile>
-    <Compile Include="../../Xamarin.Android.Tools/src/Xamarin.Android.Tools/obj/Debug/TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs">
-      <Link>Xamarin.Android.Tools/src/Xamarin.Android.Tools/obj/Debug/TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs</Link>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
   </ItemGroup>
