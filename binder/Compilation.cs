@@ -361,15 +361,23 @@ namespace MonoEmbeddinator4000
 
         void CompileCode()
         {
-            var files = GetOutputFiles("c");
+            IEnumerable<string> files;
 
             switch (Options.Language)
             {
+            case GeneratorKind.C:
+                files = GetOutputFiles("c");
+                break;
             case GeneratorKind.ObjectiveC:
+                files = GetOutputFiles("c");
                 files = files.Concat(GetOutputFiles("mm"));
                 break;
             case GeneratorKind.CPlusPlus:
+                files = GetOutputFiles("c");
                 files = files.Concat(GetOutputFiles("cpp"));
+                break;
+            case GeneratorKind.Java:
+                files = GetOutputFiles("java");
                 break;
             }
 
