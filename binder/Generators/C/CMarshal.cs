@@ -364,7 +364,6 @@ namespace MonoEmbeddinator4000.Generators
                 ArgName = elementId,
             };
 
-
             var marshal = new CMarshalNativeToManaged (Options, ctx) { PrimitiveValuesByValue = true };
             elementType.Visit(marshal);
 
