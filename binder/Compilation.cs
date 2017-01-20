@@ -361,7 +361,7 @@ namespace MonoEmbeddinator4000
 
         void CompileCode()
         {
-            IEnumerable<string> files;
+            IEnumerable<string> files = null;
 
             switch (Options.Language)
             {
@@ -381,53 +381,95 @@ namespace MonoEmbeddinator4000
                 break;
             }
 
-            const string exportDefine = "MONO_M2N_DLL_EXPORT";
+            if (files == null || files.Count() == 0)
+                throw new Exception("No generated files found.");
 
+            if (Options.Language != GeneratorKind.Java)
+                CompileNativeCode(files);
+        }
+
+        const string DLLExportDefine = "MONO_M2N_DLL_EXPORT";
+
+        void CompileMSVC(IEnumerable<string> files)
+        {
+            List<ToolchainVersion> vsSdks;
+            MSVCToolchain.GetVisualStudioSdks(out vsSdks);
+
+            if (vsSdks.Count == 0)
+                throw new Exception("Visual Studio SDK was not found on your system.");
+
+            var vsSdk = vsSdks.FirstOrDefault();
+            var clBin = Path.GetFullPath(
+                Path.Combine(vsSdk.Directory, "..", "..", "VC", "bin", "cl.exe"));
+
+            var monoPath = ManagedToolchain.FindMonoPath();
+            var output = Path.Combine(Options.OutputDir, Options.LibraryName ??
+                Path.GetFileNameWithoutExtension(Options.Project.Assemblies[0]));
+
+            var args = new List<string> {
+                "/nologo",
+                $"-D{DLLExportDefine}",
+                $"-I\"{monoPath}\\include\\mono-2.0\"",
+                string.Join(" ", files.ToList()),
+                $"\"{monoPath}\\lib\\monosgen-2.0.lib\"",
+                Options.CompileSharedLibrary ? "/LD" : string.Empty,
+                $"/Fe{output}"
+            };
+
+            var invocation = string.Join(" ", args);
+
+            var vsVersion = (VisualStudioVersion)(int)vsSdk.Version;
+            var includes = MSVCToolchain.GetSystemIncludes(vsVersion);
+
+            Dictionary<string, string> envVars = null;
+            if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("INCLUDE")))
+            {
+                envVars = new Dictionary<string, string>();
+                envVars["INCLUDE"] = string.Join(";", includes);
+
+                var clLib = Path.GetFullPath(
+                    Path.Combine(vsSdk.Directory, "..", "..", "VC", "lib"));
+                envVars["LIB"] = clLib;
+            }
+
+            Invoke(clBin, invocation, envVars);
+        }
+
+        void CompileClang(IEnumerable<string> files)
+        {
+            var xcodePath = XcodeToolchain.GetXcodeToolchainPath();
+            var clangBin = Path.Combine(xcodePath, "usr/bin/clang");
+            var monoPath = ManagedToolchain.FindMonoPath();
+
+            var args = new List<string> {
+                $"-D{DLLExportDefine}",
+                "-framework CoreFoundation",
+                $"-I\"{monoPath}/include/mono-2.0\"",
+                $"-L\"{monoPath}/lib/\" -lmonosgen-2.0",
+                string.Join(" ", files.ToList())
+            };
+
+            switch (Options.Language)
+            {
+            case GeneratorKind.ObjectiveC:
+                args.Add("-ObjC");
+                args.Add("-lobjc");
+                break;
+            case GeneratorKind.CPlusPlus:
+                args.Add("-x c++");
+                break;
+            }
+
+            var invocation = string.Join(" ", args);
+
+            Invoke(clangBin, invocation);
+        }
+
+        void CompileNativeCode(IEnumerable<string> files)
+        {
             if (Platform.IsWindows)
             {
-                List<ToolchainVersion> vsSdks;
-                MSVCToolchain.GetVisualStudioSdks(out vsSdks);
-
-                if (vsSdks.Count == 0)
-                    throw new Exception("Visual Studio SDK was not found on your system.");
-
-                var vsSdk = vsSdks.FirstOrDefault();
-                var clBin = Path.GetFullPath(
-                    Path.Combine(vsSdk.Directory, "..", "..", "VC", "bin", "cl.exe"));
-
-                var monoPath = ManagedToolchain.FindMonoPath();
-                var output = Path.Combine(Options.OutputDir, Options.LibraryName ??
-                    Path.GetFileNameWithoutExtension(Options.Project.Assemblies[0]));
-
-                var args = new List<string>
-                {
-                    "/nologo",
-                    $"-D{exportDefine}",
-                    $"-I\"{monoPath}\\include\\mono-2.0\"",
-                    string.Join(" ", files.ToList()),
-                    $"\"{monoPath}\\lib\\monosgen-2.0.lib\"",
-                    Options.CompileSharedLibrary ? "/LD" : string.Empty,
-                    $"/Fe{output}"
-                };
-
-                var invocation = string.Join(" ", args);
-
-                var vsVersion = (VisualStudioVersion)(int)vsSdk.Version;
-                var includes = MSVCToolchain.GetSystemIncludes(vsVersion);
-
-                Dictionary<string, string> envVars = null;
-                if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("INCLUDE")))
-                {
-                    envVars = new Dictionary<string, string>();
-                    envVars["INCLUDE"] = string.Join(";", includes);
-
-                    var clLib = Path.GetFullPath(
-                        Path.Combine(vsSdk.Directory, "..", "..", "VC", "lib"));
-                    envVars["LIB"] = clLib;
-                }
-
-                Invoke(clBin, invocation, envVars);
-
+                CompileMSVC(files);
                 return;
             }
             else if (Platform.IsMacOS)
@@ -444,33 +486,7 @@ namespace MonoEmbeddinator4000
                     throw new NotSupportedException(
                         $"Cross compilation to target platform '{Options.Platform}' is not supported.");
                 case TargetPlatform.MacOS:
-                    var xcodePath = XcodeToolchain.GetXcodeToolchainPath();
-                    var clangBin = Path.Combine(xcodePath, "usr/bin/clang");
-                    var monoPath = ManagedToolchain.FindMonoPath();
-                    
-                    var args = new List<string>
-                    {
-                        $"-D{exportDefine}",
-                        "-framework CoreFoundation",
-                        $"-I\"{monoPath}/include/mono-2.0\"",
-                        $"-L\"{monoPath}/lib/\" -lmonosgen-2.0",
-                        string.Join(" ", files.ToList())
-                    };
-
-                    switch (Options.Language)
-                    {
-                    case GeneratorKind.ObjectiveC:
-                        args.Add("-ObjC");
-                        args.Add("-lobjc");
-                        break;
-                    case GeneratorKind.CPlusPlus:
-                        args.Add("-x c++");
-                        break;
-                    }
-                        
-                    var invocation = string.Join(" ", args);
-
-                    Invoke(clangBin, invocation);
+                    CompileClang(files);
                     break;
                 }
                 return;
