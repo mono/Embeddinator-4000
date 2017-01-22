@@ -1,15 +1,15 @@
 [submodule "ikvm"]
-	path = ikvm
+	path = external/ikvm
 	url = https://github.com/mono/ikvm-fork.git
 [submodule "catch"]
-	path = catch
+	path = external/catch
 	url = https://github.com/philsquared/Catch.git
 [submodule "CppSharp"]
-	path = CppSharp
+	path = external/CppSharp
 	url = https://github.com/mono/CppSharp
 [submodule "Xamarin.MacDev"]
-	path = Xamarin.MacDev
+	path = external/Xamarin.MacDev
 	url = https://github.com/xamarin/Xamarin.MacDev.git
 [submodule "Xamarin.Android.Tools"]
-	path = Xamarin.Android.Tools
+	path = external/Xamarin.Android.Tools
 	url = git@github.com:xamarin/xamarin-android-tools.git
