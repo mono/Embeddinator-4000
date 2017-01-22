@@ -42,14 +42,14 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="../../CppSharp/src/Runtime/Helpers.cs">
-      <Link>CppSharp/src/Runtime/Helpers.cs</Link>
+    <Compile Include="../../external/CppSharp/src/Runtime/Helpers.cs">
+      <Link>external/CppSharp/src/Runtime/Helpers.cs</Link>
     </Compile>
-    <Compile Include="../../CppSharp/src/Runtime/Interfaces.cs">
-      <Link>CppSharp/src/Runtime/Interfaces.cs</Link>
+    <Compile Include="../../external/CppSharp/src/Runtime/Interfaces.cs">
+      <Link>external/CppSharp/src/Runtime/Interfaces.cs</Link>
     </Compile>
-    <Compile Include="../../CppSharp/src/Runtime/SymbolResolver.cs">
-      <Link>CppSharp/src/Runtime/SymbolResolver.cs</Link>
+    <Compile Include="../../external/CppSharp/src/Runtime/SymbolResolver.cs">
+      <Link>external/CppSharp/src/Runtime/SymbolResolver.cs</Link>
     </Compile>
   </ItemGroup>
   <ItemGroup>

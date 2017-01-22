@@ -16,15 +16,15 @@ if "%C%"=="1" goto vs2015
 if "%C%"=="0" goto clean
 
 :clean
-"..\CppSharp\build\premake5" --file=premake5.lua clean
+"..\external\CppSharp\build\premake5" --file=premake5.lua clean
 goto quit
 
 :vs2015
-"..\CppSharp\build\premake5" --file=premake5.lua --outdir=. --os=macosx vs2015
+"..\external\CppSharp\build\premake5" --file=premake5.lua --outdir=. --os=macosx vs2015
 goto quit
 
 :gmake
-"..\CppSharp\build\premake5" --file=premake5.lua gmake
+"..\external\CppSharp\build\premake5" --file=premake5.lua gmake
 goto quit
 
 :quit

@@ -43,20 +43,20 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="../../CppSharp/src/Core/Diagnostics.cs">
-      <Link>CppSharp/src/Core/Diagnostics.cs</Link>
+    <Compile Include="../../external/CppSharp/src/Core/Diagnostics.cs">
+      <Link>external/CppSharp/src/Core/Diagnostics.cs</Link>
     </Compile>
-    <Compile Include="../../CppSharp/src/Core/Platform.cs">
-      <Link>CppSharp/src/Core/Platform.cs</Link>
+    <Compile Include="../../external/CppSharp/src/Core/Platform.cs">
+      <Link>external/CppSharp/src/Core/Platform.cs</Link>
     </Compile>
-    <Compile Include="../../CppSharp/src/Core/Toolchains/MSVCToolchain.cs">
-      <Link>CppSharp/src/Core/Toolchains/MSVCToolchain.cs</Link>
+    <Compile Include="../../external/CppSharp/src/Core/Toolchains/MSVCToolchain.cs">
+      <Link>external/CppSharp/src/Core/Toolchains/MSVCToolchain.cs</Link>
     </Compile>
-    <Compile Include="../../CppSharp/src/Core/Toolchains/ManagedToolchain.cs">
-      <Link>CppSharp/src/Core/Toolchains/ManagedToolchain.cs</Link>
+    <Compile Include="../../external/CppSharp/src/Core/Toolchains/ManagedToolchain.cs">
+      <Link>external/CppSharp/src/Core/Toolchains/ManagedToolchain.cs</Link>
     </Compile>
-    <Compile Include="../../CppSharp/src/Core/Toolchains/XcodeToolchain.cs">
-      <Link>CppSharp/src/Core/Toolchains/XcodeToolchain.cs</Link>
+    <Compile Include="../../external/CppSharp/src/Core/Toolchains/XcodeToolchain.cs">
+      <Link>external/CppSharp/src/Core/Toolchains/XcodeToolchain.cs</Link>
     </Compile>
   </ItemGroup>
   <ItemGroup>

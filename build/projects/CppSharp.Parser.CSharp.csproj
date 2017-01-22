@@ -41,14 +41,14 @@
   <ItemGroup>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="../../CppSharp/src/CppParser/Bindings/CSharp/i686-apple-darwin12.4.0/CppSharp.CppParser.cs">
-      <Link>CppSharp/src/CppParser/Bindings/CSharp/i686-apple-darwin12.4.0/CppSharp.CppParser.cs</Link>
+    <Compile Include="../../external/CppSharp/src/CppParser/Bindings/CSharp/i686-apple-darwin12.4.0/CppSharp.CppParser.cs">
+      <Link>external/CppSharp/src/CppParser/Bindings/CSharp/i686-apple-darwin12.4.0/CppSharp.CppParser.cs</Link>
     </Compile>
-    <Compile Include="../../CppSharp/src/CppParser/Bindings/CSharp/i686-apple-darwin12.4.0/Std.cs">
-      <Link>CppSharp/src/CppParser/Bindings/CSharp/i686-apple-darwin12.4.0/Std.cs</Link>
+    <Compile Include="../../external/CppSharp/src/CppParser/Bindings/CSharp/i686-apple-darwin12.4.0/Std.cs">
+      <Link>external/CppSharp/src/CppParser/Bindings/CSharp/i686-apple-darwin12.4.0/Std.cs</Link>
     </Compile>
-    <None Include="../../CppSharp/src/CppParser/Bindings/CSharp/premake5.lua">
-      <Link>CppSharp/src/CppParser/Bindings/CSharp/premake5.lua</Link>
+    <None Include="../../external/CppSharp/src/CppParser/Bindings/CSharp/premake5.lua">
+      <Link>external/CppSharp/src/CppParser/Bindings/CSharp/premake5.lua</Link>
     </None>
   </ItemGroup>
   <ItemGroup>

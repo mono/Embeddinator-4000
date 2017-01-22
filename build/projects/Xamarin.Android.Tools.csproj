@@ -42,47 +42,56 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="../../Xamarin.Android.Tools/src/Xamarin.Android.Tools/AndroidLogger.cs">
-      <Link>Xamarin.Android.Tools/src/Xamarin.Android.Tools/AndroidLogger.cs</Link>
+    <Compile Include="../../external/Xamarin.Android.Tools/src/Xamarin.Android.Tools/AndroidLogger.cs">
+      <Link>external/Xamarin.Android.Tools/src/Xamarin.Android.Tools/AndroidLogger.cs</Link>
     </Compile>
-    <Compile Include="../../Xamarin.Android.Tools/src/Xamarin.Android.Tools/AndroidSdk.cs">
-      <Link>Xamarin.Android.Tools/src/Xamarin.Android.Tools/AndroidSdk.cs</Link>
+    <Compile Include="../../external/Xamarin.Android.Tools/src/Xamarin.Android.Tools/AndroidSdk.cs">
+      <Link>external/Xamarin.Android.Tools/src/Xamarin.Android.Tools/AndroidSdk.cs</Link>
     </Compile>
-    <Compile Include="../../Xamarin.Android.Tools/src/Xamarin.Android.Tools/AndroidTargetArch.cs">
-      <Link>Xamarin.Android.Tools/src/Xamarin.Android.Tools/AndroidTargetArch.cs</Link>
+    <Compile Include="../../external/Xamarin.Android.Tools/src/Xamarin.Android.Tools/AndroidTargetArch.cs">
+      <Link>external/Xamarin.Android.Tools/src/Xamarin.Android.Tools/AndroidTargetArch.cs</Link>
     </Compile>
-    <Compile Include="../../Xamarin.Android.Tools/src/Xamarin.Android.Tools/AndroidVersion.cs">
-      <Link>Xamarin.Android.Tools/src/Xamarin.Android.Tools/AndroidVersion.cs</Link>
+    <Compile Include="../../external/Xamarin.Android.Tools/src/Xamarin.Android.Tools/AndroidVersion.cs">
+      <Link>external/Xamarin.Android.Tools/src/Xamarin.Android.Tools/AndroidVersion.cs</Link>
     </Compile>
-    <Compile Include="../../Xamarin.Android.Tools/src/Xamarin.Android.Tools/MonoDroidSdk.cs">
-      <Link>Xamarin.Android.Tools/src/Xamarin.Android.Tools/MonoDroidSdk.cs</Link>
+    <Compile Include="../../external/Xamarin.Android.Tools/src/Xamarin.Android.Tools/MonoDroidSdk.cs">
+      <Link>external/Xamarin.Android.Tools/src/Xamarin.Android.Tools/MonoDroidSdk.cs</Link>
     </Compile>
-    <Compile Include="../../Xamarin.Android.Tools/src/Xamarin.Android.Tools/OS.cs">
-      <Link>Xamarin.Android.Tools/src/Xamarin.Android.Tools/OS.cs</Link>
+    <Compile Include="../../external/Xamarin.Android.Tools/src/Xamarin.Android.Tools/OS.cs">
+      <Link>external/Xamarin.Android.Tools/src/Xamarin.Android.Tools/OS.cs</Link>
     </Compile>
-    <Compile Include="../../Xamarin.Android.Tools/src/Xamarin.Android.Tools/ProcessUtils.cs">
-      <Link>Xamarin.Android.Tools/src/Xamarin.Android.Tools/ProcessUtils.cs</Link>
+    <Compile Include="../../external/Xamarin.Android.Tools/src/Xamarin.Android.Tools/ProcessUtils.cs">
+      <Link>external/Xamarin.Android.Tools/src/Xamarin.Android.Tools/ProcessUtils.cs</Link>
     </Compile>
-    <Compile Include="../../Xamarin.Android.Tools/src/Xamarin.Android.Tools/Properties/AssemblyInfo.cs">
-      <Link>Xamarin.Android.Tools/src/Xamarin.Android.Tools/Properties/AssemblyInfo.cs</Link>
+    <Compile Include="../../external/Xamarin.Android.Tools/src/Xamarin.Android.Tools/Properties/AssemblyInfo.cs">
+      <Link>external/Xamarin.Android.Tools/src/Xamarin.Android.Tools/Properties/AssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="../../Xamarin.Android.Tools/src/Xamarin.Android.Tools/Sdks/AndroidSdkBase.cs">
-      <Link>Xamarin.Android.Tools/src/Xamarin.Android.Tools/Sdks/AndroidSdkBase.cs</Link>
+    <Compile Include="../../external/Xamarin.Android.Tools/src/Xamarin.Android.Tools/Sdks/AndroidSdkBase.cs">
+      <Link>external/Xamarin.Android.Tools/src/Xamarin.Android.Tools/Sdks/AndroidSdkBase.cs</Link>
     </Compile>
-    <Compile Include="../../Xamarin.Android.Tools/src/Xamarin.Android.Tools/Sdks/AndroidSdkUnix.cs">
-      <Link>Xamarin.Android.Tools/src/Xamarin.Android.Tools/Sdks/AndroidSdkUnix.cs</Link>
+    <Compile Include="../../external/Xamarin.Android.Tools/src/Xamarin.Android.Tools/Sdks/AndroidSdkUnix.cs">
+      <Link>external/Xamarin.Android.Tools/src/Xamarin.Android.Tools/Sdks/AndroidSdkUnix.cs</Link>
     </Compile>
-    <Compile Include="../../Xamarin.Android.Tools/src/Xamarin.Android.Tools/Sdks/AndroidSdkWindows.cs">
-      <Link>Xamarin.Android.Tools/src/Xamarin.Android.Tools/Sdks/AndroidSdkWindows.cs</Link>
+    <Compile Include="../../external/Xamarin.Android.Tools/src/Xamarin.Android.Tools/Sdks/AndroidSdkWindows.cs">
+      <Link>external/Xamarin.Android.Tools/src/Xamarin.Android.Tools/Sdks/AndroidSdkWindows.cs</Link>
     </Compile>
-    <Compile Include="../../Xamarin.Android.Tools/src/Xamarin.Android.Tools/Sdks/MonoDroidSdkBase.cs">
-      <Link>Xamarin.Android.Tools/src/Xamarin.Android.Tools/Sdks/MonoDroidSdkBase.cs</Link>
+    <Compile Include="../../external/Xamarin.Android.Tools/src/Xamarin.Android.Tools/Sdks/MonoDroidSdkBase.cs">
+      <Link>external/Xamarin.Android.Tools/src/Xamarin.Android.Tools/Sdks/MonoDroidSdkBase.cs</Link>
     </Compile>
-    <Compile Include="../../Xamarin.Android.Tools/src/Xamarin.Android.Tools/Sdks/MonoDroidSdkUnix.cs">
-      <Link>Xamarin.Android.Tools/src/Xamarin.Android.Tools/Sdks/MonoDroidSdkUnix.cs</Link>
+    <Compile Include="../../external/Xamarin.Android.Tools/src/Xamarin.Android.Tools/Sdks/MonoDroidSdkUnix.cs">
+      <Link>external/Xamarin.Android.Tools/src/Xamarin.Android.Tools/Sdks/MonoDroidSdkUnix.cs</Link>
     </Compile>
-    <Compile Include="../../Xamarin.Android.Tools/src/Xamarin.Android.Tools/Sdks/MonoDroidSdkWindows.cs">
-      <Link>Xamarin.Android.Tools/src/Xamarin.Android.Tools/Sdks/MonoDroidSdkWindows.cs</Link>
+    <Compile Include="../../external/Xamarin.Android.Tools/src/Xamarin.Android.Tools/Sdks/MonoDroidSdkWindows.cs">
+      <Link>external/Xamarin.Android.Tools/src/Xamarin.Android.Tools/Sdks/MonoDroidSdkWindows.cs</Link>
+    </Compile>
+    <Compile Include="../../external/Xamarin.Android.Tools/src/Xamarin.Android.Tools/obj/Debug/TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs">
+      <Link>external/Xamarin.Android.Tools/src/Xamarin.Android.Tools/obj/Debug/TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs</Link>
+    </Compile>
+    <Compile Include="../../external/Xamarin.Android.Tools/src/Xamarin.Android.Tools/obj/Debug/TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs">
+      <Link>external/Xamarin.Android.Tools/src/Xamarin.Android.Tools/obj/Debug/TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs</Link>
+    </Compile>
+    <Compile Include="../../external/Xamarin.Android.Tools/src/Xamarin.Android.Tools/obj/Debug/TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs">
+      <Link>external/Xamarin.Android.Tools/src/Xamarin.Android.Tools/obj/Debug/TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs</Link>
     </Compile>
   </ItemGroup>
   <ItemGroup>

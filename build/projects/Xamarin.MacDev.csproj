@@ -46,104 +46,104 @@
     <Reference Include="Mono.Posix" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="../../Xamarin.MacDev/Xamarin.MacDev/AnalyticsService.cs">
-      <Link>Xamarin.MacDev/Xamarin.MacDev/AnalyticsService.cs</Link>
+    <Compile Include="../../external/Xamarin.MacDev/Xamarin.MacDev/AnalyticsService.cs">
+      <Link>external/Xamarin.MacDev/Xamarin.MacDev/AnalyticsService.cs</Link>
     </Compile>
-    <Compile Include="../../Xamarin.MacDev/Xamarin.MacDev/AppleCodeSigningIdentity.cs">
-      <Link>Xamarin.MacDev/Xamarin.MacDev/AppleCodeSigningIdentity.cs</Link>
+    <Compile Include="../../external/Xamarin.MacDev/Xamarin.MacDev/AppleCodeSigningIdentity.cs">
+      <Link>external/Xamarin.MacDev/Xamarin.MacDev/AppleCodeSigningIdentity.cs</Link>
     </Compile>
-    <Compile Include="../../Xamarin.MacDev/Xamarin.MacDev/AppleIPhoneSdk.cs">
-      <Link>Xamarin.MacDev/Xamarin.MacDev/AppleIPhoneSdk.cs</Link>
+    <Compile Include="../../external/Xamarin.MacDev/Xamarin.MacDev/AppleIPhoneSdk.cs">
+      <Link>external/Xamarin.MacDev/Xamarin.MacDev/AppleIPhoneSdk.cs</Link>
     </Compile>
-    <Compile Include="../../Xamarin.MacDev/Xamarin.MacDev/AppleSdk.cs">
-      <Link>Xamarin.MacDev/Xamarin.MacDev/AppleSdk.cs</Link>
+    <Compile Include="../../external/Xamarin.MacDev/Xamarin.MacDev/AppleSdk.cs">
+      <Link>external/Xamarin.MacDev/Xamarin.MacDev/AppleSdk.cs</Link>
     </Compile>
-    <Compile Include="../../Xamarin.MacDev/Xamarin.MacDev/AppleSdkSettings.cs">
-      <Link>Xamarin.MacDev/Xamarin.MacDev/AppleSdkSettings.cs</Link>
+    <Compile Include="../../external/Xamarin.MacDev/Xamarin.MacDev/AppleSdkSettings.cs">
+      <Link>external/Xamarin.MacDev/Xamarin.MacDev/AppleSdkSettings.cs</Link>
     </Compile>
-    <Compile Include="../../Xamarin.MacDev/Xamarin.MacDev/AppleTVOSSdk.cs">
-      <Link>Xamarin.MacDev/Xamarin.MacDev/AppleTVOSSdk.cs</Link>
+    <Compile Include="../../external/Xamarin.MacDev/Xamarin.MacDev/AppleTVOSSdk.cs">
+      <Link>external/Xamarin.MacDev/Xamarin.MacDev/AppleTVOSSdk.cs</Link>
     </Compile>
-    <Compile Include="../../Xamarin.MacDev/Xamarin.MacDev/AppleWatchSdk.cs">
-      <Link>Xamarin.MacDev/Xamarin.MacDev/AppleWatchSdk.cs</Link>
+    <Compile Include="../../external/Xamarin.MacDev/Xamarin.MacDev/AppleWatchSdk.cs">
+      <Link>external/Xamarin.MacDev/Xamarin.MacDev/AppleWatchSdk.cs</Link>
     </Compile>
-    <Compile Include="../../Xamarin.MacDev/Xamarin.MacDev/EntitlementExtensions.cs">
-      <Link>Xamarin.MacDev/Xamarin.MacDev/EntitlementExtensions.cs</Link>
+    <Compile Include="../../external/Xamarin.MacDev/Xamarin.MacDev/EntitlementExtensions.cs">
+      <Link>external/Xamarin.MacDev/Xamarin.MacDev/EntitlementExtensions.cs</Link>
     </Compile>
-    <Compile Include="../../Xamarin.MacDev/Xamarin.MacDev/ExtendedVersion.cs">
-      <Link>Xamarin.MacDev/Xamarin.MacDev/ExtendedVersion.cs</Link>
+    <Compile Include="../../external/Xamarin.MacDev/Xamarin.MacDev/ExtendedVersion.cs">
+      <Link>external/Xamarin.MacDev/Xamarin.MacDev/ExtendedVersion.cs</Link>
     </Compile>
-    <Compile Include="../../Xamarin.MacDev/Xamarin.MacDev/HttpMessageHandler.cs">
-      <Link>Xamarin.MacDev/Xamarin.MacDev/HttpMessageHandler.cs</Link>
+    <Compile Include="../../external/Xamarin.MacDev/Xamarin.MacDev/HttpMessageHandler.cs">
+      <Link>external/Xamarin.MacDev/Xamarin.MacDev/HttpMessageHandler.cs</Link>
     </Compile>
-    <Compile Include="../../Xamarin.MacDev/Xamarin.MacDev/IMonoMacSdk.cs">
-      <Link>Xamarin.MacDev/Xamarin.MacDev/IMonoMacSdk.cs</Link>
+    <Compile Include="../../external/Xamarin.MacDev/Xamarin.MacDev/IMonoMacSdk.cs">
+      <Link>external/Xamarin.MacDev/Xamarin.MacDev/IMonoMacSdk.cs</Link>
     </Compile>
-    <Compile Include="../../Xamarin.MacDev/Xamarin.MacDev/IPhoneArchitecture.cs">
-      <Link>Xamarin.MacDev/Xamarin.MacDev/IPhoneArchitecture.cs</Link>
+    <Compile Include="../../external/Xamarin.MacDev/Xamarin.MacDev/IPhoneArchitecture.cs">
+      <Link>external/Xamarin.MacDev/Xamarin.MacDev/IPhoneArchitecture.cs</Link>
     </Compile>
-    <Compile Include="../../Xamarin.MacDev/Xamarin.MacDev/IPhoneCertificate.cs">
-      <Link>Xamarin.MacDev/Xamarin.MacDev/IPhoneCertificate.cs</Link>
+    <Compile Include="../../external/Xamarin.MacDev/Xamarin.MacDev/IPhoneCertificate.cs">
+      <Link>external/Xamarin.MacDev/Xamarin.MacDev/IPhoneCertificate.cs</Link>
     </Compile>
-    <Compile Include="../../Xamarin.MacDev/Xamarin.MacDev/IPhoneDeviceCapabilities.cs">
-      <Link>Xamarin.MacDev/Xamarin.MacDev/IPhoneDeviceCapabilities.cs</Link>
+    <Compile Include="../../external/Xamarin.MacDev/Xamarin.MacDev/IPhoneDeviceCapabilities.cs">
+      <Link>external/Xamarin.MacDev/Xamarin.MacDev/IPhoneDeviceCapabilities.cs</Link>
     </Compile>
-    <Compile Include="../../Xamarin.MacDev/Xamarin.MacDev/IPhoneDeviceType.cs">
-      <Link>Xamarin.MacDev/Xamarin.MacDev/IPhoneDeviceType.cs</Link>
+    <Compile Include="../../external/Xamarin.MacDev/Xamarin.MacDev/IPhoneDeviceType.cs">
+      <Link>external/Xamarin.MacDev/Xamarin.MacDev/IPhoneDeviceType.cs</Link>
     </Compile>
-    <Compile Include="../../Xamarin.MacDev/Xamarin.MacDev/IPhoneImageSizes.cs">
-      <Link>Xamarin.MacDev/Xamarin.MacDev/IPhoneImageSizes.cs</Link>
+    <Compile Include="../../external/Xamarin.MacDev/Xamarin.MacDev/IPhoneImageSizes.cs">
+      <Link>external/Xamarin.MacDev/Xamarin.MacDev/IPhoneImageSizes.cs</Link>
     </Compile>
-    <Compile Include="../../Xamarin.MacDev/Xamarin.MacDev/IPhoneSdkVersion.cs">
-      <Link>Xamarin.MacDev/Xamarin.MacDev/IPhoneSdkVersion.cs</Link>
+    <Compile Include="../../external/Xamarin.MacDev/Xamarin.MacDev/IPhoneSdkVersion.cs">
+      <Link>external/Xamarin.MacDev/Xamarin.MacDev/IPhoneSdkVersion.cs</Link>
     </Compile>
-    <Compile Include="../../Xamarin.MacDev/Xamarin.MacDev/Keychain.cs">
-      <Link>Xamarin.MacDev/Xamarin.MacDev/Keychain.cs</Link>
+    <Compile Include="../../external/Xamarin.MacDev/Xamarin.MacDev/Keychain.cs">
+      <Link>external/Xamarin.MacDev/Xamarin.MacDev/Keychain.cs</Link>
     </Compile>
-    <Compile Include="../../Xamarin.MacDev/Xamarin.MacDev/LoggingService.cs">
-      <Link>Xamarin.MacDev/Xamarin.MacDev/LoggingService.cs</Link>
+    <Compile Include="../../external/Xamarin.MacDev/Xamarin.MacDev/LoggingService.cs">
+      <Link>external/Xamarin.MacDev/Xamarin.MacDev/LoggingService.cs</Link>
     </Compile>
-    <Compile Include="../../Xamarin.MacDev/Xamarin.MacDev/MacOSXSdk.cs">
-      <Link>Xamarin.MacDev/Xamarin.MacDev/MacOSXSdk.cs</Link>
+    <Compile Include="../../external/Xamarin.MacDev/Xamarin.MacDev/MacOSXSdk.cs">
+      <Link>external/Xamarin.MacDev/Xamarin.MacDev/MacOSXSdk.cs</Link>
     </Compile>
-    <Compile Include="../../Xamarin.MacDev/Xamarin.MacDev/MacOSXSdkVersion.cs">
-      <Link>Xamarin.MacDev/Xamarin.MacDev/MacOSXSdkVersion.cs</Link>
+    <Compile Include="../../external/Xamarin.MacDev/Xamarin.MacDev/MacOSXSdkVersion.cs">
+      <Link>external/Xamarin.MacDev/Xamarin.MacDev/MacOSXSdkVersion.cs</Link>
     </Compile>
-    <Compile Include="../../Xamarin.MacDev/Xamarin.MacDev/ManifestExtensions.cs">
-      <Link>Xamarin.MacDev/Xamarin.MacDev/ManifestExtensions.cs</Link>
+    <Compile Include="../../external/Xamarin.MacDev/Xamarin.MacDev/ManifestExtensions.cs">
+      <Link>external/Xamarin.MacDev/Xamarin.MacDev/ManifestExtensions.cs</Link>
     </Compile>
-    <Compile Include="../../Xamarin.MacDev/Xamarin.MacDev/MobileProvision.cs">
-      <Link>Xamarin.MacDev/Xamarin.MacDev/MobileProvision.cs</Link>
+    <Compile Include="../../external/Xamarin.MacDev/Xamarin.MacDev/MobileProvision.cs">
+      <Link>external/Xamarin.MacDev/Xamarin.MacDev/MobileProvision.cs</Link>
     </Compile>
-    <Compile Include="../../Xamarin.MacDev/Xamarin.MacDev/MobileProvisionIndex.cs">
-      <Link>Xamarin.MacDev/Xamarin.MacDev/MobileProvisionIndex.cs</Link>
+    <Compile Include="../../external/Xamarin.MacDev/Xamarin.MacDev/MobileProvisionIndex.cs">
+      <Link>external/Xamarin.MacDev/Xamarin.MacDev/MobileProvisionIndex.cs</Link>
     </Compile>
-    <Compile Include="../../Xamarin.MacDev/Xamarin.MacDev/MonoMacSdk.cs">
-      <Link>Xamarin.MacDev/Xamarin.MacDev/MonoMacSdk.cs</Link>
+    <Compile Include="../../external/Xamarin.MacDev/Xamarin.MacDev/MonoMacSdk.cs">
+      <Link>external/Xamarin.MacDev/Xamarin.MacDev/MonoMacSdk.cs</Link>
     </Compile>
-    <Compile Include="../../Xamarin.MacDev/Xamarin.MacDev/MonoTouchSdk.cs">
-      <Link>Xamarin.MacDev/Xamarin.MacDev/MonoTouchSdk.cs</Link>
+    <Compile Include="../../external/Xamarin.MacDev/Xamarin.MacDev/MonoTouchSdk.cs">
+      <Link>external/Xamarin.MacDev/Xamarin.MacDev/MonoTouchSdk.cs</Link>
     </Compile>
-    <Compile Include="../../Xamarin.MacDev/Xamarin.MacDev/PListObject.cs">
-      <Link>Xamarin.MacDev/Xamarin.MacDev/PListObject.cs</Link>
+    <Compile Include="../../external/Xamarin.MacDev/Xamarin.MacDev/PListObject.cs">
+      <Link>external/Xamarin.MacDev/Xamarin.MacDev/PListObject.cs</Link>
     </Compile>
-    <Compile Include="../../Xamarin.MacDev/Xamarin.MacDev/PlatformAvailability.cs">
-      <Link>Xamarin.MacDev/Xamarin.MacDev/PlatformAvailability.cs</Link>
+    <Compile Include="../../external/Xamarin.MacDev/Xamarin.MacDev/PlatformAvailability.cs">
+      <Link>external/Xamarin.MacDev/Xamarin.MacDev/PlatformAvailability.cs</Link>
     </Compile>
-    <Compile Include="../../Xamarin.MacDev/Xamarin.MacDev/ProcessArgumentBuilder.cs">
-      <Link>Xamarin.MacDev/Xamarin.MacDev/ProcessArgumentBuilder.cs</Link>
+    <Compile Include="../../external/Xamarin.MacDev/Xamarin.MacDev/ProcessArgumentBuilder.cs">
+      <Link>external/Xamarin.MacDev/Xamarin.MacDev/ProcessArgumentBuilder.cs</Link>
     </Compile>
-    <Compile Include="../../Xamarin.MacDev/Xamarin.MacDev/Properties/AssemblyInfo.cs">
-      <Link>Xamarin.MacDev/Xamarin.MacDev/Properties/AssemblyInfo.cs</Link>
+    <Compile Include="../../external/Xamarin.MacDev/Xamarin.MacDev/Properties/AssemblyInfo.cs">
+      <Link>external/Xamarin.MacDev/Xamarin.MacDev/Properties/AssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="../../Xamarin.MacDev/Xamarin.MacDev/SQLite.cs">
-      <Link>Xamarin.MacDev/Xamarin.MacDev/SQLite.cs</Link>
+    <Compile Include="../../external/Xamarin.MacDev/Xamarin.MacDev/SQLite.cs">
+      <Link>external/Xamarin.MacDev/Xamarin.MacDev/SQLite.cs</Link>
     </Compile>
-    <Compile Include="../../Xamarin.MacDev/Xamarin.MacDev/TlsProvider.cs">
-      <Link>Xamarin.MacDev/Xamarin.MacDev/TlsProvider.cs</Link>
+    <Compile Include="../../external/Xamarin.MacDev/Xamarin.MacDev/TlsProvider.cs">
+      <Link>external/Xamarin.MacDev/Xamarin.MacDev/TlsProvider.cs</Link>
     </Compile>
-    <Compile Include="../../Xamarin.MacDev/Xamarin.MacDev/XamMacSdk.cs">
-      <Link>Xamarin.MacDev/Xamarin.MacDev/XamMacSdk.cs</Link>
+    <Compile Include="../../external/Xamarin.MacDev/Xamarin.MacDev/XamMacSdk.cs">
+      <Link>external/Xamarin.MacDev/Xamarin.MacDev/XamMacSdk.cs</Link>
     </Compile>
   </ItemGroup>
   <ItemGroup>

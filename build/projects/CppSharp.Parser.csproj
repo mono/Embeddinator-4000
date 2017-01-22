@@ -43,17 +43,17 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="../../CppSharp/src/Parser/ASTConverter.cs">
-      <Link>CppSharp/src/Parser/ASTConverter.cs</Link>
+    <Compile Include="../../external/CppSharp/src/Parser/ASTConverter.cs">
+      <Link>external/CppSharp/src/Parser/ASTConverter.cs</Link>
     </Compile>
-    <Compile Include="../../CppSharp/src/Parser/Parser.cs">
-      <Link>CppSharp/src/Parser/Parser.cs</Link>
+    <Compile Include="../../external/CppSharp/src/Parser/Parser.cs">
+      <Link>external/CppSharp/src/Parser/Parser.cs</Link>
     </Compile>
-    <Compile Include="../../CppSharp/src/Parser/ParserOptions.cs">
-      <Link>CppSharp/src/Parser/ParserOptions.cs</Link>
+    <Compile Include="../../external/CppSharp/src/Parser/ParserOptions.cs">
+      <Link>external/CppSharp/src/Parser/ParserOptions.cs</Link>
     </Compile>
-    <Compile Include="../../CppSharp/src/Parser/Project.cs">
-      <Link>CppSharp/src/Parser/Project.cs</Link>
+    <Compile Include="../../external/CppSharp/src/Parser/Project.cs">
+      <Link>external/CppSharp/src/Parser/Project.cs</Link>
     </Compile>
   </ItemGroup>
   <ItemGroup>

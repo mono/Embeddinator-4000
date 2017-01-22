@@ -2,7 +2,7 @@
 
 local gendir = "%{wks.location}/gen"
 local supportdir = path.getabsolute("../support")
-local catchdir = path.getabsolute("../catch")
+local catchdir = path.getabsolute("../external/catch")
 
 function SetupTestProject(name, extraFiles)
   SetupTestGeneratorProject(name)

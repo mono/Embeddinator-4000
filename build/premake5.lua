@@ -39,12 +39,12 @@ workspace "MonoEmbeddinator4000"
   startproject "MonoEmbeddinator4000"
 
   include ("../binder")
-  include("../CppSharp/src/Core")
-  include("../CppSharp/src/AST")
-  include("../CppSharp/src/CppParser/Bindings/CSharp")
-  include("../CppSharp/src/Parser")
-  include("../CppSharp/src/Generator")
-  include("../CppSharp/src/Runtime")
+  include("../external/CppSharp/src/Core")
+  include("../external/CppSharp/src/AST")
+  include("../external/CppSharp/src/CppParser/Bindings/CSharp")
+  include("../external/CppSharp/src/Parser")
+  include("../external/CppSharp/src/Generator")
+  include("../external/CppSharp/src/Runtime")
 
   project "IKVM.Reflection"
     SetupManagedProject()
@@ -52,7 +52,7 @@ workspace "MonoEmbeddinator4000"
     kind "SharedLib"
     language "C#"
 
-    files { "../ikvm/reflect/**.cs" }
+    files { "../external/ikvm/reflect/**.cs" }
     links { "System", "System.Core", "System.Security" }
 
   project "Xamarin.MacDev"
@@ -62,7 +62,7 @@ workspace "MonoEmbeddinator4000"
     language "C#"
     clr "Unsafe"
 
-    files { "../Xamarin.MacDev/Xamarin.MacDev/**.cs" }
+    files { "../external/Xamarin.MacDev/Xamarin.MacDev/**.cs" }
     links
     {
       "System",
@@ -78,7 +78,7 @@ workspace "MonoEmbeddinator4000"
     kind "SharedLib"
     language "C#"
 
-    files { "../Xamarin.Android.Tools/src/Xamarin.Android.Tools/**.cs" }
+    files { "../external/Xamarin.Android.Tools/src/Xamarin.Android.Tools/**.cs" }
     links
     {
       "System",
