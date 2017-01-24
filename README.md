@@ -1,8 +1,4 @@
-# MonoEmbeddinator-4000
-
 ![Embeddinator-4000 Logo](e4000-logo.png)
-
-## Introduction
 
 Embeddinator-4000 is a tool to turn existing .NET libraries into
 libraries that can be consumed by other languages.   
@@ -18,8 +14,9 @@ This is a work in progress, the initial goals for this project are to
 surface .NET to C, C++, Objective-C (across the various Apple platforms)
 and Java (Android and regular Java).
 
-* Create a native API to access some C# APIs
-* For now C bindings, in the future Obj-C binding, Java bindings
+The project is still under heavy development. Usage under mission-critical
+production scenarios is not advised. Please report any bugs or suggestions
+so we can improve the tool.
 
 ## Building
 
@@ -48,10 +45,4 @@ To generate C bindings for a `Xamarin.Foo.dll` assembly you would call
 the tool like:
 
 `MonoEmbeddinator4000.exe -gen=c -out=foo Xamarin.Foo.dll`
-
-Dependencies
-------------
-
-* IKVM.Reflection
-* CppSharp
 
