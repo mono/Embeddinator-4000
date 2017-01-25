@@ -123,7 +123,7 @@ namespace MonoEmbeddinator4000
                 return TargetPlatform.TVOS;
             }
 
-            throw new NotSupportedException("Unknown target platform: " + platform);
+            throw new NotSupportedException ("Unknown target platform: " + platform);
         }
 
         static void Main(string[] args)
