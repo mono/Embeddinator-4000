@@ -72,20 +72,20 @@ namespace MonoEmbeddinator4000
 
         static GeneratorKind ConvertToGeneratorKind(string gen)
         {
-            switch (gen.ToLower())
+            switch(gen.ToLower())
             {
-                case "c":
-                    return GeneratorKind.C;
-                case "c++":
-                case "cpp":
-                    return GeneratorKind.CPlusPlus;
-                case "objc":
-                case "obj-c":
-                case "objectivec":
-                case "objective-c":
-                    return GeneratorKind.ObjectiveC;
-                case "java":
-                    return GeneratorKind.Java;
+            case "c":
+                return GeneratorKind.C;
+            case "c++":
+            case "cpp":
+                return GeneratorKind.CPlusPlus;
+            case "objc":
+            case "obj-c":
+            case "objectivec":
+            case "objective-c":
+                return GeneratorKind.ObjectiveC;
+            case "java":
+                return GeneratorKind.Java;
             }
 
             throw new NotSupportedException("Unknown target generator: " + gen);
@@ -94,14 +94,12 @@ namespace MonoEmbeddinator4000
         static VisualStudioVersion ConvertToVsVersion(string version)
         {
             if (string.Equals(version, "latest", StringComparison.InvariantCultureIgnoreCase))
-            {
                 return VisualStudioVersion.Latest;
-            }
+
             VisualStudioVersion result;
             if (Enum.TryParse("VS" + version, out result))
-            {
                 return result;
-            }
+
             throw new NotSupportedException("Unknown Visual Studio version: " + version);
         }
 
@@ -109,20 +107,20 @@ namespace MonoEmbeddinator4000
         {
             switch (platform.ToLower())
             {
-                case "windows":
-                    return TargetPlatform.Windows;
-                case "android":
-                    return TargetPlatform.Android;
-                case "osx":
-                case "macosx":
-                case "macos":
-                    return TargetPlatform.MacOS;
-                case "ios":
-                    return TargetPlatform.iOS;
-                case "watchos":
-                    return TargetPlatform.WatchOS;
-                case "tvos":
-                    return TargetPlatform.TVOS;
+            case "windows":
+                return TargetPlatform.Windows;
+            case "android":
+                return TargetPlatform.Android;
+            case "osx":
+            case "macosx":
+            case "macos":
+                return TargetPlatform.MacOS;
+            case "ios":
+                return TargetPlatform.iOS;
+            case "watchos":
+                return TargetPlatform.WatchOS;
+            case "tvos":
+                return TargetPlatform.TVOS;
             }
 
             throw new NotSupportedException("Unknown target platform: " + platform);
