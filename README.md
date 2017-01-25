@@ -20,6 +20,8 @@ so we can improve the tool.
 
 ## Building
 
+Clone this repository and initialize/update submodules as well as solution depends on them.
+
 Open the solution in `build/MonoEmbeddinator4000.sln` with Visual Studio or Xamarin Studio and press F7.
 
 ## Usage
