@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using CppSharp;
 using CppSharp.Generators;
+using Xamarin.Android.Tools;
 
 namespace MonoEmbeddinator4000
 {
@@ -380,6 +381,47 @@ namespace MonoEmbeddinator4000
 
             if (Options.Language != GeneratorKind.Java)
                 CompileNativeCode(files);
+
+            if (Options.Language == GeneratorKind.Java)
+                CompileJava(files);
+        }
+
+        bool initXamarinAndroidTools = false;
+
+        void CompileJava(IEnumerable<string> files)
+        {
+            if (!initXamarinAndroidTools)
+            {
+                AndroidLogger.Info += AndroidLogger_Info;
+                AndroidLogger.Error += AndroidLogger_Error;
+                initXamarinAndroidTools = true;
+            }
+
+            AndroidSdk.Refresh();
+
+            var executableSuffix = Platform.IsWindows ? ".exe" : string.Empty;
+            var javac = $"{Path.Combine(AndroidSdk.JavaSdkPath, "bin", "javac" + executableSuffix)}";
+
+            var args = new List<string> {
+                string.Join(" ", files.ToList())
+            };
+
+            if (Options.DebugMode)
+                args.Add("-g");
+
+            var invocation = string.Join(" ", args);
+
+            Invoke(javac, invocation);
+        }
+
+        private void AndroidLogger_Info(string task, string message)
+        {
+            Diagnostics.Debug(message);
+        }
+
+        private void AndroidLogger_Error(string task, string message)
+        {
+            Diagnostics.Error(message);
         }
 
         const string DLLExportDefine = "MONO_M2N_DLL_EXPORT";
