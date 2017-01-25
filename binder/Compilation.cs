@@ -75,7 +75,7 @@ namespace MonoEmbeddinator4000
     public partial class Driver
     {
         public Application App { get; } = new Application();
-        
+
         public static string GetXamarinTargetFrameworkName(TargetPlatform platform)
         {
             switch (platform) {
@@ -287,15 +287,9 @@ namespace MonoEmbeddinator4000
             }
         }
 
-        Xamarin.MacDev.AppleSdk AppleSdk
-        {
-            get { return DetectIPhoneSdks.CurrentSdk; }
-        }
-        
-        string XamarinSdkRoot
-        {
-            get { return DetectIPhoneSdks.XamarinSdkRoot; }
-        }
+        Xamarin.MacDev.AppleSdk AppleSdk => DetectIPhoneSdks.CurrentSdk;
+
+        string XamarinSdkRoot => DetectIPhoneSdks.XamarinSdkRoot;
         
         string OutputName => Path.GetFileNameWithoutExtension(Options.Project.Assemblies[0]);
 
