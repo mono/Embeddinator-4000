@@ -17,16 +17,9 @@ namespace MonoEmbeddinator4000.Passes
         Dictionary<string, QualifiedType> Arrays;
         List<TypedefDecl> Declarations;
 
-        static CArrayTypePrinter ArrayPrinter
-        {
-            get
-            {
-                return new CArrayTypePrinter
-                {
-                    PrintScopeKind = CppTypePrintScopeKind.Qualified,
-                };
-            }
-        }
+        static CArrayTypePrinter ArrayPrinter => new CArrayTypePrinter {
+            PrintScopeKind = CppTypePrintScopeKind.Qualified,
+        };
 
         public GenerateArrayTypes()
         {
