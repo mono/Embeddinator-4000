@@ -26,7 +26,7 @@ install:
 
 script: |
   if [ "$TRAVIS_OS_NAME" = "linux" ]; then PREMAKE=premake5-linux-64; else PREMAKE=premake5-osx; fi &&
-  CppSharp/build/$PREMAKE --file=build/premake5.lua gmake &&
+  external/CppSharp/build/$PREMAKE --file=build/premake5.lua gmake &&
   if [ "$TRAVIS_OS_NAME" = "osx" ]; then export PATH=$PATH:/Library/Frameworks/Mono.framework/Versions/Current/bin/; fi &&
   config=release make -C build/gmake/ &&
   TEST_RESULT=0 &&
