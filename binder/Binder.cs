@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using CppSharp;
 using CppSharp.Generators;
 
@@ -11,6 +12,7 @@ namespace MonoEmbeddinator4000
         static string Generator;
         static string Platform;
         static string OutputDir;
+        static string VsVersion;
         static List<string> Assemblies;
         static bool CompileCode;
         static bool Verbose;
@@ -21,6 +23,10 @@ namespace MonoEmbeddinator4000
         {
             var showHelp = args.Length == 0;
 
+            string vsVersions = string.Join(", ", 
+                Enum.GetNames(typeof(VisualStudioVersion))
+                .Select(s => s.StartsWith("VS", StringComparison.InvariantCulture) ? s.Substring(2) : s)
+                );
             var optionSet = new Mono.Options.OptionSet() {
                 { "gen=", "target generator (C, C++, Obj-C)", v => Generator = v },
                 { "p|platform=", "target platform (iOS, macOS, Android)", v => Platform = v },
@@ -29,11 +35,13 @@ namespace MonoEmbeddinator4000
                 { "d|debug", "enables debug mode for generated native and managed code", v => DebugMode = true },
                 { "dll|shared", "compiles as a static library", v => Target = CompilationTarget.SharedLibrary },
                 { "static", "compiles as a static library", v => Target = CompilationTarget.StaticLibrary },
+                { "vs=", $"Visual Studio version for compilation: {vsVersions} (defaults to Latest)", v => VsVersion = v },
                 { "v|verbose", "generates diagnostic verbose output", v => Verbose = true },
                 { "h|help",  "show this message and exit",  v => showHelp = v != null },
             };
 
             Generator = "C";
+            VsVersion = "latest";
 
             try
             {
@@ -83,9 +91,22 @@ namespace MonoEmbeddinator4000
             throw new NotSupportedException("Unknown target generator: " + gen);
         }
 
-        static TargetPlatform ConvertToTargetPlatform (string platform)
+        static VisualStudioVersion ConvertToVsVersion(string version)
         {
-            switch (platform.ToLower ()) {
+            if (string.Equals(version, "latest", StringComparison.InvariantCultureIgnoreCase))
+                return VisualStudioVersion.Latest;
+
+            VisualStudioVersion result;
+            if (Enum.TryParse("VS" + version, out result))
+                return result;
+
+            throw new NotSupportedException("Unknown Visual Studio version: " + version);
+        }
+
+        static TargetPlatform ConvertToTargetPlatform(string platform)
+        {
+            switch (platform.ToLower())
+            {
             case "windows":
                 return TargetPlatform.Windows;
             case "android":
@@ -120,6 +141,9 @@ namespace MonoEmbeddinator4000
 
             var targetPlatform = ConvertToTargetPlatform(Platform);
             options.Platform = targetPlatform;
+
+            var vsVersion = ConvertToVsVersion(VsVersion);
+            options.VsVersion = vsVersion;
 
             var currentDir = Directory.GetCurrentDirectory();
             options.Project.AssemblyDirs.Add(currentDir);

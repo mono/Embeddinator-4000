@@ -48,6 +48,7 @@ Generates target language bindings for interop with managed code.
   -o, --out=VALUE            output directory
   -c, --compile              compiles the generated output
       --dll, --shared        compiles as a shared library / DLL
+      --vs=VALUE             Visual Studio version for compilation: 2012, 2013, 2015, Latest (defaults to Latest)
   -v, --verbose              generates diagnostic verbose output
   -h, --help                 show this message and exit
 ```
