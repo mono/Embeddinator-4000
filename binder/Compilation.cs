@@ -398,7 +398,7 @@ namespace MonoEmbeddinator4000
             if (vsSdks.Count == 0)
                 throw new Exception("Visual Studio SDK was not found on your system.");
 
-            var vsSdk = vsSdks.FirstOrDefault();
+            var vsSdk = vsSdks.LastOrDefault();
             var clBin = Path.GetFullPath(
                 Path.Combine(vsSdk.Directory, "..", "..", "VC", "bin", "cl.exe"));
 
