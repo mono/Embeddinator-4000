@@ -40,5 +40,15 @@ namespace MonoEmbeddinator4000.Generators
 
             return true;
         }
+
+        public override bool VisitMethodDecl(Method method)
+        {
+            return true;
+        }
+
+        public override bool VisitTypedefDecl(TypedefDecl typedef)
+        {
+            return true;
+        }
     }
 }
