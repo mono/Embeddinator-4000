@@ -20,8 +20,7 @@
     <OutputPath>../lib/Debug\</OutputPath>
     <BaseIntermediateOutputPath>../obj/Debug/Xamarin.Android.Tools\</BaseIntermediateOutputPath>
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
-    <DefineConstants>
-    </DefineConstants>
+    <DefineConstants></DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -33,8 +32,7 @@
     <OutputPath>../lib/Release\</OutputPath>
     <BaseIntermediateOutputPath>../obj/Release/Xamarin.Android.Tools\</BaseIntermediateOutputPath>
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
-    <DefineConstants>
-    </DefineConstants>
+    <DefineConstants></DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>

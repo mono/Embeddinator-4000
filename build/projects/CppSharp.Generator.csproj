@@ -39,16 +39,8 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="Mono.Cecil" />
-    <Reference Include="Mono.Cecil.Pdb" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="../../external/CppSharp/deps/InjectModuleInitializer/Errors.cs">
-      <Link>external/CppSharp/deps/InjectModuleInitializer/Errors.cs</Link>
-    </Compile>
-    <Compile Include="../../external/CppSharp/deps/InjectModuleInitializer/Injector.cs">
-      <Link>external/CppSharp/deps/InjectModuleInitializer/Injector.cs</Link>
-    </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/AST/ASTRecord.cs">
       <Link>external/CppSharp/src/Generator/AST/ASTRecord.cs</Link>
     </Compile>
