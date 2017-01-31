@@ -403,7 +403,7 @@ namespace MonoEmbeddinator4000
             var javac = $"{Path.Combine(AndroidSdk.JavaSdkPath, "bin", "javac" + executableSuffix)}";
 
             var args = new List<string> {
-                string.Join(" ", files.ToList())
+                string.Join(" ", files.Select(file => Path.GetFullPath(file)))
             };
 
             if (Options.DebugMode)
@@ -457,7 +457,7 @@ namespace MonoEmbeddinator4000
                 "/nologo",
                 $"-D{DLLExportDefine}",
                 $"-I\"{monoPath}\\include\\mono-2.0\"",
-                string.Join(" ", files.ToList()),
+                string.Join(" ", files.Select(file => Path.GetFullPath(file))),
                 $"\"{monoPath}\\lib\\monosgen-2.0.lib\"",
                 Options.CompileSharedLibrary ? "/LD" : string.Empty,
                 $"/Fe{output}"
