@@ -133,8 +133,20 @@ namespace MonoEmbeddinator4000
             options.Target = Target;
             options.DebugMode = DebugMode;
 
+            if (string.IsNullOrEmpty(Generator))
+            {
+                Console.Error.WriteLine("Please specify a target generator.");
+                return false;
+            }
+
             var generator = ConvertToGeneratorKind(Generator);
             options.Language = generator;
+
+            if (string.IsNullOrEmpty(Platform))
+            {
+                Console.Error.WriteLine("Please specify a target platform.");
+                return false;
+            }
 
             var targetPlatform = ConvertToTargetPlatform(Platform);
             options.Platform = targetPlatform;
