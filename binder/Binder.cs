@@ -126,11 +126,8 @@ namespace MonoEmbeddinator4000
             throw new NotSupportedException ("Unknown target platform: " + platform);
         }
 
-        static void Main(string[] args)
+        static bool SetupOptions(Options options)
         {
-            ParseCommandLineArgs(args);
-
-            var options = new Options();
             options.OutputDir = OutputDir;
             options.CompileCode = CompileCode;
             options.Target = Target;
@@ -150,6 +147,17 @@ namespace MonoEmbeddinator4000
 
             foreach (var assembly in Assemblies)
                 options.Project.Assemblies.Add(assembly);
+
+            return true;
+        }
+
+        static void Main(string[] args)
+        {
+            ParseCommandLineArgs(args);
+
+            var options = new Options();
+            if (!SetupOptions(options))
+                return;
 
             var driver = new Driver(options);
 
