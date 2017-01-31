@@ -131,9 +131,6 @@
     <Compile Include="../../binder/Tests/TestsGenerator.cs">
       <Link>binder/Tests/TestsGenerator.cs</Link>
     </Compile>
-    <Compile Include="../../binder/Utils/BlocksGenerator.cs">
-      <Link>binder/Utils/BlocksGenerator.cs</Link>
-    </Compile>
     <Compile Include="../../binder/Utils/DetectIPhoneSdks.cs">
       <Link>binder/Utils/DetectIPhoneSdks.cs</Link>
     </Compile>
