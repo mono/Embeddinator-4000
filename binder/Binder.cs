@@ -28,8 +28,8 @@ namespace MonoEmbeddinator4000
                 .Select(s => s.StartsWith("VS", StringComparison.InvariantCulture) ? s.Substring(2) : s)
                 );
             var optionSet = new Mono.Options.OptionSet() {
-                { "gen=", "target generator (C, C++, Obj-C)", v => Generator = v },
-                { "p|platform=", "target platform (iOS, macOS, Android)", v => Platform = v },
+                { "gen=", "target generator (C, C++, Obj-C, Java)", v => Generator = v },
+                { "p|platform=", "target platform (iOS, macOS, Android, Windows)", v => Platform = v },
                 { "o|out|outdir=", "output directory", v => OutputDir = v },
                 { "c|compile", "compiles the generated output", v => CompileCode = true },
                 { "d|debug", "enables debug mode for generated native and managed code", v => DebugMode = true },
