@@ -1,4 +1,5 @@
-﻿using CppSharp.AST;
+﻿using CppSharp;
+using CppSharp.AST;
 using CppSharp.Generators;
 
 namespace MonoEmbeddinator4000.Generators

@@ -1,4 +1,5 @@
-﻿using CppSharp.AST;
+﻿using CppSharp;
+using CppSharp.AST;
 using CppSharp.Generators;
 using System.Linq;
 

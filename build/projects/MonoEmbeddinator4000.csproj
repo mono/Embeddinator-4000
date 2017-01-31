@@ -140,9 +140,6 @@
     <Compile Include="../../binder/Utils/TargetFramework.cs">
       <Link>binder/Utils/TargetFramework.cs</Link>
     </Compile>
-    <Compile Include="../../binder/Utils/TextGenerator.cs">
-      <Link>binder/Utils/TextGenerator.cs</Link>
-    </Compile>
     <Compile Include="../../binder/Utils/Utils.cs">
       <Link>binder/Utils/Utils.cs</Link>
     </Compile>
