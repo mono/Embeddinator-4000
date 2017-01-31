@@ -248,6 +248,9 @@
     <Compile Include="../../external/CppSharp/src/Generator/Types/Types.cs">
       <Link>external/CppSharp/src/Generator/Types/Types.cs</Link>
     </Compile>
+    <Compile Include="../../external/CppSharp/src/Generator/Utils/BlockGenerator.cs">
+      <Link>external/CppSharp/src/Generator/Utils/BlockGenerator.cs</Link>
+    </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Utils/HtmlEncoder.cs">
       <Link>external/CppSharp/src/Generator/Utils/HtmlEncoder.cs</Link>
     </Compile>
