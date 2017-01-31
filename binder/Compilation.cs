@@ -439,7 +439,8 @@ namespace MonoEmbeddinator4000
                 vsSdk = vsSdks.LastOrDefault();
             else
             {
-                var exactVersion = vsSdks.Where(vs => vs.Version == (float)Options.VsVersion).Cast<ToolchainVersion?>().SingleOrDefault();
+                var exactVersion = vsSdks.Where(vs => (int)vs.Version == (int)Options.VsVersion)
+                    .Cast<ToolchainVersion?>().SingleOrDefault();
                 if (!exactVersion.HasValue)
                     throw new Exception($"Visual Studio SDK version {Options.VsVersion} was not found on your system.");
 
