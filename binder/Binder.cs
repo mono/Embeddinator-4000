@@ -25,8 +25,8 @@ namespace MonoEmbeddinator4000
 
             string vsVersions = string.Join(", ", 
                 Enum.GetNames(typeof(VisualStudioVersion))
-                .Select(s => s.StartsWith("VS", StringComparison.InvariantCulture) ? s.Substring(2) : s)
-                );
+                .Select(s => s.StartsWith("VS", StringComparison.InvariantCulture) ? s.Substring(2) : s));
+
             var optionSet = new Mono.Options.OptionSet() {
                 { "gen=", "target generator (C, C++, Obj-C, Java)", v => Generator = v },
                 { "p|platform=", "target platform (iOS, macOS, Android, Windows)", v => Platform = v },
@@ -72,7 +72,7 @@ namespace MonoEmbeddinator4000
 
         static GeneratorKind ConvertToGeneratorKind(string gen)
         {
-            switch(gen.ToLower())
+            switch(gen.ToLowerInvariant())
             {
             case "c":
                 return GeneratorKind.C;
@@ -105,7 +105,7 @@ namespace MonoEmbeddinator4000
 
         static TargetPlatform ConvertToTargetPlatform(string platform)
         {
-            switch (platform.ToLower())
+            switch (platform.ToLowerInvariant())
             {
             case "windows":
                 return TargetPlatform.Windows;
