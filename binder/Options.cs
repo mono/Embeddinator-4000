@@ -10,7 +10,7 @@ namespace MonoEmbeddinator4000
         Application
     }
 
-    public class Options
+    public class Options : DriverOptions
     {
         public Options()
         {
@@ -21,7 +21,6 @@ namespace MonoEmbeddinator4000
         public Project Project;
 
         // Generator options
-        public string LibraryName;
         public GeneratorKind Language;
 
         public TargetPlatform Platform;
@@ -35,9 +34,6 @@ namespace MonoEmbeddinator4000
         // If code compilation is enabled, then sets the compilation target.
         public CompilationTarget Target;
 
-        public string OutputNamespace;
-        public string OutputDir;
-
         // If true, will force the generation of debug metadata for the native
         // and managed code.
         public bool DebugMode;
@@ -49,9 +45,6 @@ namespace MonoEmbeddinator4000
 
         // If true, will generate support files alongside generated binding code.
         public bool GenerateSupportFiles;
-
-        // If true, will try to compile the generated managed-to-native binding code.
-        public bool CompileCode;
 
         // If true, will compile the generated as a shared library / DLL.
         public bool CompileSharedLibrary => Target == CompilationTarget.SharedLibrary;
