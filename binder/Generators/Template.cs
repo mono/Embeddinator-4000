@@ -9,9 +9,6 @@ namespace MonoEmbeddinator4000.Generators
         public BindingContext Context { get; private set; }
         public Options Options { get; private set; }
 
-
-        public Assembly Assembly { get; set; }
-
         protected Template(BindingContext context, Options options)
         {
             Context = context;
