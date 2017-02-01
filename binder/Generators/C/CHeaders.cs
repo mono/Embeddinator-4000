@@ -1,4 +1,4 @@
-﻿using CppSharp;
+using CppSharp;
 using CppSharp.AST;
 using CppSharp.Generators;
 using System.Linq;
@@ -17,7 +17,7 @@ namespace MonoEmbeddinator4000.Generators
 
         public void WriteStandardHeader(string name)
         {
-            var header = Options.Language == GeneratorKind.CPlusPlus ?
+            var header = Options.GeneratorKind == GeneratorKind.CPlusPlus ?
                 string.Format("c{0}", name) : string.Format("{0}.h", name);
             WriteLine("#include <{0}>", header);
         }
@@ -64,7 +64,7 @@ namespace MonoEmbeddinator4000.Generators
 
             Write("enum {0}", @enum.Name);
 
-            if (Options.Language == GeneratorKind.CPlusPlus)
+            if (Options.GeneratorKind == GeneratorKind.CPlusPlus)
             {
                 var typePrinter = CTypePrinter;
                 var typeName = typePrinter.VisitPrimitiveType(

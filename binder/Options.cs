@@ -21,8 +21,6 @@ namespace MonoEmbeddinator4000
         public Project Project;
 
         // Generator options
-        public GeneratorKind Language;
-
         public TargetPlatform Platform;
 
         /// <summary>

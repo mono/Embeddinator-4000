@@ -140,7 +140,7 @@ namespace MonoEmbeddinator4000
             }
 
             var generator = ConvertToGeneratorKind(Generator);
-            options.Language = generator;
+            options.GeneratorKind = generator;
 
             if (string.IsNullOrEmpty(Platform))
             {

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using IKVM.Reflection;
@@ -132,7 +132,7 @@ namespace MonoEmbeddinator4000.Generators
             };
             HandleNamespace(type, @enum);
 
-            if (Options.Language == GeneratorKind.CPlusPlus)
+            if (Options.GeneratorKind == GeneratorKind.CPlusPlus)
                 @enum.Modifiers = Enumeration.EnumModifiers.Scoped;
 
             foreach (var item in type.DeclaredFields)
@@ -318,7 +318,7 @@ namespace MonoEmbeddinator4000.Generators
                 {
                     var ptrType = new PointerType(elementType)
                     {
-                        Modifier = (Options.Language == GeneratorKind.CPlusPlus) ?
+                        Modifier = (Options.GeneratorKind == GeneratorKind.CPlusPlus) ?
                             PointerType.TypeModifier.LVReference :
                             PointerType.TypeModifier.Pointer
                     };

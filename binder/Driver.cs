@@ -30,7 +30,7 @@ namespace MonoEmbeddinator4000
 
             Assemblies = new List<IKVM.Reflection.Assembly>();
 
-            var driverOptions = new DriverOptions { GeneratorKind = options.Language };
+            var driverOptions = new DriverOptions { GeneratorKind = options.GeneratorKind };
             Context = new BindingContext(driverOptions);
             Context.ASTContext = new ASTContext();
 
@@ -44,7 +44,7 @@ namespace MonoEmbeddinator4000
             CppSharp.AST.Type.TypePrinterDelegate = type =>
             {
                 CppTypePrintFlavorKind kind = CppTypePrintFlavorKind.Cpp;
-                switch (Options.Language)
+                switch (Options.GeneratorKind)
                 {
                 case GeneratorKind.C:
                     kind = CppTypePrintFlavorKind.C;
@@ -80,7 +80,7 @@ namespace MonoEmbeddinator4000
             Context.TranslationUnitPasses.AddPass(new GenerateArrayTypes());
             Context.TranslationUnitPasses.AddPass(new CheckIgnoredDeclsPass());
 
-            if (Options.Language != GeneratorKind.CPlusPlus)
+            if (Options.GeneratorKind != GeneratorKind.CPlusPlus)
                 Context.TranslationUnitPasses.AddPass(new RenameEnumItemsPass());
 
             Context.TranslationUnitPasses.AddPass(new RenameDuplicatedDeclsPass());
@@ -126,7 +126,7 @@ namespace MonoEmbeddinator4000
             Output = new ProjectOutput();
 
             Generators.Generator generator = null;
-            switch (Options.Language)
+            switch (Options.GeneratorKind)
             {
                 case GeneratorKind.C:
                     generator = new CGenerator(Context, Options);

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using CppSharp;
 using CppSharp.AST;
@@ -66,7 +66,7 @@ namespace MonoEmbeddinator4000.Generators
 
         public string QualifiedName(Declaration decl)
         {
-            if (Options.Language == GeneratorKind.CPlusPlus)
+            if (Options.GeneratorKind == GeneratorKind.CPlusPlus)
                 return decl.Name;
 
             return decl.QualifiedName;
@@ -76,7 +76,7 @@ namespace MonoEmbeddinator4000.Generators
         {
             get
             {
-                return CGenerator.GetCTypePrinter(Options.Language);
+                return CGenerator.GetCTypePrinter(Options.GeneratorKind);
             }
         }
 

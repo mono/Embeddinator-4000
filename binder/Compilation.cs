@@ -358,7 +358,7 @@ namespace MonoEmbeddinator4000
         {
             IEnumerable<string> files = null;
 
-            switch (Options.Language)
+            switch (Options.GeneratorKind)
             {
             case GeneratorKind.C:
                 files = GetOutputFiles("c");
@@ -379,10 +379,10 @@ namespace MonoEmbeddinator4000
             if (files == null || files.Count() == 0)
                 throw new Exception("No generated files found.");
 
-            if (Options.Language != GeneratorKind.Java)
+            if (Options.GeneratorKind != GeneratorKind.Java)
                 CompileNativeCode(files);
 
-            if (Options.Language == GeneratorKind.Java)
+            if (Options.GeneratorKind == GeneratorKind.Java)
                 CompileJava(files);
         }
 
@@ -497,7 +497,7 @@ namespace MonoEmbeddinator4000
                 string.Join(" ", files.ToList())
             };
 
-            switch (Options.Language)
+            switch (Options.GeneratorKind)
             {
             case GeneratorKind.ObjectiveC:
                 args.Add("-ObjC");

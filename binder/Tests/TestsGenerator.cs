@@ -21,7 +21,7 @@ namespace MonoEmbeddinator4000.Tests
             this.name = name;
 
             options = new Options();
-            options.Language = languageKind;
+            options.GeneratorKind = languageKind;
             driver = new Driver(options);
 
             Setup();
@@ -35,7 +35,7 @@ namespace MonoEmbeddinator4000.Tests
 
             Diagnostics.Message("");
             Diagnostics.Message("Generating bindings for {0} ({1})",
-                options.LibraryName, options.Language.ToString());
+                options.LibraryName, options.GeneratorKind.ToString());
 
             var currentDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             options.Project.Assemblies.Add(Path.Combine(currentDir, name + ".Managed.dll"));

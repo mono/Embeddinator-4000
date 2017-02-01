@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using CppSharp;
 using CppSharp.AST;
@@ -201,7 +201,7 @@ namespace MonoEmbeddinator4000.Generators
 
         public static string GetMonoObjectField(Options options, string @object, string field)
         {
-            switch (options.Language)
+            switch (options.GeneratorKind)
             {
             case GeneratorKind.C:
                 return $"{@object}->{field}";
