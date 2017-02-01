@@ -258,9 +258,9 @@ namespace MonoEmbeddinator4000
 
             foreach (var diag in result.Diagnostics)
             {
-                Diagnostics.Message(string.Format("{0}({1},{2}): {3}: {4}",
+                Diagnostics.Message("{0}({1},{2}): {3}: {4}",
                     diag.FileName, diag.LineNumber, diag.ColumnNumber,
-                    diag.Level.ToString().ToLower(), diag.Message));
+                    diag.Level.ToString().ToLower(), diag.Message);
             }
         }
 
