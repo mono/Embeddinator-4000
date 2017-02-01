@@ -174,7 +174,7 @@ namespace MonoEmbeddinator4000
             var driver = new Driver(options);
 
             if (Verbose)
-                driver.Diagnostics.Level = DiagnosticKind.Debug;
+                Diagnostics.Level = DiagnosticKind.Debug;
 
             driver.Run();
         }

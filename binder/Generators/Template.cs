@@ -9,10 +9,6 @@ namespace MonoEmbeddinator4000.Generators
         public BindingContext Context { get; private set; }
         public Options Options { get; private set; }
 
-        public IDiagnostics Diagnostics
-        {
-            get { return Context.Diagnostics; }
-        }
 
         public Assembly Assembly { get; set; }
 

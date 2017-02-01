@@ -14,7 +14,6 @@ namespace MonoEmbeddinator4000
     public partial class Driver
     {
         public Options Options { get; private set; }
-        public IDiagnostics Diagnostics { get; private set; }
 
         public BindingContext Context { get; private set; }
 
@@ -22,13 +21,9 @@ namespace MonoEmbeddinator4000
 
         public ProjectOutput Output { get; private set; }
 
-        public Driver(Options options, IDiagnostics diagnostics = null)
+        public Driver(Options options)
         {
             Options = options;
-            Diagnostics = diagnostics;
-
-            if (Diagnostics == null)
-                Diagnostics = new TextDiagnosticPrinter();
 
             if (Options.OutputDir == null)
                 Options.OutputDir = Directory.GetCurrentDirectory();
@@ -36,7 +31,7 @@ namespace MonoEmbeddinator4000
             Assemblies = new List<IKVM.Reflection.Assembly>();
 
             var driverOptions = new DriverOptions { GeneratorKind = options.Language };
-            Context = new BindingContext(Diagnostics, driverOptions);
+            Context = new BindingContext(driverOptions);
             Context.ASTContext = new ASTContext();
 
             Declaration.QualifiedNameSeparator = "_";

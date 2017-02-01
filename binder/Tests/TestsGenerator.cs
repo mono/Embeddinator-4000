@@ -33,8 +33,8 @@ namespace MonoEmbeddinator4000.Tests
             options.OutputDir = Path.Combine(outputDir, "gen", name);
             options.LibraryName = name;
 
-            driver.Diagnostics.Message("");
-            driver.Diagnostics.Message("Generating bindings for {0} ({1})",
+            Diagnostics.Message("");
+            Diagnostics.Message("Generating bindings for {0} ({1})",
                 options.LibraryName, options.Language.ToString());
 
             var currentDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
