@@ -41,8 +41,8 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="../../binder/Binder.cs">
-      <Link>binder/Binder.cs</Link>
+    <Compile Include="../../binder/CLI.cs">
+      <Link>binder/CLI.cs</Link>
     </Compile>
     <Compile Include="../../binder/Compilation.cs">
       <Link>binder/Compilation.cs</Link>
