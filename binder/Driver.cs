@@ -24,15 +24,13 @@ namespace MonoEmbeddinator4000
         public Driver(Options options)
         {
             Options = options;
-
-            if (Options.OutputDir == null)
-                Options.OutputDir = Directory.GetCurrentDirectory();
-
             Assemblies = new List<IKVM.Reflection.Assembly>();
 
-            var driverOptions = new DriverOptions { GeneratorKind = options.GeneratorKind };
-            Context = new BindingContext(driverOptions);
+            Context = new BindingContext(options);
             Context.ASTContext = new ASTContext();
+
+            if (Options.Verbose)
+                Diagnostics.Level = DiagnosticKind.Debug;
 
             Declaration.QualifiedNameSeparator = "_";
 

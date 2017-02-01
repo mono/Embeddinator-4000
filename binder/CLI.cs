@@ -128,6 +128,7 @@ namespace MonoEmbeddinator4000
 
         static bool SetupOptions(Options options)
         {
+            options.Verbose = Verbose;
             options.OutputDir = OutputDir;
             options.CompileCode = CompileCode;
             options.Target = Target;
@@ -172,9 +173,6 @@ namespace MonoEmbeddinator4000
                 return;
 
             var driver = new Driver(options);
-
-            if (Verbose)
-                Diagnostics.Level = DiagnosticKind.Debug;
 
             driver.Run();
         }
