@@ -11,6 +11,12 @@ newoption {
    description = "Output directory for the generated project files"
 }
 
+newoption {
+   trigger     = "dev",
+   value       = "bool",
+   description = "Enables development mode"
+}
+
 workspace "MonoEmbeddinator4000"
 
   configurations { "Debug", "Release" }
@@ -87,7 +93,7 @@ workspace "MonoEmbeddinator4000"
     }
 
     local xamarinMacios = "../../xamarin-macios"
-    if os.isdir(xamarinMacios) then
+    if os.isdir(xamarinMacios) and _OPTIONS["dev"] then
 
       externalproject "mtouch"
         SetupManagedProject()
