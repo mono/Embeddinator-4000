@@ -1,24 +1,15 @@
-﻿using CppSharp;
-using CppSharp.Generators;
+﻿using CppSharp.Generators;
 
 namespace MonoEmbeddinator4000.Generators
 {
-    public abstract class Template : BlockGenerator
+    public abstract class Template : CppSharp.Generators.Template
     {
-        public BindingContext Context { get; private set; }
-        public Options Options { get; private set; }
-
-        protected Template(BindingContext context, Options options)
+        protected Template(BindingContext context)
+            : base(context, null)
         {
-            Context = context;
-            Options = options;
         }
 
         public abstract string Name { get; }
-
-        public abstract string FileExtension { get; }
-
-        public abstract void Process();
 
         public abstract void WriteHeaders();
     }
