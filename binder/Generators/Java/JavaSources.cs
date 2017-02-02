@@ -25,10 +25,6 @@ namespace MonoEmbeddinator4000.Generators
             VisitDeclContext(Unit);
         }
 
-        public override void WriteHeaders()
-        {
-        }
-
         public override bool VisitEnumDecl(Enumeration @enum)
         {
             return true;

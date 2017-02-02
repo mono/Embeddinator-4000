@@ -1,5 +1,6 @@
 ﻿using CppSharp.AST;
 using CppSharp.Generators;
+using Template = CppSharp.Generators.Template;
 using System.Collections.Generic;
 
 namespace MonoEmbeddinator4000.Generators

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using CppSharp;
 using CppSharp.AST;
 using CppSharp.Generators;
+using Template = CppSharp.Generators.Template;
 
 namespace MonoEmbeddinator4000.Generators
 {
@@ -46,14 +47,9 @@ namespace MonoEmbeddinator4000.Generators
         public TranslationUnit Unit;
 
         public JavaTemplate(BindingContext context, TranslationUnit unit)
-            : base(context)
+            : base(context, unit)
         {
             Unit = unit;
-        }
-
-        public override string Name
-        {
-            get { return Unit.FileNameWithoutExtension; }
         }
 
         public string GeneratedIdentifier(string id)

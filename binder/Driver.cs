@@ -148,7 +148,9 @@ namespace MonoEmbeddinator4000
                 {
                     template.Process();
                     var text = template.Generate();
-                    var path = string.Format("{0}.{1}", template.Name, template.FileExtension);
+
+                    var name = unit.FileNameWithoutExtension;
+                    var path = string.Format("{0}.{1}", name, template.FileExtension);
 
                     Output.WriteOutput(path, text);
                 }
