@@ -88,6 +88,7 @@ workspace "MonoEmbeddinator4000"
     links
     {
       "System",
+      "System.Core",
       "System.Xml",
       "System.Xml.Linq"
     }
