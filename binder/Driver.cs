@@ -24,7 +24,9 @@ namespace MonoEmbeddinator4000
 
         public Driver(Project project, Options options)
         {
+            Project = project;
             Options = options;
+
             Assemblies = new List<IKVM.Reflection.Assembly>();
 
             Context = new BindingContext(options);
