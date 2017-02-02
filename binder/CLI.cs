@@ -7,7 +7,7 @@ using CppSharp.Generators;
 
 namespace MonoEmbeddinator4000
 {
-    public class Binder
+    public class CLI
     {
         static string Generator;
         static string Platform;
