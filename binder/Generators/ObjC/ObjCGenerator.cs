@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using CppSharp.AST;
 using CppSharp.Generators;
@@ -7,15 +7,15 @@ namespace MonoEmbeddinator4000.Generators
 {
     public class ObjCGenerator : CGenerator
     {
-        public ObjCGenerator(BindingContext context, Options options)
-            : base(context, options)
+        public ObjCGenerator(BindingContext context)
+            : base(context)
         {
         }
 
         public override List<Template> Generate(TranslationUnit unit)
         {
-            var headers = new ObjCHeaders(Context, Options, unit);
-            var sources = new ObjCSources(Context, Options, unit);
+            var headers = new ObjCHeaders(Context, unit);
+            var sources = new ObjCSources(Context, unit);
 
             return new List<Template> { headers, sources };
         }

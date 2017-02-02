@@ -1,6 +1,5 @@
 using CppSharp;
 using CppSharp.Generators;
-using MonoEmbeddinator4000.Generators;
 using System;
 using System.IO;
 using System.Reflection;
@@ -15,6 +14,7 @@ namespace MonoEmbeddinator4000.Tests
         readonly string name;
         readonly Driver driver;
         readonly Options options;
+        readonly Project project;
 
         protected TestsGenerator(string name, GeneratorKind languageKind)
         {
@@ -22,7 +22,8 @@ namespace MonoEmbeddinator4000.Tests
 
             options = new Options();
             options.GeneratorKind = languageKind;
-            driver = new Driver(options);
+            project = new Project();
+            driver = new Driver(project, options);
 
             Setup();
         }
@@ -38,7 +39,7 @@ namespace MonoEmbeddinator4000.Tests
                 options.LibraryName, options.GeneratorKind.ToString());
 
             var currentDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            options.Project.Assemblies.Add(Path.Combine(currentDir, name + ".Managed.dll"));
+            project.Assemblies.Add(Path.Combine(currentDir, name + ".Managed.dll"));
         }
 
         public virtual void Generate()

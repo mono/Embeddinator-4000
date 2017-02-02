@@ -1,4 +1,4 @@
-﻿using CppSharp;
+using CppSharp;
 using CppSharp.AST;
 using CppSharp.AST.Extensions;
 using System.Linq;

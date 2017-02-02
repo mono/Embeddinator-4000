@@ -7,9 +7,9 @@ namespace MonoEmbeddinator4000.Generators
 {
     public class CHeaders : CTemplate
     {
-        public CHeaders(BindingContext context, Options options,
+        public CHeaders(BindingContext context,
             TranslationUnit unit)
-            : base(context, options, unit)
+            : base(context, unit)
         {
         }
 

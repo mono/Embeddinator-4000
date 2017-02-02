@@ -155,12 +155,6 @@ namespace MonoEmbeddinator4000
             var vsVersion = ConvertToVsVersion(VsVersion);
             options.VsVersion = vsVersion;
 
-            var currentDir = Directory.GetCurrentDirectory();
-            options.Project.AssemblyDirs.Add(currentDir);
-
-            foreach (var assembly in Assemblies)
-                options.Project.Assemblies.Add(assembly);
-
             return true;
         }
 
@@ -172,7 +166,15 @@ namespace MonoEmbeddinator4000
             if (!SetupOptions(options))
                 return;
 
-            var driver = new Driver(options);
+            var project = new Project();
+
+            var currentDir = Directory.GetCurrentDirectory();
+            project.AssemblyDirs.Add(currentDir);
+
+            foreach (var assembly in Assemblies)
+                project.Assemblies.Add(assembly);
+
+            var driver = new Driver(project, options);
 
             driver.Run();
         }

@@ -8,16 +8,13 @@ namespace MonoEmbeddinator4000.Generators
 {
     public class JavaGenerator : Generator
     {
-        internal Options Options { get; set; }
-
-        public JavaGenerator(BindingContext context, Options options) : base(context)
+        public JavaGenerator(BindingContext context) : base(context)
         {
-            Options = options; 
         }
 
         public override List<Template> Generate(TranslationUnit unit)
         {
-            var sources = new JavaSources(Context, Options, unit);
+            var sources = new JavaSources(Context, unit);
 
             return new List<Template> { sources };
         }
@@ -48,8 +45,8 @@ namespace MonoEmbeddinator4000.Generators
     {
         public TranslationUnit Unit;
 
-        public JavaTemplate(BindingContext context, Options options,
-            TranslationUnit unit) : base(context, options)
+        public JavaTemplate(BindingContext context, TranslationUnit unit)
+            : base(context)
         {
             Unit = unit;
         }

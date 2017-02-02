@@ -10,14 +10,16 @@ namespace MonoEmbeddinator4000.Generators
 {
     public class CSources : CTemplate
     {
-        public CSources(BindingContext context, Options options, TranslationUnit unit)
-         : base(context, options, unit)
+        public CSources(BindingContext context, TranslationUnit unit)
+         : base(context, unit)
         {
         }
 
         public override string FileExtension => "c";
 
         public string AssemblyId => CGenerator.AssemblyId(Unit);
+
+        Options EmbedOptions => Options as Options;
 
         public override void WriteHeaders()
         {
@@ -199,7 +201,7 @@ namespace MonoEmbeddinator4000.Generators
             WriteCloseBraceIndent();
         }
 
-        public static string GetMonoObjectField(Options options, string @object, string field)
+        public static string GetMonoObjectField(DriverOptions options, string @object, string field)
         {
             switch (options.GeneratorKind)
             {
@@ -260,7 +262,7 @@ namespace MonoEmbeddinator4000.Generators
                 };
                 contexts.Add(ctx);
 
-                var marshal = new CMarshalNativeToManaged(Options, ctx);
+                var marshal = new CMarshalNativeToManaged(EmbedOptions, ctx);
                 param.QualifiedType.Visit(marshal);
 
                 if (!string.IsNullOrWhiteSpace(marshal.Context.SupportBefore))
@@ -331,7 +333,7 @@ namespace MonoEmbeddinator4000.Generators
                     ReturnType = retType
                 };
 
-                var marshal = new CMarshalManagedToNative(Options, ctx);
+                var marshal = new CMarshalManagedToNative(EmbedOptions, ctx);
                 retType.Visit(marshal);
 
                 if (!string.IsNullOrWhiteSpace(marshal.Context.SupportBefore))

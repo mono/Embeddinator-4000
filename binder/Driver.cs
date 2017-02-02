@@ -13,6 +13,7 @@ namespace MonoEmbeddinator4000
 {
     public partial class Driver
     {
+        public Project Project { get; private set; }
         public Options Options { get; private set; }
 
         public BindingContext Context { get; private set; }
@@ -21,7 +22,7 @@ namespace MonoEmbeddinator4000
 
         public ProjectOutput Output { get; private set; }
 
-        public Driver(Options options)
+        public Driver(Project project, Options options)
         {
             Options = options;
             Assemblies = new List<IKVM.Reflection.Assembly>();
@@ -62,7 +63,7 @@ namespace MonoEmbeddinator4000
             var parser = new Parser();
             parser.OnAssemblyParsed += HandleAssemblyParsed;
 
-            return parser.Parse(Options.Project);
+            return parser.Parse(Project);
         }
 
         void Process()
@@ -127,13 +128,13 @@ namespace MonoEmbeddinator4000
             switch (Options.GeneratorKind)
             {
                 case GeneratorKind.C:
-                    generator = new CGenerator(Context, Options);
+                    generator = new CGenerator(Context);
                     break;
                 case GeneratorKind.ObjectiveC:
-                    generator = new ObjCGenerator(Context, Options);
+                    generator = new ObjCGenerator(Context);
                     break;
                 case GeneratorKind.Java:
-                    generator = new JavaGenerator(Context, Options);
+                    generator = new JavaGenerator(Context);
                     break;
                 default:
                     throw new NotImplementedException();
@@ -186,7 +187,7 @@ namespace MonoEmbeddinator4000
 
         bool ValidateAssemblies()
         {
-            foreach (var assembly in Options.Project.Assemblies)
+            foreach (var assembly in Project.Assemblies)
             {
                 var file = Path.GetFullPath(assembly);
 
@@ -205,7 +206,7 @@ namespace MonoEmbeddinator4000
             if (!ValidateAssemblies())
                 return;
 
-            Options.Project.BuildInputs();
+            Project.BuildInputs();
 
             Diagnostics.Message("Parsing assemblies...");
             Diagnostics.PushIndent();

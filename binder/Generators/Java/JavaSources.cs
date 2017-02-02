@@ -1,4 +1,4 @@
-﻿using CppSharp;
+using CppSharp;
 using CppSharp.AST;
 using CppSharp.Generators;
 
@@ -6,9 +6,8 @@ namespace MonoEmbeddinator4000.Generators
 {
     public class JavaSources : CTemplate
     {
-        public JavaSources(BindingContext context, Options options,
-            TranslationUnit unit)
-         : base(context, options, unit)
+        public JavaSources(BindingContext context, TranslationUnit unit)
+            : base(context, unit)
         {
         }
 

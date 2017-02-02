@@ -8,17 +8,14 @@ namespace MonoEmbeddinator4000.Generators
 {
     public class CGenerator : Generator
     {
-        internal Options Options { get; set; }
-
-        public CGenerator(BindingContext context, Options options) : base(context)
+        public CGenerator(BindingContext context) : base(context)
         {
-            Options = options; 
         }
 
         public override List<Template> Generate(TranslationUnit unit)
         {
-            var headers = new CHeaders(Context, Options, unit);
-            var sources = new CSources(Context, Options, unit);
+            var headers = new CHeaders(Context, unit);
+            var sources = new CSources(Context, unit);
 
             return new List<Template> { headers, sources };
         }
@@ -65,8 +62,8 @@ namespace MonoEmbeddinator4000.Generators
     {
         public TranslationUnit Unit;
 
-        public CTemplate(BindingContext context, Options options,
-            TranslationUnit unit) : base(context, options)
+        public CTemplate(BindingContext context,
+            TranslationUnit unit) : base(context)
         {
             Unit = unit;
         }

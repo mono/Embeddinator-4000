@@ -241,7 +241,7 @@ namespace MonoEmbeddinator4000
                     XamarinSdkRoot, is64bits: false);
 
                 // Call the Mono AOT cross compiler for all input assemblies.
-                foreach (var assembly in Options.Project.Assemblies)
+                foreach (var assembly in Project.Assemblies)
                 {
                     var args = GetAotArguments(App, assembly, Abi.ARMv7,
                         Path.GetFullPath(Options.OutputDir), assembly + ".o",
@@ -292,7 +292,7 @@ namespace MonoEmbeddinator4000
 
         string XamarinSdkRoot => DetectIPhoneSdks.XamarinSdkRoot;
         
-        string OutputName => Path.GetFileNameWithoutExtension(Options.Project.Assemblies[0]);
+        string OutputName => Path.GetFileNameWithoutExtension(Project.Assemblies[0]);
 
         string GetOutputFolder()
         {
@@ -345,7 +345,7 @@ namespace MonoEmbeddinator4000
             foreach (var @ref in references)
                 args.Add($"--r {@ref}");
 
-            foreach (var assembly in Options.Project.Assemblies)
+            foreach (var assembly in Project.Assemblies)
                 args.Add(assembly);
  
             var mtouchPath = Path.Combine(MonoTouchSdk.BinDir, "mtouch");
@@ -452,7 +452,7 @@ namespace MonoEmbeddinator4000
 
             var monoPath = ManagedToolchain.FindMonoPath();
             var output = Path.Combine(Options.OutputDir, Options.LibraryName ??
-                Path.GetFileNameWithoutExtension(Options.Project.Assemblies[0]));
+                Path.GetFileNameWithoutExtension(Project.Assemblies[0]));
 
             var args = new List<string> {
                 "/nologo",
