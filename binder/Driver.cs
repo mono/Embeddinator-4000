@@ -75,17 +75,26 @@ namespace MonoEmbeddinator4000
             foreach (var assembly in Assemblies)
                 astGenerator.Visit(assembly);
 
-            Context.TranslationUnitPasses.AddPass(new CheckKeywordsPass());
-            Context.TranslationUnitPasses.AddPass(new FixMethodParametersPass());
-            Context.TranslationUnitPasses.AddPass(new GenerateObjectTypesPass());
-            Context.TranslationUnitPasses.AddPass(new GenerateArrayTypes());
-            Context.TranslationUnitPasses.AddPass(new CheckIgnoredDeclsPass());
+            var passes = new List<TranslationUnitPass>
+            {
+                new CheckKeywordsPass(),
+                new FixMethodParametersPass(),
+                new GenerateObjectTypesPass(),
+                new GenerateArrayTypes(),
+                new CheckIgnoredDeclsPass()
+            };
 
             if (Options.GeneratorKind != GeneratorKind.CPlusPlus)
-                Context.TranslationUnitPasses.AddPass(new RenameEnumItemsPass());
+                passes.Add(new RenameEnumItemsPass());
 
-            Context.TranslationUnitPasses.AddPass(new RenameDuplicatedDeclsPass());
-            Context.TranslationUnitPasses.AddPass(new CheckDuplicatedNamesPass());
+            passes.AddRange(new TranslationUnitPass[]
+            {
+                new RenameDuplicatedDeclsPass(),
+                new CheckDuplicatedNamesPass()
+            });
+
+            Context.TranslationUnitPasses.Passes.AddRange(passes);
+
             Context.RunPasses();
         }
 
@@ -104,7 +113,7 @@ namespace MonoEmbeddinator4000
             }
 
             throw new Exception("Support directory was not found");
-        }        
+        }
 
         void GenerateSupportFiles(ProjectOutput output)
         {

@@ -135,7 +135,7 @@ namespace MonoEmbeddinator4000.Generators
             return $"({type}*) calloc(1, sizeof({type}))";
         }
 
-        public virtual bool VisitTypedefDecl(TypedefDecl typedef)
+        public override bool VisitTypedefDecl(TypedefDecl typedef)
         {
             PushBlock();
 
@@ -157,134 +157,20 @@ namespace MonoEmbeddinator4000.Generators
             return true;
         }
 
-        public virtual bool VisitNamespace (Namespace @namespace)
+        public override bool VisitNamespace (Namespace @namespace)
         {
             return VisitDeclContext(@namespace);
         }
 
-        public virtual bool VisitFieldDecl(Field field)
+        public override bool VisitFieldDecl(Field field)
         {
             WriteLine("{0} {1};", field.Type, field.Name);
             return true;
         }
 
-        public virtual bool VisitProperty(Property property)
+        public override bool VisitProperty(Property property)
         {
             return true;
         }
-
-        #region IDeclVisitor methods
-
-        public virtual bool VisitClassDecl(Class @class)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual bool VisitClassTemplateDecl(ClassTemplate template)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual bool VisitClassTemplateSpecializationDecl(ClassTemplateSpecialization specialization)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual bool VisitDeclaration(Declaration decl)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual bool VisitEnumDecl(Enumeration @enum)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual bool VisitEnumItemDecl(Enumeration.Item item)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual bool VisitEvent(Event @event)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual bool VisitFriend(Friend friend)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual bool VisitFunctionDecl(Function function)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual bool VisitFunctionTemplateDecl(FunctionTemplate template)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual bool VisitFunctionTemplateSpecializationDecl(FunctionTemplateSpecialization spec)
-        {
-            throw new NotImplementedException();
-        }        
-
-        public virtual bool VisitMacroDefinition(MacroDefinition macro)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual bool VisitMethodDecl(Method method)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual bool VisitNonTypeTemplateParameterDecl(NonTypeTemplateParameter nonTypeTemplateParameter)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual bool VisitParameterDecl(Parameter parameter)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual bool VisitTemplateParameterDecl(TypeTemplateParameter templateParameter)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual bool VisitTemplateTemplateParameterDecl(TemplateTemplateParameter templateTemplateParameter)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual bool VisitTypeAliasDecl(TypeAlias typeAlias)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual bool VisitTypeAliasTemplateDecl(TypeAliasTemplate typeAliasTemplate)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual bool VisitVariableDecl(Variable variable)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual bool VisitVarTemplateDecl(VarTemplate template)
-        {
-            throw new NotImplementedException();
-        }
-
-        public virtual bool VisitVarTemplateSpecializationDecl(VarTemplateSpecialization spec)
-        {
-            throw new NotImplementedException();
-        }
-
-        #endregion
     }
 }
