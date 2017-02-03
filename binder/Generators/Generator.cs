@@ -1,6 +1,5 @@
 ﻿using CppSharp.AST;
 using CppSharp.Generators;
-using Template = CppSharp.Generators.Template;
 using System.Collections.Generic;
 
 namespace MonoEmbeddinator4000.Generators
@@ -20,6 +19,6 @@ namespace MonoEmbeddinator4000.Generators
         /// <summary>
         /// Generates the outputs for a given translation unit.
         /// </summary>
-        public abstract List<Template> Generate(TranslationUnit unit);
+        public abstract List<CodeTemplate> Generate(TranslationUnit unit);
     }
 }

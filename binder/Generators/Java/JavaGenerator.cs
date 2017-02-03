@@ -1,9 +1,7 @@
-using System;
 using System.Collections.Generic;
 using CppSharp;
 using CppSharp.AST;
 using CppSharp.Generators;
-using Template = CppSharp.Generators.Template;
 
 namespace MonoEmbeddinator4000.Generators
 {
@@ -13,11 +11,11 @@ namespace MonoEmbeddinator4000.Generators
         {
         }
 
-        public override List<Template> Generate(TranslationUnit unit)
+        public override List<CodeTemplate> Generate(TranslationUnit unit)
         {
             var sources = new JavaSources(Context, unit);
 
-            return new List<Template> { sources };
+            return new List<CodeTemplate> { sources };
         }
 
         public static string GenId(string id)
@@ -42,7 +40,7 @@ namespace MonoEmbeddinator4000.Generators
         }
     }
 
-    public abstract class JavaTemplate : Template
+    public abstract class JavaTemplate : CodeTemplate
     {
         public TranslationUnit Unit;
 

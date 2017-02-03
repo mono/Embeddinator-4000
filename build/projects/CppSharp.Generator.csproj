@@ -98,14 +98,14 @@
     <Compile Include="../../external/CppSharp/src/Generator/Generators/CSharp/CSharpTypePrinter.cs">
       <Link>external/CppSharp/src/Generator/Generators/CSharp/CSharpTypePrinter.cs</Link>
     </Compile>
+    <Compile Include="../../external/CppSharp/src/Generator/Generators/CodeTemplate.cs">
+      <Link>external/CppSharp/src/Generator/Generators/CodeTemplate.cs</Link>
+    </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Generators/ExtensionMethods.cs">
       <Link>external/CppSharp/src/Generator/Generators/ExtensionMethods.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Generators/Marshal.cs">
       <Link>external/CppSharp/src/Generator/Generators/Marshal.cs</Link>
-    </Compile>
-    <Compile Include="../../external/CppSharp/src/Generator/Generators/Template.cs">
-      <Link>external/CppSharp/src/Generator/Generators/Template.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Library.cs">
       <Link>external/CppSharp/src/Generator/Library.cs</Link>

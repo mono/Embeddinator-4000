@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using CppSharp.AST;
 using CppSharp.Generators;
-using Template = CppSharp.Generators.Template;
 
 namespace MonoEmbeddinator4000.Generators
 {
@@ -13,12 +12,12 @@ namespace MonoEmbeddinator4000.Generators
         {
         }
 
-        public override List<Template> Generate(TranslationUnit unit)
+        public override List<CodeTemplate> Generate(TranslationUnit unit)
         {
             var headers = new ObjCHeaders(Context, unit);
             var sources = new ObjCSources(Context, unit);
 
-            return new List<Template> { headers, sources };
+            return new List<CodeTemplate> { headers, sources };
         }
     }
 

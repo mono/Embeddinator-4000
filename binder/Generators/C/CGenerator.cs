@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using CppSharp;
 using CppSharp.AST;
 using CppSharp.Generators;
-using Template = CppSharp.Generators.Template;
 
 namespace MonoEmbeddinator4000.Generators
 {
@@ -13,12 +12,12 @@ namespace MonoEmbeddinator4000.Generators
         {
         }
 
-        public override List<Template> Generate(TranslationUnit unit)
+        public override List<CodeTemplate> Generate(TranslationUnit unit)
         {
             var headers = new CHeaders(Context, unit);
             var sources = new CSources(Context, unit);
 
-            return new List<Template> { headers, sources };
+            return new List<CodeTemplate> { headers, sources };
         }
 
         public static string GenId(string id)
@@ -59,7 +58,7 @@ namespace MonoEmbeddinator4000.Generators
         }
     }
 
-    public abstract class CTemplate : Template
+    public abstract class CTemplate : CodeTemplate
     {
         public TranslationUnit Unit;
 
