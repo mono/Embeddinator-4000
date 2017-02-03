@@ -42,7 +42,7 @@ namespace MonoEmbeddinator4000.Generators
         }
     }
 
-    public abstract class JavaTemplate : Template, IDeclVisitor<bool>
+    public abstract class JavaTemplate : Template
     {
         public TranslationUnit Unit;
 

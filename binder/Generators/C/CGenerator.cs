@@ -59,7 +59,7 @@ namespace MonoEmbeddinator4000.Generators
         }
     }
 
-    public abstract class CTemplate : Template, IDeclVisitor<bool>
+    public abstract class CTemplate : Template
     {
         public TranslationUnit Unit;
 
