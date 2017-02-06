@@ -153,15 +153,15 @@ namespace MonoEmbeddinator4000
 
             foreach (var unit in Context.ASTContext.TranslationUnits)
             {
-                var templates = generator.Generate(unit);
+                var outputs = generator.Generate(unit);
 
-                foreach (var template in templates)
+                foreach (var output in outputs)
                 {
-                    template.Process();
-                    var text = template.Generate();
+                    output.Process();
+                    var text = output.Generate();
 
                     var name = unit.FileNameWithoutExtension;
-                    var path = string.Format("{0}.{1}", name, template.FileExtension);
+                    var path = string.Format("{0}.{1}", name, output.FileExtension);
 
                     Output.WriteOutput(path, text);
                 }

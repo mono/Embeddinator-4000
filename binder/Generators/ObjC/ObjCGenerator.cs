@@ -23,17 +23,17 @@ namespace MonoEmbeddinator4000.Generators
 
     public static class ObjCExtensions
     {
-        public static void GenerateObjCMethodSignature(this CCodeGenerator template,
+        public static void GenerateObjCMethodSignature(this CCodeGenerator gen,
             Method method)
         {
             var @class = method.Namespace as Class;
-            var retType = method.ReturnType.Visit(template.CTypePrinter);
+            var retType = method.ReturnType.Visit(gen.CTypePrinter);
 
-            template.Write("{0}", method.IsStatic ? "+" : "-");
+            gen.Write("{0}", method.IsStatic ? "+" : "-");
 
-            template.Write(" ({0}){1}", retType, method.Name);
+            gen.Write(" ({0}){1}", retType, method.Name);
 
-            template.Write(template.CTypePrinter.VisitParameters(method.Parameters));
+            gen.Write(gen.CTypePrinter.VisitParameters(method.Parameters));
         }
 
         public static string GetObjCAccessKeyword(AccessSpecifier access)
@@ -53,10 +53,9 @@ namespace MonoEmbeddinator4000.Generators
             throw new NotSupportedException();
         }
 
-        public static bool GenerateObjCField(this CCodeGenerator template,
-            Field field)
+        public static bool GenerateObjCField(this CCodeGenerator gen, Field field)
         {
-            template.WriteLine($"{GetObjCAccessKeyword(field.Access)} {field.Type} {field.Name};");
+            gen.WriteLine($"{GetObjCAccessKeyword(field.Access)} {field.Type} {field.Name};");
             return true;
         }
     }
