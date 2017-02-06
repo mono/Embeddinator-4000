@@ -40,11 +40,11 @@ namespace MonoEmbeddinator4000.Generators
         }
     }
 
-    public abstract class JavaTemplate : CodeGenerator
+    public abstract class JavaCodeGenerator : CodeGenerator
     {
         public TranslationUnit Unit;
 
-        public JavaTemplate(BindingContext context, TranslationUnit unit)
+        public JavaCodeGenerator(BindingContext context, TranslationUnit unit)
             : base(context, unit)
         {
             Unit = unit;
