@@ -23,7 +23,7 @@ namespace MonoEmbeddinator4000.Generators
 
     public static class ObjCExtensions
     {
-        public static void GenerateObjCMethodSignature(this CTemplate template,
+        public static void GenerateObjCMethodSignature(this CCodeGenerator template,
             Method method)
         {
             var @class = method.Namespace as Class;
@@ -53,7 +53,7 @@ namespace MonoEmbeddinator4000.Generators
             throw new NotSupportedException();
         }
 
-        public static bool GenerateObjCField(this CTemplate template,
+        public static bool GenerateObjCField(this CCodeGenerator template,
             Field field)
         {
             template.WriteLine($"{GetObjCAccessKeyword(field.Access)} {field.Type} {field.Name};");

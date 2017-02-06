@@ -58,11 +58,11 @@ namespace MonoEmbeddinator4000.Generators
         }
     }
 
-    public abstract class CTemplate : CodeGenerator
+    public abstract class CCodeGenerator : CodeGenerator
     {
         public TranslationUnit Unit;
 
-        public CTemplate(BindingContext context,
+        public CCodeGenerator(BindingContext context,
             TranslationUnit unit) : base(context, unit)
         {
             Unit = unit;

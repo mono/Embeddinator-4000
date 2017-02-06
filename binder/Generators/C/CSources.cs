@@ -8,7 +8,7 @@ using MonoEmbeddinator4000.Passes;
 
 namespace MonoEmbeddinator4000.Generators
 {
-    public class CSources : CTemplate
+    public class CSources : CCodeGenerator
     {
         public CSources(BindingContext context, TranslationUnit unit)
          : base(context, unit)

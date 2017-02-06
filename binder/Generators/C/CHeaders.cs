@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace MonoEmbeddinator4000.Generators
 {
-    public class CHeaders : CTemplate
+    public class CHeaders : CCodeGenerator
     {
         public CHeaders(BindingContext context, TranslationUnit unit)
             : base(context, unit)
