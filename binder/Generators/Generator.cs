@@ -19,6 +19,6 @@ namespace MonoEmbeddinator4000.Generators
         /// <summary>
         /// Generates the outputs for a given translation unit.
         /// </summary>
-        public abstract List<CodeTemplate> Generate(TranslationUnit unit);
+        public abstract List<CodeGenerator> Generate(TranslationUnit unit);
     }
 }

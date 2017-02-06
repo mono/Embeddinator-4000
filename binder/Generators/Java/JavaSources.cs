@@ -1,28 +1,29 @@
+using System.Collections.Generic;
 using CppSharp;
 using CppSharp.AST;
 using CppSharp.Generators;
 
 namespace MonoEmbeddinator4000.Generators
 {
-    public class JavaSources : CTemplate
+    public class JavaSources : CppSharp.Generators.CSharp.CSharpSources
     {
         public JavaSources(BindingContext context, TranslationUnit unit)
-            : base(context, unit)
+            : base(context, new List<TranslationUnit> { unit }, null, null)
         {
         }
 
         public override string FileExtension => "java";
 
-        public string AssemblyId => CGenerator.AssemblyId(Unit);
+        public string AssemblyId => CGenerator.AssemblyId(TranslationUnit);
 
         public override void Process()
         {
-            GenerateFilePreamble();
+            //GenerateFilePreamble();
 
             PushBlock();
             PopBlock(NewLineKind.BeforeNextBlock);
 
-            VisitDeclContext(Unit);
+            TranslationUnit.Visit(this);
         }
 
         public override bool VisitEnumDecl(Enumeration @enum)

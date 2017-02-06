@@ -12,12 +12,12 @@ namespace MonoEmbeddinator4000.Generators
         {
         }
 
-        public override List<CodeTemplate> Generate(TranslationUnit unit)
+        public override List<CodeGenerator> Generate(TranslationUnit unit)
         {
             var headers = new CHeaders(Context, unit);
             var sources = new CSources(Context, unit);
 
-            return new List<CodeTemplate> { headers, sources };
+            return new List<CodeGenerator> { headers, sources };
         }
 
         public static string GenId(string id)
@@ -58,7 +58,7 @@ namespace MonoEmbeddinator4000.Generators
         }
     }
 
-    public abstract class CTemplate : CodeTemplate
+    public abstract class CTemplate : CodeGenerator
     {
         public TranslationUnit Unit;
 
@@ -90,15 +90,6 @@ namespace MonoEmbeddinator4000.Generators
         }
 
         public virtual void WriteHeaders() { }
-
-        public bool VisitDeclContext(DeclarationContext ctx)
-        {
-            foreach (var decl in ctx.Declarations)
-                if (!decl.Ignore)
-                    decl.Visit(this);
-
-            return true;
-        }
 
         public void WriteInclude(string include)
         {
@@ -154,11 +145,6 @@ namespace MonoEmbeddinator4000.Generators
             PopBlock(newlineKind);
 
             return true;
-        }
-
-        public override bool VisitNamespace (Namespace @namespace)
-        {
-            return VisitDeclContext(@namespace);
         }
 
         public override bool VisitFieldDecl(Field field)

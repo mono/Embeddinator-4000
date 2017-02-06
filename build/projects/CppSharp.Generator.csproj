@@ -98,8 +98,8 @@
     <Compile Include="../../external/CppSharp/src/Generator/Generators/CSharp/CSharpTypePrinter.cs">
       <Link>external/CppSharp/src/Generator/Generators/CSharp/CSharpTypePrinter.cs</Link>
     </Compile>
-    <Compile Include="../../external/CppSharp/src/Generator/Generators/CodeTemplate.cs">
-      <Link>external/CppSharp/src/Generator/Generators/CodeTemplate.cs</Link>
+    <Compile Include="../../external/CppSharp/src/Generator/Generators/CodeGenerator.cs">
+      <Link>external/CppSharp/src/Generator/Generators/CodeGenerator.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Generators/ExtensionMethods.cs">
       <Link>external/CppSharp/src/Generator/Generators/ExtensionMethods.cs</Link>
@@ -136,9 +136,6 @@
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Passes/CheckStaticClass.cs">
       <Link>external/CppSharp/src/Generator/Passes/CheckStaticClass.cs</Link>
-    </Compile>
-    <Compile Include="../../external/CppSharp/src/Generator/Passes/CheckVTableComponentsPass.cs">
-      <Link>external/CppSharp/src/Generator/Passes/CheckVTableComponentsPass.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Passes/CheckVirtualOverrideReturnCovariance.cs">
       <Link>external/CppSharp/src/Generator/Passes/CheckVirtualOverrideReturnCovariance.cs</Link>
@@ -193,6 +190,9 @@
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Passes/IgnoreSystemDeclarationsPass.cs">
       <Link>external/CppSharp/src/Generator/Passes/IgnoreSystemDeclarationsPass.cs</Link>
+    </Compile>
+    <Compile Include="../../external/CppSharp/src/Generator/Passes/InlinesCodeGenerator.cs">
+      <Link>external/CppSharp/src/Generator/Passes/InlinesCodeGenerator.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Passes/MarkSupportedClassTemplateSpecializationsPass.cs">
       <Link>external/CppSharp/src/Generator/Passes/MarkSupportedClassTemplateSpecializationsPass.cs</Link>

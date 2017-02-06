@@ -11,11 +11,11 @@ namespace MonoEmbeddinator4000.Generators
         {
         }
 
-        public override List<CodeTemplate> Generate(TranslationUnit unit)
+        public override List<CodeGenerator> Generate(TranslationUnit unit)
         {
             var sources = new JavaSources(Context, unit);
 
-            return new List<CodeTemplate> { sources };
+            return new List<CodeGenerator> { sources };
         }
 
         public static string GenId(string id)
@@ -40,7 +40,7 @@ namespace MonoEmbeddinator4000.Generators
         }
     }
 
-    public abstract class JavaTemplate : CodeTemplate
+    public abstract class JavaTemplate : CodeGenerator
     {
         public TranslationUnit Unit;
 
@@ -69,15 +69,6 @@ namespace MonoEmbeddinator4000.Generators
             {
                 return CGenerator.GetCTypePrinter(Options.GeneratorKind);
             }
-        }
-
-        public bool VisitDeclContext(DeclarationContext ctx)
-        {
-            foreach (var decl in ctx.Declarations)
-                if (!decl.Ignore)
-                    decl.Visit(this);
-
-            return true;
         }
 
         public void WriteInclude(string include)

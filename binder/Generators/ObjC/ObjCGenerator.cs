@@ -12,12 +12,12 @@ namespace MonoEmbeddinator4000.Generators
         {
         }
 
-        public override List<CodeTemplate> Generate(TranslationUnit unit)
+        public override List<CodeGenerator> Generate(TranslationUnit unit)
         {
             var headers = new ObjCHeaders(Context, unit);
             var sources = new ObjCSources(Context, unit);
 
-            return new List<CodeTemplate> { headers, sources };
+            return new List<CodeGenerator> { headers, sources };
         }
     }
 
