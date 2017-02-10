@@ -176,8 +176,8 @@
     <Compile Include="../../external/CppSharp/src/Generator/Passes/GenerateAnonymousDelegatesPass.cs">
       <Link>external/CppSharp/src/Generator/Passes/GenerateAnonymousDelegatesPass.cs</Link>
     </Compile>
-    <Compile Include="../../external/CppSharp/src/Generator/Passes/GenerateInlinesCodePass.cs">
-      <Link>external/CppSharp/src/Generator/Passes/GenerateInlinesCodePass.cs</Link>
+    <Compile Include="../../external/CppSharp/src/Generator/Passes/GenerateInlinesPass.cs">
+      <Link>external/CppSharp/src/Generator/Passes/GenerateInlinesPass.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Passes/GenerateTemplatesCodePass.cs">
       <Link>external/CppSharp/src/Generator/Passes/GenerateTemplatesCodePass.cs</Link>
@@ -262,6 +262,9 @@
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Utils/OrderedSet.cs">
       <Link>external/CppSharp/src/Generator/Utils/OrderedSet.cs</Link>
+    </Compile>
+    <Compile Include="../../external/CppSharp/src/Generator/Utils/ProcessHelper.cs">
+      <Link>external/CppSharp/src/Generator/Utils/ProcessHelper.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Utils/TextGenerator.cs">
       <Link>external/CppSharp/src/Generator/Utils/TextGenerator.cs</Link>

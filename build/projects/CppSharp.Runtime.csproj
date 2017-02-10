@@ -45,9 +45,6 @@
     <Compile Include="../../external/CppSharp/src/Runtime/Helpers.cs">
       <Link>external/CppSharp/src/Runtime/Helpers.cs</Link>
     </Compile>
-    <Compile Include="../../external/CppSharp/src/Runtime/Interfaces.cs">
-      <Link>external/CppSharp/src/Runtime/Interfaces.cs</Link>
-    </Compile>
     <Compile Include="../../external/CppSharp/src/Runtime/SymbolResolver.cs">
       <Link>external/CppSharp/src/Runtime/SymbolResolver.cs</Link>
     </Compile>
