@@ -2,14 +2,17 @@ using System.Collections.Generic;
 using CppSharp;
 using CppSharp.AST;
 using CppSharp.Generators;
+using CppSharp.Generators.CSharp;
 
 namespace MonoEmbeddinator4000.Generators
 {
     public class JavaSources : CppSharp.Generators.CSharp.CSharpSources
     {
         public JavaSources(BindingContext context, TranslationUnit unit)
-            : base(context, new List<TranslationUnit> { unit }, null, null)
+            : base(context, new List<TranslationUnit> { unit })
         {
+            TypePrinter = new CSharpTypePrinter(context);
+            ExpressionPrinter = new CSharpExpressionPrinter(TypePrinter);
         }
 
         public override string FileExtension => "java";
