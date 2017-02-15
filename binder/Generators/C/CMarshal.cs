@@ -60,10 +60,10 @@ namespace MonoEmbeddinator4000.Generators
                                             arraySizeId, arrayId);
 
             var typePrinter = CTypePrinter;
-            typePrinter.PrintScopeKind = CppTypePrintScopeKind.Local;
+            typePrinter.PrintScopeKind = TypePrintScopeKind.Local;
             var arrayTypedefName = array.Typedef.Visit(typePrinter);
 
-            typePrinter.PrintScopeKind = CppTypePrintScopeKind.Qualified;
+            typePrinter.PrintScopeKind = TypePrintScopeKind.Qualified;
             var arrayElementName = array.Array.Type.Visit(typePrinter);
             var elementSize = string.Format("sizeof({0})", arrayElementName);
 

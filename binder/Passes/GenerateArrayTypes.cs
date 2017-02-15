@@ -18,7 +18,7 @@ namespace MonoEmbeddinator4000.Passes
         List<TypedefDecl> Declarations;
 
         static CArrayTypePrinter ArrayPrinter => new CArrayTypePrinter {
-            PrintScopeKind = CppTypePrintScopeKind.Qualified,
+            PrintScopeKind = TypePrintScopeKind.Qualified,
         };
 
         public GenerateArrayTypes()

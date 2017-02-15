@@ -6,13 +6,12 @@ using CppSharp.Generators.CSharp;
 
 namespace MonoEmbeddinator4000.Generators
 {
-    public class JavaSources : CppSharp.Generators.CSharp.CSharpSources
+    public class JavaSources : CSharpSources
     {
         public JavaSources(BindingContext context, TranslationUnit unit)
             : base(context, new List<TranslationUnit> { unit })
         {
-            TypePrinter = new CSharpTypePrinter(context);
-            ExpressionPrinter = new CSharpExpressionPrinter(TypePrinter);
+            TypePrinter = new JavaTypePrinter(context);
         }
 
         public override string FileExtension => "java";
