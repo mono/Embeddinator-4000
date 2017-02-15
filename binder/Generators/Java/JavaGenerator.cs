@@ -28,9 +28,9 @@ namespace MonoEmbeddinator4000.Generators
             return GenId(unit.FileName).Replace('.', '_');
         }
 
-        public static JavaTypePrinter GetJavaTypePrinter()
+        public static JavaManagedToNativeTypePrinter GetJavaManagedToNativeTypePrinter()
         {
-            return new JavaTypePrinter
+            return new JavaManagedToNativeTypePrinter
             {
                 PrintScopeKind = TypePrintScopeKind.Qualified,
                 PrintVariableArrayAsPointers = true
