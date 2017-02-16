@@ -69,14 +69,6 @@ namespace MonoEmbeddinator4000.Generators
             }
         }
 
-        public void WriteInclude(string include)
-        {
-            if (Options.GenerateSupportFiles)
-                WriteLine("#include \"{0}\"", include);
-            else
-                WriteLine("#include <{0}>", include);
-        }
-
         public override void GenerateFilePreamble()
         {
             WriteLine("/*");
