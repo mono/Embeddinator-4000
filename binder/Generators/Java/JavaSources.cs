@@ -20,7 +20,7 @@ namespace MonoEmbeddinator4000.Generators
 
         public override void Process()
         {
-            //GenerateFilePreamble();
+            GenerateFilePreamble();
 
             PushBlock();
             PopBlock(NewLineKind.BeforeNextBlock);
