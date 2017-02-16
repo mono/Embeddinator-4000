@@ -28,6 +28,15 @@ namespace MonoEmbeddinator4000.Generators
             TranslationUnit.Visit(this);
         }
 
+        public override bool VisitDeclContext(DeclarationContext context)
+        {
+            foreach (var decl in context.Declarations)
+                decl.Visit(this);
+
+
+            return true;
+        }
+
         public override bool VisitEnumDecl(Enumeration @enum)
         {
             return true;
