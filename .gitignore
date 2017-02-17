@@ -25,9 +25,10 @@ bin/
 *.metagen
 *.ilk
 *.manifest
+/build/gen
 /build/lib
 /build/obj
 /build/vs2015
 /build/gmake
-/CppSharp
-/ikvm
+/external/jna
+/external/ikvm
