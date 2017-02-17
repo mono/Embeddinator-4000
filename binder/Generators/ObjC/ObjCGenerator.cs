@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using CppSharp.AST;
 using CppSharp.Generators;
 
@@ -12,8 +13,9 @@ namespace MonoEmbeddinator4000.Generators
         {
         }
 
-        public override List<CodeGenerator> Generate(TranslationUnit unit)
+        public override List<CodeGenerator> Generate(IEnumerable<TranslationUnit> units)
         {
+            var unit = units.First();
             var headers = new ObjCHeaders(Context, unit);
             var sources = new ObjCSources(Context, unit);
 

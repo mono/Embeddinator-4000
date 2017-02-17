@@ -135,7 +135,7 @@ namespace MonoEmbeddinator4000
         {
             Output = new ProjectOutput();
 
-            Generators.Generator generator = null;
+            Generator generator = null;
             switch (Options.GeneratorKind)
             {
                 case GeneratorKind.C:
@@ -153,7 +153,7 @@ namespace MonoEmbeddinator4000
 
             foreach (var unit in Context.ASTContext.TranslationUnits)
             {
-                var outputs = generator.Generate(unit);
+                var outputs = generator.Generate(new[] { unit });
 
                 foreach (var output in outputs)
                 {

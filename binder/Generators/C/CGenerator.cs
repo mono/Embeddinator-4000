@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using CppSharp;
 using CppSharp.AST;
 using CppSharp.Generators;
@@ -12,8 +13,9 @@ namespace MonoEmbeddinator4000.Generators
         {
         }
 
-        public override List<CodeGenerator> Generate(TranslationUnit unit)
+        public override List<CodeGenerator> Generate(IEnumerable<TranslationUnit> units)
         {
+            var unit = units.First();
             var headers = new CHeaders(Context, unit);
             var sources = new CSources(Context, unit);
 
@@ -56,6 +58,16 @@ namespace MonoEmbeddinator4000.Generators
 
             return typePrinter;
         }
+
+        public override bool SetupPasses()
+        {
+            return true;
+        }
+
+        protected override string TypePrinterDelegate(CppSharp.AST.Type type)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     public abstract class CCodeGenerator : CodeGenerator
@@ -81,13 +93,8 @@ namespace MonoEmbeddinator4000.Generators
             return decl.QualifiedName;
         }
 
-        public CManagedToNativeTypePrinter CTypePrinter
-        {
-            get
-            {
-                return CGenerator.GetCTypePrinter(Options.GeneratorKind);
-            }
-        }
+        public CManagedToNativeTypePrinter CTypePrinter =>
+                CGenerator.GetCTypePrinter(Options.GeneratorKind);
 
         public virtual void WriteHeaders() { }
 
