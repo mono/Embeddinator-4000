@@ -45,12 +45,17 @@ workspace "MonoEmbeddinator4000"
   startproject "MonoEmbeddinator4000"
 
   include ("../binder")
-  include("../external/CppSharp/src/Core")
-  include("../external/CppSharp/src/AST")
-  include("../external/CppSharp/src/CppParser/Bindings/CSharp")
-  include("../external/CppSharp/src/Parser")
-  include("../external/CppSharp/src/Generator")
-  include("../external/CppSharp/src/Runtime")
+
+  function include_cppsharp_project(name)
+    include("../external/CppSharp/src/" .. name)
+  end
+
+  include_cppsharp_project("Core")
+  include_cppsharp_project("AST")
+  include_cppsharp_project("CppParser/Bindings/CSharp")
+  include_cppsharp_project("Parser")
+  include_cppsharp_project("Generator")
+  include_cppsharp_project("Runtime")
 
   project "IKVM.Reflection"
     SetupManagedProject()
