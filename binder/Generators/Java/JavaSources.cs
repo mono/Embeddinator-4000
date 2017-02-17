@@ -58,5 +58,11 @@ namespace MonoEmbeddinator4000.Generators
         {
             return true;
         }
+
+        public override bool VisitProperty(Property property)
+        {
+            // Ignore properties since they're converted to getter/setter pais.
+            return true;
+        }
     }
 }

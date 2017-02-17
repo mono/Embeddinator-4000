@@ -114,6 +114,9 @@
     <Compile Include="../../binder/Passes/GenerateObjectTypes.cs">
       <Link>binder/Passes/GenerateObjectTypes.cs</Link>
     </Compile>
+    <Compile Include="../../binder/Passes/PropertyToGetterSetter.cs">
+      <Link>binder/Passes/PropertyToGetterSetter.cs</Link>
+    </Compile>
     <Compile Include="../../binder/Passes/RenameDuplicatedDecls.cs">
       <Link>binder/Passes/RenameDuplicatedDecls.cs</Link>
     </Compile>
