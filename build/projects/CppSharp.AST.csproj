@@ -42,121 +42,121 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="../../external/CppSharp/src/AST/ASTContext.cs">
-      <Link>external/CppSharp/src/AST/ASTContext.cs</Link>
+      <Link>ASTContext.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/AST/ASTVisitor.cs">
-      <Link>external/CppSharp/src/AST/ASTVisitor.cs</Link>
+      <Link>ASTVisitor.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/AST/Attribute.cs">
-      <Link>external/CppSharp/src/AST/Attribute.cs</Link>
+      <Link>Attribute.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/AST/Class.cs">
-      <Link>external/CppSharp/src/AST/Class.cs</Link>
+      <Link>Class.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/AST/ClassExtensions.cs">
-      <Link>external/CppSharp/src/AST/ClassExtensions.cs</Link>
+      <Link>ClassExtensions.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/AST/ClassLayout.cs">
-      <Link>external/CppSharp/src/AST/ClassLayout.cs</Link>
+      <Link>ClassLayout.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/AST/Comment.cs">
-      <Link>external/CppSharp/src/AST/Comment.cs</Link>
+      <Link>Comment.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/AST/Conversions.cs">
-      <Link>external/CppSharp/src/AST/Conversions.cs</Link>
+      <Link>Conversions.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/AST/CppTypePrinter.cs">
-      <Link>external/CppSharp/src/AST/CppTypePrinter.cs</Link>
+      <Link>CppTypePrinter.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/AST/DeclIterator.cs">
-      <Link>external/CppSharp/src/AST/DeclIterator.cs</Link>
+      <Link>DeclIterator.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/AST/Declaration.cs">
-      <Link>external/CppSharp/src/AST/Declaration.cs</Link>
+      <Link>Declaration.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/AST/Delegate.cs">
-      <Link>external/CppSharp/src/AST/Delegate.cs</Link>
+      <Link>Delegate.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/AST/Enumeration.cs">
-      <Link>external/CppSharp/src/AST/Enumeration.cs</Link>
+      <Link>Enumeration.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/AST/Event.cs">
-      <Link>external/CppSharp/src/AST/Event.cs</Link>
+      <Link>Event.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/AST/Expression.cs">
-      <Link>external/CppSharp/src/AST/Expression.cs</Link>
+      <Link>Expression.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/AST/Field.cs">
-      <Link>external/CppSharp/src/AST/Field.cs</Link>
+      <Link>Field.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/AST/Friend.cs">
-      <Link>external/CppSharp/src/AST/Friend.cs</Link>
+      <Link>Friend.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/AST/Function.cs">
-      <Link>external/CppSharp/src/AST/Function.cs</Link>
+      <Link>Function.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/AST/FunctionExtensions.cs">
-      <Link>external/CppSharp/src/AST/FunctionExtensions.cs</Link>
+      <Link>FunctionExtensions.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/AST/IExpressionPrinter.cs">
-      <Link>external/CppSharp/src/AST/IExpressionPrinter.cs</Link>
+      <Link>IExpressionPrinter.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/AST/ITypePrinter.cs">
-      <Link>external/CppSharp/src/AST/ITypePrinter.cs</Link>
+      <Link>ITypePrinter.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/AST/LayoutBase.cs">
-      <Link>external/CppSharp/src/AST/LayoutBase.cs</Link>
+      <Link>LayoutBase.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/AST/LayoutField.cs">
-      <Link>external/CppSharp/src/AST/LayoutField.cs</Link>
+      <Link>LayoutField.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/AST/Method.cs">
-      <Link>external/CppSharp/src/AST/Method.cs</Link>
+      <Link>Method.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/AST/Module.cs">
-      <Link>external/CppSharp/src/AST/Module.cs</Link>
+      <Link>Module.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/AST/Namespace.cs">
-      <Link>external/CppSharp/src/AST/Namespace.cs</Link>
+      <Link>Namespace.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/AST/Preprocessor.cs">
-      <Link>external/CppSharp/src/AST/Preprocessor.cs</Link>
+      <Link>Preprocessor.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/AST/Property.cs">
-      <Link>external/CppSharp/src/AST/Property.cs</Link>
+      <Link>Property.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/AST/PropertyExtensions.cs">
-      <Link>external/CppSharp/src/AST/PropertyExtensions.cs</Link>
+      <Link>PropertyExtensions.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/AST/Reference.cs">
-      <Link>external/CppSharp/src/AST/Reference.cs</Link>
+      <Link>Reference.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/AST/SourceLocation.cs">
-      <Link>external/CppSharp/src/AST/SourceLocation.cs</Link>
+      <Link>SourceLocation.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/AST/Statement.cs">
-      <Link>external/CppSharp/src/AST/Statement.cs</Link>
+      <Link>Statement.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/AST/SymbolContext.cs">
-      <Link>external/CppSharp/src/AST/SymbolContext.cs</Link>
+      <Link>SymbolContext.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/AST/Template.cs">
-      <Link>external/CppSharp/src/AST/Template.cs</Link>
+      <Link>Template.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/AST/TranslationUnit.cs">
-      <Link>external/CppSharp/src/AST/TranslationUnit.cs</Link>
+      <Link>TranslationUnit.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/AST/Type.cs">
-      <Link>external/CppSharp/src/AST/Type.cs</Link>
+      <Link>Type.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/AST/TypeExtensions.cs">
-      <Link>external/CppSharp/src/AST/TypeExtensions.cs</Link>
+      <Link>TypeExtensions.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/AST/Typedef.cs">
-      <Link>external/CppSharp/src/AST/Typedef.cs</Link>
+      <Link>Typedef.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/AST/Variable.cs">
-      <Link>external/CppSharp/src/AST/Variable.cs</Link>
+      <Link>Variable.cs</Link>
     </Compile>
   </ItemGroup>
   <ItemGroup>

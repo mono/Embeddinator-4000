@@ -43,10 +43,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="../../external/CppSharp/src/Runtime/Helpers.cs">
-      <Link>external/CppSharp/src/Runtime/Helpers.cs</Link>
+      <Link>Helpers.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Runtime/SymbolResolver.cs">
-      <Link>external/CppSharp/src/Runtime/SymbolResolver.cs</Link>
+      <Link>SymbolResolver.cs</Link>
     </Compile>
   </ItemGroup>
   <ItemGroup>

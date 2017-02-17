@@ -44,19 +44,19 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="../../external/CppSharp/src/Core/Diagnostics.cs">
-      <Link>external/CppSharp/src/Core/Diagnostics.cs</Link>
+      <Link>Diagnostics.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Core/Platform.cs">
-      <Link>external/CppSharp/src/Core/Platform.cs</Link>
+      <Link>Platform.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Core/Toolchains/MSVCToolchain.cs">
-      <Link>external/CppSharp/src/Core/Toolchains/MSVCToolchain.cs</Link>
+      <Link>Toolchains/MSVCToolchain.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Core/Toolchains/ManagedToolchain.cs">
-      <Link>external/CppSharp/src/Core/Toolchains/ManagedToolchain.cs</Link>
+      <Link>Toolchains/ManagedToolchain.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Core/Toolchains/XcodeToolchain.cs">
-      <Link>external/CppSharp/src/Core/Toolchains/XcodeToolchain.cs</Link>
+      <Link>Toolchains/XcodeToolchain.cs</Link>
     </Compile>
   </ItemGroup>
   <ItemGroup>

@@ -42,235 +42,238 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="../../external/CppSharp/src/Generator/AST/ASTRecord.cs">
-      <Link>external/CppSharp/src/Generator/AST/ASTRecord.cs</Link>
+      <Link>AST/ASTRecord.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/AST/Utils.cs">
-      <Link>external/CppSharp/src/Generator/AST/Utils.cs</Link>
+      <Link>AST/Utils.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/AST/VTables.cs">
-      <Link>external/CppSharp/src/Generator/AST/VTables.cs</Link>
+      <Link>AST/VTables.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/BindingContext.cs">
-      <Link>external/CppSharp/src/Generator/BindingContext.cs</Link>
+      <Link>BindingContext.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Driver.cs">
-      <Link>external/CppSharp/src/Generator/Driver.cs</Link>
+      <Link>Driver.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Generator.cs">
-      <Link>external/CppSharp/src/Generator/Generator.cs</Link>
+      <Link>Generator.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Generators/CLI/CLIGenerator.cs">
-      <Link>external/CppSharp/src/Generator/Generators/CLI/CLIGenerator.cs</Link>
+      <Link>Generators/CLI/CLIGenerator.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Generators/CLI/CLIHeaders.cs">
-      <Link>external/CppSharp/src/Generator/Generators/CLI/CLIHeaders.cs</Link>
+      <Link>Generators/CLI/CLIHeaders.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Generators/CLI/CLIMarshal.cs">
-      <Link>external/CppSharp/src/Generator/Generators/CLI/CLIMarshal.cs</Link>
+      <Link>Generators/CLI/CLIMarshal.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Generators/CLI/CLISources.cs">
-      <Link>external/CppSharp/src/Generator/Generators/CLI/CLISources.cs</Link>
+      <Link>Generators/CLI/CLISources.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Generators/CLI/CLITemplate.cs">
-      <Link>external/CppSharp/src/Generator/Generators/CLI/CLITemplate.cs</Link>
+      <Link>Generators/CLI/CLITemplate.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Generators/CLI/CLITypePrinter.cs">
-      <Link>external/CppSharp/src/Generator/Generators/CLI/CLITypePrinter.cs</Link>
+      <Link>Generators/CLI/CLITypePrinter.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Generators/CLI/CLITypeReferences.cs">
-      <Link>external/CppSharp/src/Generator/Generators/CLI/CLITypeReferences.cs</Link>
+      <Link>Generators/CLI/CLITypeReferences.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Generators/CSharp/CSharpCommentPrinter.cs">
-      <Link>external/CppSharp/src/Generator/Generators/CSharp/CSharpCommentPrinter.cs</Link>
+      <Link>Generators/CSharp/CSharpCommentPrinter.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Generators/CSharp/CSharpExpressionPrinter.cs">
-      <Link>external/CppSharp/src/Generator/Generators/CSharp/CSharpExpressionPrinter.cs</Link>
+      <Link>Generators/CSharp/CSharpExpressionPrinter.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Generators/CSharp/CSharpGenerator.cs">
-      <Link>external/CppSharp/src/Generator/Generators/CSharp/CSharpGenerator.cs</Link>
+      <Link>Generators/CSharp/CSharpGenerator.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Generators/CSharp/CSharpMarshal.cs">
-      <Link>external/CppSharp/src/Generator/Generators/CSharp/CSharpMarshal.cs</Link>
+      <Link>Generators/CSharp/CSharpMarshal.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Generators/CSharp/CSharpSources.cs">
-      <Link>external/CppSharp/src/Generator/Generators/CSharp/CSharpSources.cs</Link>
+      <Link>Generators/CSharp/CSharpSources.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Generators/CSharp/CSharpTypePrinter.cs">
-      <Link>external/CppSharp/src/Generator/Generators/CSharp/CSharpTypePrinter.cs</Link>
+      <Link>Generators/CSharp/CSharpTypePrinter.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Generators/CodeGenerator.cs">
-      <Link>external/CppSharp/src/Generator/Generators/CodeGenerator.cs</Link>
+      <Link>Generators/CodeGenerator.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Generators/ExtensionMethods.cs">
-      <Link>external/CppSharp/src/Generator/Generators/ExtensionMethods.cs</Link>
+      <Link>Generators/ExtensionMethods.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Generators/Marshal.cs">
-      <Link>external/CppSharp/src/Generator/Generators/Marshal.cs</Link>
+      <Link>Generators/Marshal.cs</Link>
+    </Compile>
+    <Compile Include="../../external/CppSharp/src/Generator/Generators/TypePrinter.cs">
+      <Link>Generators/TypePrinter.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Library.cs">
-      <Link>external/CppSharp/src/Generator/Library.cs</Link>
+      <Link>Library.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Options.cs">
-      <Link>external/CppSharp/src/Generator/Options.cs</Link>
+      <Link>Options.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Passes/CheckAbiParameters.cs">
-      <Link>external/CppSharp/src/Generator/Passes/CheckAbiParameters.cs</Link>
+      <Link>Passes/CheckAbiParameters.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Passes/CheckAmbiguousFunctions.cs">
-      <Link>external/CppSharp/src/Generator/Passes/CheckAmbiguousFunctions.cs</Link>
+      <Link>Passes/CheckAmbiguousFunctions.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Passes/CheckDuplicatedNamesPass.cs">
-      <Link>external/CppSharp/src/Generator/Passes/CheckDuplicatedNamesPass.cs</Link>
+      <Link>Passes/CheckDuplicatedNamesPass.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Passes/CheckFlagEnumsPass.cs">
-      <Link>external/CppSharp/src/Generator/Passes/CheckFlagEnumsPass.cs</Link>
+      <Link>Passes/CheckFlagEnumsPass.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Passes/CheckIgnoredDecls.cs">
-      <Link>external/CppSharp/src/Generator/Passes/CheckIgnoredDecls.cs</Link>
+      <Link>Passes/CheckIgnoredDecls.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Passes/CheckMacrosPass.cs">
-      <Link>external/CppSharp/src/Generator/Passes/CheckMacrosPass.cs</Link>
+      <Link>Passes/CheckMacrosPass.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Passes/CheckOperatorsOverloads.cs">
-      <Link>external/CppSharp/src/Generator/Passes/CheckOperatorsOverloads.cs</Link>
+      <Link>Passes/CheckOperatorsOverloads.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Passes/CheckStaticClass.cs">
-      <Link>external/CppSharp/src/Generator/Passes/CheckStaticClass.cs</Link>
+      <Link>Passes/CheckStaticClass.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Passes/CheckVirtualOverrideReturnCovariance.cs">
-      <Link>external/CppSharp/src/Generator/Passes/CheckVirtualOverrideReturnCovariance.cs</Link>
+      <Link>Passes/CheckVirtualOverrideReturnCovariance.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Passes/CleanInvalidDeclNamesPass.cs">
-      <Link>external/CppSharp/src/Generator/Passes/CleanInvalidDeclNamesPass.cs</Link>
+      <Link>Passes/CleanInvalidDeclNamesPass.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Passes/CleanUnitPass.cs">
-      <Link>external/CppSharp/src/Generator/Passes/CleanUnitPass.cs</Link>
+      <Link>Passes/CleanUnitPass.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Passes/ConstructorToConversionOperatorPass.cs">
-      <Link>external/CppSharp/src/Generator/Passes/ConstructorToConversionOperatorPass.cs</Link>
+      <Link>Passes/ConstructorToConversionOperatorPass.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Passes/DelegatesPass.cs">
-      <Link>external/CppSharp/src/Generator/Passes/DelegatesPass.cs</Link>
+      <Link>Passes/DelegatesPass.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Passes/FieldToPropertyPass.cs">
-      <Link>external/CppSharp/src/Generator/Passes/FieldToPropertyPass.cs</Link>
+      <Link>Passes/FieldToPropertyPass.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Passes/FindSymbolsPass.cs">
-      <Link>external/CppSharp/src/Generator/Passes/FindSymbolsPass.cs</Link>
+      <Link>Passes/FindSymbolsPass.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Passes/FixDefaultParamValuesOfOverridesPass.cs">
-      <Link>external/CppSharp/src/Generator/Passes/FixDefaultParamValuesOfOverridesPass.cs</Link>
+      <Link>Passes/FixDefaultParamValuesOfOverridesPass.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Passes/FixParameterUsageFromComments.cs">
-      <Link>external/CppSharp/src/Generator/Passes/FixParameterUsageFromComments.cs</Link>
+      <Link>Passes/FixParameterUsageFromComments.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Passes/FunctionToInstanceMethodPass.cs">
-      <Link>external/CppSharp/src/Generator/Passes/FunctionToInstanceMethodPass.cs</Link>
+      <Link>Passes/FunctionToInstanceMethodPass.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Passes/FunctionToStaticMethodPass.cs">
-      <Link>external/CppSharp/src/Generator/Passes/FunctionToStaticMethodPass.cs</Link>
+      <Link>Passes/FunctionToStaticMethodPass.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Passes/GenerateAbstractImplementationsPass.cs">
-      <Link>external/CppSharp/src/Generator/Passes/GenerateAbstractImplementationsPass.cs</Link>
+      <Link>Passes/GenerateAbstractImplementationsPass.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Passes/GenerateAnonymousDelegatesPass.cs">
-      <Link>external/CppSharp/src/Generator/Passes/GenerateAnonymousDelegatesPass.cs</Link>
+      <Link>Passes/GenerateAnonymousDelegatesPass.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Passes/GenerateInlinesPass.cs">
-      <Link>external/CppSharp/src/Generator/Passes/GenerateInlinesPass.cs</Link>
+      <Link>Passes/GenerateInlinesPass.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Passes/GenerateTemplatesCodePass.cs">
-      <Link>external/CppSharp/src/Generator/Passes/GenerateTemplatesCodePass.cs</Link>
+      <Link>Passes/GenerateTemplatesCodePass.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Passes/GetterSetterToPropertyPass.cs">
-      <Link>external/CppSharp/src/Generator/Passes/GetterSetterToPropertyPass.cs</Link>
+      <Link>Passes/GetterSetterToPropertyPass.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Passes/HandleDefaultParamValuesPass.cs">
-      <Link>external/CppSharp/src/Generator/Passes/HandleDefaultParamValuesPass.cs</Link>
+      <Link>Passes/HandleDefaultParamValuesPass.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Passes/IgnoreSystemDeclarationsPass.cs">
-      <Link>external/CppSharp/src/Generator/Passes/IgnoreSystemDeclarationsPass.cs</Link>
+      <Link>Passes/IgnoreSystemDeclarationsPass.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Passes/InlinesCodeGenerator.cs">
-      <Link>external/CppSharp/src/Generator/Passes/InlinesCodeGenerator.cs</Link>
+      <Link>Passes/InlinesCodeGenerator.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Passes/MarkSupportedClassTemplateSpecializationsPass.cs">
-      <Link>external/CppSharp/src/Generator/Passes/MarkSupportedClassTemplateSpecializationsPass.cs</Link>
+      <Link>Passes/MarkSupportedClassTemplateSpecializationsPass.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Passes/MarshalPrimitivePointersAsRefTypePass.cs">
-      <Link>external/CppSharp/src/Generator/Passes/MarshalPrimitivePointersAsRefTypePass.cs</Link>
+      <Link>Passes/MarshalPrimitivePointersAsRefTypePass.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Passes/MoveFunctionToClassPass.cs">
-      <Link>external/CppSharp/src/Generator/Passes/MoveFunctionToClassPass.cs</Link>
+      <Link>Passes/MoveFunctionToClassPass.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Passes/MoveOperatorToClassPass.cs">
-      <Link>external/CppSharp/src/Generator/Passes/MoveOperatorToClassPass.cs</Link>
+      <Link>Passes/MoveOperatorToClassPass.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Passes/MultipleInheritancePass.cs">
-      <Link>external/CppSharp/src/Generator/Passes/MultipleInheritancePass.cs</Link>
+      <Link>Passes/MultipleInheritancePass.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Passes/ObjectOverridesPass.cs">
-      <Link>external/CppSharp/src/Generator/Passes/ObjectOverridesPass.cs</Link>
+      <Link>Passes/ObjectOverridesPass.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Passes/ParamTypeToInterfacePass.cs">
-      <Link>external/CppSharp/src/Generator/Passes/ParamTypeToInterfacePass.cs</Link>
+      <Link>Passes/ParamTypeToInterfacePass.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Passes/Pass.cs">
-      <Link>external/CppSharp/src/Generator/Passes/Pass.cs</Link>
+      <Link>Passes/Pass.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Passes/PassBuilder.cs">
-      <Link>external/CppSharp/src/Generator/Passes/PassBuilder.cs</Link>
+      <Link>Passes/PassBuilder.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Passes/RenamePass.cs">
-      <Link>external/CppSharp/src/Generator/Passes/RenamePass.cs</Link>
+      <Link>Passes/RenamePass.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Passes/ResolveIncompleteDeclsPass.cs">
-      <Link>external/CppSharp/src/Generator/Passes/ResolveIncompleteDeclsPass.cs</Link>
+      <Link>Passes/ResolveIncompleteDeclsPass.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Passes/SortDeclarationsPass.cs">
-      <Link>external/CppSharp/src/Generator/Passes/SortDeclarationsPass.cs</Link>
+      <Link>Passes/SortDeclarationsPass.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Passes/StripUnusedSystemTypesPass.cs">
-      <Link>external/CppSharp/src/Generator/Passes/StripUnusedSystemTypesPass.cs</Link>
+      <Link>Passes/StripUnusedSystemTypesPass.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Passes/TrimSpecializationsPass.cs">
-      <Link>external/CppSharp/src/Generator/Passes/TrimSpecializationsPass.cs</Link>
+      <Link>Passes/TrimSpecializationsPass.cs</Link>
     </Compile>
     <EmbeddedResource Include="../../external/CppSharp/src/Generator/Passes/verbs.txt">
-      <Link>external/CppSharp/src/Generator/Passes/verbs.txt</Link>
+      <Link>Passes/verbs.txt</Link>
     </EmbeddedResource>
     <Compile Include="../../external/CppSharp/src/Generator/Types/Std/Stdlib.cs">
-      <Link>external/CppSharp/src/Generator/Types/Std/Stdlib.cs</Link>
+      <Link>Types/Std/Stdlib.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Types/TypeMap.cs">
-      <Link>external/CppSharp/src/Generator/Types/TypeMap.cs</Link>
+      <Link>Types/TypeMap.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Types/Types.cs">
-      <Link>external/CppSharp/src/Generator/Types/Types.cs</Link>
+      <Link>Types/Types.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Utils/BlockGenerator.cs">
-      <Link>external/CppSharp/src/Generator/Utils/BlockGenerator.cs</Link>
+      <Link>Utils/BlockGenerator.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Utils/HtmlEncoder.cs">
-      <Link>external/CppSharp/src/Generator/Utils/HtmlEncoder.cs</Link>
+      <Link>Utils/HtmlEncoder.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Utils/IEnumerableExtensions.cs">
-      <Link>external/CppSharp/src/Generator/Utils/IEnumerableExtensions.cs</Link>
+      <Link>Utils/IEnumerableExtensions.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Utils/Options.cs">
-      <Link>external/CppSharp/src/Generator/Utils/Options.cs</Link>
+      <Link>Utils/Options.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Utils/OrderedSet.cs">
-      <Link>external/CppSharp/src/Generator/Utils/OrderedSet.cs</Link>
+      <Link>Utils/OrderedSet.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Utils/ProcessHelper.cs">
-      <Link>external/CppSharp/src/Generator/Utils/ProcessHelper.cs</Link>
+      <Link>Utils/ProcessHelper.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Utils/TextGenerator.cs">
-      <Link>external/CppSharp/src/Generator/Utils/TextGenerator.cs</Link>
+      <Link>Utils/TextGenerator.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Utils/Utils.cs">
-      <Link>external/CppSharp/src/Generator/Utils/Utils.cs</Link>
+      <Link>Utils/Utils.cs</Link>
     </Compile>
   </ItemGroup>
   <ItemGroup>

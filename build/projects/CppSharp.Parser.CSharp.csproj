@@ -42,13 +42,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="../../external/CppSharp/src/CppParser/Bindings/CSharp/i686-apple-darwin12.4.0/CppSharp.CppParser.cs">
-      <Link>external/CppSharp/src/CppParser/Bindings/CSharp/i686-apple-darwin12.4.0/CppSharp.CppParser.cs</Link>
+      <Link>i686-apple-darwin12.4.0/CppSharp.CppParser.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/CppParser/Bindings/CSharp/i686-apple-darwin12.4.0/Std.cs">
-      <Link>external/CppSharp/src/CppParser/Bindings/CSharp/i686-apple-darwin12.4.0/Std.cs</Link>
+      <Link>i686-apple-darwin12.4.0/Std.cs</Link>
     </Compile>
     <None Include="../../external/CppSharp/src/CppParser/Bindings/CSharp/premake5.lua">
-      <Link>external/CppSharp/src/CppParser/Bindings/CSharp/premake5.lua</Link>
+      <Link>premake5.lua</Link>
     </None>
   </ItemGroup>
   <ItemGroup>

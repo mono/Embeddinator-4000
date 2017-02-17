@@ -44,16 +44,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="../../external/CppSharp/src/Parser/ASTConverter.cs">
-      <Link>external/CppSharp/src/Parser/ASTConverter.cs</Link>
+      <Link>ASTConverter.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Parser/Parser.cs">
-      <Link>external/CppSharp/src/Parser/Parser.cs</Link>
+      <Link>Parser.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Parser/ParserOptions.cs">
-      <Link>external/CppSharp/src/Parser/ParserOptions.cs</Link>
+      <Link>ParserOptions.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Parser/Project.cs">
-      <Link>external/CppSharp/src/Parser/Project.cs</Link>
+      <Link>Project.cs</Link>
     </Compile>
   </ItemGroup>
   <ItemGroup>
