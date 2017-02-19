@@ -5,6 +5,7 @@ os:
   - osx
 
 dist: trusty
+sudo: required
 
 addons:
   apt:
