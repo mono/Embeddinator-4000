@@ -134,6 +134,9 @@ namespace MonoEmbeddinator4000
             options.Target = Target;
             options.DebugMode = DebugMode;
 
+            if (options.OutputDir == null)
+                options.OutputDir = Directory.GetCurrentDirectory();
+
             if (string.IsNullOrEmpty(Generator))
             {
                 Console.Error.WriteLine("Please specify a target generator.");
