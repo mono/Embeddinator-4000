@@ -151,6 +151,8 @@ namespace MonoEmbeddinator4000
                     throw new NotImplementedException();
             }
 
+            generator.SetupPasses();
+
             foreach (var unit in Context.ASTContext.TranslationUnits)
             {
                 var outputs = generator.Generate(new[] { unit });
