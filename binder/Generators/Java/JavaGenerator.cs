@@ -100,30 +100,8 @@ namespace MonoEmbeddinator4000.Generators
             Write(")");
         }
 
-        public virtual string GenerateClassObjectAlloc(string type)
-        {
-            return $"({type}*) calloc(1, sizeof({type}))";
-        }
-
         public override bool VisitTypedefDecl(TypedefDecl typedef)
         {
-            PushBlock();
-
-            var typeName = typedef.Type.Visit(CTypePrinter);
-            WriteLine("typedef {0} {1};", typeName, typedef.Name);
-
-            var newlineKind = NewLineKind.BeforeNextBlock;
-
-            var declarations = typedef.Namespace.Declarations;
-            var newIndex = declarations.FindIndex(d => d == typedef) + 1;
-            if (newIndex < declarations.Count)
-            {
-                if (declarations[newIndex] is TypedefDecl)
-                    newlineKind = NewLineKind.Never;
-            }
-
-            PopBlock(newlineKind);
-
             return true;
         }
 

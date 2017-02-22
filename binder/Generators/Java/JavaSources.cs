@@ -33,7 +33,6 @@ namespace MonoEmbeddinator4000.Generators
             foreach (var decl in context.Declarations)
                 decl.Visit(this);
 
-
             return true;
         }
 
