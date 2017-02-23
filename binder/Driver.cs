@@ -162,10 +162,7 @@ namespace MonoEmbeddinator4000
                     output.Process();
                     var text = output.Generate();
 
-                    var name = unit.FileNameWithoutExtension;
-                    var path = string.Format("{0}.{1}", name, output.FileExtension);
-
-                    Output.WriteOutput(path, text);
+                    Output.WriteOutput(output.FilePath, text);
                 }
             }
 
