@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using CppSharp;
 using CppSharp.AST;
 using CppSharp.Generators;
@@ -8,13 +10,32 @@ namespace MonoEmbeddinator4000.Generators
 {
     public class JavaSources : CSharpSources
     {
-        public JavaSources(BindingContext context, TranslationUnit unit)
-            : base(context, new List<TranslationUnit> { unit })
+        public JavaSources(BindingContext context, Declaration decl)
+            : base(context, new List<TranslationUnit> { decl.TranslationUnit })
         {
+            Declaration = decl;
             TypePrinter = new JavaTypePrinter(context);
         }
 
+        public Declaration Declaration;
+
         public override string FileExtension => "java";
+
+        public override string FilePath
+        {
+            get
+            {
+                var packages = Declaration.GatherNamespaces(Declaration.Namespace)
+                    .ToList();
+                packages.Add(Declaration);
+                packages.Remove(packages.First());
+
+                var filePath = string.Join(Path.DirectorySeparatorChar.ToString(),
+                    packages.Select(n => n.Name));
+
+                return $"{filePath}.{FileExtension}";
+            }
+        }
 
         public string AssemblyId => CGenerator.AssemblyId(TranslationUnit);
 
@@ -23,9 +44,8 @@ namespace MonoEmbeddinator4000.Generators
             GenerateFilePreamble();
 
             PushBlock();
+            Declaration.Visit(this);
             PopBlock(NewLineKind.BeforeNextBlock);
-
-            TranslationUnit.Visit(this);
         }
 
         public override bool VisitDeclContext(DeclarationContext context)

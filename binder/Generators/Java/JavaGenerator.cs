@@ -14,12 +14,34 @@ namespace MonoEmbeddinator4000.Generators
         {
         }
 
+        List<CodeGenerator> Generators = new List<CodeGenerator>();
+
         public override List<CodeGenerator> Generate(IEnumerable<TranslationUnit> units)
         {
             var unit = units.First();
-            var sources = new JavaSources(Context, unit);
 
-            return new List<CodeGenerator> { sources };
+            // Java packages work very differently from C++/C# namespaces, so we take a
+            // different approach. We generate a file for each declaration in the source.
+            GenerateDeclarationContext(unit);
+
+            return Generators;
+        }
+
+        public void GenerateDeclarationContext(DeclarationContext context)
+        {
+            foreach (var decl in context.Declarations)
+            {
+                if (decl is Method || decl is Field || decl is Property) continue;
+
+                if (!(decl is Namespace))
+                {
+                    var sources = new JavaSources(Context, decl);
+                    Generators.Add(sources);
+                }
+
+                if (decl is DeclarationContext)
+                    GenerateDeclarationContext(decl as DeclarationContext);
+            }
         }
 
         public static JavaManagedToNativeTypePrinter GetJavaManagedToNativeTypePrinter()
