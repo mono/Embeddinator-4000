@@ -31,7 +31,7 @@ namespace MonoEmbeddinator4000.Generators
 
         public override void Process()
         {
-            GenerateFilePreamble();
+            GenerateFilePreamble(CommentKind.BCPL);
 
             PushBlock();
             WriteHeaders();

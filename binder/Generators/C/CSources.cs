@@ -41,7 +41,7 @@ namespace MonoEmbeddinator4000.Generators
         {
             RemoveTypedefNodes();
 
-            GenerateFilePreamble();
+            GenerateFilePreamble(CommentKind.BCPL);
 
             PushBlock();
             WriteHeaders();
