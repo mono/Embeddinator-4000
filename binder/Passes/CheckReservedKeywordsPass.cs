@@ -4,7 +4,7 @@ using CppSharp.Passes;
 
 namespace MonoEmbeddinator4000
 {
-    public class CheckKeywordsPass : TranslationUnitPass
+    public class CheckReservedKeywords : TranslationUnitPass
     {
         readonly List<string> ReservedKeywords = new List<string> {
             // C99 6.4.1: Keywords.

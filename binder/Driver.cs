@@ -77,7 +77,7 @@ namespace MonoEmbeddinator4000
 
             var passes = new List<TranslationUnitPass>
             {
-                new CheckKeywordsPass(),
+                new CheckReservedKeywords(),
                 new FixMethodParametersPass(),
                 new GenerateObjectTypesPass(),
                 new GenerateArrayTypes(),

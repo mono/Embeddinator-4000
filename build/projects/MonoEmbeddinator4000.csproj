@@ -11,7 +11,6 @@
     <AssemblyName>MonoEmbeddinator4000</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <BaseIntermediateOutputPath>..\obj\Debug\MonoEmbeddinator4000</BaseIntermediateOutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -99,8 +98,8 @@
     <Compile Include="../../binder/Parser.cs">
       <Link>binder/Parser.cs</Link>
     </Compile>
-    <Compile Include="../../binder/Passes/CheckKeywordsPass.cs">
-      <Link>binder/Passes/CheckKeywordsPass.cs</Link>
+    <Compile Include="../../binder/Passes/CheckReservedKeywordsPass.cs">
+      <Link>binder/Passes/CheckReservedKeywordsPass.cs</Link>
     </Compile>
     <Compile Include="../../binder/Passes/FieldToGetterSetter.cs">
       <Link>binder/Passes/FieldToGetterSetter.cs</Link>
