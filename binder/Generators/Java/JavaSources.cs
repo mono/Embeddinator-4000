@@ -21,18 +21,23 @@ namespace MonoEmbeddinator4000.Generators
 
         public override string FileExtension => "java";
 
+        static IEnumerable<string> GetPackageNames(Declaration decl)
+        {
+            var namespaces = Declaration.GatherNamespaces(decl.Namespace)
+                .ToList();
+            namespaces.Remove(namespaces.First());
+
+            return namespaces.Select(n => n.Name.ToLowerInvariant());
+        }
+
         public override string FilePath
         {
             get
             {
-                var packages = Declaration.GatherNamespaces(Declaration.Namespace)
-                    .ToList();
-                packages.Add(Declaration);
-                packages.Remove(packages.First());
+                var names = GetPackageNames(Declaration).ToList();
+                names.Add(Declaration.Name);
 
-                var filePath = string.Join(Path.DirectorySeparatorChar.ToString(),
-                    packages.Select(n => n.Name));
-
+                var filePath = string.Join(Path.DirectorySeparatorChar.ToString(), names);
                 return $"{filePath}.{FileExtension}";
             }
         }
@@ -43,9 +48,17 @@ namespace MonoEmbeddinator4000.Generators
         {
             GenerateFilePreamble();
 
+            GenerateJavaPackage(Declaration);
+
             PushBlock();
             Declaration.Visit(this);
             PopBlock(NewLineKind.BeforeNextBlock);
+        }
+
+        public void GenerateJavaPackage(Declaration decl)
+        {
+            var package = string.Join(".", GetPackageNames(decl));
+            WriteLine($"package {package};");
         }
 
         public override bool VisitDeclContext(DeclarationContext context)
