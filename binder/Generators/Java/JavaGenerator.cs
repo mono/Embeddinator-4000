@@ -22,16 +22,6 @@ namespace MonoEmbeddinator4000.Generators
             return new List<CodeGenerator> { sources };
         }
 
-        public static string GenId(string id)
-        {
-            return "__" + id;
-        }
-
-        public static string AssemblyId(TranslationUnit unit)
-        {
-            return GenId(unit.FileName).Replace('.', '_');
-        }
-
         public static JavaManagedToNativeTypePrinter GetJavaManagedToNativeTypePrinter()
         {
             return new JavaManagedToNativeTypePrinter
@@ -61,19 +51,6 @@ namespace MonoEmbeddinator4000.Generators
             : base(context, unit)
         {
             Unit = unit;
-        }
-
-        public string GeneratedIdentifier(string id)
-        {
-            return CGenerator.GenId(id);
-        }
-
-        public string QualifiedName(Declaration decl)
-        {
-            if (Options.GeneratorKind == GeneratorKind.CPlusPlus)
-                return decl.Name;
-
-            return decl.QualifiedName;
         }
 
         public CManagedToNativeTypePrinter CTypePrinter =>
