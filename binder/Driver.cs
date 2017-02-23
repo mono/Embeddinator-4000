@@ -115,7 +115,7 @@ namespace MonoEmbeddinator4000
             throw new Exception("Support directory was not found");
         }
 
-        void GenerateSupportFiles(ProjectOutput output)
+        void GenerateSupportFiles()
         {
             // Search for the location of support directory and bundle files with output.
             try
@@ -167,7 +167,7 @@ namespace MonoEmbeddinator4000
             }
 
             if (Options.GenerateSupportFiles)
-                GenerateSupportFiles(Output);
+                GenerateSupportFiles();
         }
 
         void WriteFiles()
