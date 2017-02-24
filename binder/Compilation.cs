@@ -225,8 +225,8 @@ namespace MonoEmbeddinator4000
 
         private IEnumerable<string> GetOutputFiles(string pattern)
         {
-            return Directory.EnumerateFiles(Options.OutputDir)
-                    .Where(file => file.EndsWith(pattern, StringComparison.OrdinalIgnoreCase));
+            return Output.Files.Keys.Select(file => Path.Combine(Options.OutputDir, file))
+                .Where(file => file.EndsWith(pattern, StringComparison.OrdinalIgnoreCase));
         }
 
         void AotAssemblies()
