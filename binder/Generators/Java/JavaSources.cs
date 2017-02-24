@@ -58,7 +58,8 @@ namespace MonoEmbeddinator4000.Generators
         public void GenerateJavaPackage(Declaration decl)
         {
             var package = string.Join(".", GetPackageNames(decl));
-            WriteLine($"package {package};");
+            if (!string.IsNullOrWhiteSpace(package))
+                WriteLine($"package {package};");
         }
 
         public override bool VisitDeclContext(DeclarationContext context)
