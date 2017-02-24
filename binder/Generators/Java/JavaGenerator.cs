@@ -31,7 +31,8 @@ namespace MonoEmbeddinator4000.Generators
         {
             foreach (var decl in context.Declarations)
             {
-                if (decl is Method || decl is Field || decl is Property) continue;
+                if (decl is Method || decl is Field || decl is Property ||
+                    decl is TypedefDecl) continue;
 
                 if (!(decl is Namespace))
                 {

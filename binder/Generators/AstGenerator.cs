@@ -144,6 +144,7 @@ namespace MonoEmbeddinator4000.Generators
                 var @value = Convert.ToUInt64(item.GetRawConstantValue());
                 var enumItem = new Enumeration.Item
                 {
+                    Namespace = @enum,
                     Name = item.Name,
                     Value = @value,
                     ExplicitValue = true
