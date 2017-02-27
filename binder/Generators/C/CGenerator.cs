@@ -80,7 +80,7 @@ namespace MonoEmbeddinator4000.Generators
             Unit = unit;
         }
 
-        public string GeneratedIdentifier(string id)
+        public override string GeneratedIdentifier(string id)
         {
             return CGenerator.GenId(id);
         }
