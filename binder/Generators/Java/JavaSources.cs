@@ -72,6 +72,54 @@ namespace MonoEmbeddinator4000.Generators
 
         public override bool VisitEnumDecl(Enumeration @enum)
         {
+            if (@enum.IsIncomplete)
+                return true;
+
+            PushBlock(CSharpBlockKind.Enum);
+            GenerateDeclarationCommon(@enum);
+
+            //Write(Helpers.GetAccess(@enum.Access));
+            Write("enum {0}", SafeIdentifier(@enum.Name));
+
+            //var typeName = TypePrinter.VisitPrimitiveType(@enum.BuiltinType.Type,
+            //                                              new TypeQualifiers());
+
+            //if (@enum.BuiltinType.Type != PrimitiveType.Int)
+            //    Write(" : {0}", typeName);
+
+            NewLine();
+
+            WriteStartBraceIndent();
+            GenerateEnumItems(@enum);
+
+            NewLine();
+            WriteLine("private final int id;");
+            WriteLine($"{@enum.Name}(int id) {{ this.id = id; }}");
+            WriteLine("public int getValue() { return id; }");
+
+            WriteCloseBraceIndent();
+            PopBlock(NewLineKind.BeforeNextBlock);
+
+            return true;
+        }
+
+        public override void GenerateEnumItems(Enumeration @enum)
+        {
+            base.GenerateEnumItems(@enum);
+            WriteLine(";");
+        }
+
+        public override bool VisitEnumItemDecl(Enumeration.Item item)
+        {
+            if (item.Comment != null)
+                GenerateInlineSummary(item.Comment);
+
+            Write(item.Name);
+
+            var @enum = item.Namespace as Enumeration;
+            if (item.ExplicitValue)
+                Write("({0})", @enum.GetItemValueAsString(item));
+
             return true;
         }
 
