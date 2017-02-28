@@ -79,9 +79,7 @@ namespace MonoEmbeddinator4000.Generators
             GenerateDeclarationCommon(@enum);
 
             Write(AccessIdentifier(@enum.Access));
-            Write("enum {0}", SafeIdentifier(@enum.Name));
-
-            NewLine();
+            Write("enum {0} ", SafeIdentifier(@enum.Name));
 
             WriteStartBraceIndent();
             GenerateEnumItems(@enum);
