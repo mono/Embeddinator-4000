@@ -120,9 +120,50 @@ namespace MonoEmbeddinator4000.Generators
             return true;
         }
 
+        public override void GenerateClassSpecifier(Class @class)
+        {
+            var keywords = new List<string>();
+            
+            keywords.Add(@class.Access == AccessSpecifier.Protected ? "protected internal" : "public");
+
+            if (@class.IsAbstract)
+                keywords.Add("abstract");
+
+            if (@class.IsStatic)
+                keywords.Add("static");
+
+            keywords.Add(@class.IsInterface ? "interface" : "class");
+            keywords.Add(SafeIdentifier(@class.Name));
+
+            Write(string.Join(" ", keywords));
+
+            var bases = new List<BaseClassSpecifier>();
+
+            if (@class.NeedsBase)
+                bases.AddRange(@class.Bases.Where(@base => @base.IsClass));
+
+            if (bases.Count > 0 && !@class.IsStatic)
+            {
+                var classes = bases.Where(@base => !@base.Class.IsInterface)
+                                   .Select(@base => @base.Class.Visit(TypePrinter).Type);
+                if (classes.Count() > 0)
+                    Write(" extends {0}", string.Join(", ", classes));
+
+                var interfaces = bases.Where(@base => @base.Class.IsInterface)
+                                      .Select(@base => @base.Class.Visit(TypePrinter).Type);
+                if (interfaces.Count() > 0)
+                    Write(" implements {0}", string.Join(", ", interfaces));
+            }
+        }
+
         public override bool VisitClassDecl(Class @class)
         {
+            GenerateClassSpecifier(@class);
+            Write(" ");
+
+            WriteStartBraceIndent();
             VisitDeclContext(@class);
+            WriteCloseBraceIndent();
 
             return true;
         }
