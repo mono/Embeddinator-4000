@@ -49,6 +49,7 @@ namespace MonoEmbeddinator4000.Generators
             GenerateFilePreamble(CommentKind.JavaDoc);
 
             GenerateJavaPackage(Declaration);
+            NewLine();
 
             PushBlock();
             Declaration.Visit(this);
