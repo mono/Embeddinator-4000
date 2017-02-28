@@ -75,17 +75,11 @@ namespace MonoEmbeddinator4000.Generators
             if (@enum.IsIncomplete)
                 return true;
 
-            PushBlock(CSharpBlockKind.Enum);
+            PushBlock(BlockKind.Enum);
             GenerateDeclarationCommon(@enum);
 
-            //Write(Helpers.GetAccess(@enum.Access));
+            Write(AccessIdentifier(@enum.Access));
             Write("enum {0}", SafeIdentifier(@enum.Name));
-
-            //var typeName = TypePrinter.VisitPrimitiveType(@enum.BuiltinType.Type,
-            //                                              new TypeQualifiers());
-
-            //if (@enum.BuiltinType.Type != PrimitiveType.Int)
-            //    Write(" : {0}", typeName);
 
             NewLine();
 
@@ -93,7 +87,10 @@ namespace MonoEmbeddinator4000.Generators
             GenerateEnumItems(@enum);
 
             NewLine();
-            WriteLine("private final int id;");
+
+            var typeName = TypePrinter.VisitPrimitiveType(@enum.BuiltinType.Type,
+                                                          new TypeQualifiers());
+            WriteLine($"private final {typeName} id;");
             WriteLine($"{@enum.Name}(int id) {{ this.id = id; }}");
             WriteLine("public int getValue() { return id; }");
 
