@@ -28,11 +28,9 @@ namespace MonoEmbeddinator4000.Generators
         public static void GenerateObjCMethodSignature(this CCodeGenerator gen,
             Method method)
         {
-            var @class = method.Namespace as Class;
-            var retType = method.ReturnType.Visit(gen.CTypePrinter);
-
             gen.Write("{0}", method.IsStatic ? "+" : "-");
 
+            var retType = method.ReturnType.Visit(gen.CTypePrinter);
             gen.Write(" ({0}){1}", retType, method.Name);
 
             gen.Write(gen.CTypePrinter.VisitParameters(method.Parameters));
