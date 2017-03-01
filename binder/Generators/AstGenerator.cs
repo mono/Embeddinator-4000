@@ -136,19 +136,26 @@ namespace MonoEmbeddinator4000.Generators
             if (Options.GeneratorKind == GeneratorKind.CPlusPlus)
                 @enum.Modifiers = Enumeration.EnumModifiers.Scoped;
 
+            var builtinType = @enum.Type as BuiltinType;
+
             foreach (var item in type.DeclaredFields)
             {
                 if (!item.IsLiteral)
                     continue;
 
-                var @value = Convert.ToUInt64(item.GetRawConstantValue());
                 var enumItem = new Enumeration.Item
                 {
                     Namespace = @enum,
                     Name = item.Name,
-                    Value = @value,
                     ExplicitValue = true
                 };
+
+                var rawValue = item.GetRawConstantValue();
+
+                if (builtinType.IsUnsigned)
+                    enumItem.Value = Convert.ToUInt64(rawValue);
+                else
+                    enumItem.Value = (ulong) Convert.ToInt64(rawValue);
 
                 @enum.AddItem(enumItem);
             }
