@@ -45,24 +45,21 @@ namespace MonoEmbeddinator4000.Generators
             }
         }
 
-        public static JavaManagedToNativeTypePrinter GetJavaManagedToNativeTypePrinter()
-        {
-            return new JavaManagedToNativeTypePrinter
-            {
-                PrintScopeKind = TypePrintScopeKind.Qualified,
-                PrintVariableArrayAsPointers = true
-            };
-        }
-
         public override bool SetupPasses()
         {
             Context.TranslationUnitPasses.AddPass(new PropertyToGetterSetterPass());
             return true;
         }
 
+        public CManagedToNativeTypePrinter TypePrinter => new JavaManagedToNativeTypePrinter
+        {
+            PrintScopeKind = TypePrintScopeKind.Qualified,
+            PrintVariableArrayAsPointers = true
+        };
+
         protected override string TypePrinterDelegate(CppSharp.AST.Type type)
         {
-            throw new NotImplementedException();
+            return type.Visit(TypePrinter);
         }
     }
 
