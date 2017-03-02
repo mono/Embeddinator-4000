@@ -81,7 +81,7 @@ namespace MonoEmbeddinator4000
                 new FixMethodParametersPass(),
                 new GenerateObjectTypesPass(),
                 new GenerateArrayTypes(),
-                new CheckIgnoredDeclsPass()
+                new CheckIgnoredDeclsPass { CheckDecayedTypes = false }
             };
 
             if (Options.GeneratorKind == GeneratorKind.C ||
