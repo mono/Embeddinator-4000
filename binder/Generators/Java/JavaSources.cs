@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using CppSharp;
 using CppSharp.AST;
+using CppSharp.AST.Extensions;
 using CppSharp.Generators;
 using CppSharp.Generators.CSharp;
 
@@ -123,7 +124,7 @@ namespace MonoEmbeddinator4000.Generators
         {
             var keywords = new List<string>();
             
-            keywords.Add(@class.Access == AccessSpecifier.Protected ? "protected internal" : "public");
+            keywords.Add(AccessIdentifier(@class.Access));
 
             if (@class.IsAbstract)
                 keywords.Add("abstract");
@@ -167,8 +168,50 @@ namespace MonoEmbeddinator4000.Generators
             return true;
         }
 
+        public override void GenerateMethodSpecifier(Method method, Class @class)
+        {
+            var keywords = new List<string>();
+
+            if (method.IsGeneratedOverride())
+            {
+                Write("@Override");
+                NewLine();
+            }
+
+            if (method.IsStatic)
+                keywords.Add("static");
+
+            if (method.IsPure)
+                keywords.Add("abstract");
+
+            if (keywords.Count != 0)
+                Write("{0} ", string.Join(" ", keywords));
+
+            var functionName = GetMethodIdentifier(method);
+
+            if (method.IsConstructor || method.IsDestructor)
+                Write("{0}(", functionName);
+            else
+                Write("{0} {1}(", method.OriginalReturnType, functionName);
+
+            //Write(FormatMethodParameters(method.Parameters));
+
+            Write(")");
+        }
+
         public override bool VisitMethodDecl(Method method)
         {
+            PushBlock(BlockKind.Method, method);
+
+            var @class = method.Namespace as Class;
+            GenerateMethodSpecifier(method, @class);
+            NewLine();
+
+            WriteStartBraceIndent();
+            WriteCloseBraceIndent();
+
+            PopBlock(NewLineKind.BeforeNextBlock);
+
             return true;
         }
 
