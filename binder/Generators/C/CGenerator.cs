@@ -59,6 +59,9 @@ namespace MonoEmbeddinator4000.Generators
             return typePrinter;
         }
 
+        public virtual CManagedToNativeTypePrinter TypePrinter =>
+            GetCTypePrinter(GeneratorKind.C);
+
         public override bool SetupPasses()
         {
             return true;
@@ -66,7 +69,7 @@ namespace MonoEmbeddinator4000.Generators
 
         protected override string TypePrinterDelegate(CppSharp.AST.Type type)
         {
-            throw new NotImplementedException();
+            return type.Visit(TypePrinter);
         }
     }
 

@@ -8,6 +8,9 @@ namespace MonoEmbeddinator4000.Generators
 {
     public class ObjCGenerator : CGenerator
     {
+        public override CManagedToNativeTypePrinter TypePrinter =>
+            GetCTypePrinter(GeneratorKind.ObjectiveC);
+
         public ObjCGenerator(BindingContext context)
             : base(context)
         {
