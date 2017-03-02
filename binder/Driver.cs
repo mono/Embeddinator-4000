@@ -84,7 +84,8 @@ namespace MonoEmbeddinator4000
                 new CheckIgnoredDeclsPass()
             };
 
-            if (Options.GeneratorKind != GeneratorKind.CPlusPlus)
+            if (Options.GeneratorKind == GeneratorKind.C ||
+                Options.GeneratorKind == GeneratorKind.ObjectiveC)
                 passes.Add(new RenameEnumItemsPass());
 
             passes.AddRange(new TranslationUnitPass[]
