@@ -74,6 +74,7 @@ namespace MonoEmbeddinator4000.Generators
                 case PrimitiveType.IntPtr:
                 case PrimitiveType.UIntPtr:
                 case PrimitiveType.Null: return "Pointer";
+                case PrimitiveType.String: return "String";
             }
 
             throw new NotSupportedException();

@@ -252,6 +252,8 @@ namespace MonoEmbeddinator4000.Generators
                     return "mono_get_intptr_class()";
                 case PrimitiveType.UIntPtr:
                     return "mono_get_uintptr_class()";
+                case PrimitiveType.String:
+                    return "mono_get_string_class()";
                 default:
                     throw new System.NotImplementedException();
             }
