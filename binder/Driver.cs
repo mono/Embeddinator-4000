@@ -17,6 +17,7 @@ namespace MonoEmbeddinator4000
         public Options Options { get; private set; }
 
         public BindingContext Context { get; private set; }
+        public Generator Generator { get; private set; }
 
         public List<IKVM.Reflection.Assembly> Assemblies { get; private set; }
 
@@ -36,28 +37,6 @@ namespace MonoEmbeddinator4000
                 Diagnostics.Level = DiagnosticKind.Debug;
 
             Declaration.QualifiedNameSeparator = "_";
-
-            SetupTypePrinter();
-        }
-
-        void SetupTypePrinter()
-        {
-            CppSharp.AST.Type.TypePrinterDelegate = type =>
-            {
-                CppTypePrintFlavorKind kind = CppTypePrintFlavorKind.Cpp;
-                switch (Options.GeneratorKind)
-                {
-                case GeneratorKind.C:
-                    kind = CppTypePrintFlavorKind.C;
-                    break;
-                case GeneratorKind.ObjectiveC:
-                    kind = CppTypePrintFlavorKind.ObjC;
-                    break;
-                }
-
-                var typePrinter = new CppTypePrinter { PrintFlavorKind = kind };
-                return type.Visit(typePrinter);
-            };
         }
 
         bool Parse()
@@ -70,6 +49,8 @@ namespace MonoEmbeddinator4000
 
         void Process()
         {
+            Generator = CreateGenerator();
+
             var astGenerator = new ASTGenerator(Context.ASTContext, Options);
 
             foreach (var assembly in Assemblies)
@@ -136,6 +117,27 @@ namespace MonoEmbeddinator4000
         {
             Output = new ProjectOutput();
 
+            Generator.SetupPasses();
+
+            foreach (var unit in Context.ASTContext.TranslationUnits)
+            {
+                var outputs = Generator.Generate(new[] { unit });
+
+                foreach (var output in outputs)
+                {
+                    output.Process();
+                    var text = output.Generate();
+
+                    Output.WriteOutput(output.FilePath, text);
+                }
+            }
+
+            if (Options.GenerateSupportFiles)
+                GenerateSupportFiles();
+        }
+
+        Generator CreateGenerator()
+        {
             Generator generator = null;
             switch (Options.GeneratorKind)
             {
@@ -152,23 +154,7 @@ namespace MonoEmbeddinator4000
                     throw new NotImplementedException();
             }
 
-            generator.SetupPasses();
-
-            foreach (var unit in Context.ASTContext.TranslationUnits)
-            {
-                var outputs = generator.Generate(new[] { unit });
-
-                foreach (var output in outputs)
-                {
-                    output.Process();
-                    var text = output.Generate();
-
-                    Output.WriteOutput(output.FilePath, text);
-                }
-            }
-
-            if (Options.GenerateSupportFiles)
-                GenerateSupportFiles();
+            return generator;
         }
 
         void WriteFiles()
