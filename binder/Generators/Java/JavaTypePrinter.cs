@@ -66,8 +66,8 @@ namespace MonoEmbeddinator4000.Generators
                 case PrimitiveType.Void: return "void";
                 case PrimitiveType.Char16:
                 case PrimitiveType.Char32:
-                case PrimitiveType.WideChar: return "WString";
-                case PrimitiveType.Char: return "String";
+                case PrimitiveType.WideChar: return "com.sun.jna.WString";
+                case PrimitiveType.Char: return "com.sun.jna.String";
                 case PrimitiveType.SChar:
                 case PrimitiveType.UChar:
                 case PrimitiveType.Short:
@@ -88,7 +88,7 @@ namespace MonoEmbeddinator4000.Generators
                 case PrimitiveType.IntPtr:
                 case PrimitiveType.UIntPtr:
                 case PrimitiveType.Null: return "Pointer";
-                case PrimitiveType.String: return "String";
+                case PrimitiveType.String: return "java.lang.String";
             }
 
             throw new NotSupportedException();
