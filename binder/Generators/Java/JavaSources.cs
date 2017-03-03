@@ -209,7 +209,7 @@ namespace MonoEmbeddinator4000.Generators
 
             var @class = method.Namespace as Class;
             GenerateMethodSpecifier(method, @class);
-            NewLine();
+            Write(" ");
 
             WriteStartBraceIndent();
             WriteCloseBraceIndent();
