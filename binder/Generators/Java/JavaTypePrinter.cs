@@ -79,9 +79,4 @@ namespace MonoEmbeddinator4000.Generators
             throw new NotSupportedException();
         }
     }
-
-    public class JavaManagedToNativeTypePrinter : CManagedToNativeTypePrinter
-    {
-
-    }
 }

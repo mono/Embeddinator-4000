@@ -51,15 +51,11 @@ namespace MonoEmbeddinator4000.Generators
             return true;
         }
 
-        public CManagedToNativeTypePrinter TypePrinter => new JavaManagedToNativeTypePrinter
-        {
-            PrintScopeKind = TypePrintScopeKind.Qualified,
-            PrintVariableArrayAsPointers = true
-        };
+        public JavaTypePrinter TypePrinter => new JavaTypePrinter(Context);
 
         protected override string TypePrinterDelegate(CppSharp.AST.Type type)
         {
-            return type.Visit(TypePrinter);
+            return type.Visit(TypePrinter).ToString();
         }
     }
 }
