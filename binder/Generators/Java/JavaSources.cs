@@ -45,6 +45,9 @@ namespace MonoEmbeddinator4000.Generators
 
         public string AssemblyId => CGenerator.AssemblyId(TranslationUnit);
 
+        public override string AccessIdentifier(AccessSpecifier accessSpecifier) =>
+            base.AccessIdentifier(accessSpecifier).Trim();
+
         public override void Process()
         {
             GenerateFilePreamble(CommentKind.JavaDoc);
