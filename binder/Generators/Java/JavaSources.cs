@@ -22,7 +22,7 @@ namespace MonoEmbeddinator4000.Generators
 
         public override string FileExtension => "java";
 
-        static IEnumerable<string> GetPackageNames(Declaration decl)
+        public static IEnumerable<string> GetPackageNames(Declaration decl)
         {
             var namespaces = Declaration.GatherNamespaces(decl.Namespace)
                 .ToList();
@@ -196,7 +196,7 @@ namespace MonoEmbeddinator4000.Generators
             if (method.IsConstructor || method.IsDestructor)
                 Write("{0}(", functionName);
             else
-                Write("{0} {1}(", method.OriginalReturnType, functionName);
+                Write("{0} {1}(", method.ReturnType, functionName);
 
             //Write(FormatMethodParameters(method.Parameters));
 

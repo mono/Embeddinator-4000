@@ -1,10 +1,9 @@
-using CppSharp;
 using CppSharp.AST;
 using CppSharp.Generators;
 using CppSharp.Generators.CSharp;
 using CppSharp.Parser;
 using System;
-using System.Linq;
+using System.Collections.Generic;
 
 namespace MonoEmbeddinator4000.Generators
 {
@@ -17,6 +16,21 @@ namespace MonoEmbeddinator4000.Generators
     {
         public JavaTypePrinter(BindingContext context) : base(context)
         {
+        }
+
+        static string GetName(Declaration decl)
+        {
+            var names = new List<string>();
+
+            names.AddRange(JavaSources.GetPackageNames(decl));
+            names.Add(decl.Name);
+
+            return string.Join(".", names);
+        }
+
+        public override TypePrinterResult VisitDeclaration(Declaration decl)
+        {
+            return GetName(decl);
         }
 
         static string GetIntegerTypeName(PrimitiveType primitive,
