@@ -30,5 +30,6 @@ bin/
 /build/obj
 /build/vs2015
 /build/gmake
+/build/packages
 /external/jna
 /external/ikvm
