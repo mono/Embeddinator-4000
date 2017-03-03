@@ -70,7 +70,8 @@ namespace MonoEmbeddinator4000.Generators
         public override bool VisitDeclContext(DeclarationContext context)
         {
             foreach (var decl in context.Declarations)
-                decl.Visit(this);
+                if (decl.IsGenerated)
+                    decl.Visit(this);
 
             return true;
         }
