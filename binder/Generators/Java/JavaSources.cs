@@ -218,10 +218,31 @@ namespace MonoEmbeddinator4000.Generators
 
             var @class = method.Namespace as Class;
             GenerateMethodSpecifier(method, @class);
-            Write(" ");
 
-            WriteStartBraceIndent();
-            WriteCloseBraceIndent();
+            if (method.IsPure)
+            {
+                Write(";");
+            }
+            else
+            {
+                Write(" ");
+
+                WriteStartBraceIndent();
+
+                PrimitiveType primitive;
+                var isPrimitive = method.OriginalReturnType.Type.IsPrimitiveType(out primitive);
+
+                var hasReturn = primitive != PrimitiveType.Void;
+                if ((!(method.IsConstructor || method.IsDestructor)) && hasReturn)
+                {
+                    if (isPrimitive && primitive != PrimitiveType.String)
+                        WriteLine("return {0};", primitive == PrimitiveType.Bool ? "false" : "0");
+                    else
+                        WriteLine("return null;");
+                }
+
+                WriteCloseBraceIndent();
+            }
 
             PopBlock(NewLineKind.BeforeNextBlock);
 
