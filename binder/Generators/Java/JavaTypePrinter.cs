@@ -18,6 +18,12 @@ namespace MonoEmbeddinator4000.Generators
         {
         }
 
+        public override TypePrinterResult VisitArrayType(ArrayType array,
+            TypeQualifiers quals)
+        {
+            return string.Format("{0}[]", array.Type.Visit(this));
+        }
+
         static string GetName(Declaration decl)
         {
             var names = new List<string>();
