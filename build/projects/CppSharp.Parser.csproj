@@ -55,6 +55,9 @@
     <Compile Include="../../external/CppSharp/src/Parser/Project.cs">
       <Link>Project.cs</Link>
     </Compile>
+    <Compile Include="../../external/CppSharp/src/Parser/TargetTriple.cs">
+      <Link>TargetTriple.cs</Link>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="CppSharp.csproj">
