@@ -69,6 +69,8 @@ namespace MonoEmbeddinator4000
                 Options.GeneratorKind == GeneratorKind.ObjectiveC)
                 passes.Add(new RenameEnumItemsPass());
 
+            Generator.SetupPasses();
+
             passes.AddRange(new TranslationUnitPass[]
             {
                 new RenameDuplicatedDeclsPass(),
@@ -116,8 +118,6 @@ namespace MonoEmbeddinator4000
         void Generate()
         {
             Output = new ProjectOutput();
-
-            Generator.SetupPasses();
 
             foreach (var unit in Context.ASTContext.TranslationUnits)
             {
