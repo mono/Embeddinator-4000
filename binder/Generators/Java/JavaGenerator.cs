@@ -4,6 +4,8 @@ using System.Linq;
 using CppSharp;
 using CppSharp.AST;
 using CppSharp.Generators;
+using CppSharp.Passes;
+
 using MonoEmbeddinator4000.Passes;
 
 namespace MonoEmbeddinator4000.Generators
@@ -48,6 +50,8 @@ namespace MonoEmbeddinator4000.Generators
         public override bool SetupPasses()
         {
             Context.TranslationUnitPasses.AddPass(new PropertyToGetterSetterPass());
+            Context.TranslationUnitPasses.RenameDeclsLowerCase(
+                RenameTargets.Function | RenameTargets.Method | RenameTargets.Property);
             return true;
         }
 
