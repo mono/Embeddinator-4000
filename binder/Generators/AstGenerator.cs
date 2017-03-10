@@ -111,7 +111,8 @@ namespace MonoEmbeddinator4000.Generators
             var @class = new Class
             {
                 Name = UnmangleTypeName(type.Name),
-                Type = type.IsInterface ? ClassType.Interface : ClassType.RefType
+                Type = type.IsInterface ? ClassType.Interface : ClassType.RefType,
+                IsFinal = type.IsSealed
             };
 
             HandleNamespace(type, @class);
@@ -457,12 +458,14 @@ namespace MonoEmbeddinator4000.Generators
             var method = new Method
             {
                 Kind = methodBase.IsConstructor ?
-                    CXXMethodKind.Constructor : CXXMethodKind.Normal
+                    CXXMethodKind.Constructor : CXXMethodKind.Normal,
+                IsFinal = methodBase.IsFinal
             };
             method.Name = UnmangleTypeName(methodBase.Name);
             method.OriginalName = GetInternalMethodName(methodBase);
 
-            foreach (var param in methodBase.GetParameters())
+            var parameters = methodBase.GetParameters();
+            foreach (var param in parameters)
             {
                 var paramDecl = VisitParameter(param);
                 method.Parameters.Add(paramDecl);

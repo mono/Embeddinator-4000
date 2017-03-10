@@ -133,6 +133,9 @@ namespace MonoEmbeddinator4000.Generators
             if (@class.IsAbstract)
                 keywords.Add("abstract");
 
+            if (@class.IsFinal)
+                keywords.Add("final");
+
             if (@class.IsStatic)
                 keywords.Add("static");
 
@@ -190,6 +193,9 @@ namespace MonoEmbeddinator4000.Generators
                 Write("@Override");
                 NewLine();
             }
+
+            if (@method.IsFinal)
+                keywords.Add("final");
 
             if (method.IsStatic)
                 keywords.Add("static");
