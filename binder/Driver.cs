@@ -59,7 +59,6 @@ namespace MonoEmbeddinator4000
             var passes = new List<TranslationUnitPass>
             {
                 new CheckReservedKeywords(),
-                new FixMethodParametersPass(),
                 new GenerateObjectTypesPass(),
                 new GenerateArrayTypes(),
                 new CheckIgnoredDeclsPass { CheckDecayedTypes = false }
@@ -67,7 +66,10 @@ namespace MonoEmbeddinator4000
 
             if (Options.GeneratorKind == GeneratorKind.C ||
                 Options.GeneratorKind == GeneratorKind.ObjectiveC)
+            {
                 passes.Add(new RenameEnumItemsPass());
+                passes.Add(new FixMethodParametersPass());
+            }
 
             Generator.SetupPasses();
 
