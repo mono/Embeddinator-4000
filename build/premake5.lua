@@ -57,6 +57,12 @@ workspace "MonoEmbeddinator4000"
   include_cppsharp_project("Generator")
   include_cppsharp_project("Runtime")
 
+  if _OPTIONS["dev"] then
+    include_cppsharp_project("Generator.Tests")
+    include_cppsharp_project("../build/Tests")
+    IncludeTests()
+  end
+
   project "IKVM.Reflection"
     SetupManagedProject()
 
@@ -100,7 +106,7 @@ workspace "MonoEmbeddinator4000"
 
     local xamarinMacios = "../../xamarin-macios"
     if os.isdir(xamarinMacios) and _OPTIONS["dev"] then
-
+      --[[
       externalproject "mtouch"
         SetupManagedProject()
         location (path.join(xamarinMacios, "tools/mtouch"))
@@ -118,10 +124,9 @@ workspace "MonoEmbeddinator4000"
         location (path.join(xamarinMacios, "external/mono/external/cecil/symbols/mdb"))
         uuid "8559DD7F-A16F-46D0-A05A-9139FAEBA8FD"
         kind "SharedLib"
+      ]]
+
+      print("Searching for tests projects...")
+      IncludeDir("../tests")
 
     end
-
-  group "Tests"
-
-    print("Searching for tests projects...")
-    IncludeDir("../tests")
