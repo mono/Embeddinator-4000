@@ -108,7 +108,12 @@ namespace MonoEmbeddinator4000.Generators
 
         public Class VisitRecord(TypeInfo type)
         {
-            var @class = new Class { Name = UnmangleTypeName(type.Name) };
+            var @class = new Class
+            {
+                Name = UnmangleTypeName(type.Name),
+                Type = type.IsInterface ? ClassType.Interface : ClassType.RefType
+            };
+
             HandleNamespace(type, @class);
             VisitMembers(type, @class);
 
