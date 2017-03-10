@@ -142,7 +142,9 @@ namespace MonoEmbeddinator4000.Generators
             keywords.Add(@class.IsInterface ? "interface" : "class");
             keywords.Add(SafeIdentifier(@class.Name));
 
-            Write(string.Join(" ", keywords.Where(s => !string.IsNullOrWhiteSpace(s))));
+            keywords = keywords.Where(s => !string.IsNullOrWhiteSpace(s)).ToList();
+            if (keywords.Count != 0)
+                Write("{0} ", string.Join(" ", keywords));
 
             var bases = new List<BaseClassSpecifier>();
 
@@ -205,6 +207,7 @@ namespace MonoEmbeddinator4000.Generators
             if (method.IsPure)
                 keywords.Add("abstract");
 
+            keywords = keywords.Where(s => !string.IsNullOrWhiteSpace(s)).ToList();
             if (keywords.Count != 0)
                 Write("{0} ", string.Join(" ", keywords));
 
