@@ -46,7 +46,7 @@ namespace MonoEmbeddinator4000.Generators
         public string AssemblyId => CGenerator.AssemblyId(TranslationUnit);
 
         public override string AccessIdentifier(AccessSpecifier accessSpecifier) =>
-            base.AccessIdentifier(accessSpecifier).Trim();
+            GetAccess(accessSpecifier);
 
         public override void Process()
         {
@@ -142,7 +142,7 @@ namespace MonoEmbeddinator4000.Generators
             keywords.Add(@class.IsInterface ? "interface" : "class");
             keywords.Add(SafeIdentifier(@class.Name));
 
-            Write(string.Join(" ", keywords));
+            Write(string.Join(" ", keywords.Where(s => !string.IsNullOrWhiteSpace(s))));
 
             var bases = new List<BaseClassSpecifier>();
 
@@ -193,6 +193,8 @@ namespace MonoEmbeddinator4000.Generators
                 Write("@Override");
                 NewLine();
             }
+
+            keywords.Add(AccessIdentifier(method.Access));
 
             if (@method.IsFinal)
                 keywords.Add("final");
@@ -264,6 +266,21 @@ namespace MonoEmbeddinator4000.Generators
         {
             // Ignore properties since they're converted to getter/setter pais.
             return true;
+        }
+
+        public static string GetAccess(AccessSpecifier accessSpecifier)
+        {
+            switch (accessSpecifier)
+            {
+                case AccessSpecifier.Private:
+                    return "private";
+                case AccessSpecifier.Internal:
+                    return string.Empty;
+                case AccessSpecifier.Protected:
+                    return "protected";
+                default:
+                    return "public";
+            }
         }
     }
 }
