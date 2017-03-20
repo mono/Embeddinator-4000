@@ -1,7 +1,9 @@
 using CppSharp;
 using CppSharp.AST;
 using CppSharp.Generators;
-
+using MonoEmbeddinator4000.Passes;
+using System.Linq;
+ 
 namespace MonoEmbeddinator4000.Generators
 {
     public class ObjCHeaders : CHeaders
@@ -20,6 +22,19 @@ namespace MonoEmbeddinator4000.Generators
         {
             base.WriteHeaders();
             WriteLine("#import <Foundation/Foundation.h>");
+        }
+
+        public override void WriteForwardDecls()
+        {
+            var refs = new GetReferencedClasses();
+            TranslationUnit.Visit(refs);
+
+            var classes = refs.Classes.ToList();
+            classes.RemoveAll((c) => c == GenerateArrayTypes.MonoEmbedArray);
+            classes.RemoveAll((c) => c == GenerateObjectTypesPass.MonoEmbedObject);
+
+            foreach (var @class in classes.Distinct())
+                WriteLine($"@class {@class.QualifiedName};");
         }
 
         public override void GenerateMethodSignature(Method method,

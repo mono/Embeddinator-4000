@@ -2,6 +2,7 @@ using CppSharp;
 using CppSharp.AST;
 using CppSharp.Generators;
 using System.Linq;
+using System;
 
 namespace MonoEmbeddinator4000.Generators
 {
@@ -43,6 +44,8 @@ namespace MonoEmbeddinator4000.Generators
             WriteLine("MONO_M2N_BEGIN_DECLS");
             PopBlock(NewLineKind.BeforeNextBlock);
 
+            WriteForwardDecls();
+
             VisitDeclContext(Unit);
 
             PushBlock();
@@ -55,6 +58,10 @@ namespace MonoEmbeddinator4000.Generators
             PushBlock();
 
             PopBlock(NewLineKind.BeforeNextBlock);
+        }
+
+        public virtual void WriteForwardDecls()
+        {
         }
 
         public override bool VisitEnumDecl(Enumeration @enum)
