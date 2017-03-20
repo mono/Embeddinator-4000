@@ -27,6 +27,10 @@ The project is still under heavy development. Usage under mission-critical
 production scenarios is not advised. Please report any bugs or suggestions
 so we can improve the tool.
 
+## Community
+
+Feel free to join us at our [#managed-interop](https://gitter.im/managed-interop) Gitter discussion channel.
+
 ## Building
 
 Clone this repository and initialize/update submodules as well as solution depends on them.
