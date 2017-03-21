@@ -49,13 +49,11 @@ namespace MonoEmbeddinator4000.Generators
         {
             var support = Context.SupportBefore;
 
-            var arrayId = CGenerator.GenId(string.Format("{0}_array",
-                Context.ArgName));
+            var arrayId = CGenerator.GenId($"{Context.ArgName}_array");
             support.WriteLine("MonoArray* {0} = (MonoArray*) {1};",
                                             arrayId, Context.ArgName);
 
-            var arraySizeId = CGenerator.GenId(string.Format("{0}_array_size",
-                Context.ArgName));
+            var arraySizeId = CGenerator.GenId($"{Context.ArgName}_array_size");
             support.WriteLine("uintptr_t {0} = mono_array_length({1});",
                                             arraySizeId, arrayId);
 
@@ -65,22 +63,19 @@ namespace MonoEmbeddinator4000.Generators
 
             typePrinter.PrintScopeKind = TypePrintScopeKind.Qualified;
             var arrayElementName = array.Array.Type.Visit(typePrinter);
-            var elementSize = string.Format("sizeof({0})", arrayElementName);
+            var elementSize = $"sizeof({arrayElementName})";
 
-            var nativeArrayId = CGenerator.GenId(string.Format("{0}_native_array",
-                Context.ArgName));
+            var nativeArrayId = CGenerator.GenId($"{Context.ArgName}_native_array");
             support.WriteLine("{0} {1};", arrayTypedefName, nativeArrayId);
             support.WriteLine("{0}.array = g_array_sized_new(/*zero_terminated=*/FALSE," +
                 " /*clear_=*/TRUE, {1}, {2});", nativeArrayId, elementSize, arraySizeId);
 
-            var elementClassId = CGenerator.GenId(string.Format("{0}_element_class",
-                Context.ArgName));
+            var elementClassId = CGenerator.GenId($"{Context.ArgName}_element_class");
             support.WriteLine("MonoClass* {0} = mono_class_get_element_class({1});",
                 elementClassId,
                 CMarshalNativeToManaged.GenerateArrayTypeLookup(array.Array.Type, support));
 
-            var elementSizeId = CGenerator.GenId(string.Format("{0}_array_element_size",
-                Context.ArgName));
+            var elementSizeId = CGenerator.GenId($"{Context.ArgName}_array_element_size");
             support.WriteLine("gint32 {0} = mono_class_array_element_size({1});",
                 elementSizeId, elementClassId);
 
@@ -89,8 +84,7 @@ namespace MonoEmbeddinator4000.Generators
                 iteratorId, arraySizeId);
             support.WriteStartBraceIndent();
 
-            var elementId = CGenerator.GenId(string.Format("{0}_array_element",
-                Context.ArgName));
+            var elementId = CGenerator.GenId($"{Context.ArgName}_array_element");
 
             var isValueType = CMarshalNativeToManaged.IsValueType(array.Array.Type);
             support.WriteLine("{5} {0} = {4}mono_array_addr_with_size({1}, {2}, {3});",
@@ -140,7 +134,7 @@ namespace MonoEmbeddinator4000.Generators
         public override bool VisitClassDecl(Class @class)
         {
             var typeName = @class.Visit(CTypePrinter);
-            var objectId = string.Format("{0}_obj", Context.ArgName);
+            var objectId = $"{Context.ArgName}_obj";
             Context.SupportBefore.WriteLine("{1}* {0} = ({1}*) mono_m2n_create_object({2});",
                 objectId, typeName, Context.ArgName);
             Context.Return.Write("{0}", objectId);
@@ -286,12 +280,12 @@ namespace MonoEmbeddinator4000.Generators
 
                 var @namespace = string.Empty;
                 var ids = string.Join(", ",
-                    decl.QualifiedName.Split('.').Select(n => string.Format("\"{0}\"", n)));
+                    decl.QualifiedName.Split('.').Select(n => $"\"{n}\""));
 
                 var unit = decl.TranslationUnit;
 
-                var classId = string.Format("{0}_class", decl.QualifiedName);
-                var monoImageName = string.Format("{0}_image", CGenerator.AssemblyId(unit));
+                var classId = $"{decl.QualifiedName}_class";
+                var monoImageName = $"{CGenerator.AssemblyId(unit)}_image";
                 gen.WriteLine("{0} = mono_class_from_name({1}, \"{2}\", \"{3}\");",
                     classId, monoImageName, @namespace, decl.OriginalName);
 
@@ -336,9 +330,8 @@ namespace MonoEmbeddinator4000.Generators
             var support = Context.SupportBefore;
 
             var contextId = CGenerator.GenId("mono_context");
-            var arrayId = CGenerator.GenId(string.Format("{0}_array", Context.ArgName));
-            var elementClassId = CGenerator.GenId(string.Format("{0}_element_class",
-                Context.ArgName));
+            var arrayId = CGenerator.GenId($"{Context.ArgName}_array");
+            var elementClassId = CGenerator.GenId($"{Context.ArgName}_element_class");
 
             var managedArray = array.Array;
             var elementType = managedArray.Type;
@@ -356,9 +349,7 @@ namespace MonoEmbeddinator4000.Generators
             var typePrinter = CTypePrinter;
             string elementTypeName = elementType.Visit(typePrinter);
 
-            var elementId = CGenerator.GenId(string.Format("{0}_array_element",
-                Context.ArgName));
-
+            var elementId = CGenerator.GenId($"{Context.ArgName}_array_element");
             support.WriteLine("{0} {1} = g_array_index({2}.array, {0}, {3});",
                 elementTypeName, elementId, Context.ArgName, iteratorId);
 
