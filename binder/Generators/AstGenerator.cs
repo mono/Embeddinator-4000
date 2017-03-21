@@ -513,6 +513,9 @@ namespace MonoEmbeddinator4000.Generators
             if (type == null || (type.IsPointer() && type.GetFinalPointee() == null))
                 param.Ignore = true;
 
+            if (paramInfo.ParameterType.ContainsGenericParameters)
+                param.Ignore = true;
+
             return param;
         }
 
