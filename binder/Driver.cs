@@ -153,7 +153,9 @@ namespace MonoEmbeddinator4000
                     generator = new JavaGenerator(Context);
                     break;
                 default:
-                    throw new NotImplementedException();
+                    Diagnostics.Error($"The Generator {Options.GeneratorKind} is not supported yet. Please choose a different one.");
+                    Environment.Exit(-1);
+                    break;
             }
 
             return generator;
