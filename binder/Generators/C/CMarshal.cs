@@ -408,7 +408,7 @@ namespace MonoEmbeddinator4000.Generators
 
             if (type == typeof(string))
             {
-                var argId = CGenerator.GenId(Context.ArgName);
+                var argId = $"{CGenerator.GenId(Context.ArgName)}_{Context.ParameterIndex}";
                 var contextId = CGenerator.GenId("mono_context");
                 var stringText = Context.ArgName;
 
