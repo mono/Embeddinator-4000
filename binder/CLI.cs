@@ -114,6 +114,7 @@ namespace MonoEmbeddinator4000
             case "osx":
             case "macosx":
             case "macos":
+            case "mac":
                 return TargetPlatform.MacOS;
             case "ios":
                 return TargetPlatform.iOS;
