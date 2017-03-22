@@ -33,7 +33,7 @@ namespace MonoEmbeddinator4000
                 { "o|out|outdir=", "output directory", v => OutputDir = v },
                 { "c|compile", "compiles the generated output", v => CompileCode = true },
                 { "d|debug", "enables debug mode for generated native and managed code", v => DebugMode = true },
-                { "t|target", "compilation target (static, shared, app)", v => Target = ConvertToCompilationTarget(v) },
+                { "t|target=", "compilation target (static, shared, app)", v => Target = ConvertToCompilationTarget(v) },
                 { "dll|shared", "compiles as a shared library", v => Target = CompilationTarget.SharedLibrary },
                 { "static", "compiles as a static library", v => Target = CompilationTarget.StaticLibrary },
                 { "vs=", $"Visual Studio version for compilation: {vsVersions} (defaults to Latest)", v => VsVersion = v },
