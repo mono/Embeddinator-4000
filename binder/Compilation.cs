@@ -500,6 +500,14 @@ namespace MonoEmbeddinator4000
             var sysroot = Path.Combine (XcodeToolchain.GetXcodeIncludesFolder (), "../..");
             args.Add ($"-isysroot {sysroot}");
 
+            if (Options.Target == CompilationTarget.SharedLibrary)
+            {
+                var name = Path.GetFileNameWithoutExtension(Project.Assemblies[0]);
+                var libName = $"lib{name}.dylib";
+                var output = Path.Combine(Options.OutputDir, libName);
+                args.Add($"-dynamiclib -install_name {libName} -o {output}");
+            }
+
             switch (Options.GeneratorKind)
             {
             case GeneratorKind.ObjectiveC:
