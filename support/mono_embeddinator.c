@@ -38,6 +38,9 @@
 #include <errno.h>
 #include <libproc.h>
 #include <unistd.h>
+
+#include <objc/runtime.h>
+#include <objc/objc-runtime.h>
 #endif
 
 #ifdef _WIN32
@@ -60,6 +63,23 @@ void mono_m2n_set_context(mono_m2n_context_t* ctx)
     _current_context = ctx;
 }
 
+#if defined(__APPLE__)
+id allocAndInitAutoreleasePool()
+{
+    Class NSAutoreleasePoolClass = objc_getClass("NSAutoreleasePool");
+    id pool = class_createInstance(NSAutoreleasePoolClass, 0);
+    return objc_msgSend(pool, sel_registerName("new"));
+}
+
+void drainAutoreleasePool(id pool)
+{
+    (void)objc_msgSend(pool, sel_registerName("drain"));
+}
+
+#define AUTORELEASE_POOL_DEFAULT_VALUE ((id)-1)
+static id _autoreleasePool = AUTORELEASE_POOL_DEFAULT_VALUE;
+#endif
+
 int mono_m2n_init(mono_m2n_context_t* ctx, const char* domain)
 {
     if (ctx == 0 || ctx->domain != 0)
@@ -70,6 +90,11 @@ int mono_m2n_init(mono_m2n_context_t* ctx, const char* domain)
 
     mono_m2n_set_context(ctx);
 
+#if defined(__APPLE__)
+    if (_autoreleasePool == AUTORELEASE_POOL_DEFAULT_VALUE)
+        _autoreleasePool = allocAndInitAutoreleasePool();
+#endif
+
     return true;
 }
 
@@ -79,6 +104,15 @@ int mono_m2n_destroy(mono_m2n_context_t* ctx)
         return false;
 
     mono_jit_cleanup (ctx->domain);
+
+#if defined(__APPLE__)
+    if (_autoreleasePool != AUTORELEASE_POOL_DEFAULT_VALUE)
+    {
+        drainAutoreleasePool(_autoreleasePool);
+        _autoreleasePool = AUTORELEASE_POOL_DEFAULT_VALUE;
+    }
+#endif
+
     return true;
 }
 
