@@ -28,6 +28,8 @@ namespace MonoEmbeddinator4000
             Project = project;
             Options = options;
 
+            Options.MainModule.LibraryName = null;
+
             Assemblies = new List<IKVM.Reflection.Assembly>();
 
             Context = new BindingContext(options);
