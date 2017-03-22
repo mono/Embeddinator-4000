@@ -64,11 +64,44 @@ namespace MonoEmbeddinator4000
 
         public ParsedDelegate<IKVM.Reflection.Assembly> OnAssemblyParsed = delegate { };
 
+        public bool AllowMissingAssembly;
+
+        List<string> AssemblyResolveDirs;
+
         IKVM.Reflection.Universe Universe;
 
         public Parser()
         {
+            AssemblyResolveDirs = new List<string>();
             Universe = new IKVM.Reflection.Universe(IKVM.Reflection.UniverseOptions.MetadataOnly);
+            Universe.AssemblyResolve += AssemblyResolve;
+        }
+
+        public void AddAssemblyResolveDirectory(string dir)
+        {
+            AssemblyResolveDirs.Add(dir);
+        }
+
+        IKVM.Reflection.Assembly AssemblyResolve (object sender, IKVM.Reflection.ResolveEventArgs args)
+        {
+            var universe = ((IKVM.Reflection.Universe)sender);
+            var assemblyName = args.Name;
+
+            var assembly = universe.DefaultResolver(assemblyName, throwOnError: false);
+            if (assembly != null)
+                return assembly;
+        
+            foreach (var dir in AssemblyResolveDirs)
+            {
+                var assemblyPath = Path.Combine(dir, assemblyName);
+
+                if (!File.Exists(assemblyPath))
+                    continue;
+
+                return universe.LoadFile(assemblyPath);
+            }
+
+            return AllowMissingAssembly ? universe.CreateMissingAssembly(assemblyName) : null;
         }
 
         public void ParseAssembly(ProjectInput input, ParserResult<IKVM.Reflection.Assembly> result)
