@@ -497,6 +497,9 @@ namespace MonoEmbeddinator4000
                 string.Join(" ", files.ToList())
             };
 
+            var sysroot = Path.Combine (XcodeToolchain.GetXcodeIncludesFolder (), "../..");
+            args.Add ($"-isysroot {sysroot}");
+
             switch (Options.GeneratorKind)
             {
             case GeneratorKind.ObjectiveC:
