@@ -33,8 +33,12 @@ namespace MonoEmbeddinator4000.Generators
             classes.RemoveAll((c) => c == GenerateArrayTypes.MonoEmbedArray);
             classes.RemoveAll((c) => c == GenerateObjectTypesPass.MonoEmbedObject);
 
+            PushBlock();
+
             foreach (var @class in classes.Distinct())
                 WriteLine($"@class {@class.QualifiedName};");
+
+            PopBlock(NewLineKind.BeforeNextBlock);
         }
 
         public override void GenerateMethodSignature(Method method,
