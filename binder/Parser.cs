@@ -85,15 +85,15 @@ namespace MonoEmbeddinator4000
         IKVM.Reflection.Assembly AssemblyResolve (object sender, IKVM.Reflection.ResolveEventArgs args)
         {
             var universe = ((IKVM.Reflection.Universe)sender);
-            var assemblyName = args.Name;
 
-            var assembly = universe.DefaultResolver(assemblyName, throwOnError: false);
+            var assembly = universe.DefaultResolver(args.Name, throwOnError: false);
             if (assembly != null)
                 return assembly;
-        
+
+            var assemblyName = new IKVM.Reflection.AssemblyName(args.Name);
             foreach (var dir in AssemblyResolveDirs)
             {
-                var assemblyPath = Path.Combine(dir, assemblyName);
+                var assemblyPath = Path.Combine(dir, $"{assemblyName.Name}.dll");
 
                 if (!File.Exists(assemblyPath))
                     continue;
@@ -101,7 +101,7 @@ namespace MonoEmbeddinator4000
                 return universe.LoadFile(assemblyPath);
             }
 
-            return AllowMissingAssembly ? universe.CreateMissingAssembly(assemblyName) : null;
+            return AllowMissingAssembly ? universe.CreateMissingAssembly(args.Name) : null;
         }
 
         public void ParseAssembly(ProjectInput input, ParserResult<IKVM.Reflection.Assembly> result)
