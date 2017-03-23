@@ -288,6 +288,8 @@ namespace MonoEmbeddinator4000
             }
         }
 
+        Xamarin.MacDev.XamMacSdk XamMacSdk => new Xamarin.MacDev.XamMacSdk(null);
+
         Xamarin.MacDev.AppleSdk AppleSdk => DetectIPhoneSdks.CurrentSdk;
 
         string XamarinSdkRoot => DetectIPhoneSdks.XamarinSdkRoot;
