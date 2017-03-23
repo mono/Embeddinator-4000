@@ -46,6 +46,24 @@ namespace MonoEmbeddinator4000
             var parser = new Parser();
             parser.OnAssemblyParsed += HandleAssemblyParsed;
 
+            try
+            {
+                var libDir = Path.Combine(MonoTouchSdk.LibDir, "32bits");
+                parser.AddAssemblyResolveDirectory(libDir);
+            }
+            catch (Exception)
+            {
+            }
+
+            try
+            {
+                var libDir = Path.GetDirectoryName(XamMacSdk.UnifiedFullProfileFrameworkAssembly);
+                parser.AddAssemblyResolveDirectory(libDir);
+            }
+            catch (Exception)
+            {
+            }
+
             return parser.Parse(Project);
         }
 
