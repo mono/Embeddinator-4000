@@ -68,7 +68,7 @@ id allocAndInitAutoreleasePool()
 {
     Class NSAutoreleasePoolClass = objc_getClass("NSAutoreleasePool");
     id pool = class_createInstance(NSAutoreleasePoolClass, 0);
-    return objc_msgSend(pool, sel_registerName("new"));
+    return objc_msgSend(pool, sel_registerName("init"));
 }
 
 void drainAutoreleasePool(id pool)
