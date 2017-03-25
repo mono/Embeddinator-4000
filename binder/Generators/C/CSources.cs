@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using CppSharp;
 using CppSharp.AST;
 using CppSharp.AST.Extensions;
@@ -151,11 +152,15 @@ namespace MonoEmbeddinator4000.Generators
                 assemblyName.Replace('.', '_')));
             WriteLine("{0}();", assemblyLookupId);
 
-            var namespaces = Declaration.GatherNamespaces(@class.Namespace).ToList();
-            namespaces.Reverse();
-            namespaces.Remove(namespaces.First());
+            StringBuilder @namespace = new StringBuilder ();
+            foreach (var ns in Declaration.GatherNamespaces (@class.Namespace)) {
+                if (ns is TranslationUnit)
+                    continue;
+                if (@namespace.Length > 0)
+                    @namespace.Append ('.');
+                @namespace.Append (ns.LogicalName);
+            }
 
-            var @namespace = string.Join(".", namespaces);
             var ids = string.Join(", ",
                 @class.QualifiedName.Split('.').Select(n => string.Format("\"{0}\"", n)));
 
