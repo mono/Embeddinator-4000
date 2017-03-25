@@ -28,15 +28,66 @@ namespace MonoEmbeddinator4000.Generators
 
     public static class ObjCExtensions
     {
-        public static void GenerateObjCMethodSignature(this CCodeGenerator gen,
-            Method method)
+        public static bool IsProperty (this Method method)
         {
-            gen.Write("{0}", method.IsStatic ? "+" : "-");
+            if (method.Name.StartsWith ("get_", StringComparison.Ordinal))
+                return method.Parameters.Count == 0;
+            if (method.Name.StartsWith ("set_", StringComparison.Ordinal))
+                return method.Parameters.Count == 1;
+            return false;
+        }
 
-            var retType = method.ReturnType.Visit(gen.CTypePrinter);
-            gen.Write(" ({0}){1}", retType, method.Name);
+        public static bool IsProperty (this Method method, out bool readOnly)
+        {
+            readOnly = false;
+            if (!method.IsProperty ())
+                return false;
 
-            gen.Write(gen.CTypePrinter.VisitParameters(method.Parameters));
+            readOnly = true;
+            var name = method.Name;
+            var setter = "set_" + name.Substring (4, name.Length - 4);
+            foreach (var candidate in method.Namespace.Declarations) {
+                if (candidate.Name == setter) {
+                    readOnly = false;
+                    break;
+                }
+            }
+            return true;
+        }
+
+        public static void GenerateObjCMethodSignature(this CCodeGenerator gen, Method method, bool headers)
+        {
+            var name = method.Name;
+            var retType = method.ReturnType.Visit (gen.CTypePrinter);
+
+            bool is_readonly;
+            bool is_property = method.IsProperty (out is_readonly);
+            if (is_property) {
+                // skip setters for headers, it's already dealt with the getters
+                if (headers && method.Name.StartsWith ("set_", StringComparison.Ordinal))
+                    return;
+                // by convention ObjC is camel cased
+                name = Char.ToLowerInvariant (name [4]) + name.Substring (5, name.Length - 5);
+            }
+
+            if (headers) {
+               if (is_property) {
+                    gen.Write ("@property (nonatomic");
+                    if (method.IsStatic)
+                        gen.Write (", class");
+                    if (is_readonly)
+                        gen.Write (", readonly");
+                    gen.Write (") {0} {1}", retType, name);
+                } else {
+                    gen.Write (method.IsStatic ? "+" : "-");
+                    gen.Write (" ({0}){1}", retType, name);
+                }
+                gen.Write (gen.CTypePrinter.VisitParameters (method.Parameters));
+            } else {
+                gen.Write (method.IsStatic ? "+" : "-");
+                gen.Write (" ({0}){1}", retType, name);
+                gen.Write (gen.CTypePrinter.VisitParameters (method.Parameters));
+            }
         }
 
         public static string GetObjCAccessKeyword(AccessSpecifier access)
