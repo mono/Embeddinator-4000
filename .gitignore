@@ -34,3 +34,6 @@ bin/
 /build/projects/packages
 /external/jna
 /external/ikvm
+/tests/**/gen/c
+/tests/**/gen/objc
+/tests/**/gen/java
