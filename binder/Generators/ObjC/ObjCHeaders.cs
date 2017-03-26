@@ -44,7 +44,7 @@ namespace MonoEmbeddinator4000.Generators
         public override void GenerateMethodSignature(Method method,
             bool isSource)
         {
-            this.GenerateObjCMethodSignature(method);
+            this.GenerateObjCMethodSignature(method, headers: true);
         }
 
         public override bool VisitClassDecl(Class @class)

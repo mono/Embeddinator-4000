@@ -21,7 +21,7 @@ namespace MonoEmbeddinator4000.Generators
         public override void GenerateMethodSignature(Method method,
             bool isSource)
         {
-            this.GenerateObjCMethodSignature(method);
+            this.GenerateObjCMethodSignature(method, headers: false);
         }
 
         public override string GenerateClassObjectAlloc(string type)
