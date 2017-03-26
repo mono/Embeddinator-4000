@@ -34,11 +34,13 @@
 #include <stdlib.h>
 #include <string.h>
 
-#ifdef __APPLE__
+#if defined(__APPLE__)
 #include <errno.h>
 #include <libproc.h>
 #include <unistd.h>
+#endif
 
+#if defined(__OBJC__)
 #include <objc/runtime.h>
 #include <objc/objc-runtime.h>
 #endif
@@ -63,7 +65,7 @@ void mono_m2n_set_context(mono_m2n_context_t* ctx)
     _current_context = ctx;
 }
 
-#if defined(__APPLE__)
+#if defined(__OBJC__)
 id allocAndInitAutoreleasePool()
 {
     Class NSAutoreleasePoolClass = objc_getClass("NSAutoreleasePool");
@@ -90,7 +92,7 @@ int mono_m2n_init(mono_m2n_context_t* ctx, const char* domain)
 
     mono_m2n_set_context(ctx);
 
-#if defined(__APPLE__)
+#if defined(__OBJC__)
     if (_autoreleasePool == AUTORELEASE_POOL_DEFAULT_VALUE)
         _autoreleasePool = allocAndInitAutoreleasePool();
 #endif
@@ -105,7 +107,7 @@ int mono_m2n_destroy(mono_m2n_context_t* ctx)
 
     mono_jit_cleanup (ctx->domain);
 
-#if defined(__APPLE__)
+#if defined(__OBJC__)
     if (_autoreleasePool != AUTORELEASE_POOL_DEFAULT_VALUE)
     {
         drainAutoreleasePool(_autoreleasePool);
