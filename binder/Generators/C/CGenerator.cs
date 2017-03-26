@@ -27,6 +27,8 @@ namespace MonoEmbeddinator4000.Generators
             return "__" + id;
         }
 
+        public static string ObjectInstanceId => GenId("object");
+
         public static string AssemblyId(TranslationUnit unit)
         {
             return GenId(unit.FileName).Replace('.', '_');

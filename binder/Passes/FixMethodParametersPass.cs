@@ -1,10 +1,14 @@
 using CppSharp.AST;
+using CppSharp.Generators;
 using CppSharp.Passes;
+using MonoEmbeddinator4000.Generators;
 
 namespace MonoEmbeddinator4000.Passes
 {
     public class FixMethodParametersPass : TranslationUnitPass
     {
+        public static string ObjectParameterId => "object";
+
         void AddObjectParameterToMethod(Method method, Class @class)
         {
             var ptrType = new QualifiedType(
@@ -12,7 +16,7 @@ namespace MonoEmbeddinator4000.Passes
 
             var param = new Parameter
             {
-                Name = "object",
+                Name = ObjectParameterId,
                 Namespace = @class,
                 QualifiedType = ptrType,
                 IsImplicit = true
@@ -63,7 +67,8 @@ namespace MonoEmbeddinator4000.Passes
             if (method.IsConstructor)
                 return false;
 
-            AddObjectParameterToMethod(method, @class);
+            if (Options.GeneratorKind == GeneratorKind.C)
+                AddObjectParameterToMethod(method, @class);
 
             return true;
         }

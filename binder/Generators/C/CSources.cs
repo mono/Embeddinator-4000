@@ -201,14 +201,22 @@ namespace MonoEmbeddinator4000.Generators
             WriteCloseBraceIndent();
         }
 
-        public static string GetMonoObjectField(DriverOptions options, string @object, string field)
+        public enum MonoObjectFieldUsage
+        {
+            Parameter,
+            Instance
+        }
+
+        public static string GetMonoObjectField(DriverOptions options, MonoObjectFieldUsage usage,
+            string @object, string field)
         {
             switch (options.GeneratorKind)
             {
             case GeneratorKind.C:
                 return $"{@object}->{field}";
             default:
-                return $"{@object}->_object->{field}";
+                var objExpr = usage == MonoObjectFieldUsage.Instance ? string.Empty : $"{@object}->";
+                return $"{objExpr}{CGenerator.ObjectInstanceId}->{field}";
             }
         }
 
@@ -217,7 +225,8 @@ namespace MonoEmbeddinator4000.Generators
             var @class = method.Namespace as Class;
             var classId = string.Format("{0}_class", @class.QualifiedName);
             var instanceId = GeneratedIdentifier("instance");
-            var handle = GetMonoObjectField(Options, "object", "_handle");
+            var handle = GetMonoObjectField(Options, MonoObjectFieldUsage.Instance,
+                FixMethodParametersPass.ObjectParameterId, "_handle");
 
             if (method.IsConstructor)
             {

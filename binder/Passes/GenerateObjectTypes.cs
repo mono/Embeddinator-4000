@@ -3,6 +3,7 @@ using CppSharp.AST;
 using CppSharp.Generators;
 using CppSharp.Passes;
 using CppSharp.Utils;
+using MonoEmbeddinator4000.Generators;
 
 namespace MonoEmbeddinator4000.Passes
 {
@@ -99,7 +100,7 @@ namespace MonoEmbeddinator4000.Passes
 
             var field = new Field
             {
-                Name = "_object",
+                Name = CGenerator.ObjectInstanceId,
                 QualifiedType = new QualifiedType(ptrType),
                 Access = AccessSpecifier.Public,
                 Namespace = @class
