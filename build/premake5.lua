@@ -57,7 +57,7 @@ workspace "MonoEmbeddinator4000"
   include_cppsharp_project("Generator")
   include_cppsharp_project("Runtime")
 
-  if _OPTIONS["dev"] then
+  if _OPTIONS["dev-cppsharp"] then
     include_cppsharp_project("Generator.Tests")
     include_cppsharp_project("../build/Tests")
     IncludeTests()
