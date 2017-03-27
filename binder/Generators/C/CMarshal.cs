@@ -135,7 +135,7 @@ namespace MonoEmbeddinator4000.Generators
         {
             var typeName = @class.Visit(CTypePrinter);
             var objectId = $"{Context.ArgName}_obj";
-            Context.SupportBefore.WriteLine("{1}* {0} = ({1}*) mono_m2n_create_object({2});",
+            Context.SupportBefore.WriteLine("{1}* {0} = ({1}*) mono_embeddinator_create_object({2});",
                 objectId, typeName, Context.ArgName);
             Context.Return.Write("{0}", objectId);
             return true;
@@ -269,7 +269,7 @@ namespace MonoEmbeddinator4000.Generators
                 if (cilType.Type == typeof(string))
                     return "mono_get_string_class()";
 
-                return string.Format("mono_m2n_search_class(\"{0}\", \"{1}\", \"{2}\")",
+                return string.Format("mono_embeddinator_search_class(\"{0}\", \"{1}\", \"{2}\")",
                     cilType.Type.Assembly.GetName().Name, cilType.Type.Namespace,
                     cilType.Type.Name);
             }

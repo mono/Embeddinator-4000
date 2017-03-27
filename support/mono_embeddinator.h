@@ -37,25 +37,25 @@
 #endif
 
 #ifdef  __cplusplus
-    #define MONO_M2N_BEGIN_DECLS  extern "C" {
-    #define MONO_M2N_END_DECLS    }
+    #define MONO_EMBEDDINATOR_BEGIN_DECLS  extern "C" {
+    #define MONO_EMBEDDINATOR_END_DECLS    }
 #else
-    #define MONO_M2N_BEGIN_DECLS
-    #define MONO_M2N_END_DECLS
+    #define MONO_EMBEDDINATOR_BEGIN_DECLS
+    #define MONO_EMBEDDINATOR_END_DECLS
 #endif
 
 #if defined(_MSC_VER)
-    #define MONO_M2N_API_EXPORT __declspec(dllexport)
-    #define MONO_M2N_API_IMPORT __declspec(dllimport)
+    #define MONO_EMBEDDINATOR_API_EXPORT __declspec(dllexport)
+    #define MONO_EMBEDDINATOR_API_IMPORT __declspec(dllimport)
 #else
-    #define MONO_M2N_API_EXPORT __attribute__ ((visibility ("default")))
-    #define MONO_M2N_API_IMPORT
+    #define MONO_EMBEDDINATOR_API_EXPORT __attribute__ ((visibility ("default")))
+    #define MONO_EMBEDDINATOR_API_IMPORT
 #endif
 
-#if defined(MONO_M2N_DLL_EXPORT)
-    #define MONO_M2N_API MONO_M2N_API_EXPORT
+#if defined(MONO_EMBEDDINATOR_DLL_EXPORT)
+    #define MONO_EMBEDDINATOR_API MONO_EMBEDDINATOR_API_EXPORT
 #else
-    #define MONO_M2N_API MONO_M2N_API_IMPORT
+    #define MONO_EMBEDDINATOR_API MONO_EMBEDDINATOR_API_IMPORT
 #endif
 
 typedef uint16_t gunichar2;
@@ -69,7 +69,7 @@ typedef struct _MonoClass MonoClass;
 typedef struct _MonoObject MonoObject;
 typedef struct _MonoImage MonoImage;
 
-MONO_M2N_BEGIN_DECLS
+MONO_EMBEDDINATOR_BEGIN_DECLS
 
 /** 
  * Represents a managed-to-native binding context.
@@ -77,55 +77,55 @@ MONO_M2N_BEGIN_DECLS
 typedef struct
 {
   MonoDomain* domain;
-} mono_m2n_context_t;
+} mono_embeddinator_context_t;
 
 /** 
  * Initializes a managed-to-native binding context.
  * Returns a boolean indicating success or failure.
  */
-MONO_M2N_API int mono_m2n_init(mono_m2n_context_t* ctx, const char* domain);
+MONO_EMBEDDINATOR_API int mono_embeddinator_init(mono_embeddinator_context_t* ctx, const char* domain);
 
 /** 
  * Destroys the managed-to-native binding context.
  * Returns a boolean indicating success or failure.
  */
-MONO_M2N_API int mono_m2n_destroy(mono_m2n_context_t* ctx);
+MONO_EMBEDDINATOR_API int mono_embeddinator_destroy(mono_embeddinator_context_t* ctx);
 
 /** 
  * Returns the current context.
  */
-MONO_M2N_API mono_m2n_context_t* mono_m2n_get_context();
+MONO_EMBEDDINATOR_API mono_embeddinator_context_t* mono_embeddinator_get_context();
 
 /** 
  * Sets the current context.
  */
-MONO_M2N_API void mono_m2n_set_context(mono_m2n_context_t* ctx);
+MONO_EMBEDDINATOR_API void mono_embeddinator_set_context(mono_embeddinator_context_t* ctx);
 
 
 /** 
  * Loads an assembly into the context.
  */
-MONO_M2N_API MonoImage* mono_m2n_load_assembly(mono_m2n_context_t* ctx,
+MONO_EMBEDDINATOR_API MonoImage* mono_embeddinator_load_assembly(mono_embeddinator_context_t* ctx,
     const char* assembly);
 
 /** 
  * Searches and returns the path to the given managed assembly.
  */
-MONO_M2N_API char* mono_m2n_search_assembly(const char* assembly);
+MONO_EMBEDDINATOR_API char* mono_embeddinator_search_assembly(const char* assembly);
 
 /** Represents the assembly search hook function type. */
-typedef const char* (*mono_m2n_assembly_search_hook_t)(const char*);
+typedef const char* (*mono_embeddinator_assembly_search_hook_t)(const char*);
 
 /**
  * Installs an hook that returns the path to the given managed assembly.
  * Returns the previous installed hook.
  */
-MONO_M2N_API void* mono_m2n_install_assembly_search_hook(mono_m2n_assembly_search_hook_t hook);
+MONO_EMBEDDINATOR_API void* mono_embeddinator_install_assembly_search_hook(mono_embeddinator_assembly_search_hook_t hook);
 
 /** 
  * Searches and returns for the Mono class in the given assembly.
  */
-MONO_M2N_API MonoClass* mono_m2n_search_class(const char* assembly, const char* _namespace,
+MONO_EMBEDDINATOR_API MonoClass* mono_embeddinator_search_class(const char* assembly, const char* _namespace,
     const char* name);
 
 /**
@@ -133,38 +133,38 @@ MONO_M2N_API MonoClass* mono_m2n_search_class(const char* assembly, const char* 
  */
 typedef enum
 {
-    MONO_M2N_OK = 0,
+    MONO_EMBEDDINATOR_OK = 0,
     // Mono managed exception
-    MONO_M2N_EXCEPTION_THROWN,
+    MONO_EMBEDDINATOR_EXCEPTION_THROWN,
     // Mono failed to load assembly
-    MONO_M2N_ASSEMBLY_OPEN_FAILED,
+    MONO_EMBEDDINATOR_ASSEMBLY_OPEN_FAILED,
     // Mono failed to lookup method
-    MONO_M2N_METHOD_LOOKUP_FAILED
-} mono_m2n_error_type_t;
+    MONO_EMBEDDINATOR_METHOD_LOOKUP_FAILED
+} mono_embeddinator_error_type_t;
 
 /**
  * Represents the error type and associated data.
  */
 typedef struct
 {
-    mono_m2n_error_type_t type;
-    // Contains exception object if type is MONO_M2N_EXCEPTION_THROWN
+    mono_embeddinator_error_type_t type;
+    // Contains exception object if type is MONO_EMBEDDINATOR_EXCEPTION_THROWN
     MonoException* exception;
     const char* string;
-} mono_m2n_error_t;
+} mono_embeddinator_error_t;
 
 /**
  * Fires an error and calls the installed error hook for handling.
  */
-MONO_M2N_API void mono_m2n_error(mono_m2n_error_t error);
+MONO_EMBEDDINATOR_API void mono_embeddinator_error(mono_embeddinator_error_t error);
 
 /** Represents the error report hook function type. */
-typedef void (*mono_m2n_error_report_hook_t)(mono_m2n_error_t);
+typedef void (*mono_embeddinator_error_report_hook_t)(mono_embeddinator_error_t);
 
 /**
  * Installs an hook that is called for each error reported.
  */
-MONO_M2N_API void* mono_m2n_install_error_report_hook(mono_m2n_error_report_hook_t hook);
+MONO_EMBEDDINATOR_API void* mono_embeddinator_install_error_report_hook(mono_embeddinator_error_report_hook_t hook);
 
 /** 
  * Arrays
@@ -188,6 +188,6 @@ typedef struct
 /**
  * Creates an support object from a Mono object instance.
  */
-MONO_M2N_API void* mono_m2n_create_object(MonoObject* instance);
+MONO_EMBEDDINATOR_API void* mono_embeddinator_create_object(MonoObject* instance);
 
-MONO_M2N_END_DECLS
+MONO_EMBEDDINATOR_END_DECLS

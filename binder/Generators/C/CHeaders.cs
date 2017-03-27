@@ -41,7 +41,7 @@ namespace MonoEmbeddinator4000.Generators
             GenerateDefines();
 
             PushBlock();
-            WriteLine("MONO_M2N_BEGIN_DECLS");
+            WriteLine("MONO_EMBEDDINATOR_BEGIN_DECLS");
             PopBlock(NewLineKind.BeforeNextBlock);
 
             WriteForwardDecls();
@@ -49,7 +49,7 @@ namespace MonoEmbeddinator4000.Generators
             VisitDeclContext(Unit);
 
             PushBlock();
-            WriteLine("MONO_M2N_END_DECLS");
+            WriteLine("MONO_EMBEDDINATOR_END_DECLS");
             PopBlock(NewLineKind.BeforeNextBlock);
         }
 

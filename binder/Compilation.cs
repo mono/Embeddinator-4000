@@ -426,7 +426,7 @@ namespace MonoEmbeddinator4000
             Diagnostics.Error(message);
         }
 
-        const string DLLExportDefine = "MONO_M2N_DLL_EXPORT";
+        const string DLLExportDefine = "MONO_EMBEDDINATOR_DLL_EXPORT";
 
         void CompileMSVC(IEnumerable<string> files)
         {

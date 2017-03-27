@@ -48,7 +48,7 @@ namespace MonoEmbeddinator4000.Generators
             PopBlock(NewLineKind.BeforeNextBlock);
 
             PushBlock();
-            WriteLine("mono_m2n_context_t {0};", GeneratedIdentifier("mono_context"));
+            WriteLine("mono_embeddinator_context_t {0};", GeneratedIdentifier("mono_context"));
             WriteLine("MonoImage* {0}_image;", AssemblyId);
             PopBlock(NewLineKind.BeforeNextBlock);
 
@@ -103,7 +103,7 @@ namespace MonoEmbeddinator4000.Generators
             WriteLineIndent("return;");
 
             var domainName = "mono_embeddinator_binding";
-            WriteLine("mono_m2n_init(&{0}, \"{1}\");", contextId, domainName);
+            WriteLine("mono_embeddinator_init(&{0}, \"{1}\");", contextId, domainName);
 
             WriteCloseBraceIndent();
             PopBlock(NewLineKind.BeforeNextBlock);
@@ -123,7 +123,7 @@ namespace MonoEmbeddinator4000.Generators
             WriteLine("if ({0})", monoImageName);
             WriteLineIndent("return;");
 
-            WriteLine("{0} = mono_m2n_load_assembly(&{1}, \"{2}\");",
+            WriteLine("{0} = mono_embeddinator_load_assembly(&{1}, \"{2}\");",
                 monoImageName, GeneratedIdentifier("mono_context"), assemblyName);
 
             WriteCloseBraceIndent();
@@ -193,10 +193,10 @@ namespace MonoEmbeddinator4000.Generators
             WriteStartBraceIndent();
 
             var errorId = GeneratedIdentifier("error");
-            WriteLine("mono_m2n_error_t {0};", errorId);
-            WriteLine("{0}.type = MONO_M2N_METHOD_LOOKUP_FAILED;", errorId);
+            WriteLine("mono_embeddinator_error_t {0};", errorId);
+            WriteLine("{0}.type = MONO_EMBEDDINATOR_METHOD_LOOKUP_FAILED;", errorId);
             WriteLine("{0}.string = {1};", errorId, methodNameId);
-            WriteLine("mono_m2n_error({0});", errorId);
+            WriteLine("mono_embeddinator_error({0});", errorId);
 
             WriteCloseBraceIndent();
         }
@@ -296,10 +296,10 @@ namespace MonoEmbeddinator4000.Generators
             WriteLine("if ({0} != 0)", exceptionId);
             WriteStartBraceIndent();
             var errorId = GeneratedIdentifier("error");
-            WriteLine("mono_m2n_error_t {0};", errorId);
-            WriteLine("{0}.type = MONO_M2N_EXCEPTION_THROWN;", errorId);
+            WriteLine("mono_embeddinator_error_t {0};", errorId);
+            WriteLine("{0}.type = MONO_EMBEDDINATOR_EXCEPTION_THROWN;", errorId);
             WriteLine("{0}.exception = (MonoException*) {1};", errorId, exceptionId);
-            WriteLine("mono_m2n_error({0});", errorId);
+            WriteLine("mono_embeddinator_error({0});", errorId);
             WriteCloseBraceIndent();
 
             foreach (var marshalContext in contexts)

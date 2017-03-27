@@ -53,14 +53,14 @@
 #include <mono/metadata/mono-config.h>
 #include <mono/metadata/assembly.h>
  
-mono_m2n_context_t* _current_context;
+mono_embeddinator_context_t* _current_context;
 
-mono_m2n_context_t* mono_m2n_get_context()
+mono_embeddinator_context_t* mono_embeddinator_get_context()
 {
     return _current_context;
 }
 
-void mono_m2n_set_context(mono_m2n_context_t* ctx)
+void mono_embeddinator_set_context(mono_embeddinator_context_t* ctx)
 {
     _current_context = ctx;
 }
@@ -82,7 +82,7 @@ void drainAutoreleasePool(id pool)
 static id _autoreleasePool = AUTORELEASE_POOL_DEFAULT_VALUE;
 #endif
 
-int mono_m2n_init(mono_m2n_context_t* ctx, const char* domain)
+int mono_embeddinator_init(mono_embeddinator_context_t* ctx, const char* domain)
 {
     if (ctx == 0 || ctx->domain != 0)
         return false;
@@ -90,7 +90,7 @@ int mono_m2n_init(mono_m2n_context_t* ctx, const char* domain)
     mono_config_parse(NULL);
     ctx->domain = mono_jit_init_version(domain, "v4.0.30319");
 
-    mono_m2n_set_context(ctx);
+    mono_embeddinator_set_context(ctx);
 
 #if defined(__OBJC__)
     if (_autoreleasePool == AUTORELEASE_POOL_DEFAULT_VALUE)
@@ -100,7 +100,7 @@ int mono_m2n_init(mono_m2n_context_t* ctx, const char* domain)
     return true;
 }
 
-int mono_m2n_destroy(mono_m2n_context_t* ctx)
+int mono_embeddinator_destroy(mono_embeddinator_context_t* ctx)
 {
     if (ctx == 0 || ctx->domain != 0)
         return false;
@@ -158,7 +158,7 @@ strrchr_seperator (const gchar* filename)
     return p;
 }
 
-char* mono_m2n_search_assembly(const char* assembly)
+char* mono_embeddinator_search_assembly(const char* assembly)
 {
     GString* path = get_current_executable_path();
 
@@ -174,45 +174,45 @@ char* mono_m2n_search_assembly(const char* assembly)
     return data;
 }
 
-MonoImage* mono_m2n_load_assembly(mono_m2n_context_t* ctx, const char* assembly)
+MonoImage* mono_embeddinator_load_assembly(mono_embeddinator_context_t* ctx, const char* assembly)
 {
-    const char* path = mono_m2n_search_assembly(assembly);
+    const char* path = mono_embeddinator_search_assembly(assembly);
     MonoAssembly* mono_assembly = mono_domain_assembly_open(ctx->domain, path);
     if (mono_assembly == 0)
     {
-        mono_m2n_error_t __error;
-        __error.type = MONO_M2N_ASSEMBLY_OPEN_FAILED;
+        mono_embeddinator_error_t __error;
+        __error.type = MONO_EMBEDDINATOR_ASSEMBLY_OPEN_FAILED;
         __error.string = path;
-        mono_m2n_error(__error);
+        mono_embeddinator_error(__error);
         return 0;
     }
 
     return mono_assembly_get_image(mono_assembly);
 }
 
-static mono_m2n_assembly_search_hook_t g_assembly_search_hook = 0;
+static mono_embeddinator_assembly_search_hook_t g_assembly_search_hook = 0;
 
-void* mono_m2n_install_assembly_search_hook(mono_m2n_assembly_search_hook_t hook)
+void* mono_embeddinator_install_assembly_search_hook(mono_embeddinator_assembly_search_hook_t hook)
 {
-    mono_m2n_assembly_search_hook_t prev = g_assembly_search_hook;
+    mono_embeddinator_assembly_search_hook_t prev = g_assembly_search_hook;
     g_assembly_search_hook = hook;
     return (void*)prev;
 }
 
-MonoClass* mono_m2n_search_class(const char* assembly, const char* _namespace,
+MonoClass* mono_embeddinator_search_class(const char* assembly, const char* _namespace,
     const char* name)
 {
-    mono_m2n_context_t* ctx = mono_m2n_get_context();
+    mono_embeddinator_context_t* ctx = mono_embeddinator_get_context();
 
-    const char* path = mono_m2n_search_assembly(assembly);
+    const char* path = mono_embeddinator_search_assembly(assembly);
     MonoAssembly* mono_assembly = mono_domain_assembly_open(ctx->domain, path);
 
     if (mono_assembly == 0)
     {
-        mono_m2n_error_t error;
-        error.type = MONO_M2N_ASSEMBLY_OPEN_FAILED;
+        mono_embeddinator_error_t error;
+        error.type = MONO_EMBEDDINATOR_ASSEMBLY_OPEN_FAILED;
         error.string = path;
-        mono_m2n_error(error);
+        mono_embeddinator_error(error);
     }
 
     MonoImage* image = mono_assembly_get_image(mono_assembly);
@@ -221,16 +221,16 @@ MonoClass* mono_m2n_search_class(const char* assembly, const char* _namespace,
     return klass;
 }
 
-static mono_m2n_error_report_hook_t g_error_report_hook = 0;
+static mono_embeddinator_error_report_hook_t g_error_report_hook = 0;
 
-void* mono_m2n_install_error_report_hook(mono_m2n_error_report_hook_t hook)
+void* mono_embeddinator_install_error_report_hook(mono_embeddinator_error_report_hook_t hook)
 {
-    mono_m2n_error_report_hook_t prev = g_error_report_hook;
+    mono_embeddinator_error_report_hook_t prev = g_error_report_hook;
     g_error_report_hook = hook;
     return prev;
 }
 
-void mono_m2n_error(mono_m2n_error_t error)
+void mono_embeddinator_error(mono_embeddinator_error_t error)
 {
     if (g_error_report_hook == 0)
         return;
@@ -238,7 +238,7 @@ void mono_m2n_error(mono_m2n_error_t error)
     g_error_report_hook(error);
 }
 
-void* mono_m2n_create_object(MonoObject* instance)
+void* mono_embeddinator_create_object(MonoObject* instance)
 {
     MonoEmbedObject* object = g_new(MonoEmbedObject, 1);
     object->_class = mono_object_get_class(instance);
