@@ -54,10 +54,17 @@ namespace MonoEmbeddinator4000.Generators
 
             GenerateObjectDeclarations();
 
-            GenerateMonoInitialization();
-            GenerateAssemblyLoad();
+            GenerateGlobalMethods();
 
             VisitDeclContext(Unit);
+        }
+
+        public virtual void GenerateGlobalMethods ()
+        {
+            GenerateMonoInitialization();
+            GenerateAssemblyLoad();
+            GenerateMethodLookup();
+            GenerateMethodExceptionThrown();
         }
 
         public override bool VisitEnumDecl(Enumeration @enum)
@@ -130,6 +137,44 @@ namespace MonoEmbeddinator4000.Generators
             PopBlock(NewLineKind.BeforeNextBlock);
         }
 
+        public void GenerateMethodLookup()
+        {
+            PushBlock();
+            WriteLine("static MonoMethod* __method_lookup (const char* method_name, MonoClass *klass)");
+            WriteStartBraceIndent();
+
+            WriteLine("MonoMethodDesc* desc = mono_method_desc_new (method_name, /*include_namespace=*/true);");
+            WriteLine("MonoMethod* method = mono_method_desc_search_in_class (desc, klass);");
+            WriteLine("mono_method_desc_free (desc);");
+
+            WriteLine("if (!method)");
+            WriteStartBraceIndent();
+            WriteLine("mono_embeddinator_error_t error;");
+            WriteLine("error.type = MONO_EMBEDDINATOR_METHOD_LOOKUP_FAILED;");
+            WriteLine("error.string = method_name;");
+            WriteLine("mono_embeddinator_error (error);");
+            WriteCloseBraceIndent();
+
+            WriteLine("return method;");
+            WriteCloseBraceIndent();
+            PopBlock(NewLineKind.BeforeNextBlock);
+        }
+
+        public void GenerateMethodExceptionThrown ()
+        {
+            PushBlock ();
+            WriteLine ("static void __method_exception_thrown (MonoObject *exception)");
+            WriteStartBraceIndent ();
+
+            WriteLine ("mono_embeddinator_error_t error;");
+            WriteLine ("error.type = MONO_EMBEDDINATOR_EXCEPTION_THROWN;");
+            WriteLine ("error.exception = (MonoException*) exception;");
+            WriteLine ("mono_embeddinator_error (error);");
+
+            WriteCloseBraceIndent ();
+            PopBlock (NewLineKind.BeforeNextBlock);
+        }
+
         public void GenerateClassLookup(Class @class)
         {
             PushBlock();
@@ -172,33 +217,17 @@ namespace MonoEmbeddinator4000.Generators
         {
             var methodNameId = GeneratedIdentifier("method_name");
             WriteLine("const char {0}[] = \"{1}\";", methodNameId, method.OriginalName);
-            var descId = GeneratedIdentifier("desc");
-
-            WriteLine("MonoMethodDesc* {0} = mono_method_desc_new({1}, /*include_namespace=*/true);",
-                descId, methodNameId);
 
             var methodId = GeneratedIdentifier("method");
+            WriteLine ($"static MonoMethod *{methodId} = 0;");
 
             var @class = method.Namespace as Class;
             var classId = string.Format("{0}_class", @class.QualifiedName);
 
-            WriteLine("MonoMethod* {0} = mono_method_desc_search_in_class({1}, {2});",
-                methodId, descId, classId);
-
-            WriteLine("mono_method_desc_free({0});", descId);
-
             var retType = method.ReturnType;
 
             WriteLine("if ({0} == 0)", methodId);
-            WriteStartBraceIndent();
-
-            var errorId = GeneratedIdentifier("error");
-            WriteLine("mono_embeddinator_error_t {0};", errorId);
-            WriteLine("{0}.type = MONO_EMBEDDINATOR_METHOD_LOOKUP_FAILED;", errorId);
-            WriteLine("{0}.string = {1};", errorId, methodNameId);
-            WriteLine("mono_embeddinator_error({0});", errorId);
-
-            WriteCloseBraceIndent();
+            WriteLineIndent ($"{methodId} = __method_lookup ({methodNameId}, {classId});");
         }
 
         public enum MonoObjectFieldUsage
@@ -294,13 +323,7 @@ namespace MonoEmbeddinator4000.Generators
                 methodId, instanceId, argsId, exceptionId);
 
             WriteLine("if ({0} != 0)", exceptionId);
-            WriteStartBraceIndent();
-            var errorId = GeneratedIdentifier("error");
-            WriteLine("mono_embeddinator_error_t {0};", errorId);
-            WriteLine("{0}.type = MONO_EMBEDDINATOR_EXCEPTION_THROWN;", errorId);
-            WriteLine("{0}.exception = (MonoException*) {1};", errorId, exceptionId);
-            WriteLine("mono_embeddinator_error({0});", errorId);
-            WriteCloseBraceIndent();
+            WriteLineIndent ($"__method_exception_thrown ({exceptionId});");
 
             foreach (var marshalContext in contexts)
             {
