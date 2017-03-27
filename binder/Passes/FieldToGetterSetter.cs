@@ -1,8 +1,6 @@
 using CppSharp;
 using CppSharp.AST;
-using CppSharp.AST.Extensions;
 using CppSharp.Passes;
-using System.Linq;
 
 namespace MonoEmbeddinator4000.Passes
 {

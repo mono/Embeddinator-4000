@@ -1,7 +1,6 @@
 using CppSharp.AST;
 using CppSharp.Generators;
 using CppSharp.Passes;
-using MonoEmbeddinator4000.Generators;
 
 namespace MonoEmbeddinator4000.Passes
 {
