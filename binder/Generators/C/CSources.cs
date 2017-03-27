@@ -221,13 +221,20 @@ namespace MonoEmbeddinator4000.Generators
             var methodId = GeneratedIdentifier("method");
             WriteLine ($"static MonoMethod *{methodId} = 0;");
 
+            NewLine();
+
+            WriteLine($"if (!{methodId})");
+            WriteStartBraceIndent();
+
             var @class = method.Namespace as Class;
+            var classLookupId = GeneratedIdentifier(string.Format("lookup_class_{0}",
+                @class.QualifiedName.Replace('.', '_')));
+            WriteLine($"{classLookupId}();");
+            
             var classId = string.Format("{0}_class", @class.QualifiedName);
+            WriteLine($"{methodId} = __method_lookup({methodNameId}, {classId});");
 
-            var retType = method.ReturnType;
-
-            WriteLine("if ({0} == 0)", methodId);
-            WriteLineIndent ($"{methodId} = __method_lookup ({methodNameId}, {classId});");
+            WriteCloseBraceIndent();
         }
 
         public enum MonoObjectFieldUsage
@@ -275,6 +282,7 @@ namespace MonoEmbeddinator4000.Generators
         public void GenerateMethodInvocation(Method method)
         {
             GenerateMethodGCHandleLookup(method);
+            NewLine();
 
             var paramsToMarshal = method.Parameters.Where(p => !p.IsImplicit);
             var numParamsToMarshal = paramsToMarshal.Count();
@@ -321,9 +329,10 @@ namespace MonoEmbeddinator4000.Generators
 
             WriteLine("{0} = mono_runtime_invoke({1}, {2}, {3}, &{4});", resultId,
                 methodId, instanceId, argsId, exceptionId);
+            NewLine();
 
             WriteLine("if ({0} != 0)", exceptionId);
-            WriteLineIndent ($"__method_exception_thrown ({exceptionId});");
+            WriteLineIndent ($"__method_exception_thrown({exceptionId});");
 
             foreach (var marshalContext in contexts)
             {
@@ -340,17 +349,14 @@ namespace MonoEmbeddinator4000.Generators
             NewLine();
             WriteStartBraceIndent();
 
-            var @class = method.Namespace as Class;
-            var classLookupId = GeneratedIdentifier(string.Format("lookup_class_{0}",
-                @class.QualifiedName.Replace('.', '_')));
-            WriteLine("{0}();", classLookupId);
-
             GenerateMethodLookup(method);
+            NewLine();
 
             var retType = method.ReturnType;
             var needsReturn = !retType.Type.IsPrimitiveType(PrimitiveType.Void);
 
             GenerateMethodInvocation(method);
+            NewLine();
 
             string returnCode = "0";
 
