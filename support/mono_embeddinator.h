@@ -84,34 +84,40 @@ typedef struct
  * Initializes a managed-to-native binding context.
  * Returns a boolean indicating success or failure.
  */
-MONO_EMBEDDINATOR_API int mono_embeddinator_init(mono_embeddinator_context_t* ctx, const char* domain);
+MONO_EMBEDDINATOR_API
+int mono_embeddinator_init(mono_embeddinator_context_t* ctx, const char* domain);
 
 /** 
  * Destroys the managed-to-native binding context.
  * Returns a boolean indicating success or failure.
  */
-MONO_EMBEDDINATOR_API int mono_embeddinator_destroy(mono_embeddinator_context_t* ctx);
+MONO_EMBEDDINATOR_API
+int mono_embeddinator_destroy(mono_embeddinator_context_t* ctx);
 
 /** 
  * Returns the current context.
  */
-MONO_EMBEDDINATOR_API mono_embeddinator_context_t* mono_embeddinator_get_context();
+MONO_EMBEDDINATOR_API
+mono_embeddinator_context_t* mono_embeddinator_get_context();
 
 /** 
  * Sets the current context.
  */
-MONO_EMBEDDINATOR_API void mono_embeddinator_set_context(mono_embeddinator_context_t* ctx);
+MONO_EMBEDDINATOR_API
+void mono_embeddinator_set_context(mono_embeddinator_context_t* ctx);
 
 /** 
  * Loads an assembly into the context.
  */
-MONO_EMBEDDINATOR_API MonoImage* mono_embeddinator_load_assembly(mono_embeddinator_context_t* ctx,
+MONO_EMBEDDINATOR_API
+MonoImage* mono_embeddinator_load_assembly(mono_embeddinator_context_t* ctx,
     const char* assembly);
 
 /** 
  * Searches and returns the path to the given managed assembly.
  */
-MONO_EMBEDDINATOR_API char* mono_embeddinator_search_assembly(const char* assembly);
+MONO_EMBEDDINATOR_API
+char* mono_embeddinator_search_assembly(const char* assembly);
 
 /** Represents the assembly search hook function type. */
 typedef const char* (*mono_embeddinator_assembly_search_hook_t)(const char*);
@@ -120,18 +126,21 @@ typedef const char* (*mono_embeddinator_assembly_search_hook_t)(const char*);
  * Installs an hook that returns the path to the given managed assembly.
  * Returns the previous installed hook.
  */
-MONO_EMBEDDINATOR_API void* mono_embeddinator_install_assembly_search_hook(mono_embeddinator_assembly_search_hook_t hook);
+MONO_EMBEDDINATOR_API
+void* mono_embeddinator_install_assembly_search_hook(mono_embeddinator_assembly_search_hook_t hook);
 
 /** 
  * Searches and returns for the Mono class in the given assembly.
  */
-MONO_EMBEDDINATOR_API MonoClass* mono_embeddinator_search_class(const char* assembly, const char* _namespace,
+MONO_EMBEDDINATOR_API
+MonoClass* mono_embeddinator_search_class(const char* assembly, const char* _namespace,
     const char* name);
 
 /** 
  * Looks up and returns a MonoMethod* for a given Mono class and method name.
  */
-MONO_EMBEDDINATOR_API MonoMethod* mono_embeddinator_lookup_method(const char* method_name, MonoClass *klass);
+MONO_EMBEDDINATOR_API
+MonoMethod* mono_embeddinator_lookup_method(const char* method_name, MonoClass *klass);
 
 /**
  * Represents the different types of errors to be reported.
@@ -161,7 +170,8 @@ typedef struct
 /**
  * Fires an error and calls the installed error hook for handling.
  */
-MONO_EMBEDDINATOR_API void mono_embeddinator_error(mono_embeddinator_error_t error);
+MONO_EMBEDDINATOR_API
+void mono_embeddinator_error(mono_embeddinator_error_t error);
 
 /** Represents the error report hook function type. */
 typedef void (*mono_embeddinator_error_report_hook_t)(mono_embeddinator_error_t);
@@ -169,7 +179,8 @@ typedef void (*mono_embeddinator_error_report_hook_t)(mono_embeddinator_error_t)
 /**
  * Installs an hook that is called for each error reported.
  */
-MONO_EMBEDDINATOR_API void* mono_embeddinator_install_error_report_hook(mono_embeddinator_error_report_hook_t hook);
+MONO_EMBEDDINATOR_API
+void* mono_embeddinator_install_error_report_hook(mono_embeddinator_error_report_hook_t hook);
 
 /** 
  * Arrays
@@ -193,12 +204,13 @@ typedef struct
 /**
  * Creates a MonoEmbedObject support object from a Mono object instance.
  */
-MONO_EMBEDDINATOR_API void* mono_embeddinator_create_object(MonoObject* instance);
+MONO_EMBEDDINATOR_API
+void* mono_embeddinator_create_object(MonoObject* instance);
 
 /**
  * Initializes a MonoEmbedObject object from a Mono object instance.
  */
-MONO_EMBEDDINATOR_API void mono_embeddinator_init_object(MonoEmbedObject* object, MonoObject* instance);
-
+MONO_EMBEDDINATOR_API
+void mono_embeddinator_init_object(MonoEmbedObject* object, MonoObject* instance);
 
 MONO_EMBEDDINATOR_END_DECLS
