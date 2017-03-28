@@ -140,7 +140,13 @@ MonoClass* mono_embeddinator_search_class(const char* assembly, const char* _nam
  * Looks up and returns a MonoMethod* for a given Mono class and method name.
  */
 MONO_EMBEDDINATOR_API
-MonoMethod* mono_embeddinator_lookup_method(const char* method_name, MonoClass *klass);
+MonoMethod* mono_embeddinator_lookup_method(const char* method_name, MonoClass* klass);
+
+/** 
+ * Throws an exception based on a given Mono exception object.
+ */
+MONO_EMBEDDINATOR_API
+void mono_embeddinator_throw_exception(MonoObject* exception);
 
 /**
  * Represents the different types of errors to be reported.

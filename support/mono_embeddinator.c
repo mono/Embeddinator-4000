@@ -239,6 +239,14 @@ MonoMethod* mono_embeddinator_lookup_method(const char* method_name, MonoClass *
     return method;
 }
 
+void mono_embeddinator_throw_exception(MonoObject *exception)
+{
+    mono_embeddinator_error_t error;
+    error.type = MONO_EMBEDDINATOR_EXCEPTION_THROWN;
+    error.exception = (MonoException*) exception;
+    mono_embeddinator_error(error);
+}
+
 static mono_embeddinator_error_report_hook_t g_error_report_hook = 0;
 
 void* mono_embeddinator_install_error_report_hook(mono_embeddinator_error_report_hook_t hook)

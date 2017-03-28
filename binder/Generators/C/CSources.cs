@@ -62,7 +62,6 @@ namespace MonoEmbeddinator4000.Generators
         {
             GenerateMonoInitialization();
             GenerateAssemblyLoad();
-            GenerateMethodExceptionThrown();
         }
 
         public override bool VisitEnumDecl(Enumeration @enum)
@@ -130,21 +129,6 @@ namespace MonoEmbeddinator4000.Generators
 
             WriteLine("{0} = mono_embeddinator_load_assembly(&{1}, \"{2}\");",
                 monoImageName, GeneratedIdentifier("mono_context"), assemblyName);
-
-            WriteCloseBraceIndent();
-            PopBlock(NewLineKind.BeforeNextBlock);
-        }
-
-        public void GenerateMethodExceptionThrown()
-        {
-            PushBlock();
-            WriteLine("static void __method_exception_thrown (MonoObject *exception)");
-            WriteStartBraceIndent();
-
-            WriteLine("mono_embeddinator_error_t error;");
-            WriteLine("error.type = MONO_EMBEDDINATOR_EXCEPTION_THROWN;");
-            WriteLine("error.exception = (MonoException*) exception;");
-            WriteLine("mono_embeddinator_error (error);");
 
             WriteCloseBraceIndent();
             PopBlock(NewLineKind.BeforeNextBlock);
@@ -309,7 +293,7 @@ namespace MonoEmbeddinator4000.Generators
             NewLine();
 
             WriteLine($"if (!{exceptionId})");
-            WriteLineIndent($"__method_exception_thrown({exceptionId});");
+            WriteLineIndent($"mono_embeddinator_throw_exception({exceptionId});");
 
             foreach (var marshalContext in contexts)
             {
