@@ -255,19 +255,17 @@ namespace MonoEmbeddinator4000.Generators
             }
         }
 
-        public void GenerateMethodGCHandleLookup(Method method)
+        public virtual void GenerateMethodInitialization(Method method)
         {
             var @class = method.Namespace as Class;
-            var classId = $"class_{@class.QualifiedName}";
             var instanceId = GeneratedIdentifier("instance");
-            var handle = GetMonoObjectField(Options, MonoObjectFieldUsage.Instance,
-                FixMethodParametersPass.ObjectParameterId, "_handle");
 
             if (method.IsConstructor)
             {
                 var alloc = GenerateClassObjectAlloc(@class.QualifiedName);
                 WriteLine($"{@class.QualifiedName}* object = {alloc};");
 
+                var classId = $"class_{@class.QualifiedName}";
                 WriteLine("MonoObject* {0} = mono_object_new({1}.domain, {2});",
                     instanceId, GeneratedIdentifier("mono_context"), classId);
 
@@ -278,13 +276,15 @@ namespace MonoEmbeddinator4000.Generators
             }
             else if (!method.IsStatic)
             {
+                var handle = GetMonoObjectField(Options, MonoObjectFieldUsage.Instance,
+                    FixMethodParametersPass.ObjectParameterId, "_handle");
                 WriteLine($"MonoObject* {instanceId} = mono_gchandle_get_target({handle});");
             }
         }
 
         public void GenerateMethodInvocation(Method method)
         {
-            GenerateMethodGCHandleLookup(method);
+            GenerateMethodInitialization(method);
             NewLine();
 
             var paramsToMarshal = method.Parameters.Where(p => !p.IsImplicit);

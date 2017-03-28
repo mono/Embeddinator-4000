@@ -220,6 +220,10 @@ namespace MonoEmbeddinator4000.Generators
                 method.Ignore = true;
 
             method.Name = "new";
+
+            if (Options.GeneratorKind == GeneratorKind.ObjectiveC)
+                method.Name = "init";
+
             return method;
         }
 
