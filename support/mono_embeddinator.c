@@ -52,7 +52,8 @@
 #include <mono/jit/jit.h>
 #include <mono/metadata/mono-config.h>
 #include <mono/metadata/assembly.h>
- 
+#include <mono/metadata/debug-helpers.h>
+
 mono_embeddinator_context_t* _current_context;
 
 mono_embeddinator_context_t* mono_embeddinator_get_context()
@@ -219,6 +220,23 @@ MonoClass* mono_embeddinator_search_class(const char* assembly, const char* _nam
     MonoClass* klass = mono_class_from_name(image, _namespace, name);
 
     return klass;
+}
+
+MonoMethod* mono_embeddinator_lookup_method(const char* method_name, MonoClass *klass)
+{
+    MonoMethodDesc* desc = mono_method_desc_new(method_name, /*include_namespace=*/true);
+    MonoMethod* method = mono_method_desc_search_in_class(desc, klass);
+    mono_method_desc_free(desc);
+
+    if (!method)
+    {
+        mono_embeddinator_error_t error;
+        error.type = MONO_EMBEDDINATOR_METHOD_LOOKUP_FAILED;
+        error.string = method_name;
+        mono_embeddinator_error(error);
+    }
+
+    return method;
 }
 
 static mono_embeddinator_error_report_hook_t g_error_report_hook = 0;

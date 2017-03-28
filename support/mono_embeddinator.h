@@ -68,6 +68,7 @@ typedef struct _MonoException MonoException;
 typedef struct _MonoClass MonoClass;
 typedef struct _MonoObject MonoObject;
 typedef struct _MonoImage MonoImage;
+typedef struct _MonoMethod MonoMethod;
 
 MONO_EMBEDDINATOR_BEGIN_DECLS
 
@@ -126,6 +127,11 @@ MONO_EMBEDDINATOR_API void* mono_embeddinator_install_assembly_search_hook(mono_
  */
 MONO_EMBEDDINATOR_API MonoClass* mono_embeddinator_search_class(const char* assembly, const char* _namespace,
     const char* name);
+
+/** 
+ * Looks up and returns a MonoMethod* for a given Mono class and method name.
+ */
+MONO_EMBEDDINATOR_API MonoMethod* mono_embeddinator_lookup_method(const char* method_name, MonoClass *klass);
 
 /**
  * Represents the different types of errors to be reported.

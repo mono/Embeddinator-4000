@@ -29,7 +29,6 @@ namespace MonoEmbeddinator4000.Generators
             WriteLine("#include <mono/metadata/assembly.h>");
             WriteLine("#include <mono/metadata/object.h>");
             WriteLine("#include <mono/metadata/mono-config.h>");
-            WriteLine("#include <mono/metadata/debug-helpers.h>");
         }
 
         void RemoveTypedefNodes()
@@ -63,7 +62,6 @@ namespace MonoEmbeddinator4000.Generators
         {
             GenerateMonoInitialization();
             GenerateAssemblyLoad();
-            GenerateMethodLookup();
             GenerateMethodExceptionThrown();
         }
 
@@ -133,29 +131,6 @@ namespace MonoEmbeddinator4000.Generators
             WriteLine("{0} = mono_embeddinator_load_assembly(&{1}, \"{2}\");",
                 monoImageName, GeneratedIdentifier("mono_context"), assemblyName);
 
-            WriteCloseBraceIndent();
-            PopBlock(NewLineKind.BeforeNextBlock);
-        }
-
-        public void GenerateMethodLookup()
-        {
-            PushBlock();
-            WriteLine("static MonoMethod* __method_lookup (const char* method_name, MonoClass *klass)");
-            WriteStartBraceIndent();
-
-            WriteLine("MonoMethodDesc* desc = mono_method_desc_new (method_name, /*include_namespace=*/true);");
-            WriteLine("MonoMethod* method = mono_method_desc_search_in_class (desc, klass);");
-            WriteLine("mono_method_desc_free (desc);");
-
-            WriteLine("if (!method)");
-            WriteStartBraceIndent();
-            WriteLine("mono_embeddinator_error_t error;");
-            WriteLine("error.type = MONO_EMBEDDINATOR_METHOD_LOOKUP_FAILED;");
-            WriteLine("error.string = method_name;");
-            WriteLine("mono_embeddinator_error (error);");
-            WriteCloseBraceIndent();
-
-            WriteLine("return method;");
             WriteCloseBraceIndent();
             PopBlock(NewLineKind.BeforeNextBlock);
         }
@@ -231,7 +206,7 @@ namespace MonoEmbeddinator4000.Generators
             WriteLine($"{classLookupId}();");
 
             var classId = $"class_{@class.QualifiedName}";
-            WriteLine($"{methodId} = __method_lookup({methodNameId}, {classId});");
+            WriteLine($"{methodId} = mono_embeddinator_lookup_method({methodNameId}, {classId});");
 
             WriteCloseBraceIndent();
         }
