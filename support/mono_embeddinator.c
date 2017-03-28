@@ -241,7 +241,13 @@ void mono_embeddinator_error(mono_embeddinator_error_t error)
 void* mono_embeddinator_create_object(MonoObject* instance)
 {
     MonoEmbedObject* object = g_new(MonoEmbedObject, 1);
+    mono_embeddinator_init_object(object, instance);
+
+    return object;
+}
+
+void mono_embeddinator_init_object(MonoEmbedObject* object, MonoObject* instance)
+{
     object->_class = mono_object_get_class(instance);
     object->_handle = mono_gchandle_new(instance, /*pinned=*/false);
-    return object;
 }

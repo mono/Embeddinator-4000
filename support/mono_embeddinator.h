@@ -101,7 +101,6 @@ MONO_EMBEDDINATOR_API mono_embeddinator_context_t* mono_embeddinator_get_context
  */
 MONO_EMBEDDINATOR_API void mono_embeddinator_set_context(mono_embeddinator_context_t* ctx);
 
-
 /** 
  * Loads an assembly into the context.
  */
@@ -186,8 +185,14 @@ typedef struct
 } MonoEmbedObject;
 
 /**
- * Creates an support object from a Mono object instance.
+ * Creates a MonoEmbedObject support object from a Mono object instance.
  */
 MONO_EMBEDDINATOR_API void* mono_embeddinator_create_object(MonoObject* instance);
+
+/**
+ * Initializes a MonoEmbedObject object from a Mono object instance.
+ */
+MONO_EMBEDDINATOR_API void mono_embeddinator_init_object(MonoEmbedObject* object, MonoObject* instance);
+
 
 MONO_EMBEDDINATOR_END_DECLS

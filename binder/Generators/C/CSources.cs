@@ -267,10 +267,14 @@ namespace MonoEmbeddinator4000.Generators
             {
                 var alloc = GenerateClassObjectAlloc(@class.QualifiedName);
                 WriteLine($"{@class.QualifiedName}* object = {alloc};");
+
                 WriteLine("MonoObject* {0} = mono_object_new({1}.domain, {2});",
                     instanceId, GeneratedIdentifier("mono_context"), classId);
 
-                WriteLine($"{handle} = mono_gchandle_new({instanceId}, /*pinned=*/false);");
+                if (Options.GeneratorKind == GeneratorKind.C)
+                    WriteLine($"mono_embeddinator_init_object(object, {instanceId});");
+                else
+                    WriteLine($"object->{CGenerator.ObjectInstanceId} = mono_embeddinator_create_object({instanceId});");
             }
             else if (!method.IsStatic)
             {
