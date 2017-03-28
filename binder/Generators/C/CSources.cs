@@ -59,7 +59,7 @@ namespace MonoEmbeddinator4000.Generators
             VisitDeclContext(Unit);
         }
 
-        public virtual void GenerateGlobalMethods ()
+        public virtual void GenerateGlobalMethods()
         {
             GenerateMonoInitialization();
             GenerateAssemblyLoad();
@@ -160,19 +160,19 @@ namespace MonoEmbeddinator4000.Generators
             PopBlock(NewLineKind.BeforeNextBlock);
         }
 
-        public void GenerateMethodExceptionThrown ()
+        public void GenerateMethodExceptionThrown()
         {
-            PushBlock ();
-            WriteLine ("static void __method_exception_thrown (MonoObject *exception)");
-            WriteStartBraceIndent ();
+            PushBlock();
+            WriteLine("static void __method_exception_thrown (MonoObject *exception)");
+            WriteStartBraceIndent();
 
-            WriteLine ("mono_embeddinator_error_t error;");
-            WriteLine ("error.type = MONO_EMBEDDINATOR_EXCEPTION_THROWN;");
-            WriteLine ("error.exception = (MonoException*) exception;");
-            WriteLine ("mono_embeddinator_error (error);");
+            WriteLine("mono_embeddinator_error_t error;");
+            WriteLine("error.type = MONO_EMBEDDINATOR_EXCEPTION_THROWN;");
+            WriteLine("error.exception = (MonoException*) exception;");
+            WriteLine("mono_embeddinator_error (error);");
 
-            WriteCloseBraceIndent ();
-            PopBlock (NewLineKind.BeforeNextBlock);
+            WriteCloseBraceIndent();
+            PopBlock(NewLineKind.BeforeNextBlock);
         }
 
         public void GenerateClassLookup(Class @class)
@@ -219,7 +219,7 @@ namespace MonoEmbeddinator4000.Generators
             WriteLine("const char {0}[] = \"{1}\";", methodNameId, method.OriginalName);
 
             var methodId = GeneratedIdentifier("method");
-            WriteLine ($"static MonoMethod *{methodId} = 0;");
+            WriteLine($"static MonoMethod *{methodId} = 0;");
 
             NewLine();
 
@@ -336,8 +336,8 @@ namespace MonoEmbeddinator4000.Generators
 
             foreach (var marshalContext in contexts)
             {
-                if (!string.IsNullOrWhiteSpace (marshalContext.SupportAfter))
-                    Write (marshalContext.SupportAfter);
+                if (!string.IsNullOrWhiteSpace(marshalContext.SupportAfter))
+                    Write(marshalContext.SupportAfter);
             }
         }
 
