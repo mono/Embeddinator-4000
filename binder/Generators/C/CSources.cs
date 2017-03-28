@@ -92,7 +92,7 @@ namespace MonoEmbeddinator4000.Generators
                     continue;
 
                 PushBlock();
-                WriteLine("static MonoClass* {0}_class = 0;", @class.QualifiedName);
+                WriteLine($"static MonoClass* class_{@class.QualifiedName} = 0;");
                 PopBlock(NewLineKind.Never);
             }
 
@@ -184,8 +184,7 @@ namespace MonoEmbeddinator4000.Generators
             WriteLine("static void {0}()", classLookupId);
             WriteStartBraceIndent();
 
-            var classId = string.Format("{0}_class", @class.QualifiedName);
-
+            var classId = $"class_{@class.QualifiedName}";
             WriteLine("if ({0} == 0)", classId);
             WriteStartBraceIndent();
 
@@ -230,8 +229,8 @@ namespace MonoEmbeddinator4000.Generators
             var classLookupId = GeneratedIdentifier(string.Format("lookup_class_{0}",
                 @class.QualifiedName.Replace('.', '_')));
             WriteLine($"{classLookupId}();");
-            
-            var classId = string.Format("{0}_class", @class.QualifiedName);
+
+            var classId = $"class_{@class.QualifiedName}";
             WriteLine($"{methodId} = __method_lookup({methodNameId}, {classId});");
 
             WriteCloseBraceIndent();
@@ -259,7 +258,7 @@ namespace MonoEmbeddinator4000.Generators
         public void GenerateMethodGCHandleLookup(Method method)
         {
             var @class = method.Namespace as Class;
-            var classId = string.Format("{0}_class", @class.QualifiedName);
+            var classId = $"class_{@class.QualifiedName}";
             var instanceId = GeneratedIdentifier("instance");
             var handle = GetMonoObjectField(Options, MonoObjectFieldUsage.Instance,
                 FixMethodParametersPass.ObjectParameterId, "_handle");

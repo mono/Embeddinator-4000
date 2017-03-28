@@ -284,7 +284,7 @@ namespace MonoEmbeddinator4000.Generators
 
                 var unit = decl.TranslationUnit;
 
-                var classId = $"{decl.QualifiedName}_class";
+                var classId = $"class_{decl.QualifiedName}";
                 var monoImageName = $"{CGenerator.AssemblyId(unit)}_image";
                 gen.WriteLine("{0} = mono_class_from_name({1}, \"{2}\", \"{3}\");",
                     classId, monoImageName, @namespace, decl.OriginalName);
