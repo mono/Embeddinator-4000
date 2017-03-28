@@ -30,6 +30,11 @@ namespace MonoEmbeddinator4000
 
             Options.MainModule.LibraryName = null;
 
+            Options.GenerateSupportFiles = 
+                Options.GeneratorKind == GeneratorKind.C ||
+                Options.GeneratorKind == GeneratorKind.CPlusPlus ||
+                Options.GeneratorKind == GeneratorKind.ObjectiveC;
+
             Assemblies = new List<IKVM.Reflection.Assembly>();
 
             Context = new BindingContext(options);
