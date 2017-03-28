@@ -292,7 +292,7 @@ namespace MonoEmbeddinator4000.Generators
             if (numParamsToMarshal > 0)
             {
                 argsId = GeneratedIdentifier("args");
-                WriteLine("void* {0}[{1}];", argsId, numParamsToMarshal);
+                WriteLine($"void* {argsId}[{numParamsToMarshal}];");
             }
 
             var contexts = new List<MarshalContext>();
@@ -314,15 +314,14 @@ namespace MonoEmbeddinator4000.Generators
                 if (!string.IsNullOrWhiteSpace(marshal.Context.SupportBefore))
                     Write(marshal.Context.SupportBefore);
 
-                WriteLine("{0}[{1}] = {2};", argsId, paramIndex++,
-                    marshal.Context.Return.ToString());
+                WriteLine($"{argsId}[{paramIndex++}] = {marshal.Context.Return};");
             }
 
             var exceptionId = GeneratedIdentifier("exception");
-            WriteLine("MonoObject* {0} = 0;", exceptionId);
+            WriteLine($"MonoObject* {exceptionId} = 0;");
 
             var resultId = GeneratedIdentifier("result");
-            WriteLine("MonoObject* {0};", resultId);
+            WriteLine($"MonoObject* {resultId};");
 
             var methodId = GeneratedIdentifier("method");
             var instanceId = method.IsStatic ? "0" : GeneratedIdentifier("instance");
@@ -331,8 +330,8 @@ namespace MonoEmbeddinator4000.Generators
                 methodId, instanceId, argsId, exceptionId);
             NewLine();
 
-            WriteLine("if ({0} != 0)", exceptionId);
-            WriteLineIndent ($"__method_exception_thrown({exceptionId});");
+            WriteLine($"if (!{exceptionId})");
+            WriteLineIndent($"__method_exception_thrown({exceptionId});");
 
             foreach (var marshalContext in contexts)
             {
