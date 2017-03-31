@@ -13,18 +13,18 @@ endif
 ifeq ($(config),release)
   RESCOMP = windres
   TARGETDIR = .
-  TARGET = $(TARGETDIR)/Basic.Tests
+  TARGET = $(TARGETDIR)/libBasic.ObjC.dylib
   OBJDIR = obj
-  DEFINES += -DNDEBUG
-  INCLUDES += -Ic -I../../external/catch/include -I../../support
+  DEFINES += -DNDEBUG -DMONO_DLL_IMPORT -DMONO_M2N_DLL_EXPORT
+  INCLUDES += -I../../support -I/Library/Frameworks/Mono.framework/Versions/Current/include/mono-2.0
   FORCE_INCLUDE +=
   ALL_CPPFLAGS += $(CPPFLAGS) -MMD -MP $(DEFINES) $(INCLUDES)
-  ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -O2 -stdlib=libc++ -fpermissive -std=c++11
+  ALL_CFLAGS += $(CFLAGS) $(ALL_CPPFLAGS) -O2 -fPIC -stdlib=libc++ -fpermissive -std=c++11
   ALL_CXXFLAGS += $(CXXFLAGS) $(ALL_CFLAGS)
   ALL_RESFLAGS += $(RESFLAGS) $(DEFINES) $(INCLUDES)
-  LIBS += libBasic.C.dylib libBasic.ObjC.dylib -lc++ -lobjc -framework CoreFoundation -framework Foundation
-  LDDEPS += libBasic.C.dylib libBasic.ObjC.dylib
-  ALL_LDFLAGS += $(LDFLAGS) -Wl,-rpath,'@loader_path/.' -Wl,-x
+  LIBS += -lc++ -lobjc -lmonosgen-2.0 -framework CoreFoundation
+  LDDEPS +=
+  ALL_LDFLAGS += $(LDFLAGS) -L/Library/Frameworks/Mono.framework/Versions/Current/lib -dynamiclib -Wl,-install_name,@rpath/libBasic.ObjC.dylib -Wl,-x
   LINKCMD = $(CXX) -o "$@" $(OBJECTS) $(RESOURCES) $(ALL_LDFLAGS) $(LIBS)
   define PREBUILDCMDS
   endef
@@ -38,9 +38,10 @@ all: $(TARGETDIR) $(OBJDIR) prebuild prelink $(TARGET)
 endif
 
 OBJECTS := \
-	$(OBJDIR)/Basic.Tests.C.o \
-	$(OBJDIR)/Basic.Tests.ObjC.o \
+	$(OBJDIR)/Basic.Managed.o \
 	$(OBJDIR)/glib.o \
+	$(OBJDIR)/main.o \
+	$(OBJDIR)/mono_embeddinator.o \
 
 RESOURCES := \
 
@@ -55,7 +56,7 @@ ifeq (/bin,$(findstring /bin,$(SHELL)))
 endif
 
 $(TARGET): $(GCH) ${CUSTOMFILES} $(OBJECTS) $(LDDEPS) $(RESOURCES)
-	@echo Linking Basic.Tests
+	@echo Linking Basic.ObjC
 	$(SILENT) $(LINKCMD)
 	$(POSTBUILDCMDS)
 
@@ -76,7 +77,7 @@ else
 endif
 
 clean:
-	@echo Cleaning Basic.Tests
+	@echo Cleaning Basic.ObjC
 ifeq (posix,$(SHELLTYPE))
 	$(SILENT) rm -f  $(TARGET)
 	$(SILENT) rm -rf $(OBJDIR)
@@ -98,13 +99,16 @@ $(GCH): $(PCH)
 	$(SILENT) $(CXX) -x c++-header $(ALL_CXXFLAGS) -o "$@" -MF "$(@:%.gch=%.d)" -c "$<"
 endif
 
-$(OBJDIR)/Basic.Tests.C.o: Basic.Tests.C.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
-$(OBJDIR)/Basic.Tests.ObjC.o: Basic.Tests.ObjC.mm
+$(OBJDIR)/Basic.Managed.o: objc/Basic.Managed.mm
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(ALL_CXXFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 $(OBJDIR)/glib.o: ../../support/glib.c
+	@echo $(notdir $<)
+	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/main.o: ../../support/main.c
+	@echo $(notdir $<)
+	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
+$(OBJDIR)/mono_embeddinator.o: ../../support/mono_embeddinator.c
 	@echo $(notdir $<)
 	$(SILENT) $(CC) $(ALL_CFLAGS) $(FORCE_INCLUDE) -o "$@" -MF "$(@:%.o=%.d)" -c "$<"
 

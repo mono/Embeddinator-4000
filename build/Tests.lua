@@ -1,12 +1,16 @@
 -- Tests/examples helpers
 
-local gendir = "%{wks.location}/gen"
 local supportdir = path.getabsolute("../support")
 local catchdir = path.getabsolute("../external/catch")
+local exepath = path.join("../../build/lib/Debug/MonoEmbeddinator4000.exe")
 
 function SetupTestProject(name, extraFiles)
-  SetupTestGeneratorProject(name)
-  SetupTestNativeProject(name)  
+  objdir("!obj")
+  targetdir "."
+
+  SetupTestProjectGenerator()
+  SetupTestProjectC(name)
+  SetupTestProjectObjC(name)
   SetupTestProjectsCSharp(name, nil, extraFiles)
 end
 
@@ -18,7 +22,29 @@ function SetupManagedTestProject()
     location "."
 end
 
-function SetupTestGeneratorProject(name, depends)
+function SetupTestProjectGenerator()
+  if os.is("windows") then
+    SetupTestProjectGeneratorVS(name)
+  else
+    SetupTestProjectGeneratorMake(name)
+  end
+end
+
+function SetupTestProjectGeneratorMake()
+  project (name .. ".Gen")
+     location "."
+     kind "Makefile"
+     dependson (name .. ".Managed")
+
+     buildcommands
+     {
+        "mono --debug " .. exepath .. " -gen=c -out=c -p=macos -compile -target=shared " .. name .. ".Managed.dll",
+        "mono --debug " .. exepath .. " -gen=objc -out=objc -p=macos -compile -target=shared " .. name .. ".Managed.dll",
+        "mono --debug " .. exepath .. " -gen=java -out=java -p=macos -target=shared " .. name .. ".Managed.dll"
+     }
+end
+
+function SetupTestProjectGeneratorVS(name, depends)
   project(name .. ".Gen")
     SetupManagedTestProject()
     kind "ConsoleApp"
@@ -82,7 +108,7 @@ local function SetupMono()
   filter {}
 end
 
-function SetupTestNativeProject(name, depends)
+function SetupTestProjectC(name, depends)
   if string.starts(action, "vs") and not os.is("windows") then
     return
   end
@@ -117,6 +143,38 @@ function SetupTestNativeProject(name, depends)
       buildoptions { "/wd4018" } -- eglib signed/unsigned warnings
 
     filter {}
+
+    SetupMono()
+end
+
+function SetupTestProjectObjC(name, depends)
+  if string.starts(action, "vs") and not os.is("windows") then
+    return
+  end
+
+  project(name .. ".ObjC")
+    SetupNativeProject()
+    location "."
+
+    kind "SharedLib"
+    language "C++"
+
+    defines { "MONO_DLL_IMPORT", "MONO_M2N_DLL_EXPORT" }
+
+    flags { common_flags }
+    files
+    {
+      path.join("objc", name .. ".Managed.h"),
+      path.join("objc", name .. ".Managed.mm"),
+      path.join(supportdir, "*.h"),
+      path.join(supportdir, "*.c"),
+    }
+
+    links { "objc" }
+
+    includedirs { supportdir }
+
+    dependson { name .. ".Gen" }
 
     SetupMono()
 end
@@ -159,11 +217,13 @@ function SetupTestProjectsCSharp(name, depends, extraFiles)
 
     files
     {
-      name .. ".Tests.cpp",
+      name .. ".Tests.*",
       path.join(supportdir, "glib.*"),
     }
 
-    links { name .. ".C" }
+    links { name .. ".C", name .. ".ObjC" }
+    links { "objc", "CoreFoundation.framework", "Foundation.framework" }
+
     dependson { name .. ".Managed" }
 
     filter { "action:vs*" }
