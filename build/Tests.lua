@@ -15,6 +15,7 @@ function SetupManagedTestProject()
     language "C#"  
     clr "Unsafe"
     SetupManagedProject()
+    location "."
 end
 
 function SetupTestGeneratorProject(name, depends)
@@ -88,6 +89,7 @@ function SetupTestNativeProject(name, depends)
 
   project(name .. ".C")
     SetupNativeProject()
+    location "."
 
     kind "SharedLib"
     language "C"
@@ -97,8 +99,8 @@ function SetupTestNativeProject(name, depends)
     flags { common_flags }
     files
     {
-      path.join(gendir, name, name .. ".Managed.h"),
-      path.join(gendir, name, name .. ".Managed.c"),
+      path.join("c", name .. ".Managed.h"),
+      path.join("c", name .. ".Managed.c"),
       path.join(supportdir, "*.h"),
       path.join(supportdir, "*.c"),
     }
@@ -116,7 +118,6 @@ function SetupTestNativeProject(name, depends)
 
     filter {}
 
-    SetupTestGeneratorBuildEvent(name)
     SetupMono()
 end
 
@@ -144,12 +145,14 @@ function SetupTestProjectsCSharp(name, depends, extraFiles)
 
   project(name .. ".Tests")
     SetupNativeProject()
+    location "."
+
     language "C++"
     kind "ConsoleApp"
 
     includedirs
     {
-      path.join(gendir, name),
+      path.join("c"),
       path.join(catchdir, "include"),
       supportdir
     }
