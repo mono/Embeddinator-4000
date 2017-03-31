@@ -26,6 +26,9 @@ obj/
 *.metagen
 *.ilk
 *.manifest
+*.dylib
+bindings.h
+bindings.m
 /build/gen
 /build/lib
 /build/obj
