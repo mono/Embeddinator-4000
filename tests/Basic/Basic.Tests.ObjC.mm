@@ -3,7 +3,7 @@
 #include "Basic.Managed.h"
 #include "glib.h"
 
-TEST_CASE("BuiltinTypes", "[BuiltinTypes]") {
+TEST_CASE("BuiltinTypes.ObjC", "[ObjC][BuiltinTypes]") {
 #if 0
     BuiltinTypes* bt = [[BuiltinTypes alloc] init];
     [bt returnsVoid];
@@ -49,7 +49,7 @@ TEST_CASE("BuiltinTypes", "[BuiltinTypes]") {
 #endif
 }
 
-TEST_CASE("ClassTypes", "[ClassTypes]") {
+TEST_CASE("ClassTypes.ObjC", "[ObjC][ClassTypes]") {
 #if 0
     ClassProperties* prop = ClassProperties_new();
     REQUIRE(ClassProperties_get_Int(prop) == 0);
@@ -60,14 +60,14 @@ TEST_CASE("ClassTypes", "[ClassTypes]") {
 #endif
 }
 
-TEST_CASE("StaticTypes", "[StaticTypes]") {
+TEST_CASE("StaticTypes.ObjC", "[ObjC][StaticTypes]") {
 #if 0
     REQUIRE(NonStaticClass_StaticMethod() == 0);
     REQUIRE(StaticClass_StaticMethod() == 0);
 #endif
 }
 
-TEST_CASE("EnumTypes", "[EnumTypes]") {
+TEST_CASE("EnumTypes.ObjC", "[ObjC][EnumTypes]") {
 #if 0
     REQUIRE(EnumTypes_PassEnum(Enum_Two) == 2);
     REQUIRE(EnumTypes_PassEnum(Enum_Three) == 3);
@@ -80,7 +80,7 @@ TEST_CASE("EnumTypes", "[EnumTypes]") {
 #endif
 }
 
-TEST_CASE("ArrayTypes", "[ArrayTypes]") {
+TEST_CASE("ArrayTypes.ObjC", "[ObjC][ArrayTypes]") {
 #if 0
     char _byte_arr[] = { 1, 2, 3 };
     _UnsignedcharArray _byte;

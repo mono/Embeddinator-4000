@@ -4,7 +4,7 @@
 #include "Basic.Managed.h"
 #include "glib.h"
 
-TEST_CASE("BuiltinTypes", "[BuiltinTypes]") {
+TEST_CASE("BuiltinTypes.C", "[C][BuiltinTypes]") {
     BuiltinTypes* bt = BuiltinTypes_new();
     BuiltinTypes_ReturnsVoid(bt);
     REQUIRE(BuiltinTypes_ReturnsBool(bt)   == true);
@@ -48,7 +48,7 @@ TEST_CASE("BuiltinTypes", "[BuiltinTypes]") {
     REQUIRE(strcmp(RefStr->str, "Mono") == 0);
 }
 
-TEST_CASE("ClassTypes", "[ClassTypes]") {
+TEST_CASE("ClassTypes", "[C][ClassTypes]") {
     ClassProperties* prop = ClassProperties_new();
     REQUIRE(ClassProperties_get_Int(prop) == 0);
     ClassProperties_set_Int(prop, 10);
@@ -57,12 +57,12 @@ TEST_CASE("ClassTypes", "[ClassTypes]") {
     REQUIRE(ClassProperties_get_ReadOnlyInt(prop) == 0);
 }
 
-TEST_CASE("StaticTypes", "[StaticTypes]") {
+TEST_CASE("StaticTypes.C", "[C][StaticTypes]") {
     REQUIRE(NonStaticClass_StaticMethod() == 0);
     REQUIRE(StaticClass_StaticMethod() == 0);
 }
 
-TEST_CASE("EnumTypes", "[EnumTypes]") {
+TEST_CASE("EnumTypes.C", "[C][EnumTypes]") {
     REQUIRE(EnumTypes_PassEnum(Enum_Two) == 2);
     REQUIRE(EnumTypes_PassEnum(Enum_Three) == 3);
 
@@ -73,7 +73,7 @@ TEST_CASE("EnumTypes", "[EnumTypes]") {
     REQUIRE(EnumTypes_PassEnumFlags(EnumFlags_FlagTwo) == (1 << 2));
 }
 
-TEST_CASE("ArrayTypes", "[ArrayTypes]") {
+TEST_CASE("ArrayTypes.C", "[C][ArrayTypes]") {
     char _byte_arr[] = { 1, 2, 3 };
     _UnsignedcharArray _byte;
     _byte.array = g_array_sized_new(/*zero_terminated=*/false,
