@@ -6,14 +6,22 @@ using IKVM.Reflection;
 using Type = IKVM.Reflection.Type;
 using System.Text;
 
+using Mono.Options;
+
 using ObjC;
 
 namespace Embeddinator {
-	
-	static class Driver {
 
-		// TODO: use Mono.Options
+	enum Action
+	{
+		None,
+		Help,
+		Version,
+		Generate,
+	}
 
+	static class Driver
+	{
 		static int Main (string [] args)
 		{
 			try {
@@ -27,7 +35,37 @@ namespace Embeddinator {
 		public static int Main2 (string [] args)
 		{
 			bool shared = true; // dylib
+			var action = Action.None;
 
+			var os = new OptionSet {
+				{ "h|?|help", "Displays the help", v => action = Action.Help },
+				{ "version", "Display the version information.", v => action = Action.Version },
+			};
+
+			var assemblies = os.Parse (args);
+
+			switch (action) {
+			case Action.None:
+			case Action.Help:
+				Console.WriteLine ($"Embeddinator-4000 v0.1 ({Info.Branch}: {Info.Hash})");
+				Console.WriteLine ("Generates target language bindings for interop with managed code.");
+				Console.WriteLine ("");
+				Console.WriteLine ($"Usage: {Path.GetFileName (System.Reflection.Assembly.GetExecutingAssembly ().Location)} [options]+ ManagedAssembly1.dll ManagedAssembly2.dll");
+				Console.WriteLine ();
+				os.WriteOptionDescriptions (Console.Out);
+				return 0;
+			case Action.Version:
+				Console.WriteLine ($"Embeddinator-4000 v0.1 ({Info.Branch}: {Info.Hash})");
+				return 0;
+			case Action.Generate:
+				return Generate (assemblies, shared);
+			default:
+				throw ErrorHelper.CreateError (99, "Internal error: invalid action {0}. Please file a bug report with a test case (https://github.com/mono/Embeddinator-4000/issues)", action);
+			}
+		}
+
+		static int Generate (List<string> args, bool shared)
+		{
 			Console.WriteLine ("Parsing assemblies...");
 
 			var universe = new Universe (UniverseOptions.MetadataOnly);
