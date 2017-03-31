@@ -24,6 +24,4 @@ script: |
   external/CppSharp/build/$PREMAKE --file=build/premake5.lua --dev=true gmake &&
   if [ "$TRAVIS_OS_NAME" = "osx" ]; then export PATH=$PATH:/Library/Frameworks/Mono.framework/Versions/Current/bin/; fi &&
   config=release make -C build/gmake/ &&
-  TEST_RESULT=0 &&
-  for test in build/gmake/lib/Release/*.Tests*; do $test || TEST_RESULT=$?; done &&
-  exit "$TEST_RESULT"
+  tests/RunTestsuite.sh
