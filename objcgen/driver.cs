@@ -78,7 +78,7 @@ namespace Embeddinator {
 			var p = Process.Start ("xcrun", options.ToString ());
 			p.WaitForExit ();
 			Console.WriteLine ("Done");
-			return 0;
+			return p.ExitCode;
 		}
 	}
 }
