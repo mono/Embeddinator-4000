@@ -2,6 +2,9 @@
 using System;
 using ObjC;
 
+using IKVM.Reflection;
+using Type = IKVM.Reflection.Type;
+
 namespace ObjCGeneratorTest {
 	
 	[TestFixture]
@@ -19,9 +22,12 @@ namespace ObjCGeneratorTest {
 		[Test]
 		public void TypeMatch ()
 		{
-			Assert.That (ObjCGenerator.GetTypeName (typeof (bool)), Is.EqualTo ("bool"), "bool");
-			Assert.That (ObjCGenerator.GetTypeName (typeof (int)), Is.EqualTo ("int"), "int");
-			Assert.That (ObjCGenerator.GetTypeName (typeof (object)), Is.EqualTo ("NSObject"), "object");
+			var universe = new Universe (UniverseOptions.None);
+			var asm = universe.Load ("mscorlib.dll");
+
+			Assert.That (ObjCGenerator.GetTypeName (asm.GetType ("System.Boolean")), Is.EqualTo ("bool"), "bool");
+			Assert.That (ObjCGenerator.GetTypeName (asm.GetType ("System.Int32")), Is.EqualTo ("int"), "int");
+			Assert.That (ObjCGenerator.GetTypeName (asm.GetType ("System.Object")), Is.EqualTo ("NSObject"), "object");
 		}
 	}
 }
