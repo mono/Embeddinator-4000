@@ -102,7 +102,7 @@ namespace ObjC {
 			implementation.WriteLine ($"\tif (!{managed_name}_class) {{");
 			implementation.WriteLine ("\t\t__initialize_mono ();");
 			implementation.WriteLine ("\t\t__lookup_assembly_managed ();");
-			implementation.WriteLine ($"\t\t{managed_name}_class = mono_class_from_name (__{t.Assembly.GetName ().Name}_image, \"\", \"{managed_name}\");");
+			implementation.WriteLine ($"\t\t{managed_name}_class = mono_class_from_name (__{t.Assembly.GetName ().Name}_image, \"{t.Namespace}\", \"{managed_name}\");");
 			implementation.WriteLine ("\t}");
 			implementation.WriteLine ("}");
 
@@ -112,26 +112,64 @@ namespace ObjC {
 			headers.WriteLine ("\tMonoEmbedObject* _object;");
 			headers.WriteLine ("}");
 
-			headers.WriteLine ();
-			if (t.IsSealed && t.IsAbstract) {
-				// don't allow instantiation of static types from ObjC code
-				headers.WriteLine ("// a .net static type cannot be initialized");
+			implementation.WriteLine ($"// {t.AssemblyQualifiedName}");
+			implementation.WriteLine ($"@implementation {native_name}");
+			implementation.WriteLine ();
+
+			var default_init = false;
+			foreach (var ctor in t.GetConstructors ()) {
+				// .cctor not to be called directly by native code
+				if (ctor.IsStatic)
+					continue;
+				if (!ctor.IsPublic)
+					continue;
+				if (ctor.ParameterCount == 0) {
+					headers.WriteLine ("- (instancetype)init;");
+
+					implementation.WriteLine ("- (instancetype)init");
+					implementation.WriteLine ("{");
+					implementation.WriteLine ($"\tconst char __method_name [] = \"{t.FullName}:.ctor()\";");
+					implementation.WriteLine ("\tstatic MonoMethod* __method = nil;");
+					implementation.WriteLine ("\tif (!__method) {");
+					implementation.WriteLine ($"\t\t__lookup_class_{managed_name} ();");
+					implementation.WriteLine ($"\t\t__method = mono_embeddinator_lookup_method (__method_name, {managed_name}_class);");
+					implementation.WriteLine ("\t}");
+					implementation.WriteLine ("\tif (self = [super init]) {");
+					implementation.WriteLine ($"\t\tMonoObject* __instance = mono_object_new (__mono_context.domain, {managed_name}_class);");
+					implementation.WriteLine ("\t\tMonoObject* __exception = nil;");
+					implementation.WriteLine ("\t\tMonoObject* __result = mono_runtime_invoke (__method, __instance, nil, &__exception);");
+					implementation.WriteLine ("\t\tif (__exception)");
+					// TODO: Apple often do NSLog (or asserts but they are more brutal) and returning nil is allowed (and common)
+					implementation.WriteLine ("\t\t\treturn nil;");
+					//implementation.WriteLine ("\t\t\tmono_embeddinator_throw_exception (__exception);");
+					implementation.WriteLine ("\t\t_object = mono_embeddinator_create_object (__instance);");
+					implementation.WriteLine ("\t\t_object->_handle = mono_gchandle_new (__instance, /*pinned=*/false);");
+					implementation.WriteLine ("\t}");
+					implementation.WriteLine ("\treturn self;");
+					implementation.WriteLine ("}");
+					default_init = true;
+				}
+			}
+
+			var static_type = t.IsSealed && t.IsAbstract;
+			if (!default_init || static_type) {
+				headers.WriteLine ();
+				if (static_type)
+					headers.WriteLine ("// a .net static type cannot be initialized");
 				headers.WriteLine ("- (instancetype)init NS_UNAVAILABLE;");
 				headers.WriteLine ();
 			}
-
-			implementation.WriteLine ($"// {t.AssemblyQualifiedName}");
-			implementation.WriteLine ($"@implementation {managed_name}");
-			implementation.WriteLine ();
 
 			foreach (var pi in t.GetProperties ())
 				Generate (pi);
 
 			headers.WriteLine ();
 			headers.WriteLine ("@end");
+			headers.WriteLine ();
 
 			implementation.WriteLine ();
 			implementation.WriteLine ("@end");
+			implementation.WriteLine ();
 		}
 
 		protected override void Generate (PropertyInfo pi)
@@ -166,7 +204,12 @@ namespace ObjC {
 			implementation.WriteLine ($"\t\t__method = mono_embeddinator_lookup_method (__method_name, {managed_type_name}_class);");
 			implementation.WriteLine ("\t}");
 			implementation.WriteLine ("\tMonoObject* __exception = nil;");
-			implementation.WriteLine ("\tMonoObject* __result = mono_runtime_invoke (__method, nil, nil, &__exception);");
+			var instance = "nil";
+			if (!getter.IsStatic) {
+				implementation.WriteLine ($"MonoObject* instance = mono_gchandle_get_target (_object->_handle);");
+				instance = "instance";
+			}
+			implementation.WriteLine ($"\tMonoObject* __result = mono_runtime_invoke (__method, {instance}, nil, &__exception);");
 			implementation.WriteLine ("\tif (__exception)");
 			implementation.WriteLine ("\t\tmono_embeddinator_throw_exception (__exception);");
 			ReturnValue (pi.PropertyType);
@@ -187,7 +230,12 @@ namespace ObjC {
 			implementation.WriteLine ("\tvoid* __args [1];");
 			implementation.WriteLine ("\t__args [0] = &value;");
 			implementation.WriteLine ("\tMonoObject* __exception = nil;");
-			implementation.WriteLine ("\tMonoObject* __result = mono_runtime_invoke (__method, nil, __args, &__exception);");
+			instance = "nil";
+			if (!getter.IsStatic) {
+				implementation.WriteLine ($"MonoObject* instance = mono_gchandle_get_target (_object->_handle);");
+				instance = "instance";
+			}
+			implementation.WriteLine ($"\tMonoObject* __result = mono_runtime_invoke (__method, {instance}, __args, &__exception);");
 			implementation.WriteLine ("\tif (__exception)");
 			implementation.WriteLine ("\t\tmono_embeddinator_throw_exception (__exception);");
 			implementation.WriteLine ("}");
@@ -226,7 +274,7 @@ namespace ObjC {
 		{
 			switch (Type.GetTypeCode (t)) {
 			case TypeCode.Object:
-				return (t.Namespace == "System" && t.Name == "Object") ? "NSObject" : t.Name;
+				return (t.Namespace == "System" && t.Name == "Object") ? "NSObject" : t.FullName.Replace ('.', '_');
 			case TypeCode.Boolean:
 				return "bool";
 			case TypeCode.Int32:
