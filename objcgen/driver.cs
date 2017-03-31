@@ -44,6 +44,9 @@ namespace Embeddinator {
 
 			var assemblies = os.Parse (args);
 
+			if (action == Action.None && assemblies.Count > 0)
+				action = Action.Generate;
+
 			switch (action) {
 			case Action.None:
 			case Action.Help:
