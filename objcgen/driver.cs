@@ -13,8 +13,18 @@ namespace Embeddinator {
 	static class Driver {
 
 		// TODO: use Mono.Options
-		// TODO: add errors.cs
-		public static int Main (string [] args)
+
+		static int Main (string [] args)
+		{
+			try {
+				return Main2 (args);
+			} catch (Exception e) {
+				ErrorHelper.Show (e);
+				return 1;
+			}
+		}
+
+		public static int Main2 (string [] args)
 		{
 			bool shared = true; // dylib
 

@@ -303,6 +303,8 @@
     <Compile Include="..\external\ikvm\reflect\Writer\VersionInfo.cs">
       <Link>ikvm\VersionInfo.cs</Link>
     </Compile>
+    <Compile Include="error.cs" />
+    <Compile Include="ErrorHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="support\" />
@@ -331,6 +333,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="..\docs\error.md">
+      <Link>error.md</Link>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

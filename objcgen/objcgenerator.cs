@@ -140,7 +140,7 @@ namespace ObjC {
 			var setter = pi.GetSetMethod ();
 			// FIXME: setter only is valid, even if discouraged, in .NET - we should create a SetX method
 			if (getter == null && setter != null)
-				throw new NotSupportedException ();
+				throw ErrorHelper.CreateError (99, "Internal error. Please file a bug report with a test case (https://github.com/mono/Embeddinator-4000/issues).");
 
 			// TODO override with attribute ? e.g. [ObjC.Selector ("foo")]
 			var name = CamelCase (pi.Name);
@@ -204,7 +204,7 @@ namespace ObjC {
 				implementation.WriteLine ($"\treturn *(({name}*)__unbox);");
 				break;
 			default:
-				throw new NotSupportedException ();
+				throw ErrorHelper.CreateError (99, "Internal error. Please file a bug report with a test case (https://github.com/mono/Embeddinator-4000/issues).");
 			}
 		}
 
@@ -232,7 +232,7 @@ namespace ObjC {
 			case TypeCode.Int32:
 				return "int";
 			default:
-				throw new NotSupportedException ();
+				throw ErrorHelper.CreateError (99, "Internal error. Please file a bug report with a test case (https://github.com/mono/Embeddinator-4000/issues).");
 			}
 		}
 

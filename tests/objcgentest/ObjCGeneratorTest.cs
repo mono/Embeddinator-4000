@@ -29,5 +29,14 @@ namespace ObjCGeneratorTest {
 			Assert.That (ObjCGenerator.GetTypeName (asm.GetType ("System.Int32")), Is.EqualTo ("int"), "int");
 			Assert.That (ObjCGenerator.GetTypeName (asm.GetType ("System.Object")), Is.EqualTo ("NSObject"), "object");
 		}
+
+		[Test]
+		public void TypeMatchFailure ()
+		{
+			var universe = new Universe (UniverseOptions.None);
+			var asm = universe.Load ("mscorlib.dll");
+
+			Assert.Throws<Embeddinator.EmbeddinatorException> (() => ObjCGenerator.GetTypeName (asm.GetType ("System.Char")), "char");
+		}
 	}
 }
