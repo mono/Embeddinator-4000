@@ -38,3 +38,5 @@ obj/
 /tests/**/gen/c
 /tests/**/gen/objc
 /tests/**/gen/java
+packages
+
