@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Reflection;
+using IKVM.Reflection;
+using Type = IKVM.Reflection.Type;
 using System.Text;
 
 using ObjC;
@@ -19,9 +20,10 @@ namespace Embeddinator {
 
 			Console.WriteLine ("Parsing assemblies...");
 
+			var universe = new Universe (UniverseOptions.MetadataOnly);
 			var assemblies = new List<Assembly> ();
 			foreach (var arg in args) {
-				assemblies.Add (Assembly.LoadFile (arg));
+				assemblies.Add (universe.LoadFile (arg));
 				Console.WriteLine ($"\tParsed '{arg}'");
 			}
 

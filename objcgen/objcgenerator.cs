@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-// TODO: bad, need to choose either IKVM.Reflection or Cecil
-using System.Reflection;
+
+using IKVM.Reflection;
+using Type = IKVM.Reflection.Type;
 
 using Embeddinator;
 
@@ -225,7 +226,7 @@ namespace ObjC {
 		{
 			switch (Type.GetTypeCode (t)) {
 			case TypeCode.Object:
-				return t == typeof (object) ? "NSObject" : t.Name;
+				return (t.Namespace == "System" && t.Name == "Object") ? "NSObject" : t.Name;
 			case TypeCode.Boolean:
 				return "bool";
 			case TypeCode.Int32:
