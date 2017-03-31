@@ -11,6 +11,7 @@ missing
 *.dll
 *.exe
 bin/
+obj/
 *.userprefs
 *.pc
 .DS_Store
