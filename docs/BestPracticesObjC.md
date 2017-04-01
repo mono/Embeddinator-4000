@@ -7,45 +7,19 @@ title:Embeddinator-4000 Best Practices for ObjC
 
 This is a draft and might not be in-sync with the features presently supported by the tool. We hope that this document will evolve separately and eventually match the final tool, i.e. we'll suggest the long term best approaches - not immediate workarounds.
 
-A large part of the advices from this document also applies to any other supported languages. However all the provided examples are in C# and ObjC.
+A large part of this document also applies to any other supported languages. However all provided examples are in C# and ObjC.
 
 
 # Exposing a subset of the managed code
 
-The generated native library/framework contains ObjC code to call each of the managed API that is exposed. The more API you surface (public) then larger the library will become.
+The generated native library/framework contains ObjC code to call each of the managed API that is exposed. The more API you surface (public) then larger the native library will become.
 
 It might be a good idea to create a different, smaller assembly, to expose only the required API to the native developer. That facade will also allow you more control over the visibility, naming, error checking... of the generated code.
-
-E.g.
-
-```
-namespace Xamarin.Xml.Configuration {
-	public class Reader {}
-}
-```
-
-might be exposed as
-
-```
-public class XAMXmlConfigReader : Xamarin.Xml.Configuration.Reader {}
-```
-
-making it more ObjC friendly to use.
-
-```
-id reader = [[XAMXmlConfigReader alloc] init];
-```
-
-versus
-
-```
-id reader = [[Xamarin_Xml_Configuration_.Reader alloc] init];
-```
 
 
 # Exposing a chunkier API
 
-There is a price to pay to transition from native to managed (and back). As such your better to expose a _chunky instead of chatty_ API to the native developers, e.g.
+There is a price to pay to transition from native to managed (and back). As such your better to expose _chunky instead of chatty_ APIs to the native developers, e.g.
 
 **Chatty**
 ```
@@ -74,14 +48,50 @@ public class Person {
 Person *p = [[Person alloc] initWithFirstName:@"Sebastien" LastName:"Pouliot"];
 ```
 
-Since the number of transition being smaller the performance will be better. It also requires less code to be generated so it will produce a smaller native library as well.
+Since the number of transitions is smaller the performance will be better. It also requires less code to be generated so this will produce a smaller native library as well.
 
 
 # Naming
 
-A good .NET name might not be ideal for an ObjC API. From an ObjC developer point of view a method with a `Get` prefix implies you do not own the instance, i.e. the [get rule](https://developer.apple.com/library/content/documentation/CoreFoundation/Conceptual/CFMemoryMgmt/Concepts/Ownership.html#//apple_ref/doc/uid/20001148-SW1).
+Naming things is one of two hardest problems in computer science, the others being cache invalidation and off-by-1 errors. Hopefully Embeddinator-4000 can shield you from all, but naming.
 
-However a .NET method with a `Create` prefix will behave identically - but for ObjC developers it normally means you own the returned instance, i.e. the [create rule](https://developer.apple.com/library/content/documentation/CoreFoundation/Conceptual/CFMemoryMgmt/Concepts/Ownership.html#//apple_ref/doc/uid/20001148-103029).
+## Types
+
+ObjC does not support namespaces. In general its types are prefixed with a 2 (for Apple) or 3 (for 3rd parties) characters prefix, like `UIView` for UIKit's View, which denotes the framework.
+
+For .NET types skipping the namespace is not possible as it can introduce duplicated, or confusing, names. This makes existing .NET types very long, e.g. 
+
+```
+namespace Xamarin.Xml.Configuration {
+	public class Reader {}
+}
+```
+
+would be used like:
+
+```
+id reader = [[Xamarin_Xml_Configuration_.Reader alloc] init];
+```
+
+However you can re-expose the type as:
+
+```
+public class XAMXmlConfigReader : Xamarin.Xml.Configuration.Reader {}
+```
+
+making it more ObjC friendly to use, e.g.:
+
+```
+id reader = [[XAMXmlConfigReader alloc] init];
+```
+
+## Methods
+
+Even good .NET names might not be ideal for an ObjC API.
+
+From an ObjC developer point of view a method with a `Get` prefix implies you do not own the instance, i.e. the [get rule](https://developer.apple.com/library/content/documentation/CoreFoundation/Conceptual/CFMemoryMgmt/Concepts/Ownership.html#//apple_ref/doc/uid/20001148-SW1).
+
+This naming rule has not match in the .NET GC world, just a .NET method with a `Create` prefix will behave identically in .NET. However, for ObjC developers, it normally means you own the returned instance, i.e. the [create rule](https://developer.apple.com/library/content/documentation/CoreFoundation/Conceptual/CFMemoryMgmt/Concepts/Ownership.html#//apple_ref/doc/uid/20001148-103029).
 
 
 # Exceptions
