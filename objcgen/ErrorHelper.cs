@@ -147,6 +147,7 @@ namespace Embeddinator
 				if (Verbosity > 2 && !string.IsNullOrEmpty (e.StackTrace))
 					Console.Error.WriteLine (e.StackTrace);
 			} else {
+				Console.Out.WriteLine ("EM0000: Unexpected error - Please fill a bug report at https://github.com/mono/Embeddinator-4000/issues");
 				Console.Error.WriteLine (e.ToString ());
 				if (Verbosity > 1)
 					ShowInner (e);

@@ -140,7 +140,7 @@ namespace ObjC {
 			var setter = pi.GetSetMethod ();
 			// FIXME: setter only is valid, even if discouraged, in .NET - we should create a SetX method
 			if (getter == null && setter != null)
-				throw ErrorHelper.CreateError (99, "Internal error. Please file a bug report with a test case (https://github.com/mono/Embeddinator-4000/issues).");
+				throw new NotImplementedException ("Write-only properties");
 
 			// TODO override with attribute ? e.g. [ObjC.Selector ("foo")]
 			var name = CamelCase (pi.Name);
@@ -204,7 +204,7 @@ namespace ObjC {
 				implementation.WriteLine ($"\treturn *(({name}*)__unbox);");
 				break;
 			default:
-				throw ErrorHelper.CreateError (99, "Internal error. Please file a bug report with a test case (https://github.com/mono/Embeddinator-4000/issues).");
+				throw new NotImplementedException ($"Returning type {t.Name} from native code");
 			}
 		}
 
@@ -214,10 +214,10 @@ namespace ObjC {
 			File.WriteAllText (name, content);
 		}
 
-		public override void Write ()
+		public override void Write (string outputDirectory)
 		{
-			WriteFile ("bindings.h", headers.ToString ());
-			WriteFile ("bindings.m", implementation.ToString ());
+			WriteFile (Path.Combine (outputDirectory, "bindings.h"), headers.ToString ());
+			WriteFile (Path.Combine (outputDirectory, "bindings.m"), implementation.ToString ());
 		}
 
 		// TODO complete mapping (only with corresponding tests)
@@ -232,7 +232,7 @@ namespace ObjC {
 			case TypeCode.Int32:
 				return "int";
 			default:
-				throw ErrorHelper.CreateError (99, "Internal error. Please file a bug report with a test case (https://github.com/mono/Embeddinator-4000/issues).");
+				throw new NotImplementedException ($"Converting type {t.Name} to a native type name");
 			}
 		}
 

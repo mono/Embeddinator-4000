@@ -35,7 +35,7 @@ namespace Embeddinator {
 		{
 		}
 
-		public virtual void Write ()
+		public virtual void Write (string outputDirectory)
 		{
 		}
 	}
