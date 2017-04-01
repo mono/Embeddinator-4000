@@ -1,8 +1,8 @@
 ![Embeddinator-4000 Logo](e4000-logo.png)
 
-| windows-vs-x86            | linux-gcc-x86_64            | osx-clang-x86               |
-|---------------------------|-----------------------------|-----------------------------|
-| [![windows-vs-x86][1]][2] | [![linux-gcc-x86_64][3]][4] | [![osx-clang-x86][3]][4]
+| windows-vs-x86            | osx-clang-x86               |
+|---------------------------|-----------------------------|
+| [![windows-vs-x86][1]][2] | [![osx-clang-x86][3]][4]
 
 [1]: https://ci.appveyor.com/api/projects/status/5o9gxjcttuaup671/branch/master?svg=true
 [2]: https://ci.appveyor.com/project/mono/Embeddinator-4000/branch/master
