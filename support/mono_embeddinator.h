@@ -100,6 +100,12 @@ int mono_embeddinator_destroy(mono_embeddinator_context_t* ctx);
 MONO_EMBEDDINATOR_API
 mono_embeddinator_context_t* mono_embeddinator_get_context();
 
+/**
+ * Override the default path (current executable) where assemblies will be loaded.
+ */
+MONO_EMBEDDINATOR_API
+void mono_embeddinator_set_assembly_path (const char *path);
+
 /** 
  * Sets the current context.
  */

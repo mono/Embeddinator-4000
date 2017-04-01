@@ -119,8 +119,17 @@ int mono_embeddinator_destroy(mono_embeddinator_context_t* ctx)
     return true;
 }
 
+static GString* path_override = NULL;
+
+void mono_embeddinator_set_assembly_path (const char *path)
+{
+	path_override = g_string_new (path);
+}
+
 static GString* get_current_executable_path()
 {
+    if (path_override)
+        return path_override;
 #if defined(__APPLE__)
     int ret;
     pid_t pid; 
