@@ -37,6 +37,7 @@ namespace ObjC {
 			headers.WriteLine ("MONO_EMBEDDINATOR_BEGIN_DECLS");
 			headers.WriteLine ();
 
+			// TODO: sort ? so it's easier to check if a type is present in a long list
 			headers.WriteLine ("// forward declarations");
 			foreach (var t in types)
 				headers.WriteLine ($"@class {GetTypeName (t)};");
@@ -105,12 +106,14 @@ namespace ObjC {
 			implementation.WriteLine ($"\t\t{managed_name}_class = mono_class_from_name (__{t.Assembly.GetName ().Name}_image, \"{t.Namespace}\", \"{managed_name}\");");
 			implementation.WriteLine ("\t}");
 			implementation.WriteLine ("}");
+			implementation.WriteLine ();
 
 			var native_name = GetTypeName (t);
 			headers.WriteLine ($"// {t.AssemblyQualifiedName}");
 			headers.WriteLine ($"@interface {native_name} : {GetTypeName (t.BaseType)} {{");
 			headers.WriteLine ("\tMonoEmbedObject* _object;");
 			headers.WriteLine ("}");
+			headers.WriteLine ();
 
 			implementation.WriteLine ($"// {t.AssemblyQualifiedName}");
 			implementation.WriteLine ($"@implementation {native_name}");
@@ -137,7 +140,7 @@ namespace ObjC {
 					implementation.WriteLine ("\tif (self = [super init]) {");
 					implementation.WriteLine ($"\t\tMonoObject* __instance = mono_object_new (__mono_context.domain, {managed_name}_class);");
 					implementation.WriteLine ("\t\tMonoObject* __exception = nil;");
-					implementation.WriteLine ("\t\tMonoObject* __result = mono_runtime_invoke (__method, __instance, nil, &__exception);");
+					implementation.WriteLine ("\t\tmono_runtime_invoke (__method, __instance, nil, &__exception);");
 					implementation.WriteLine ("\t\tif (__exception)");
 					// TODO: Apple often do NSLog (or asserts but they are more brutal) and returning nil is allowed (and common)
 					implementation.WriteLine ("\t\t\treturn nil;");
@@ -147,6 +150,7 @@ namespace ObjC {
 					implementation.WriteLine ("\t}");
 					implementation.WriteLine ("\treturn self;");
 					implementation.WriteLine ("}");
+					implementation.WriteLine ();
 					default_init = true;
 				}
 			}
@@ -157,17 +161,15 @@ namespace ObjC {
 				if (static_type)
 					headers.WriteLine ("// a .net static type cannot be initialized");
 				headers.WriteLine ("- (instancetype)init NS_UNAVAILABLE;");
-				headers.WriteLine ();
 			}
 
+			headers.WriteLine ();
 			foreach (var pi in t.GetProperties ())
 				Generate (pi);
 
-			headers.WriteLine ();
 			headers.WriteLine ("@end");
 			headers.WriteLine ();
 
-			implementation.WriteLine ();
 			implementation.WriteLine ("@end");
 			implementation.WriteLine ();
 		}
@@ -206,7 +208,7 @@ namespace ObjC {
 			implementation.WriteLine ("\tMonoObject* __exception = nil;");
 			var instance = "nil";
 			if (!getter.IsStatic) {
-				implementation.WriteLine ($"MonoObject* instance = mono_gchandle_get_target (_object->_handle);");
+				implementation.WriteLine ($"\t\tMonoObject* instance = mono_gchandle_get_target (_object->_handle);");
 				instance = "instance";
 			}
 			implementation.WriteLine ($"\tMonoObject* __result = mono_runtime_invoke (__method, {instance}, nil, &__exception);");
@@ -214,6 +216,7 @@ namespace ObjC {
 			implementation.WriteLine ("\t\tmono_embeddinator_throw_exception (__exception);");
 			ReturnValue (pi.PropertyType);
 			implementation.WriteLine ("}");
+			implementation.WriteLine ();
 			if (setter == null)
 				return;
 			
@@ -232,13 +235,14 @@ namespace ObjC {
 			implementation.WriteLine ("\tMonoObject* __exception = nil;");
 			instance = "nil";
 			if (!getter.IsStatic) {
-				implementation.WriteLine ($"MonoObject* instance = mono_gchandle_get_target (_object->_handle);");
+				implementation.WriteLine ($"\t\tMonoObject* instance = mono_gchandle_get_target (_object->_handle);");
 				instance = "instance";
 			}
-			implementation.WriteLine ($"\tMonoObject* __result = mono_runtime_invoke (__method, {instance}, __args, &__exception);");
+			implementation.WriteLine ($"\tmono_runtime_invoke (__method, {instance}, __args, &__exception);");
 			implementation.WriteLine ("\tif (__exception)");
 			implementation.WriteLine ("\t\tmono_embeddinator_throw_exception (__exception);");
 			implementation.WriteLine ("}");
+			implementation.WriteLine ();
 		}
 
 		void ReturnValue (Type t)
