@@ -1,4 +1,4 @@
-bin/Debug/managed.dll: properties.cs namespaces.cs
+bin/Debug/managed.dll: properties.cs
 	mkdir -p bin/Debug
 	mcs $^ /out:$@ /target:library
 	
