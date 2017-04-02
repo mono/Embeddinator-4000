@@ -1,0 +1,9 @@
+**/gen/c
+**/gen/objc
+**/gen/java
+**/c
+**/objc
+**/java
+**/obj
+**/*.Tests
+**/*.dylib

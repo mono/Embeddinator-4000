@@ -1,2 +1,4 @@
 group "Tests/Basic"
-  SetupTestProject("Basic")
+name="Basic"
+
+SetupTestProject("Basic")

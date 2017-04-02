@@ -67,20 +67,20 @@ void mono_embeddinator_set_context(mono_embeddinator_context_t* ctx)
 }
 
 #if defined(__OBJC__)
-id allocAndInitAutoreleasePool()
+static id alloc_and_init_autorelease_pool()
 {
     Class NSAutoreleasePoolClass = objc_getClass("NSAutoreleasePool");
     id pool = class_createInstance(NSAutoreleasePoolClass, 0);
     return objc_msgSend(pool, sel_registerName("init"));
 }
 
-void drainAutoreleasePool(id pool)
+static void drain_autorelease_pool(id pool)
 {
     (void)objc_msgSend(pool, sel_registerName("drain"));
 }
 
 #define AUTORELEASE_POOL_DEFAULT_VALUE ((id)-1)
-static id _autoreleasePool = AUTORELEASE_POOL_DEFAULT_VALUE;
+static id _autorelease_pool = AUTORELEASE_POOL_DEFAULT_VALUE;
 #endif
 
 int mono_embeddinator_init(mono_embeddinator_context_t* ctx, const char* domain)
@@ -94,8 +94,8 @@ int mono_embeddinator_init(mono_embeddinator_context_t* ctx, const char* domain)
     mono_embeddinator_set_context(ctx);
 
 #if defined(__OBJC__)
-    if (_autoreleasePool == AUTORELEASE_POOL_DEFAULT_VALUE)
-        _autoreleasePool = allocAndInitAutoreleasePool();
+    if (_autorelease_pool == AUTORELEASE_POOL_DEFAULT_VALUE)
+        _autorelease_pool = alloc_and_init_autorelease_pool();
 #endif
 
     return true;
@@ -109,10 +109,10 @@ int mono_embeddinator_destroy(mono_embeddinator_context_t* ctx)
     mono_jit_cleanup (ctx->domain);
 
 #if defined(__OBJC__)
-    if (_autoreleasePool != AUTORELEASE_POOL_DEFAULT_VALUE)
+    if (_autorelease_pool != AUTORELEASE_POOL_DEFAULT_VALUE)
     {
-        drainAutoreleasePool(_autoreleasePool);
-        _autoreleasePool = AUTORELEASE_POOL_DEFAULT_VALUE;
+        drain_autorelease_pool(_autorelease_pool);
+        _autorelease_pool = AUTORELEASE_POOL_DEFAULT_VALUE;
     }
 #endif
 
@@ -141,8 +141,7 @@ static GString* get_current_executable_path()
 #endif
 }
 
-static gchar*
-strrchr_seperator (const gchar* filename)
+static gchar* strrchr_seperator (const gchar* filename)
 {
 #ifdef G_OS_WIN32
     char *p2;
@@ -178,13 +177,16 @@ char* mono_embeddinator_search_assembly(const char* assembly)
 MonoImage* mono_embeddinator_load_assembly(mono_embeddinator_context_t* ctx, const char* assembly)
 {
     const char* path = mono_embeddinator_search_assembly(assembly);
+
     MonoAssembly* mono_assembly = mono_domain_assembly_open(ctx->domain, path);
-    if (mono_assembly == 0)
+
+    if (!mono_assembly)
     {
-        mono_embeddinator_error_t __error;
-        __error.type = MONO_EMBEDDINATOR_ASSEMBLY_OPEN_FAILED;
-        __error.string = path;
-        mono_embeddinator_error(__error);
+        mono_embeddinator_error_t error;
+        error.type = MONO_EMBEDDINATOR_ASSEMBLY_OPEN_FAILED;
+        error.string = path;
+        mono_embeddinator_error(error);
+
         return 0;
     }
 
@@ -197,6 +199,7 @@ void* mono_embeddinator_install_assembly_search_hook(mono_embeddinator_assembly_
 {
     mono_embeddinator_assembly_search_hook_t prev = g_assembly_search_hook;
     g_assembly_search_hook = hook;
+
     return (void*)prev;
 }
 
@@ -244,6 +247,7 @@ void mono_embeddinator_throw_exception(MonoObject *exception)
     mono_embeddinator_error_t error;
     error.type = MONO_EMBEDDINATOR_EXCEPTION_THROWN;
     error.exception = (MonoException*) exception;
+
     mono_embeddinator_error(error);
 }
 
@@ -253,6 +257,7 @@ void* mono_embeddinator_install_error_report_hook(mono_embeddinator_error_report
 {
     mono_embeddinator_error_report_hook_t prev = g_error_report_hook;
     g_error_report_hook = hook;
+
     return prev;
 }
 
