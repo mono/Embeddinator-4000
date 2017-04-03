@@ -137,6 +137,7 @@ namespace ObjC {
 					implementation.WriteLine ($"\t\t__lookup_class_{managed_name} ();");
 					implementation.WriteLine ($"\t\t__method = mono_embeddinator_lookup_method (__method_name, {managed_name}_class);");
 					implementation.WriteLine ("\t}");
+					// TODO: this logic will need to be update for managed NSObject types (e.g. from XI / XM) not to call [super init]
 					implementation.WriteLine ("\tif (self = [super init]) {");
 					implementation.WriteLine ($"\t\tMonoObject* __instance = mono_object_new (__mono_context.domain, {managed_name}_class);");
 					implementation.WriteLine ("\t\tMonoObject* __exception = nil;");
