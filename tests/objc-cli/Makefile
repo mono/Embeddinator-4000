@@ -20,8 +20,5 @@ perf: libmanaged.dylib
 	clang perf-test.m -lmanaged -L. -framework Foundation -o perf-cli
 	time ./perf-cli
 
-xcode: libmanaged.dylib
-	cd libmanaged && xcodebuild test -scheme Tests
-
 clean:
 	@rm -f *.h *.c bindings.m *.dylib *.dll test-cli perf-cli
