@@ -38,6 +38,7 @@ namespace Embeddinator {
 			var action = Action.None;
 
 			var os = new OptionSet {
+				{ "c|compile", "compiles the generated output", v => CompileCode = true },
 				{ "o|out|outdir=", "output directory", v => OutputDirectory = v },
 				{ "h|?|help", "Displays the help", v => action = Action.Help },
 				{ "v|verbose", "generates diagnostic verbose output", v => ErrorHelper.Verbosity++ },
@@ -64,7 +65,11 @@ namespace Embeddinator {
 				return 0;
 			case Action.Generate:
 				try {
-					return Generate (assemblies, shared);
+					var result = Generate (assemblies, shared);
+					if (CompileCode && (result == 0))
+						result = Compile (shared);
+					Console.WriteLine ("Done");
+					return result;
 				} catch (NotImplementedException e) {
 					throw new EmbeddinatorException (1000, $"The feature `{e.Message}` is not currently supported by the tool");
 				}
@@ -90,6 +95,10 @@ namespace Embeddinator {
 			}
 		}
 
+		static bool CompileCode { get; set; }
+
+		static string LibraryName { get; set; }
+
 		static int Generate (List<string> args, bool shared)
 		{
 			Console.WriteLine ("Parsing assemblies...");
@@ -101,8 +110,9 @@ namespace Embeddinator {
 				Console.WriteLine ($"\tParsed '{arg}'");
 			}
 
-			// by default the first specified assembly
-			var name = Path.GetFileNameWithoutExtension (args [0]);
+			// if not specified then we use the first specified assembly name
+			if (LibraryName == null)
+				LibraryName = Path.GetFileNameWithoutExtension (args [0]);
 
 			Console.WriteLine ("Processing assemblies...");
 			var g = new ObjCGenerator ();
@@ -117,13 +127,19 @@ namespace Embeddinator {
 				if (res == "main.c") {
 					// no main is needed for dylib and don't re-write an existing main.c file - it's a template
 					if (shared || File.Exists ("main.c"))
-						continue; 
+						continue;
 				}
 				var path = Path.Combine (OutputDirectory, res);
 				Console.WriteLine ($"\tGenerated: {path}");
 				using (var sw = new StreamWriter (path))
 					exe.GetManifestResourceStream (res).CopyTo (sw.BaseStream);
 			}
+			return 0;
+		}
+
+		static int Compile (bool shared)
+		{
+			Console.WriteLine ("Compiling binding code...");
 
 			StringBuilder options = new StringBuilder ("clang ");
 			options.Append ("-DMONO_EMBEDDINATOR_DLL_EXPORT ");
@@ -132,16 +148,15 @@ namespace Embeddinator {
 			options.Append ("-I\"/Library/Frameworks/Mono.framework/Versions/Current/include/mono-2.0\" -L\"/Library/Frameworks/Mono.framework/Versions/Current/lib/\" -lmonosgen-2.0 ");
 			options.Append ("glib.c mono_embeddinator.c bindings.m ");
 			if (shared)
-				options.Append ($"-dynamiclib -install_name lib{name}.dylib ");
+				options.Append ($"-dynamiclib -install_name lib{LibraryName}.dylib ");
 			else
 				options.Append ("main.c ");
-			options.Append ($"-o lib{name}.dylib -ObjC -lobjc");
+			options.Append ($"-o lib{LibraryName}.dylib -ObjC -lobjc");
 
 			Console.WriteLine ("Compiling binding code...");
 			Console.WriteLine ($"\tInvoking: xcrun {options}");
 			var p = Process.Start ("xcrun", options.ToString ());
 			p.WaitForExit ();
-			Console.WriteLine ("Done");
 			return p.ExitCode;
 		}
 	}
