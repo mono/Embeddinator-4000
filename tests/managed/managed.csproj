@@ -33,6 +33,7 @@
     <Compile Include="properties.cs" />
     <Compile Include="namespaces.cs" />
     <Compile Include="types.cs" />
+    <Compile Include="exceptions.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
