@@ -20,11 +20,9 @@ An unexpected error condition occurred. Please [file an issue](https://github.co
 
 The easiest way to get exact version information is to use the **Xamarin Studio** menu, **About Xamarin Studio** item, **Show Details** button and copy/paste the version informations (you can use the **Copy Information** button).
 
-<h3><a name="EM0001"/>EM0001: Output directory `X` does not exists</h3>
+<h3><a name="EM0001"/>EM0001: Could not create Output directory `X`</h3>
 
-The directory name specified by `-o=DIR` does not exists.
-
-When no destination output is provided the tool will, by default, use the current directory. If a different destination needs to be used then it must exists on the file system.
+The directory name specified by `-o=DIR` does not exists and could not be created. It might be an invalid name for the file system.
 
 <h3><a name="EM0099"/>EM0099: Internal error *. Please file a bug report with a test case (https://github.com/mono/Embeddinator-4000/issues).</h3>
 

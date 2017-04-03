@@ -20,7 +20,7 @@ namespace Embeddinator {
 		Generate,
 	}
 
-	static class Driver
+	public static class Driver
 	{
 		static int Main (string [] args)
 		{
@@ -78,8 +78,14 @@ namespace Embeddinator {
 		public static string OutputDirectory {
 			get { return outputDirectory; }
 			set {
-				if (!Directory.Exists (value))
-					throw new EmbeddinatorException (1, $"Output directory `{value}` does not exists");
+				if (!Directory.Exists (value)) {
+					try {
+						Directory.CreateDirectory (value);
+						Console.WriteLine ($"Creating output directory `{Path.GetFullPath (value)}`");
+					} catch (Exception e) {
+						throw new EmbeddinatorException (1, true, e, $"Could not create output directory `{value}`");
+					}
+				}
 				outputDirectory = value;
 			}
 		}
