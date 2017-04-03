@@ -7,95 +7,73 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7E34557A1E92B06100FCAD74 /* libmanaged.dylib.dSYM in Resources */ = {isa = PBXBuildFile; fileRef = 7E3455791E92B06100FCAD74 /* libmanaged.dylib.dSYM */; };
+		7E5081FA1E9292E4008125B5 /* libmanaged.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 7E5081F01E928C24008125B5 /* libmanaged.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		7E5081FB1E929308008125B5 /* libmanaged.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 7E5081F01E928C24008125B5 /* libmanaged.dylib */; };
 		D1B0CD821E904EA6008FF17D /* managed.dll in Resources */ = {isa = PBXBuildFile; fileRef = D1B0CD801E904EA6008FF17D /* managed.dll */; };
 		D1B0CD831E904EA6008FF17D /* managed.pdb in Resources */ = {isa = PBXBuildFile; fileRef = D1B0CD811E904EA6008FF17D /* managed.pdb */; };
 		D1E2B2221E8F4FBB00846AF8 /* Tests.m in Sources */ = {isa = PBXBuildFile; fileRef = D1E2B2211E8F4FBB00846AF8 /* Tests.m */; };
-		D1E2B2241E8F4FBB00846AF8 /* liblibmanaged.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = D1E2B20F1E8F4F9100846AF8 /* liblibmanaged.dylib */; };
-		D1E2B2301E8F509E00846AF8 /* bindings.h in Headers */ = {isa = PBXBuildFile; fileRef = D1E2B22A1E8F509E00846AF8 /* bindings.h */; };
-		D1E2B2311E8F509E00846AF8 /* bindings.m in Sources */ = {isa = PBXBuildFile; fileRef = D1E2B22B1E8F509E00846AF8 /* bindings.m */; };
-		D1E2B2321E8F509E00846AF8 /* glib.c in Sources */ = {isa = PBXBuildFile; fileRef = D1E2B22C1E8F509E00846AF8 /* glib.c */; };
-		D1E2B2331E8F509E00846AF8 /* glib.h in Headers */ = {isa = PBXBuildFile; fileRef = D1E2B22D1E8F509E00846AF8 /* glib.h */; };
-		D1E2B2341E8F509E00846AF8 /* mono_embeddinator.c in Sources */ = {isa = PBXBuildFile; fileRef = D1E2B22E1E8F509E00846AF8 /* mono_embeddinator.c */; };
-		D1E2B2351E8F509E00846AF8 /* mono_embeddinator.h in Headers */ = {isa = PBXBuildFile; fileRef = D1E2B22F1E8F509E00846AF8 /* mono_embeddinator.h */; };
-		D1E2B2371E8F510700846AF8 /* libmonosgen-2.0.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D1E2B2361E8F510700846AF8 /* libmonosgen-2.0.a */; };
 /* End PBXBuildFile section */
 
-/* Begin PBXContainerItemProxy section */
-		D1E2B2251E8F4FBB00846AF8 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = D1E2B2071E8F4F9100846AF8 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = D1E2B20E1E8F4F9100846AF8;
-			remoteInfo = libmanaged;
-		};
-/* End PBXContainerItemProxy section */
-
-/* Begin PBXFileReference section */
-		D1B0CD801E904EA6008FF17D /* managed.dll */ = {isa = PBXFileReference; lastKnownFileType = file; name = managed.dll; path = ../../../managed/bin/Debug/managed.dll; sourceTree = "<group>"; };
-		D1B0CD811E904EA6008FF17D /* managed.pdb */ = {isa = PBXFileReference; lastKnownFileType = file; name = managed.pdb; path = ../../../managed/bin/Debug/managed.pdb; sourceTree = "<group>"; };
-		D1E2B20F1E8F4F9100846AF8 /* liblibmanaged.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = liblibmanaged.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
-		D1E2B21F1E8F4FBB00846AF8 /* Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		D1E2B2211E8F4FBB00846AF8 /* Tests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Tests.m; sourceTree = "<group>"; };
-		D1E2B2231E8F4FBB00846AF8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		D1E2B22A1E8F509E00846AF8 /* bindings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = bindings.h; path = ../../bindings.h; sourceTree = "<group>"; };
-		D1E2B22B1E8F509E00846AF8 /* bindings.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = bindings.m; path = ../../bindings.m; sourceTree = "<group>"; };
-		D1E2B22C1E8F509E00846AF8 /* glib.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = glib.c; path = ../../glib.c; sourceTree = "<group>"; };
-		D1E2B22D1E8F509E00846AF8 /* glib.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = glib.h; path = ../../glib.h; sourceTree = "<group>"; };
-		D1E2B22E1E8F509E00846AF8 /* mono_embeddinator.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = mono_embeddinator.c; path = ../../mono_embeddinator.c; sourceTree = "<group>"; };
-		D1E2B22F1E8F509E00846AF8 /* mono_embeddinator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mono_embeddinator.h; path = ../../mono_embeddinator.h; sourceTree = "<group>"; };
-		D1E2B2361E8F510700846AF8 /* libmonosgen-2.0.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libmonosgen-2.0.a"; path = "/Library/Frameworks/Mono.framework/Versions/5.0.0/lib/libmonosgen-2.0.a"; sourceTree = "<group>"; };
-/* End PBXFileReference section */
-
-/* Begin PBXFrameworksBuildPhase section */
-		D1E2B20C1E8F4F9100846AF8 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
+/* Begin PBXCopyFilesBuildPhase section */
+		7E5081F61E928DC1008125B5 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
 			files = (
-				D1E2B2371E8F510700846AF8 /* libmonosgen-2.0.a in Frameworks */,
+				7E5081FA1E9292E4008125B5 /* libmanaged.dylib in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		7E3455791E92B06100FCAD74 /* libmanaged.dylib.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = libmanaged.dylib.dSYM; path = ../libmanaged.dylib.dSYM; sourceTree = "<group>"; };
+		7E5081F01E928C24008125B5 /* libmanaged.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libmanaged.dylib; path = ../libmanaged.dylib; sourceTree = "<group>"; };
+		D1B0CD801E904EA6008FF17D /* managed.dll */ = {isa = PBXFileReference; lastKnownFileType = file; name = managed.dll; path = ../../../managed/bin/Debug/managed.dll; sourceTree = "<group>"; };
+		D1B0CD811E904EA6008FF17D /* managed.pdb */ = {isa = PBXFileReference; lastKnownFileType = file; name = managed.pdb; path = ../../../managed/bin/Debug/managed.pdb; sourceTree = "<group>"; };
+		D1E2B21F1E8F4FBB00846AF8 /* Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		D1E2B2211E8F4FBB00846AF8 /* Tests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Tests.m; sourceTree = "<group>"; };
+		D1E2B2231E8F4FBB00846AF8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
 		D1E2B21C1E8F4FBB00846AF8 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D1E2B2241E8F4FBB00846AF8 /* liblibmanaged.dylib in Frameworks */,
+				7E5081FB1E929308008125B5 /* libmanaged.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		7E5081EF1E928C24008125B5 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				7E3455791E92B06100FCAD74 /* libmanaged.dylib.dSYM */,
+				7E5081F01E928C24008125B5 /* libmanaged.dylib */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		D1E2B2061E8F4F9100846AF8 = {
 			isa = PBXGroup;
 			children = (
-				D1E2B2111E8F4F9100846AF8 /* libmanaged */,
 				D1E2B2201E8F4FBB00846AF8 /* Tests */,
 				D1E2B2101E8F4F9100846AF8 /* Products */,
+				7E5081EF1E928C24008125B5 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
 		D1E2B2101E8F4F9100846AF8 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				D1E2B20F1E8F4F9100846AF8 /* liblibmanaged.dylib */,
 				D1E2B21F1E8F4FBB00846AF8 /* Tests.xctest */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		D1E2B2111E8F4F9100846AF8 /* libmanaged */ = {
-			isa = PBXGroup;
-			children = (
-				D1E2B2361E8F510700846AF8 /* libmonosgen-2.0.a */,
-				D1E2B22A1E8F509E00846AF8 /* bindings.h */,
-				D1E2B22B1E8F509E00846AF8 /* bindings.m */,
-				D1E2B22C1E8F509E00846AF8 /* glib.c */,
-				D1E2B22D1E8F509E00846AF8 /* glib.h */,
-				D1E2B22E1E8F509E00846AF8 /* mono_embeddinator.c */,
-				D1E2B22F1E8F509E00846AF8 /* mono_embeddinator.h */,
-			);
-			path = libmanaged;
 			sourceTree = "<group>";
 		};
 		D1E2B2201E8F4FBB00846AF8 /* Tests */ = {
@@ -111,49 +89,20 @@
 		};
 /* End PBXGroup section */
 
-/* Begin PBXHeadersBuildPhase section */
-		D1E2B20D1E8F4F9100846AF8 /* Headers */ = {
-			isa = PBXHeadersBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				D1E2B2301E8F509E00846AF8 /* bindings.h in Headers */,
-				D1E2B2331E8F509E00846AF8 /* glib.h in Headers */,
-				D1E2B2351E8F509E00846AF8 /* mono_embeddinator.h in Headers */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXHeadersBuildPhase section */
-
 /* Begin PBXNativeTarget section */
-		D1E2B20E1E8F4F9100846AF8 /* libmanaged */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = D1E2B2181E8F4F9100846AF8 /* Build configuration list for PBXNativeTarget "libmanaged" */;
-			buildPhases = (
-				D1E2B20B1E8F4F9100846AF8 /* Sources */,
-				D1E2B20C1E8F4F9100846AF8 /* Frameworks */,
-				D1E2B20D1E8F4F9100846AF8 /* Headers */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = libmanaged;
-			productName = libmanaged;
-			productReference = D1E2B20F1E8F4F9100846AF8 /* liblibmanaged.dylib */;
-			productType = "com.apple.product-type.library.dynamic";
-		};
 		D1E2B21E1E8F4FBB00846AF8 /* Tests */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = D1E2B2271E8F4FBB00846AF8 /* Build configuration list for PBXNativeTarget "Tests" */;
 			buildPhases = (
+				7E415BAF1E9298880071BFCE /* ShellScript */,
 				D1E2B21B1E8F4FBB00846AF8 /* Sources */,
 				D1E2B21C1E8F4FBB00846AF8 /* Frameworks */,
 				D1E2B21D1E8F4FBB00846AF8 /* Resources */,
+				7E5081F61E928DC1008125B5 /* CopyFiles */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				D1E2B2261E8F4FBB00846AF8 /* PBXTargetDependency */,
 			);
 			name = Tests;
 			productName = Tests;
@@ -169,10 +118,6 @@
 				LastUpgradeCheck = 0830;
 				ORGANIZATIONNAME = "Sebastien Pouliot";
 				TargetAttributes = {
-					D1E2B20E1E8F4F9100846AF8 = {
-						CreatedOnToolsVersion = 8.3;
-						ProvisioningStyle = Automatic;
-					};
 					D1E2B21E1E8F4FBB00846AF8 = {
 						CreatedOnToolsVersion = 8.3;
 						ProvisioningStyle = Automatic;
@@ -191,7 +136,6 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				D1E2B20E1E8F4F9100846AF8 /* libmanaged */,
 				D1E2B21E1E8F4FBB00846AF8 /* Tests */,
 			);
 		};
@@ -204,22 +148,29 @@
 			files = (
 				D1B0CD831E904EA6008FF17D /* managed.pdb in Resources */,
 				D1B0CD821E904EA6008FF17D /* managed.dll in Resources */,
+				7E34557A1E92B06100FCAD74 /* libmanaged.dylib.dSYM in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
-/* Begin PBXSourcesBuildPhase section */
-		D1E2B20B1E8F4F9100846AF8 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
+/* Begin PBXShellScriptBuildPhase section */
+		7E415BAF1E9298880071BFCE /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D1E2B2321E8F509E00846AF8 /* glib.c in Sources */,
-				D1E2B2341E8F509E00846AF8 /* mono_embeddinator.c in Sources */,
-				D1E2B2311E8F509E00846AF8 /* bindings.m in Sources */,
+			);
+			inputPaths = (
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "make -C .. libmanaged.dylib\n";
 		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
 		D1E2B21B1E8F4FBB00846AF8 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -229,14 +180,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXTargetDependency section */
-		D1E2B2261E8F4FBB00846AF8 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = D1E2B20E1E8F4F9100846AF8 /* libmanaged */;
-			targetProxy = D1E2B2251E8F4FBB00846AF8 /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		D1E2B2161E8F4F9100846AF8 /* Debug */ = {
@@ -328,45 +271,18 @@
 			};
 			name = Release;
 		};
-		D1E2B2191E8F4F9100846AF8 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				EXECUTABLE_PREFIX = lib;
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(LOCAL_LIBRARY_DIR)/Frameworks/Mono.framework/Versions/5.0.0/lib",
-				);
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SYSTEM_HEADER_SEARCH_PATHS = "/Library/Frameworks/Mono.framework/Versions/Current/include/mono-2.0";
-				USER_HEADER_SEARCH_PATHS = "";
-			};
-			name = Debug;
-		};
-		D1E2B21A1E8F4F9100846AF8 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				EXECUTABLE_PREFIX = lib;
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(LOCAL_LIBRARY_DIR)/Frameworks/Mono.framework/Versions/5.0.0/lib",
-				);
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SYSTEM_HEADER_SEARCH_PATHS = "/Library/Frameworks/Mono.framework/Versions/Current/include/mono-2.0";
-				USER_HEADER_SEARCH_PATHS = "";
-			};
-			name = Release;
-		};
 		D1E2B2281E8F4FBB00846AF8 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				COMBINE_HIDPI_IMAGES = YES;
+				HEADER_SEARCH_PATHS = ..;
 				INFOPLIST_FILE = Tests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					..,
+					"$(PROJECT_DIR)",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.xamarin.Tests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				USER_HEADER_SEARCH_PATHS = "/Library/Frameworks/Mono.framework/Versions/Current/include/mono-2.0/**";
@@ -378,8 +294,13 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				COMBINE_HIDPI_IMAGES = YES;
+				HEADER_SEARCH_PATHS = ..;
 				INFOPLIST_FILE = Tests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					..,
+					"$(PROJECT_DIR)",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.xamarin.Tests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				USER_HEADER_SEARCH_PATHS = "/Library/Frameworks/Mono.framework/Versions/Current/include/mono-2.0/**";
@@ -394,15 +315,6 @@
 			buildConfigurations = (
 				D1E2B2161E8F4F9100846AF8 /* Debug */,
 				D1E2B2171E8F4F9100846AF8 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		D1E2B2181E8F4F9100846AF8 /* Build configuration list for PBXNativeTarget "libmanaged" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				D1E2B2191E8F4F9100846AF8 /* Debug */,
-				D1E2B21A1E8F4F9100846AF8 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
