@@ -18,8 +18,8 @@ namespace DriverTest {
 				Assert.That (Directory.Exists (valid), "valid");
 
 				try {
-					Driver.OutputDirectory = "./:output";
-					Assert.Fail ("./:output");
+					Driver.OutputDirectory = "/:output";
+					Assert.Fail ("invalid");
 				} catch (EmbeddinatorException ee) {
 					Assert.True (ee.Error, "Error");
 					Assert.That (ee.Code, Is.EqualTo (1), "Code");
