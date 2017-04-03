@@ -36,12 +36,14 @@ namespace Embeddinator {
 		{
 			bool shared = true; // dylib
 			var action = Action.None;
+			var debug = false;
 
 			var os = new OptionSet {
 				{ "o|out|outdir=", "output directory", v => OutputDirectory = v },
 				{ "h|?|help", "Displays the help", v => action = Action.Help },
 				{ "v|verbose", "generates diagnostic verbose output", v => ErrorHelper.Verbosity++ },
 				{ "version", "Display the version information.", v => action = Action.Version },
+				{ "debug", "Build the native library with debug information.", v => debug = true },
 			};
 
 			var assemblies = os.Parse (args);
@@ -64,7 +66,7 @@ namespace Embeddinator {
 				return 0;
 			case Action.Generate:
 				try {
-					return Generate (assemblies, shared);
+					return Generate (assemblies, shared, debug);
 				} catch (NotImplementedException e) {
 					throw new EmbeddinatorException (1000, $"The feature `{e.Message}` is not currently supported by the tool");
 				}
@@ -90,7 +92,7 @@ namespace Embeddinator {
 			}
 		}
 
-		static int Generate (List<string> args, bool shared)
+		static int Generate (List<string> args, bool shared, bool debug)
 		{
 			Console.WriteLine ("Parsing assemblies...");
 
@@ -126,6 +128,8 @@ namespace Embeddinator {
 			}
 
 			StringBuilder options = new StringBuilder ("clang ");
+			if (debug)
+				options.Append ("-g -O0 ");
 			options.Append ("-DMONO_EMBEDDINATOR_DLL_EXPORT ");
 			options.Append ("-framework CoreFoundation ");
 			options.Append ("-framework Foundation ");
