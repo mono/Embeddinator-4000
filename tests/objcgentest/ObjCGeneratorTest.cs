@@ -47,7 +47,7 @@ namespace ObjCGeneratorTest {
 			var universe = new Universe (UniverseOptions.None);
 			var asm = universe.Load ("mscorlib.dll");
 
-			Assert.Throws<Embeddinator.EmbeddinatorException> (() => ObjCGenerator.GetTypeName (asm.GetType ("System.DateTime")), "char");
+			Assert.Throws<NotImplementedException> (() => ObjCGenerator.GetTypeName (asm.GetType ("System.DateTime")), "DateTime");
 		}
 	}
 }

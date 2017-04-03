@@ -20,6 +20,10 @@ An unexpected error condition occurred. Please [file an issue](https://github.co
 
 The easiest way to get exact version information is to use the **Xamarin Studio** menu, **About Xamarin Studio** item, **Show Details** button and copy/paste the version informations (you can use the **Copy Information** button).
 
+<h3><a name="EM0001"/>EM0001: Could not create Output directory `X`</h3>
+
+The directory name specified by `-o=DIR` does not exists and could not be created. It might be an invalid name for the file system.
+
 <h3><a name="EM0099"/>EM0099: Internal error *. Please file a bug report with a test case (https://github.com/mono/Embeddinator-4000/issues).</h3>
 
 This error message is reported when an internal consistency check in the Embeddinator-4000 fails.
@@ -28,19 +32,11 @@ This indicates a bug in the Embeddinator-4000; please file a bug report at [http
 
 # EM1xxx: code generation
 
+<h3><a name="EM1000"/>EM1000: The feature `X` is not currently implemented by the generator</h3>
+
+This is a known issue that we intend to fix in a future release of the generator. Contributions are welcome.
+
 <!-- 1xxx: code generation -->
-
-<h3><a name="EM1001"/>EM1001: Can't generate binding code for a return value of type '*'.</h3>
-
-The generator can't does not have knowledge about the type mentioned in the error message, and can't generate binding code for it.
-
-Please file a bug report at [https://github.com/mono/Embeddinator-4000/issues](https://github.com/mono/Embeddinator-4000/issues) if this is a type the generator should be able to generate code for.
-
-<h3><a name="EM1002"/>EM1002: Can't generate binding code for the type '*'.</h3>
-
-The generator can't does not have knowledge about the type mentioned in the error message, and can't generate binding code for it.
-
-Please file a bug report at [https://github.com/mono/Embeddinator-4000/issues](https://github.com/mono/Embeddinator-4000/issues) if this is a type the generator should be able to generate code for.
 
 <!-- 2xxx: reserved -->
 <!-- 3xxx: reserved -->

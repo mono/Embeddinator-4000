@@ -20,7 +20,7 @@ namespace Embeddinator {
 		Generate,
 	}
 
-	static class Driver
+	public static class Driver
 	{
 		static int Main (string [] args)
 		{
@@ -38,7 +38,9 @@ namespace Embeddinator {
 			var action = Action.None;
 
 			var os = new OptionSet {
+				{ "o|out|outdir=", "output directory", v => OutputDirectory = v },
 				{ "h|?|help", "Displays the help", v => action = Action.Help },
+				{ "v|verbose", "generates diagnostic verbose output", v => ErrorHelper.Verbosity++ },
 				{ "version", "Display the version information.", v => action = Action.Version },
 			};
 
@@ -53,7 +55,7 @@ namespace Embeddinator {
 				Console.WriteLine ($"Embeddinator-4000 v0.1 ({Info.Branch}: {Info.Hash})");
 				Console.WriteLine ("Generates target language bindings for interop with managed code.");
 				Console.WriteLine ("");
-				Console.WriteLine ($"Usage: {Path.GetFileName (System.Reflection.Assembly.GetExecutingAssembly ().Location)} [options]+ ManagedAssembly1.dll ManagedAssembly2.dll");
+				Console.WriteLine ($"Usage: {Path.GetFileName (System.Reflection.Assembly.GetExecutingAssembly ().Location)} [options]+ ManagedAssembly1.dll [ManagedAssembly2.dll ...]");
 				Console.WriteLine ();
 				os.WriteOptionDescriptions (Console.Out);
 				return 0;
@@ -61,9 +63,30 @@ namespace Embeddinator {
 				Console.WriteLine ($"Embeddinator-4000 v0.1 ({Info.Branch}: {Info.Hash})");
 				return 0;
 			case Action.Generate:
-				return Generate (assemblies, shared);
+				try {
+					return Generate (assemblies, shared);
+				} catch (NotImplementedException e) {
+					throw new EmbeddinatorException (1000, $"The feature `{e.Message}` is not currently supported by the tool");
+				}
 			default:
 				throw ErrorHelper.CreateError (99, "Internal error: invalid action {0}. Please file a bug report with a test case (https://github.com/mono/Embeddinator-4000/issues)", action);
+			}
+		}
+
+		static string outputDirectory = ".";
+
+		public static string OutputDirectory {
+			get { return outputDirectory; }
+			set {
+				if (!Directory.Exists (value)) {
+					try {
+						Directory.CreateDirectory (value);
+						Console.WriteLine ($"Creating output directory `{Path.GetFullPath (value)}`");
+					} catch (Exception e) {
+						throw new EmbeddinatorException (1, true, e, $"Could not create output directory `{value}`");
+					}
+				}
+				outputDirectory = value;
 			}
 		}
 
@@ -87,7 +110,7 @@ namespace Embeddinator {
 
 			Console.WriteLine ("Generating binding code...");
 			g.Generate (assemblies);
-			g.Write ();
+			g.Write (OutputDirectory);
 
 			var exe = typeof (Driver).Assembly;
 			foreach (var res in exe.GetManifestResourceNames ()) {
@@ -96,12 +119,11 @@ namespace Embeddinator {
 					if (shared || File.Exists ("main.c"))
 						continue; 
 				}
-				Console.WriteLine ($"\tGenerated: {res}");
-				using (var sw = new StreamWriter (res))
+				var path = Path.Combine (OutputDirectory, res);
+				Console.WriteLine ($"\tGenerated: {path}");
+				using (var sw = new StreamWriter (path))
 					exe.GetManifestResourceStream (res).CopyTo (sw.BaseStream);
 			}
-
-			Console.WriteLine ("Compiling binding code...");
 
 			StringBuilder options = new StringBuilder ("clang ");
 			options.Append ("-DMONO_EMBEDDINATOR_DLL_EXPORT ");
