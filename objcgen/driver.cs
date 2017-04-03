@@ -152,7 +152,7 @@ namespace Embeddinator {
 			options.Append ("-I\"/Library/Frameworks/Mono.framework/Versions/Current/include/mono-2.0\" -L\"/Library/Frameworks/Mono.framework/Versions/Current/lib/\" -lmonosgen-2.0 ");
 			options.Append ("glib.c mono_embeddinator.c bindings.m ");
 			if (shared)
-				options.Append ($"-dynamiclib -install_name lib{LibraryName}.dylib ");
+				options.Append ($"-dynamiclib -install_name @rpath/lib{LibraryName}.dylib ");
 			else
 				options.Append ("main.c ");
 			options.Append ($"-o lib{LibraryName}.dylib -ObjC -lobjc");
