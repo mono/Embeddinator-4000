@@ -1,6 +1,5 @@
-bin/Debug/managed.dll: properties.cs
-	mkdir -p bin/Debug
-	mcs $^ /out:$@ /target:library
+bin/Debug/managed.dll: $(wildcard *.cs) managed.csproj
+	xbuild managed.csproj
 	
 all: managed.dll
 
