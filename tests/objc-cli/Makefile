@@ -1,6 +1,9 @@
 all: run-test perf
 
+.PHONY: managed.dll
+
 managed.dll:
+	make -C ../managed
 	cp ../managed/bin/Debug/managed.dll .
 
 libmanaged.dylib: managed.dll
