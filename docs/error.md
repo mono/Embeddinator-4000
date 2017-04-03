@@ -30,6 +30,18 @@ This indicates a bug in the Embeddinator-4000; please file a bug report at [http
 
 <!-- 1xxx: code generation -->
 
+<h3><a name="EM1001"/>EM1001: Can't generate binding code for a return value of type '*'.</h3>
+
+The generator can't does not have knowledge about the type mentioned in the error message, and can't generate binding code for it.
+
+Please file a bug report at [https://github.com/mono/Embeddinator-4000/issues](https://github.com/mono/Embeddinator-4000/issues) if this is a type the generator should be able to generate code for.
+
+<h3><a name="EM1002"/>EM1002: Can't generate binding code for the type '*'.</h3>
+
+The generator can't does not have knowledge about the type mentioned in the error message, and can't generate binding code for it.
+
+Please file a bug report at [https://github.com/mono/Embeddinator-4000/issues](https://github.com/mono/Embeddinator-4000/issues) if this is a type the generator should be able to generate code for.
+
 <!-- 2xxx: reserved -->
 <!-- 3xxx: reserved -->
 <!-- 4xxx: reserved -->
