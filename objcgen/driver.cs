@@ -36,6 +36,7 @@ namespace Embeddinator {
 		{
 			bool shared = true; // dylib
 			var action = Action.None;
+			var debug = false;
 
 			var os = new OptionSet {
 				{ "c|compile", "compiles the generated output", v => CompileCode = true },
@@ -43,6 +44,7 @@ namespace Embeddinator {
 				{ "h|?|help", "Displays the help", v => action = Action.Help },
 				{ "v|verbose", "generates diagnostic verbose output", v => ErrorHelper.Verbosity++ },
 				{ "version", "Display the version information.", v => action = Action.Version },
+				{ "debug", "Build the native library with debug information.", v => debug = true },
 			};
 
 			var assemblies = os.Parse (args);
@@ -67,7 +69,7 @@ namespace Embeddinator {
 				try {
 					var result = Generate (assemblies, shared);
 					if (CompileCode && (result == 0))
-						result = Compile (shared);
+						result = Compile (shared, debug);
 					Console.WriteLine ("Done");
 					return result;
 				} catch (NotImplementedException e) {
@@ -137,11 +139,13 @@ namespace Embeddinator {
 			return 0;
 		}
 
-		static int Compile (bool shared)
+		static int Compile (bool shared, bool debug)
 		{
 			Console.WriteLine ("Compiling binding code...");
 
 			StringBuilder options = new StringBuilder ("clang ");
+			if (debug)
+				options.Append ("-g -O0 ");
 			options.Append ("-DMONO_EMBEDDINATOR_DLL_EXPORT ");
 			options.Append ("-framework CoreFoundation ");
 			options.Append ("-framework Foundation ");
