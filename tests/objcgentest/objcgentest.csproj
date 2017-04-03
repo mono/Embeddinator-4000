@@ -32,6 +32,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ObjCGeneratorTest.cs" />
+    <Compile Include="DriverTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
