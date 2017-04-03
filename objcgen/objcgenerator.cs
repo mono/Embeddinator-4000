@@ -255,7 +255,7 @@ namespace ObjC {
 				implementation.WriteLine ("\t\treturn NULL;");
 				implementation.WriteLine ("\tint length = mono_string_length ((MonoString *) __result);");
 				implementation.WriteLine ("\tgunichar2 *str = mono_string_chars ((MonoString *) __result);");
-				implementation.WriteLine ("\treturn [[[NSString alloc] initWithBytes: str length: length encoding: NSUTF16LittleEndianStringEncoding] autorelease];");
+				implementation.WriteLine ("\treturn [[[NSString alloc] initWithBytes: str length: length * 2 encoding: NSUTF16LittleEndianStringEncoding] autorelease];");
 				break;
 			case TypeCode.Boolean:
 			case TypeCode.Char:

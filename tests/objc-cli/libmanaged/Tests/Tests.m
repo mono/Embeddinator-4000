@@ -86,6 +86,10 @@
     
     XCTAssertEqual (-DBL_MAX, [Type_Double min], "double min");
     XCTAssertEqual (DBL_MAX, [Type_Double max], "double max");
+
+    XCTAssertEqualObjects ((__bridge NSString *) nil, [Type_String nullString], "null string");
+    XCTAssertEqualObjects (@"", [Type_String emptyString], "empty string");
+    XCTAssertEqualObjects (@"Hello World", [Type_String nonEmptyString], "non-empty string");
 }
 
 @end
