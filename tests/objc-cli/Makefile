@@ -7,6 +7,7 @@ managed.dll:
 	cp ../managed/bin/Debug/managed.dll .
 
 libmanaged.dylib: managed.dll
+	xbuild ../../objcgen/objcgen.csproj
 	mono ../../objcgen/bin/Debug/objcgen.exe managed.dll
 
 test: libmanaged.dylib
