@@ -249,7 +249,6 @@ namespace ObjC {
 		void ReturnValue (Type t)
 		{
 			switch (Type.GetTypeCode (t)) {
-			// unboxing
 			case TypeCode.String:
 				implementation.WriteLine ("\tif (__result == NULL)");
 				implementation.WriteLine ("\t\treturn NULL;");
