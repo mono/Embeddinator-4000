@@ -18,4 +18,26 @@ public static class Platform {
 	}
 	
 	public static int ExitCode { get; set; }
+
+	// not generated
+	internal static string Text { get; set; }
+
+	// not generated
+	private static object Null {
+		get { return null; }
+	}
+}
+
+namespace Properties {
+
+	public class Query {
+
+		// static
+		public static int UniversalAnswer { get; } = 42;
+
+		public bool IsGood { get; } = true;
+		public bool IsBad { get; } = false;
+
+		public int Answer { get; set; } = UniversalAnswer;
+	}
 }
