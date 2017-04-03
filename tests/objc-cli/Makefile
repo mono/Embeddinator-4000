@@ -8,7 +8,7 @@ managed.dll:
 
 libmanaged.dylib: managed.dll
 	xbuild ../../objcgen/objcgen.csproj
-	mono ../../objcgen/bin/Debug/objcgen.exe --debug managed.dll
+	mono ../../objcgen/bin/Debug/objcgen.exe --debug managed.dll -c
 
 test: libmanaged.dylib
 	clang test-managed.m -lmanaged -L. -framework Foundation -o test-cli
