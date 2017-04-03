@@ -249,9 +249,25 @@ namespace ObjC {
 		void ReturnValue (Type t)
 		{
 			switch (Type.GetTypeCode (t)) {
-			// unboxing
+			case TypeCode.String:
+				implementation.WriteLine ("\tif (__result == NULL)");
+				implementation.WriteLine ("\t\treturn NULL;");
+				implementation.WriteLine ("\tint length = mono_string_length ((MonoString *) __result);");
+				implementation.WriteLine ("\tgunichar2 *str = mono_string_chars ((MonoString *) __result);");
+				implementation.WriteLine ("\treturn [[[NSString alloc] initWithBytes: str length: length * 2 encoding: NSUTF16LittleEndianStringEncoding] autorelease];");
+				break;
 			case TypeCode.Boolean:
+			case TypeCode.Char:
+			case TypeCode.SByte:
+			case TypeCode.Int16:
 			case TypeCode.Int32:
+			case TypeCode.Int64:
+			case TypeCode.Byte:
+			case TypeCode.UInt16:
+			case TypeCode.UInt32:
+			case TypeCode.UInt64:
+			case TypeCode.Single:
+			case TypeCode.Double:
 				var name = GetTypeName (t);
 				implementation.WriteLine ("\tvoid* __unbox = mono_object_unbox (__result);");
 				implementation.WriteLine ($"\treturn *(({name}*)__unbox);");
@@ -282,8 +298,30 @@ namespace ObjC {
 				return (t.Namespace == "System" && t.Name == "Object") ? "NSObject" : t.FullName.Replace ('.', '_');
 			case TypeCode.Boolean:
 				return "bool";
+			case TypeCode.Char:
+				return "unsigned short";
+			case TypeCode.Double:
+				return "double";
+			case TypeCode.Single:
+				return "float";
+			case TypeCode.Byte:
+				return "unsigned char";
+			case TypeCode.SByte:
+				return "signed char";
+			case TypeCode.Int16:
+				return "short";
 			case TypeCode.Int32:
 				return "int";
+			case TypeCode.Int64:
+				return "long long";
+			case TypeCode.UInt16:
+				return "unsigned short";
+			case TypeCode.UInt32:
+				return "unsigned int";
+			case TypeCode.UInt64:
+				return "unsigned long long";
+			case TypeCode.String:
+				return "NSString*";
 			default:
 				throw new NotImplementedException ($"Converting type {t.Name} to a native type name");
 			}
