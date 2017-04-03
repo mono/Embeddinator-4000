@@ -187,7 +187,7 @@ namespace ObjC {
 			implementation.WriteLine ("\tvoid* __args [1];");
 			implementation.WriteLine ("\t__args [0] = &value;");
 			implementation.WriteLine ("\tMonoObject* __exception = nil;");
-			implementation.WriteLine ("\tMonoObject* __result = mono_runtime_invoke (__method, nil, __args, &__exception);");
+			implementation.WriteLine ("\tmono_runtime_invoke (__method, nil, __args, &__exception);");
 			implementation.WriteLine ("\tif (__exception)");
 			implementation.WriteLine ("\t\tmono_embeddinator_throw_exception (__exception);");
 			implementation.WriteLine ("}");
