@@ -261,3 +261,9 @@ void mono_embeddinator_init_object(MonoEmbedObject* object, MonoObject* instance
     object->_class = mono_object_get_class(instance);
     object->_handle = mono_gchandle_new(instance, /*pinned=*/false);
 }
+
+void mono_embeddinator_destroy_object(MonoEmbedObject* object)
+{
+    mono_gchandle_free (object->_handle);
+    g_free (object);
+}
