@@ -123,7 +123,7 @@ namespace ObjC {
 
 			implementation.WriteLine ("-(void) dealloc");
 			implementation.WriteLine ("{");
-			implementation.WriteLine ("if (_object)");
+			implementation.WriteLine ("\tif (_object)");
 			implementation.WriteLine ("\t\tmono_embeddinator_destroy_object (_object);");
 			implementation.WriteLine ("\t[super dealloc];");
 			implementation.WriteLine ("}");
