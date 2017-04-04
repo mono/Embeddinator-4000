@@ -113,12 +113,20 @@ namespace ObjC {
 			headers.WriteLine ($"@interface {native_name} : {GetTypeName (t.BaseType)} {{");
 			headers.WriteLine ("\tMonoEmbedObject* _object;");
 			headers.WriteLine ("}");
+			headers.WriteLine ("-(void) dealloc;");
 			headers.WriteLine ();
 
 			implementation.WriteLine ();
 			implementation.WriteLine ($"// {t.AssemblyQualifiedName}");
 			implementation.WriteLine ($"@implementation {native_name}");
 			implementation.WriteLine ();
+
+			implementation.WriteLine ("-(void) dealloc");
+			implementation.WriteLine ("{");
+			implementation.WriteLine ("\tmono_embeddinator_destroy_object (_object);");
+			implementation.WriteLine ("\t[super dealloc];");
+			implementation.WriteLine ("}");
+			implementation.WriteLine ("");
 
 			var default_init = false;
 			foreach (var ctor in t.GetConstructors ()) {

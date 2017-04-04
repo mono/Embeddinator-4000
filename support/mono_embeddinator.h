@@ -225,4 +225,10 @@ void* mono_embeddinator_create_object(MonoObject* instance);
 MONO_EMBEDDINATOR_API
 void mono_embeddinator_init_object(MonoEmbedObject* object, MonoObject* instance);
 
+/**
+ * Destroys a MonoEmbedObject object for a Mono object instance.
+ */
+MONO_EMBEDDINATOR_API
+void mono_embeddinator_destroy_object(MonoEmbedObject *object);
+
 MONO_EMBEDDINATOR_END_DECLS
