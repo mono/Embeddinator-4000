@@ -185,9 +185,11 @@ char* mono_embeddinator_search_assembly(const char* assembly)
 
 MonoImage* mono_embeddinator_load_assembly(mono_embeddinator_context_t* ctx, const char* assembly)
 {
-    const char* path = mono_embeddinator_search_assembly(assembly);
+    char* path = mono_embeddinator_search_assembly(assembly);
 
     MonoAssembly* mono_assembly = mono_domain_assembly_open(ctx->domain, path);
+
+    g_free (path);
 
     if (!mono_assembly)
     {
@@ -217,8 +219,9 @@ MonoClass* mono_embeddinator_search_class(const char* assembly, const char* _nam
 {
     mono_embeddinator_context_t* ctx = mono_embeddinator_get_context();
 
-    const char* path = mono_embeddinator_search_assembly(assembly);
+    char* path = mono_embeddinator_search_assembly(assembly);
     MonoAssembly* mono_assembly = mono_domain_assembly_open(ctx->domain, path);
+    g_free (path);
 
     if (mono_assembly == 0)
     {
