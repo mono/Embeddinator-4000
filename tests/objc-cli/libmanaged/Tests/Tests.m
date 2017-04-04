@@ -30,14 +30,35 @@
 	Platform.exitCode = 255;
 	XCTAssert ([Platform exitCode] == 255, "static class property setter check");
 	
-/*	XCTAssert ([Properties_Query universalAnswer] == 42, "static property getter only");
+	XCTAssert ([Properties_Query universalAnswer] == 42, "static property getter only");
 	
 	Properties_Query* query = [[Properties_Query alloc] init];
 	XCTAssertTrue ([query isGood], "instance property getter only 1");
 	XCTAssertFalse ([query isBad], "instance property getter only 2");
 	XCTAssert ([query answer] == 42, "instance property getter");
 	query.answer = 911;
-	XCTAssert ([query answer] == 911, "instance property setter check");*/
+	XCTAssert ([query answer] == 911, "instance property setter check");
+}
+
+- (void)testNamespaces {
+	id nonamespace = [[ClassWithoutNamespace alloc] init];
+	XCTAssertTrue ([[nonamespace description] containsString:@"<ClassWithoutNamespace:"], "nonamespace");
+	
+	id singlenamespace = [[First_ClassWithSingleNamespace alloc] init];
+	XCTAssertTrue ([[singlenamespace description] containsString:@"<First_ClassWithSingleNamespace:"], "singlenamespace");
+	
+	id nestednamespaces = [[First_Second_ClassWithNestedNamespace alloc] init];
+	XCTAssertTrue ([[nestednamespaces description] containsString:@"<First_Second_ClassWithNestedNamespace:"], "nestednamespaces");
+}
+
+- (void)testExceptions {
+	// .ctor that throws
+	id throwers = [[Exceptions_Throwers alloc] init];
+	XCTAssertNil (throwers, "Exceptions_Throwers init");
+	
+	// .cctor that throw - can't be called directly but it makes the type unusable
+	id static_thrower = [[Exceptions_ThrowInStaticCtor alloc] init];
+	XCTAssertNil (static_thrower, "Exceptions_ThrowInStaticCtor init");
 }
 
 - (void)testStaticCallPerformance {
