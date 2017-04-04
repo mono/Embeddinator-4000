@@ -10,14 +10,16 @@ libmanaged.dylib: managed.dll
 	/Library/Frameworks/Mono.framework/Versions/Current/Commands/xbuild ../../objcgen/objcgen.csproj
 	/Library/Frameworks/Mono.framework/Versions/Current/Commands/mono --debug ../../objcgen/bin/Debug/objcgen.exe --debug managed.dll -c
 
-test: libmanaged.dylib
-	clang test-managed.m -lmanaged -L. -framework Foundation -o test-cli -rpath @executable_path -fobjc-arc
+test-cli: test-managed.m libmanaged.dylib
+	clang -g $< leak-check.c -lmanaged -L. -framework Foundation -o $@ -rpath @executable_path -fobjc-arc
 
-run-test: test
+perf-cli: perf-test.m libmanaged.dylib
+	clang -g $< leak-check.c -lmanaged -L. -framework Foundation -o $@ -rpath @executable_path -fobj-arc
+
+run-test: test-cli
 	./test-cli
-	
-perf: libmanaged.dylib
-	clang perf-test.m -lmanaged -L. -framework Foundation -o perf-cli -rpath @executable_path -fobjc-arc
+
+perf: perf-cli
 	time ./perf-cli
 
 clean:
