@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 using IKVM.Reflection;
 using Type = IKVM.Reflection.Type;
@@ -26,6 +27,7 @@ namespace ObjC {
 					types.Add (t);
 				}
 			}
+			types = types.OrderBy ((arg) => arg.FullName).ToList ();
 			Console.WriteLine ($"\t{types.Count} types found");
 		}
 
@@ -37,7 +39,6 @@ namespace ObjC {
 			headers.WriteLine ("MONO_EMBEDDINATOR_BEGIN_DECLS");
 			headers.WriteLine ();
 
-			// TODO: sort ? so it's easier to check if a type is present in a long list
 			headers.WriteLine ("// forward declarations");
 			foreach (var t in types)
 				headers.WriteLine ($"@class {GetTypeName (t)};");
@@ -88,9 +89,7 @@ namespace ObjC {
 			implementation.WriteLine ("}");
 			implementation.WriteLine ();
 
-			foreach (var t in a.GetTypes ()) {
-				if (!t.IsPublic)
-					continue;
+			foreach (var t in types) {
 				Generate (t);
 			}
 		}
@@ -109,12 +108,14 @@ namespace ObjC {
 			implementation.WriteLine ();
 
 			var native_name = GetTypeName (t);
+			headers.WriteLine ();
 			headers.WriteLine ($"// {t.AssemblyQualifiedName}");
 			headers.WriteLine ($"@interface {native_name} : {GetTypeName (t.BaseType)} {{");
 			headers.WriteLine ("\tMonoEmbedObject* _object;");
 			headers.WriteLine ("}");
 			headers.WriteLine ();
 
+			implementation.WriteLine ();
 			implementation.WriteLine ($"// {t.AssemblyQualifiedName}");
 			implementation.WriteLine ($"@implementation {native_name}");
 			implementation.WriteLine ();
@@ -158,7 +159,6 @@ namespace ObjC {
 
 			var static_type = t.IsSealed && t.IsAbstract;
 			if (!default_init || static_type) {
-				headers.WriteLine ();
 				if (static_type)
 					headers.WriteLine ("// a .net static type cannot be initialized");
 				headers.WriteLine ("- (instancetype)init NS_UNAVAILABLE;");
