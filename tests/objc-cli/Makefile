@@ -1,4 +1,4 @@
-all: run-test perf xctest libLeakCheckAtExit.dylib
+all: run-test perf xctest test-leaks
 
 .PHONY: managed.dll
 
