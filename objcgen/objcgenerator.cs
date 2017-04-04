@@ -123,7 +123,8 @@ namespace ObjC {
 
 			implementation.WriteLine ("-(void) dealloc");
 			implementation.WriteLine ("{");
-			implementation.WriteLine ("\tmono_embeddinator_destroy_object (_object);");
+			implementation.WriteLine ("if (_object)");
+			implementation.WriteLine ("\t\tmono_embeddinator_destroy_object (_object);");
 			implementation.WriteLine ("\t[super dealloc];");
 			implementation.WriteLine ("}");
 			implementation.WriteLine ("");
@@ -151,9 +152,11 @@ namespace ObjC {
 					implementation.WriteLine ($"\t\tMonoObject* __instance = mono_object_new (__mono_context.domain, {managed_name}_class);");
 					implementation.WriteLine ("\t\tMonoObject* __exception = nil;");
 					implementation.WriteLine ("\t\tmono_runtime_invoke (__method, __instance, nil, &__exception);");
-					implementation.WriteLine ("\t\tif (__exception)");
+					implementation.WriteLine ("\t\tif (__exception) {");
 					// TODO: Apple often do NSLog (or asserts but they are more brutal) and returning nil is allowed (and common)
+					implementation.WriteLine ("\t\t\t[self release];");
 					implementation.WriteLine ("\t\t\treturn nil;");
+					implementation.WriteLine ("\t\t}");
 					//implementation.WriteLine ("\t\t\tmono_embeddinator_throw_exception (__exception);");
 					implementation.WriteLine ("\t\t_object = mono_embeddinator_create_object (__instance);");
 					implementation.WriteLine ("\t\t_object->_handle = mono_gchandle_new (__instance, /*pinned=*/false);");
