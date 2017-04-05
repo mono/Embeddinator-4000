@@ -4,9 +4,17 @@ using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Threading;
+using System.Runtime.InteropServices;
 
 class LeakTester
 {
+	[DllImport ("libc", EntryPoint="isatty")]
+	extern static int _isatty (int fd);
+	static bool HasControllingTerminal ()
+	{
+		return _isatty (0) != 0 && _isatty (1) != 0 && _isatty (2) != 0;
+	}
+
 	static int Main (string [] args)
 	{
 		int rv = 0;
@@ -57,8 +65,11 @@ class LeakTester
 
 			Console.WriteLine ("Performing leak test...");
 			using (var leaks = new Process ()) {
-				leaks.StartInfo.FileName = "xcrun";
+				var sudo = !HasControllingTerminal ();
+				leaks.StartInfo.FileName = sudo ? "sudo" : "xcrun";
 				sb.Clear ();
+				if (sudo)
+					sb.Append ("--non-interactive xcrun ");
 				sb.Append ($"leaks {p.Id}");
 				sb.Append (" -exclude mono_save_seq_point_info"); // I haven't investigated this
 				sb.Append (" -exclude create_internal_thread_object"); // I haven't investigated this
@@ -90,7 +101,7 @@ class LeakTester
 				leaks.ErrorDataReceived += process_output;
 				leaks.OutputDataReceived += process_output;
 
-
+				Console.WriteLine ("{0} {1}", leaks.StartInfo.FileName, leaks.StartInfo.Arguments);
 				leaks.Start ();
 
 				leaks.BeginErrorReadLine ();
