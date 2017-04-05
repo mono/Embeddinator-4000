@@ -33,10 +33,13 @@ test-leaks: test-cli-leaks test-perf-leaks test-xctest-leaks
 ../leaktest/bin/Debug/leaktest.exe: $(wildcard ../leaktest/*.cs) libLeakCheckAtExit.dylib
 	/Library/Frameworks/Mono.framework/Versions/Current/Commands/xbuild ../leaktest/leaktest.csproj
 
-test-cli-leaks: test-cli ../leaktest/bin/Debug/leaktest.exe
+debug-auth-leaks: auth-check
 	whoami
 	groups
 	/usr/sbin/DevToolsSecurity -status
+	./auth-check
+
+test-cli-leaks: test-cli ../leaktest/bin/Debug/leaktest.exe
 	mono --debug ../leaktest/bin/Debug/leaktest.exe $(abspath $<)
 
 test-perf-leaks: perf-cli ../leaktest/bin/Debug/leaktest.exe
@@ -49,3 +52,6 @@ test-xctest-leaks:
 
 libLeakCheckAtExit.dylib: leak-at-exit.c
 	clang -arch i386 -arch x86_64 -shared $< -o $@
+
+auth-check: auth-check.c
+	clang $< -o$@ -framework Security
