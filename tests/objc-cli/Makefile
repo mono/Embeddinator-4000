@@ -11,10 +11,10 @@ libmanaged.dylib: managed.dll
 	/Library/Frameworks/Mono.framework/Versions/Current/Commands/mono --debug ../../objcgen/bin/Debug/objcgen.exe --debug managed.dll -c
 
 test-cli: test-managed.m libmanaged.dylib
-	clang -g $< -lmanaged -L. -framework Foundation -o $@ -rpath @executable_path
+	clang -g $< -lmanaged -L. -framework Foundation -o $@ -rpath @executable_path -fobjc-arc
 
 perf-cli: perf-test.m libmanaged.dylib
-	clang -g $< -lmanaged -L. -framework Foundation -o $@ -rpath @executable_path
+	clang -g $< -lmanaged -L. -framework Foundation -o $@ -rpath @executable_path -fobjc-arc
 
 run-test: test-cli
 	./test-cli

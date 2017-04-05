@@ -61,6 +61,29 @@
 	XCTAssertNil (static_thrower, "Exceptions_ThrowInStaticCtor init");
 }
 
+- (void)testConstructors {
+	id unique_default_init = [[Constructors_Unique alloc] init];
+	XCTAssert ([unique_default_init id] == 1, "default id");
+
+	id unique_init_id = [[Constructors_Unique alloc] initWithId:911];
+	XCTAssert ([unique_init_id id] == 911, "id");
+	
+	Constructors_Implicit* implicit = [[Constructors_Implicit alloc] init];
+	XCTAssertEqualObjects (@"OK", [implicit testResult], "implicit");
+	
+	Constructors_AllTypeCode* all1 = [[Constructors_AllTypeCode alloc] initWithB1:true C2:USHRT_MAX S:@"Mono"];
+	XCTAssertTrue ([all1 testResult], "all1");
+
+	Constructors_AllTypeCode* all2 = [[Constructors_AllTypeCode alloc] initWithI8:SCHAR_MAX I16:SHRT_MAX I32:INT_MAX I64:LONG_MAX];
+	XCTAssertTrue ([all2 testResult], "all2");
+
+	Constructors_AllTypeCode* all3 = [[Constructors_AllTypeCode alloc] initWithU8:UCHAR_MAX U16:USHRT_MAX U32:UINT_MAX U64:ULONG_MAX];
+	XCTAssertTrue ([all3 testResult], "all3");
+
+	Constructors_AllTypeCode* all4 = [[Constructors_AllTypeCode alloc] initWithF32:FLT_MAX F64:DBL_MAX];
+	XCTAssertTrue ([all4 testResult], "all4");
+}
+
 - (void)testStaticCallPerformance {
 	const int iterations = 1000000;
 	[self measureBlock:^{
