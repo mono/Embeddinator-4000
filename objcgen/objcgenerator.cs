@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 
 using IKVM.Reflection;
 using Type = IKVM.Reflection.Type;
@@ -16,6 +17,7 @@ namespace ObjC {
 		static TextWriter implementation = new StringWriter ();
 
 		List<Type> types = new List<Type> ();
+		Dictionary<Type,List<ConstructorInfo>> ctors = new Dictionary<Type,List<ConstructorInfo>> ();
 
 		public override void Process (IEnumerable<Assembly> assemblies)
 		{
@@ -25,6 +27,18 @@ namespace ObjC {
 						continue;
 					// gather types for forward declarations
 					types.Add (t);
+
+					var constructors = new List<ConstructorInfo> ();
+					foreach (var ctor in t.GetConstructors ()) {
+						// .cctor not to be called directly by native code
+						if (ctor.IsStatic)
+							continue;
+						if (!ctor.IsPublic)
+							continue;
+						constructors.Add (ctor);
+					}
+					constructors = constructors.OrderBy ((arg) => arg.ParameterCount).ToList ();
+					ctors.Add (t, constructors);
 				}
 			}
 			types = types.OrderBy ((arg) => arg.FullName).ToList ();
@@ -121,18 +135,36 @@ namespace ObjC {
 			implementation.WriteLine ();
 
 			var default_init = false;
-			foreach (var ctor in t.GetConstructors ()) {
-				// .cctor not to be called directly by native code
-				if (ctor.IsStatic)
-					continue;
-				if (!ctor.IsPublic)
-					continue;
-				if (ctor.ParameterCount == 0) {
-					headers.WriteLine ("- (instancetype)init;");
+			List<ConstructorInfo> constructors;
+			if (ctors.TryGetValue (t, out constructors)) {
+				foreach (var ctor in constructors) {
+					var pcount = ctor.ParameterCount;
+					default_init |= pcount == 0;
 
-					implementation.WriteLine ("- (instancetype)init");
+					var parameters = ctor.GetParameters ();
+					StringBuilder name = new StringBuilder ("init");
+					foreach (var p in parameters) {
+						if (name.Length == 4)
+							name.Append ("With");
+						else
+							name.Append (' ');
+						name.Append (PascalCase (p.Name));
+						name.Append (":(").Append (GetTypeName (p.ParameterType)).Append (") ").Append (p.Name);
+					}
+
+					var signature = new StringBuilder (".ctor(");
+					foreach (var p in parameters) {
+						if (signature.Length > 6)
+							signature.Append (',');
+						signature.Append (GetMonoName (p.ParameterType));
+					}
+					signature.Append (")");
+
+					headers.WriteLine ($"- (instancetype){name};");
+
+					implementation.WriteLine ($"- (instancetype){name}");
 					implementation.WriteLine ("{");
-					implementation.WriteLine ($"\tconst char __method_name [] = \"{t.FullName}:.ctor()\";");
+					implementation.WriteLine ($"\tconst char __method_name [] = \"{t.FullName}:{signature}\";");
 					implementation.WriteLine ("\tstatic MonoMethod* __method = nil;");
 					implementation.WriteLine ("\tif (!__method) {");
 					implementation.WriteLine ($"\t\t__lookup_class_{managed_name} ();");
@@ -142,7 +174,36 @@ namespace ObjC {
 					implementation.WriteLine ("\tif (self = [super init]) {");
 					implementation.WriteLine ($"\t\tMonoObject* __instance = mono_object_new (__mono_context.domain, {managed_name}_class);");
 					implementation.WriteLine ("\t\tMonoObject* __exception = nil;");
-					implementation.WriteLine ("\t\tmono_runtime_invoke (__method, __instance, nil, &__exception);");
+					var args = "nil";
+					if (pcount > 0) {
+						implementation.WriteLine ($"\t\tvoid* __args [{pcount}];");
+						for (int i = 0; i < pcount; i++) {
+							var p = parameters [i];
+							switch (Type.GetTypeCode (p.ParameterType)) {
+							case TypeCode.String:
+								implementation.WriteLine ($"\t\t__args [{i}] = mono_string_new (__mono_context.domain, [{p.Name} UTF8String]);");
+								break;
+							case TypeCode.Boolean:
+							case TypeCode.Char:
+							case TypeCode.SByte:
+							case TypeCode.Int16:
+							case TypeCode.Int32:
+							case TypeCode.Int64:
+							case TypeCode.Byte:
+							case TypeCode.UInt16:
+							case TypeCode.UInt32:
+							case TypeCode.UInt64:
+							case TypeCode.Single:
+							case TypeCode.Double:
+								implementation.WriteLine ($"\t\t__args [{i}] = &{p.Name};");
+								break;
+							default:
+								throw new NotImplementedException ($"Converting type {p.ParameterType.FullName} to mono code");
+							}
+						}
+						args = "__args";
+					}
+					implementation.WriteLine ($"\t\tmono_runtime_invoke (__method, __instance, {args}, &__exception);");
 					implementation.WriteLine ("\t\tif (__exception)");
 					// TODO: Apple often do NSLog (or asserts but they are more brutal) and returning nil is allowed (and common)
 					implementation.WriteLine ("\t\t\treturn nil;");
@@ -153,7 +214,6 @@ namespace ObjC {
 					implementation.WriteLine ("\treturn self;");
 					implementation.WriteLine ("}");
 					implementation.WriteLine ();
-					default_init = true;
 				}
 			}
 
@@ -327,6 +387,42 @@ namespace ObjC {
 			}
 		}
 
+		public static string GetMonoName (Type t)
+		{
+			switch (Type.GetTypeCode (t)) {
+			case TypeCode.Object:
+				throw new NotImplementedException ($"Converting type {t.Name} to a mono type name");
+			case TypeCode.Boolean:
+				return "bool";
+			case TypeCode.Char:
+				return "char";
+			case TypeCode.Double:
+				return "double";
+			case TypeCode.Single:
+				return "single";
+			case TypeCode.Byte:
+				return "byte";
+			case TypeCode.SByte:
+				return "sbyte";
+			case TypeCode.Int16:
+				return "int16";
+			case TypeCode.Int32:
+				return "int";
+			case TypeCode.Int64:
+				return "long";
+			case TypeCode.UInt16:
+				return "uint16";
+			case TypeCode.UInt32:
+				return "uint";
+			case TypeCode.UInt64:
+				return "ulong";
+			case TypeCode.String:
+				return "string";
+			default:
+				throw new NotImplementedException ($"Converting type {t.Name} to a mono type name");
+			}
+		}
+
 		public static string CamelCase (string s)
 		{
 			if (s == null)
@@ -334,6 +430,15 @@ namespace ObjC {
 			if (s.Length == 0)
 				return String.Empty;
 			return Char.ToLowerInvariant (s [0]) + s.Substring (1, s.Length - 1);
+		}
+
+		public static string PascalCase (string s)
+		{
+			if (s == null)
+				return null;
+			if (s.Length == 0)
+				return String.Empty;
+			return Char.ToUpperInvariant (s [0]) + s.Substring (1, s.Length - 1);
 		}
 	}
 }
