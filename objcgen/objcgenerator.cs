@@ -50,6 +50,11 @@ namespace ObjC {
 			headers.WriteLine ("#include \"mono_embeddinator.h\"");
 			headers.WriteLine ("#import <Foundation/Foundation.h>");
 			headers.WriteLine ();
+			headers.WriteLine ();
+			headers.WriteLine ("#if !__has_feature(objc_arc)");
+			headers.WriteLine ("#error Embeddinator code must be built with ARC.");
+			headers.WriteLine ("#endif");
+			headers.WriteLine ();
 			headers.WriteLine ("MONO_EMBEDDINATOR_BEGIN_DECLS");
 			headers.WriteLine ();
 
@@ -314,7 +319,7 @@ namespace ObjC {
 				implementation.WriteLine ("\t\treturn NULL;");
 				implementation.WriteLine ("\tint length = mono_string_length ((MonoString *) __result);");
 				implementation.WriteLine ("\tgunichar2 *str = mono_string_chars ((MonoString *) __result);");
-				implementation.WriteLine ("\treturn [[[NSString alloc] initWithBytes: str length: length * 2 encoding: NSUTF16LittleEndianStringEncoding] autorelease];");
+				implementation.WriteLine ("\treturn [[NSString alloc] initWithBytes: str length: length * 2 encoding: NSUTF16LittleEndianStringEncoding];");
 				break;
 			case TypeCode.Boolean:
 			case TypeCode.Char:
