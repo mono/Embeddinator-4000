@@ -21,6 +21,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xamarin.MacDev", "projects/
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Xamarin.Android.Tools", "projects/Xamarin.Android.Tools.csproj", "{83A10A50-EF0D-C64A-B801-5EA8242DE8B2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "objcgen", "../objcgen/objcgen.csproj", "{C166803B-011F-4EAF-B8C2-D7DBBA3CF1EC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -67,6 +69,10 @@ Global
 		{83A10A50-EF0D-C64A-B801-5EA8242DE8B2}.Debug|x86.Build.0 = Debug|x86
 		{83A10A50-EF0D-C64A-B801-5EA8242DE8B2}.Release|x86.ActiveCfg = Release|x86
 		{83A10A50-EF0D-C64A-B801-5EA8242DE8B2}.Release|x86.Build.0 = Release|x86
+		{C166803B-011F-4EAF-B8C2-D7DBBA3CF1EC}.Debug|x86.ActiveCfg = Debug|x86
+		{C166803B-011F-4EAF-B8C2-D7DBBA3CF1EC}.Debug|x86.Build.0 = Debug|x86
+		{C166803B-011F-4EAF-B8C2-D7DBBA3CF1EC}.Release|x86.ActiveCfg = Release|x86
+		{C166803B-011F-4EAF-B8C2-D7DBBA3CF1EC}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
