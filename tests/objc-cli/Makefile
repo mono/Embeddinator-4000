@@ -39,7 +39,7 @@ debug-auth-leaks: auth-check
 	/usr/sbin/DevToolsSecurity -status
 	./auth-check
 
-test-cli-leaks: test-cli ../leaktest/bin/Debug/leaktest.exe
+test-cli-leaks: test-cli ../leaktest/bin/Debug/leaktest.exe debug-auth-leaks
 	mono --debug ../leaktest/bin/Debug/leaktest.exe $(abspath $<)
 
 test-perf-leaks: perf-cli ../leaktest/bin/Debug/leaktest.exe
