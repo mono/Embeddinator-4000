@@ -34,6 +34,9 @@ test-leaks: test-cli-leaks test-perf-leaks test-xctest-leaks
 	/Library/Frameworks/Mono.framework/Versions/Current/Commands/xbuild ../leaktest/leaktest.csproj
 
 test-cli-leaks: test-cli ../leaktest/bin/Debug/leaktest.exe
+	whoami
+	groups
+	/usr/sbin/DevToolsSecurity -status
 	mono --debug ../leaktest/bin/Debug/leaktest.exe $(abspath $<)
 
 test-perf-leaks: perf-cli ../leaktest/bin/Debug/leaktest.exe
