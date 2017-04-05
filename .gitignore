@@ -6,11 +6,11 @@ config.status
 config.log
 autom4te.cache
 missing
-*Makefile
 *Makefile.in
 *.dll
 *.exe
 bin/
+obj/
 *.userprefs
 *.pc
 .DS_Store
@@ -25,6 +25,9 @@ bin/
 *.metagen
 *.ilk
 *.manifest
+*.dylib
+bindings.h
+bindings.m
 /build/gen
 /build/lib
 /build/obj
@@ -34,3 +37,6 @@ bin/
 /build/projects/packages
 /external/jna
 /external/ikvm
+packages
+*.dSYM
+
