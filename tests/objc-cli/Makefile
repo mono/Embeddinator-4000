@@ -40,6 +40,7 @@ debug-auth-leaks: auth-check
 	./auth-check
 
 test-cli-leaks: test-cli ../leaktest/bin/Debug/leaktest.exe debug-auth-leaks
+	mono --version
 	mono --debug ../leaktest/bin/Debug/leaktest.exe $(abspath $<)
 
 test-perf-leaks: perf-cli ../leaktest/bin/Debug/leaktest.exe

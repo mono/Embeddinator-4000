@@ -76,6 +76,7 @@ class LeakTester
 				sb.Append (" -exclude mono_thread_attach_internal"); // I haven't investigated this (and it seems random)
 				sb.Append (" -exclude mono_thread_set_name_internal"); // I haven't investigated this (and it seems random)
 				sb.Append (" -exclude mono_assembly_load_from_full"); // there's a leak in aot-runtime.c:check_usable if multiple error conditions
+				sb.Append (" -exclude load_aot_module"); // This happens with Mono 5.2.0.7 (master/bb9c915) - but not Mono 5.0.0.18 (2017-02/9ed0907). Fix suggested: https://github.com/mono/mono/pull/4643
 				leaks.StartInfo.Arguments = sb.ToString ();
 				leaks.StartInfo.UseShellExecute = false;
 				leaks.StartInfo.RedirectStandardOutput = true;
