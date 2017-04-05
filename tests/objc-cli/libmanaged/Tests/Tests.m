@@ -67,6 +67,13 @@
 
 	id unique_init_id = [[Constructors_Unique alloc] initWithId:911];
 	XCTAssert ([unique_init_id id] == 911, "id");
+
+	id super_unique_default_init = [[Constructors_SuperUnique alloc] init];
+	XCTAssert ([super_unique_default_init id] == 411, "super id");
+
+	// FIXME - this should not be allowed, that .ctor is not available to call in .NET as it is not re-declared in SuperUnique
+	id super_unique_init_id = [[Constructors_SuperUnique alloc] initWithId:42];
+	XCTAssert ([super_unique_init_id id] == 42, "id");
 	
 	Constructors_Implicit* implicit = [[Constructors_Implicit alloc] init];
 	XCTAssertEqualObjects (@"OK", [implicit testResult], "implicit");
