@@ -104,11 +104,13 @@ workspace "MonoEmbeddinator4000"
       "System.Xml.Linq"
     }
 
+  if string.startswith(_ACTION, "vs") then
     externalproject "objcgen"
       SetupManagedProject()
       location "../objcgen"
       uuid "C166803B-011F-4EAF-B8C2-D7DBBA3CF1EC"
       kind "ConsoleApp"
+  end
 
     local xamarinMacios = "../../xamarin-macios"
     if os.isdir(xamarinMacios) and _OPTIONS["dev"] then
