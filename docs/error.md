@@ -24,6 +24,18 @@ The easiest way to get exact version information is to use the **Xamarin Studio*
 
 The directory name specified by `-o=DIR` does not exists and could not be created. It might be an invalid name for the file system.
 
+<h3><a name="EM0002"/>EM0002: Option `X` is not supported</h3>
+
+The tool does not support the option `X`. It is possible that another version of the tool supports it or that it does not apply in this environment.
+
+<h3><a name="EM0003"/>EM0003: The platform `X` is not valid.</h3>
+
+The tool does not support the platform `X`. It is possible that another version of the tool supports it or that it does not apply in this environment.
+
+<h3><a name="EM0004"/>EM0004: The target `X` is not valid.</h3>
+
+The tool does not support the target `X`. It is possible that another version of the tool supports it or that it does not apply in this environment.
+
 <h3><a name="EM0099"/>EM0099: Internal error *. Please file a bug report with a test case (https://github.com/mono/Embeddinator-4000/issues).</h3>
 
 This error message is reported when an internal consistency check in the Embeddinator-4000 fails.
