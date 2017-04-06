@@ -38,17 +38,25 @@
 	XCTAssert ([query answer] == 42, "instance property getter");
 	query.answer = 911;
 	XCTAssert ([query answer] == 911, "instance property setter check");
+
+	XCTAssertFalse ([query isSecret], "instance property getter only 3");
+	// setter only property turned into method, so different syntax
+	[query set_Secret: 1];
+	XCTAssertTrue ([query isSecret], "instance property getter only 4");
 }
 
 - (void)testNamespaces {
 	id nonamespace = [[ClassWithoutNamespace alloc] init];
 	XCTAssertTrue ([[nonamespace description] containsString:@"<ClassWithoutNamespace:"], "nonamespace");
+	XCTAssertEqualObjects (@"ClassWithoutNamespace", [nonamespace toString], "nonamespace toString");
 	
 	id singlenamespace = [[First_ClassWithSingleNamespace alloc] init];
 	XCTAssertTrue ([[singlenamespace description] containsString:@"<First_ClassWithSingleNamespace:"], "singlenamespace");
+	XCTAssertEqualObjects (@"First.ClassWithSingleNamespace", [singlenamespace toString], "singlenamespace toString");
 	
 	id nestednamespaces = [[First_Second_ClassWithNestedNamespace alloc] init];
 	XCTAssertTrue ([[nestednamespaces description] containsString:@"<First_Second_ClassWithNestedNamespace:"], "nestednamespaces");
+	XCTAssertEqualObjects (@"First.Second.ClassWithNestedNamespace", [nestednamespaces toString], "nestednamespaces toString");
 }
 
 - (void)testExceptions {

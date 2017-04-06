@@ -39,5 +39,16 @@ namespace Properties {
 		public bool IsBad { get; } = false;
 
 		public int Answer { get; set; } = UniversalAnswer;
+
+		int secret;
+
+		// setter only properties are valid (even if discouraged) in .net
+		public int Secret {
+			set { secret = value; }
+		}
+
+		public bool IsSecret {
+			get { return secret != 0; }
+		}
 	}
 }
