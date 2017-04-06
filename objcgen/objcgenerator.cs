@@ -16,8 +16,12 @@ namespace ObjC {
 		static TextWriter headers = new StringWriter ();
 		static TextWriter implementation = new StringWriter ();
 
+		static ParameterInfo [] NoParameters = new ParameterInfo [0];
+
 		List<Type> types = new List<Type> ();
-		Dictionary<Type,List<ConstructorInfo>> ctors = new Dictionary<Type,List<ConstructorInfo>> ();
+		Dictionary<Type, List<ConstructorInfo>> ctors = new Dictionary<Type, List<ConstructorInfo>> ();
+		Dictionary<Type, List<MethodInfo>> methods = new Dictionary<Type, List<MethodInfo>> ();
+		Dictionary<Type, List<PropertyInfo>> properties = new Dictionary<Type, List<PropertyInfo>> ();
 
 		public override void Process (IEnumerable<Assembly> assemblies)
 		{
@@ -39,9 +43,30 @@ namespace ObjC {
 					}
 					constructors = constructors.OrderBy ((arg) => arg.ParameterCount).ToList ();
 					ctors.Add (t, constructors);
+
+					var meths = new List<MethodInfo> ();
+					foreach (var mi in t.GetMethods (BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly)) {
+						meths.Add (mi);
+					}
+					methods.Add (t, meths);
+
+					var props = new List<PropertyInfo> ();
+					foreach (var pi in t.GetProperties (BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly)) {
+						var getter = pi.GetGetMethod ();
+						var setter = pi.GetSetMethod ();
+						// setter only property are valid in .NET and we need to generate a method in ObjC (there's no writeonly properties)
+						if (getter == null)
+							continue;
+						// we can do better than methods for the more common cases (readonly and readwrite)
+						meths.Remove (getter);
+						meths.Remove (setter);
+						props.Add (pi);
+					}
+					props = props.OrderBy ((arg) => arg.Name).ToList ();
+					properties.Add (t, props);
 				}
 			}
-			types = types.OrderBy ((arg) => arg.FullName).ToList ();
+			types = types.OrderBy ((arg) => arg.FullName).OrderBy ((arg) => types.Contains (arg.BaseType)).ToList ();
 			Console.WriteLine ($"\t{types.Count} types found");
 		}
 
@@ -49,6 +74,11 @@ namespace ObjC {
 		{
 			headers.WriteLine ("#include \"mono_embeddinator.h\"");
 			headers.WriteLine ("#import <Foundation/Foundation.h>");
+			headers.WriteLine ();
+			headers.WriteLine ();
+			headers.WriteLine ("#if !__has_feature(objc_arc)");
+			headers.WriteLine ("#error Embeddinator code must be built with ARC.");
+			headers.WriteLine ("#endif");
 			headers.WriteLine ();
 			headers.WriteLine ("MONO_EMBEDDINATOR_BEGIN_DECLS");
 			headers.WriteLine ();
@@ -75,7 +105,7 @@ namespace ObjC {
 			implementation.WriteLine ();
 
 			foreach (var t in types)
-				implementation.WriteLine ($"static MonoClass* {t.Name}_class = nil;");
+				implementation.WriteLine ($"static MonoClass* {GetObjCName (t)}_class = nil;");
 			implementation.WriteLine ();
 
 			implementation.WriteLine ("static void __initialize_mono ()");
@@ -110,13 +140,15 @@ namespace ObjC {
 
 		protected override void Generate (Type t)
 		{
-			var managed_name = t.Name;
+			var has_bound_base_class = types.Contains (t.BaseType);
+
+			var managed_name = GetObjCName (t);
 			implementation.WriteLine ($"static void __lookup_class_{managed_name} ()");
 			implementation.WriteLine ("{");
 			implementation.WriteLine ($"\tif (!{managed_name}_class) {{");
 			implementation.WriteLine ("\t\t__initialize_mono ();");
 			implementation.WriteLine ("\t\t__lookup_assembly_managed ();");
-			implementation.WriteLine ($"\t\t{managed_name}_class = mono_class_from_name (__{t.Assembly.GetName ().Name}_image, \"{t.Namespace}\", \"{managed_name}\");");
+			implementation.WriteLine ($"\t\t{managed_name}_class = mono_class_from_name (__{t.Assembly.GetName ().Name}_image, \"{t.Namespace}\", \"{t.Name}\");");
 			implementation.WriteLine ("\t}");
 			implementation.WriteLine ("}");
 			implementation.WriteLine ();
@@ -125,14 +157,27 @@ namespace ObjC {
 			headers.WriteLine ();
 			headers.WriteLine ($"// {t.AssemblyQualifiedName}");
 			headers.WriteLine ($"@interface {native_name} : {GetTypeName (t.BaseType)} {{");
-			headers.WriteLine ("\tMonoEmbedObject* _object;");
+			// our internal field is only needed once in the type hierarchy
+			if (!types.Contains (t.BaseType))
+				headers.WriteLine ("\tMonoEmbedObject* _object;");
 			headers.WriteLine ("}");
+			if (!has_bound_base_class)
+				headers.WriteLine ("-(void) dealloc;");
 			headers.WriteLine ();
 
 			implementation.WriteLine ();
 			implementation.WriteLine ($"// {t.AssemblyQualifiedName}");
 			implementation.WriteLine ($"@implementation {native_name}");
 			implementation.WriteLine ();
+
+			if (!has_bound_base_class) {
+				implementation.WriteLine ("-(void) dealloc");
+				implementation.WriteLine ("{");
+				implementation.WriteLine ("\tif (_object)");
+				implementation.WriteLine ("\t\tmono_embeddinator_destroy_object (_object);");
+				implementation.WriteLine ("}");
+				implementation.WriteLine ("");
+			}
 
 			var default_init = false;
 			List<ConstructorInfo> constructors;
@@ -171,7 +216,7 @@ namespace ObjC {
 					implementation.WriteLine ($"\t\t__method = mono_embeddinator_lookup_method (__method_name, {managed_name}_class);");
 					implementation.WriteLine ("\t}");
 					// TODO: this logic will need to be update for managed NSObject types (e.g. from XI / XM) not to call [super init]
-					implementation.WriteLine ("\tif (self = [super init]) {");
+					implementation.WriteLine ("\tif (!_object) {");
 					implementation.WriteLine ($"\t\tMonoObject* __instance = mono_object_new (__mono_context.domain, {managed_name}_class);");
 					implementation.WriteLine ("\t\tMonoObject* __exception = nil;");
 					var args = "nil";
@@ -211,7 +256,7 @@ namespace ObjC {
 					implementation.WriteLine ("\t\t_object = mono_embeddinator_create_object (__instance);");
 					implementation.WriteLine ("\t\t_object->_handle = mono_gchandle_new (__instance, /*pinned=*/false);");
 					implementation.WriteLine ("\t}");
-					implementation.WriteLine ("\treturn self;");
+					implementation.WriteLine ("\treturn self = [super init];");
 					implementation.WriteLine ("}");
 					implementation.WriteLine ();
 				}
@@ -225,8 +270,20 @@ namespace ObjC {
 			}
 
 			headers.WriteLine ();
-			foreach (var pi in t.GetProperties ())
-				Generate (pi);
+			List<PropertyInfo> props;
+			if (properties.TryGetValue (t, out props)) {
+				foreach (var pi in props)
+					Generate (pi);
+				headers.WriteLine ();
+			}
+
+			headers.WriteLine ();
+			List<MethodInfo> meths;
+			if (methods.TryGetValue (t, out meths)) {
+				foreach (var mi in meths)
+					Generate (mi);
+				headers.WriteLine ();
+			}
 
 			headers.WriteLine ("@end");
 			headers.WriteLine ();
@@ -239,11 +296,10 @@ namespace ObjC {
 		{
 			var getter = pi.GetGetMethod ();
 			var setter = pi.GetSetMethod ();
-			// FIXME: setter only is valid, even if discouraged, in .NET - we should create a SetX method
+			// setter-only properties are handled as methods (and should not reach this code)
 			if (getter == null && setter != null)
-				throw new NotImplementedException ("Write-only properties");
+				throw new EmbeddinatorException (99, "Internal error `setter only`. Please file a bug report with a test case (https://github.com/mono/Embeddinator-4000/issues");
 
-			// TODO override with attribute ? e.g. [ObjC.Selector ("foo")]
 			var name = CamelCase (pi.Name);
 
 			headers.Write ("@property (nonatomic");
@@ -256,54 +312,90 @@ namespace ObjC {
 			var property_type = GetTypeName (pi.PropertyType);
 			headers.WriteLine ($") {property_type} {name};");
 
-			var managed_type_name = pi.DeclaringType.Name;
-			implementation.Write (getter.IsStatic ? '+' : '-');
-			implementation.WriteLine ($" ({property_type}) {name}");
-			implementation.WriteLine ("{");
-			implementation.WriteLine ($"\tconst char __method_name [] = \"{managed_type_name}:{getter.Name}()\";");
-			implementation.WriteLine ("\tstatic MonoMethod* __method = nil;");
-			implementation.WriteLine ("\tif (!__method) {");
-			implementation.WriteLine ($"\t\t__lookup_class_{managed_type_name} ();");
-			implementation.WriteLine ($"\t\t__method = mono_embeddinator_lookup_method (__method_name, {managed_type_name}_class);");
-			implementation.WriteLine ("\t}");
-			implementation.WriteLine ("\tMonoObject* __exception = nil;");
-			var instance = "nil";
-			if (!getter.IsStatic) {
-				implementation.WriteLine ($"\t\tMonoObject* instance = mono_gchandle_get_target (_object->_handle);");
-				instance = "instance";
-			}
-			implementation.WriteLine ($"\tMonoObject* __result = mono_runtime_invoke (__method, {instance}, nil, &__exception);");
-			implementation.WriteLine ("\tif (__exception)");
-			implementation.WriteLine ("\t\tmono_embeddinator_throw_exception (__exception);");
-			ReturnValue (pi.PropertyType);
-			implementation.WriteLine ("}");
-			implementation.WriteLine ();
+			ImplementMethod (getter.IsStatic, getter.ReturnType, name, NoParameters, pi.DeclaringType, getter.Name);
 			if (setter == null)
 				return;
-			
-			// TODO override with attribute ? e.g. [ObjC.Selector ("foo")]
-			implementation.Write (getter.IsStatic ? '+' : '-');
-			implementation.WriteLine ($" (void) set{pi.Name}:({property_type})value");
+
+			ImplementMethod (setter.IsStatic, setter.ReturnType, "set" + pi.Name, setter.GetParameters (), pi.DeclaringType, setter.Name);
+		}
+
+		// TODO override with attribute ? e.g. [ObjC.Selector ("foo")]
+		void ImplementMethod (bool isStatic, Type returnType, string name, ParameterInfo [] parametersInfo, Type type, string managed_name)
+		{
+			var managed_type_name = GetObjCName (type);
+			var return_type = GetTypeName (returnType);
+			StringBuilder parameters = new StringBuilder ();
+			StringBuilder managed_parameters = new StringBuilder ();
+			foreach (var p in parametersInfo) {
+				if (parameters.Length > 0) {
+					parameters.Append (' ');
+					managed_parameters.Append (' ');
+				}
+				parameters.Append (":(").Append (GetTypeName (p.ParameterType)).Append (")").Append (p.Name);
+				managed_parameters.Append (GetMonoName (p.ParameterType));
+			}
+
+			implementation.Write (isStatic ? '+' : '-');
+			implementation.WriteLine ($" ({return_type}) {name}{parameters}");
 			implementation.WriteLine ("{");
-			implementation.WriteLine ($"\tconst char __method_name [] = \"{managed_type_name}:{setter.Name}({property_type})\";");
+			implementation.WriteLine ($"\tconst char __method_name [] = \"{type.FullName}:{managed_name}({managed_parameters})\";");
 			implementation.WriteLine ("\tstatic MonoMethod* __method = nil;");
 			implementation.WriteLine ("\tif (!__method) {");
 			implementation.WriteLine ($"\t\t__lookup_class_{managed_type_name} ();");
 			implementation.WriteLine ($"\t\t__method = mono_embeddinator_lookup_method (__method_name, {managed_type_name}_class);");
 			implementation.WriteLine ("\t}");
-			implementation.WriteLine ("\tvoid* __args [1];");
-			implementation.WriteLine ("\t__args [0] = &value;");
+
+			var args = "nil";
+			if (parametersInfo.Length > 0) {
+				args = "__args";
+				implementation.WriteLine ($"\tvoid* __args [{parametersInfo.Length}];");
+				for (int i = 0; i < parametersInfo.Length; i++) {
+					implementation.WriteLine ($"\t__args [{i}] = &{parametersInfo [i].Name};");
+				}
+			}
+
 			implementation.WriteLine ("\tMonoObject* __exception = nil;");
-			instance = "nil";
-			if (!getter.IsStatic) {
-				implementation.WriteLine ($"\t\tMonoObject* instance = mono_gchandle_get_target (_object->_handle);");
+			var instance = "nil";
+			if (!isStatic) {
+				implementation.WriteLine ($"\tMonoObject* instance = mono_gchandle_get_target (_object->_handle);");
 				instance = "instance";
 			}
-			implementation.WriteLine ($"\tmono_runtime_invoke (__method, {instance}, __args, &__exception);");
+
+			implementation.Write ("\t");
+			if (!IsVoid (returnType))
+				implementation.Write ("MonoObject* __result = ");
+			implementation.WriteLine ($"mono_runtime_invoke (__method, {instance}, {args}, &__exception);");
+
 			implementation.WriteLine ("\tif (__exception)");
 			implementation.WriteLine ("\t\tmono_embeddinator_throw_exception (__exception);");
+			ReturnValue (returnType);
 			implementation.WriteLine ("}");
 			implementation.WriteLine ();
+		}
+
+		public static bool IsVoid (Type t)
+		{
+			if (t.Name != "Void")
+				return false;
+			return (t.Namespace == "System");
+		}
+
+		protected override void Generate (MethodInfo mi)
+		{
+			StringBuilder parameters = new StringBuilder ();
+			foreach (var p in mi.GetParameters ()) {
+				if (parameters.Length > 0)
+					parameters.Append (' ');
+				parameters.Append (":(").Append (GetTypeName (p.ParameterType)).Append (")").Append (p.Name);
+			}
+
+			var return_type = GetTypeName (mi.ReturnType);
+			var name = CamelCase (mi.Name);
+
+			headers.Write (mi.IsStatic ? '+' : '-');
+			headers.WriteLine ($" ({return_type}) {name}{parameters};");
+
+			ImplementMethod (mi.IsStatic, mi.ReturnType, name, mi.GetParameters (), mi.DeclaringType, mi.Name);
 		}
 
 		void ReturnValue (Type t)
@@ -314,7 +406,7 @@ namespace ObjC {
 				implementation.WriteLine ("\t\treturn NULL;");
 				implementation.WriteLine ("\tint length = mono_string_length ((MonoString *) __result);");
 				implementation.WriteLine ("\tgunichar2 *str = mono_string_chars ((MonoString *) __result);");
-				implementation.WriteLine ("\treturn [[[NSString alloc] initWithBytes: str length: length * 2 encoding: NSUTF16LittleEndianStringEncoding] autorelease];");
+				implementation.WriteLine ("\treturn [[NSString alloc] initWithBytes: str length: length * 2 encoding: NSUTF16LittleEndianStringEncoding];");
 				break;
 			case TypeCode.Boolean:
 			case TypeCode.Char:
@@ -332,6 +424,10 @@ namespace ObjC {
 				implementation.WriteLine ("\tvoid* __unbox = mono_object_unbox (__result);");
 				implementation.WriteLine ($"\treturn *(({name}*)__unbox);");
 				break;
+			case TypeCode.Object:
+				if (t.Namespace == "System" && t.Name == "Void")
+					return;
+				goto default;
 			default:
 				throw new NotImplementedException ($"Returning type {t.Name} from native code");
 			}
@@ -355,7 +451,19 @@ namespace ObjC {
 		{
 			switch (Type.GetTypeCode (t)) {
 			case TypeCode.Object:
-				return (t.Namespace == "System" && t.Name == "Object") ? "NSObject" : t.FullName.Replace ('.', '_');
+				switch (t.Namespace) {
+				case "System":
+					switch (t.Name) {
+					case "Object":
+						return "NSObject";
+					case "Void":
+						return "void";
+					default:
+						return GetObjCName (t);
+					}
+				default:
+					return GetObjCName (t);
+				}
 			case TypeCode.Boolean:
 				return "bool";
 			case TypeCode.Char:
@@ -391,7 +499,19 @@ namespace ObjC {
 		{
 			switch (Type.GetTypeCode (t)) {
 			case TypeCode.Object:
-				throw new NotImplementedException ($"Converting type {t.Name} to a mono type name");
+				switch (t.Namespace) {
+				case "System":
+					switch (t.Name) {
+					case "Object":
+						return "object";
+					case "Void":
+						return "void";
+					default:
+						throw new NotImplementedException ($"Converting type {t.Name} to a mono type name");
+					}
+				default:
+					throw new NotImplementedException ($"Converting type {t.Name} to a mono type name");
+				}
 			case TypeCode.Boolean:
 				return "bool";
 			case TypeCode.Char:
@@ -439,6 +559,12 @@ namespace ObjC {
 			if (s.Length == 0)
 				return String.Empty;
 			return Char.ToUpperInvariant (s [0]) + s.Substring (1, s.Length - 1);
+		}
+
+		// get a name that is safe to use from ObjC code
+		public static string GetObjCName (Type t)
+		{
+			return t.FullName.Replace ('.', '_');
 		}
 	}
 }

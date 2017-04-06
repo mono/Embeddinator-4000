@@ -34,17 +34,20 @@ namespace Embeddinator {
 
 		public static int Main2 (string [] args)
 		{
-			bool shared = true; // dylib
 			var action = Action.None;
-			var debug = false;
 
 			var os = new OptionSet {
-				{ "c|compile", "compiles the generated output", v => CompileCode = true },
-				{ "o|out|outdir=", "output directory", v => OutputDirectory = v },
+				{ "c|compile", "Compiles the generated output", v => CompileCode = true },
+				{ "d|debug", "Build the native library with debug information.", v => Debug = true },
+				{ "gen=", $"Target generator (default {Target})", v => Target = v },
+				{ "o|out|outdir=", "Output directory", v => OutputDirectory = v },
+				{ "p|platform=", "Target platform (macOS)", v => Platform = v },
+				{ "dll|shared", "Compiles as a shared library (default)", v => Shared = true },
+				{ "static", "Compiles as a static library (unsupported)", v => { throw new EmbeddinatorException (2, $"Option `--static` is not supported"); } },
+				{ "vs=", $"Visual Studio version for compilation (unsupported)", v => { throw new EmbeddinatorException (2, $"Option `--vs` is not supported"); } },
 				{ "h|?|help", "Displays the help", v => action = Action.Help },
 				{ "v|verbose", "generates diagnostic verbose output", v => ErrorHelper.Verbosity++ },
 				{ "version", "Display the version information.", v => action = Action.Version },
-				{ "debug", "Build the native library with debug information.", v => debug = true },
 			};
 
 			var assemblies = os.Parse (args);
@@ -67,9 +70,9 @@ namespace Embeddinator {
 				return 0;
 			case Action.Generate:
 				try {
-					var result = Generate (assemblies, shared);
+					var result = Generate (assemblies);
 					if (CompileCode && (result == 0))
-						result = Compile (shared, debug);
+						result = Compile ();
 					Console.WriteLine ("Done");
 					return result;
 				} catch (NotImplementedException e) {
@@ -99,9 +102,49 @@ namespace Embeddinator {
 
 		static bool CompileCode { get; set; }
 
+		static bool Debug { get; set; }
+
+		static bool Shared { get; set; } = true;
+
 		static string LibraryName { get; set; }
 
-		static int Generate (List<string> args, bool shared)
+		static string platform = "macos";
+
+		public static string Platform {
+			get { return platform; }
+			set {
+				switch (value.ToLowerInvariant ()) {
+				case "osx":
+				case "macosx":
+				case "macos":
+				case "mac":
+					target = "macos";
+					break;
+				default:
+					throw new EmbeddinatorException (3, true, $"The platform `{value}` is not valid.");
+				}
+			}
+		}
+
+		static string target = "objc";
+
+		public static string Target { 
+			get { return target; } 
+			set {
+				switch (value.ToLowerInvariant ()) {
+				case "objc":
+				case "obj-c":
+				case "objectivec":
+				case "objective-c":
+					target = "objc";
+					break;
+				default:
+					throw new EmbeddinatorException (4, true, $"The target `{value}` is not valid.");
+				}
+			}
+		}
+
+		static int Generate (List<string> args)
 		{
 			Console.WriteLine ("Parsing assemblies...");
 
@@ -128,7 +171,7 @@ namespace Embeddinator {
 			foreach (var res in exe.GetManifestResourceNames ()) {
 				if (res == "main.c") {
 					// no main is needed for dylib and don't re-write an existing main.c file - it's a template
-					if (shared || File.Exists ("main.c"))
+					if (Shared || File.Exists ("main.c"))
 						continue;
 				}
 				var path = Path.Combine (OutputDirectory, res);
@@ -139,19 +182,20 @@ namespace Embeddinator {
 			return 0;
 		}
 
-		static int Compile (bool shared, bool debug)
+		static int Compile ()
 		{
 			Console.WriteLine ("Compiling binding code...");
 
 			StringBuilder options = new StringBuilder ("clang ");
-			if (debug)
+			if (Debug)
 				options.Append ("-g -O0 ");
+			options.Append ("-fobjc-arc ");
 			options.Append ("-DMONO_EMBEDDINATOR_DLL_EXPORT ");
 			options.Append ("-framework CoreFoundation ");
 			options.Append ("-framework Foundation ");
 			options.Append ("-I\"/Library/Frameworks/Mono.framework/Versions/Current/include/mono-2.0\" -L\"/Library/Frameworks/Mono.framework/Versions/Current/lib/\" -lmonosgen-2.0 ");
 			options.Append ("glib.c mono_embeddinator.c bindings.m ");
-			if (shared)
+			if (Shared)
 				options.Append ($"-dynamiclib -install_name @rpath/lib{LibraryName}.dylib ");
 			else
 				options.Append ("main.c ");

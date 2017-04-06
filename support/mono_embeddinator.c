@@ -66,23 +66,6 @@ void mono_embeddinator_set_context(mono_embeddinator_context_t* ctx)
     _current_context = ctx;
 }
 
-#if defined(__OBJC__)
-static id alloc_and_init_autorelease_pool()
-{
-    Class NSAutoreleasePoolClass = objc_getClass("NSAutoreleasePool");
-    id pool = class_createInstance(NSAutoreleasePoolClass, 0);
-    return objc_msgSend(pool, sel_registerName("init"));
-}
-
-static void drain_autorelease_pool(id pool)
-{
-    (void)objc_msgSend(pool, sel_registerName("drain"));
-}
-
-#define AUTORELEASE_POOL_DEFAULT_VALUE ((id)-1)
-static id _autorelease_pool = AUTORELEASE_POOL_DEFAULT_VALUE;
-#endif
-
 int mono_embeddinator_init(mono_embeddinator_context_t* ctx, const char* domain)
 {
     if (ctx == 0 || ctx->domain != 0)
@@ -93,11 +76,6 @@ int mono_embeddinator_init(mono_embeddinator_context_t* ctx, const char* domain)
 
     mono_embeddinator_set_context(ctx);
 
-#if defined(__OBJC__)
-    if (_autorelease_pool == AUTORELEASE_POOL_DEFAULT_VALUE)
-        _autorelease_pool = alloc_and_init_autorelease_pool();
-#endif
-
     return true;
 }
 
@@ -107,14 +85,6 @@ int mono_embeddinator_destroy(mono_embeddinator_context_t* ctx)
         return false;
 
     mono_jit_cleanup (ctx->domain);
-
-#if defined(__OBJC__)
-    if (_autorelease_pool != AUTORELEASE_POOL_DEFAULT_VALUE)
-    {
-        drain_autorelease_pool(_autorelease_pool);
-        _autorelease_pool = AUTORELEASE_POOL_DEFAULT_VALUE;
-    }
-#endif
 
     return true;
 }
@@ -185,9 +155,11 @@ char* mono_embeddinator_search_assembly(const char* assembly)
 
 MonoImage* mono_embeddinator_load_assembly(mono_embeddinator_context_t* ctx, const char* assembly)
 {
-    const char* path = mono_embeddinator_search_assembly(assembly);
+    char* path = mono_embeddinator_search_assembly(assembly);
 
     MonoAssembly* mono_assembly = mono_domain_assembly_open(ctx->domain, path);
+
+    g_free (path);
 
     if (!mono_assembly)
     {
@@ -217,8 +189,9 @@ MonoClass* mono_embeddinator_search_class(const char* assembly, const char* _nam
 {
     mono_embeddinator_context_t* ctx = mono_embeddinator_get_context();
 
-    const char* path = mono_embeddinator_search_assembly(assembly);
+    char* path = mono_embeddinator_search_assembly(assembly);
     MonoAssembly* mono_assembly = mono_domain_assembly_open(ctx->domain, path);
+    g_free (path);
 
     if (mono_assembly == 0)
     {
@@ -290,4 +263,10 @@ void mono_embeddinator_init_object(MonoEmbedObject* object, MonoObject* instance
 {
     object->_class = mono_object_get_class(instance);
     object->_handle = mono_gchandle_new(instance, /*pinned=*/false);
+}
+
+void mono_embeddinator_destroy_object(MonoEmbedObject* object)
+{
+    mono_gchandle_free (object->_handle);
+    g_free (object);
 }
