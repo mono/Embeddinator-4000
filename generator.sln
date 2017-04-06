@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "objcgentest", "tests\objcge
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "managed", "tests\managed\managed.csproj", "{D56A7E3F-FF5C-4EC2-879F-1260ABBD1903}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "leaktest", "tests\leaktest\leaktest.csproj", "{33D1E7E3-A123-43F0-B047-163C6E75D3BF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -27,9 +29,14 @@ Global
 		{D56A7E3F-FF5C-4EC2-879F-1260ABBD1903}.Debug|x86.Build.0 = Debug|Any CPU
 		{D56A7E3F-FF5C-4EC2-879F-1260ABBD1903}.Release|x86.ActiveCfg = Release|Any CPU
 		{D56A7E3F-FF5C-4EC2-879F-1260ABBD1903}.Release|x86.Build.0 = Release|Any CPU
+		{33D1E7E3-A123-43F0-B047-163C6E75D3BF}.Debug|x86.ActiveCfg = Debug|x86
+		{33D1E7E3-A123-43F0-B047-163C6E75D3BF}.Debug|x86.Build.0 = Debug|x86
+		{33D1E7E3-A123-43F0-B047-163C6E75D3BF}.Release|x86.ActiveCfg = Release|x86
+		{33D1E7E3-A123-43F0-B047-163C6E75D3BF}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{076A871B-0C13-47D8-8923-B9242995BFF8} = {21776062-DBDA-4408-BF22-9DCB2682DCBC}
 		{D56A7E3F-FF5C-4EC2-879F-1260ABBD1903} = {21776062-DBDA-4408-BF22-9DCB2682DCBC}
+		{33D1E7E3-A123-43F0-B047-163C6E75D3BF} = {21776062-DBDA-4408-BF22-9DCB2682DCBC}
 	EndGlobalSection
 EndGlobal

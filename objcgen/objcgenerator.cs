@@ -140,6 +140,8 @@ namespace ObjC {
 
 		protected override void Generate (Type t)
 		{
+			var has_bound_base_class = types.Contains (t.BaseType);
+
 			var managed_name = t.Name;
 			implementation.WriteLine ($"static void __lookup_class_{managed_name} ()");
 			implementation.WriteLine ("{");
@@ -159,12 +161,23 @@ namespace ObjC {
 			if (!types.Contains (t.BaseType))
 				headers.WriteLine ("\tMonoEmbedObject* _object;");
 			headers.WriteLine ("}");
+			if (!has_bound_base_class)
+				headers.WriteLine ("-(void) dealloc;");
 			headers.WriteLine ();
 
 			implementation.WriteLine ();
 			implementation.WriteLine ($"// {t.AssemblyQualifiedName}");
 			implementation.WriteLine ($"@implementation {native_name}");
 			implementation.WriteLine ();
+
+			if (!has_bound_base_class) {
+				implementation.WriteLine ("-(void) dealloc");
+				implementation.WriteLine ("{");
+				implementation.WriteLine ("\tif (_object)");
+				implementation.WriteLine ("\t\tmono_embeddinator_destroy_object (_object);");
+				implementation.WriteLine ("}");
+				implementation.WriteLine ("");
+			}
 
 			var default_init = false;
 			List<ConstructorInfo> constructors;
@@ -203,7 +216,7 @@ namespace ObjC {
 					implementation.WriteLine ($"\t\t__method = mono_embeddinator_lookup_method (__method_name, {managed_name}_class);");
 					implementation.WriteLine ("\t}");
 					// TODO: this logic will need to be update for managed NSObject types (e.g. from XI / XM) not to call [super init]
-					implementation.WriteLine ("\tif (self = [super init]) {");
+					implementation.WriteLine ("\tif (!_object) {");
 					implementation.WriteLine ($"\t\tMonoObject* __instance = mono_object_new (__mono_context.domain, {managed_name}_class);");
 					implementation.WriteLine ("\t\tMonoObject* __exception = nil;");
 					var args = "nil";
@@ -243,7 +256,7 @@ namespace ObjC {
 					implementation.WriteLine ("\t\t_object = mono_embeddinator_create_object (__instance);");
 					implementation.WriteLine ("\t\t_object->_handle = mono_gchandle_new (__instance, /*pinned=*/false);");
 					implementation.WriteLine ("\t}");
-					implementation.WriteLine ("\treturn self;");
+					implementation.WriteLine ("\treturn self = [super init];");
 					implementation.WriteLine ("}");
 					implementation.WriteLine ();
 				}
