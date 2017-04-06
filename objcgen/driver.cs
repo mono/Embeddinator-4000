@@ -262,7 +262,7 @@ namespace Embeddinator {
 			options.Append ("-framework Foundation ");
 			options.Append ("-I\"/Library/Frameworks/Mono.framework/Versions/Current/include/mono-2.0\" -L\"/Library/Frameworks/Mono.framework/Versions/Current/lib/\" -lmonosgen-2.0 ");
 			options.Append ("glib.c mono_embeddinator.c bindings.m ");
-			options.Append ("-ObjC -lobjc");
+			options.Append ("-ObjC -lobjc ");
 			switch (CompilationTarget) {
 			case CompilationTarget.SharedLibrary:
 				options.Append ($"-dynamiclib ");
