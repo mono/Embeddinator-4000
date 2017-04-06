@@ -159,12 +159,21 @@ namespace ObjC {
 			if (!types.Contains (t.BaseType))
 				headers.WriteLine ("\tMonoEmbedObject* _object;");
 			headers.WriteLine ("}");
+			headers.WriteLine ("-(void) dealloc;");
 			headers.WriteLine ();
 
 			implementation.WriteLine ();
 			implementation.WriteLine ($"// {t.AssemblyQualifiedName}");
 			implementation.WriteLine ($"@implementation {native_name}");
 			implementation.WriteLine ();
+
+			implementation.WriteLine ("-(void) dealloc");
+			implementation.WriteLine ("{");
+			implementation.WriteLine ("\tif (_object)");
+			implementation.WriteLine ("\t\tmono_embeddinator_destroy_object (_object);");
+			implementation.WriteLine ("\t[super dealloc];");
+			implementation.WriteLine ("}");
+			implementation.WriteLine ("");
 
 			var default_init = false;
 			List<ConstructorInfo> constructors;
@@ -236,9 +245,11 @@ namespace ObjC {
 						args = "__args";
 					}
 					implementation.WriteLine ($"\t\tmono_runtime_invoke (__method, __instance, {args}, &__exception);");
-					implementation.WriteLine ("\t\tif (__exception)");
+					implementation.WriteLine ("\t\tif (__exception) {");
 					// TODO: Apple often do NSLog (or asserts but they are more brutal) and returning nil is allowed (and common)
+					implementation.WriteLine ("\t\t\t[self release];");
 					implementation.WriteLine ("\t\t\treturn nil;");
+					implementation.WriteLine ("\t\t}");
 					//implementation.WriteLine ("\t\t\tmono_embeddinator_throw_exception (__exception);");
 					implementation.WriteLine ("\t\t_object = mono_embeddinator_create_object (__instance);");
 					implementation.WriteLine ("\t\t_object->_handle = mono_gchandle_new (__instance, /*pinned=*/false);");

@@ -1,4 +1,4 @@
-all: run-test perf xctest
+all: run-test perf xctest test-leaks
 
 .PHONY: managed.dll
 
@@ -10,14 +10,16 @@ libmanaged.dylib: managed.dll
 	/Library/Frameworks/Mono.framework/Versions/Current/Commands/xbuild ../../objcgen/objcgen.csproj
 	/Library/Frameworks/Mono.framework/Versions/Current/Commands/mono --debug ../../objcgen/bin/Debug/objcgen.exe --debug managed.dll -c
 
-test: libmanaged.dylib
-	clang test-managed.m -lmanaged -L. -framework Foundation -o test-cli -rpath @executable_path -fobjc-arc
+test-cli: test-managed.m libmanaged.dylib
+	clang -g $< -lmanaged -L. -framework Foundation -o $@ -rpath @executable_path -fobjc-arc
 
-run-test: test
+perf-cli: perf-test.m libmanaged.dylib
+	clang -g $< -lmanaged -L. -framework Foundation -o $@ -rpath @executable_path -fobjc-arc
+
+run-test: test-cli
 	./test-cli
-	
-perf: libmanaged.dylib
-	clang perf-test.m -lmanaged -L. -framework Foundation -o perf-cli -rpath @executable_path -fobjc-arc
+
+perf: perf-cli
 	time ./perf-cli
 
 clean:
@@ -25,3 +27,32 @@ clean:
 
 xctest:
 	xcodebuild test -project libmanaged/*.xcodeproj -scheme Tests
+
+test-leaks: test-cli-leaks test-perf-leaks test-xctest-leaks
+
+../leaktest/bin/Debug/leaktest.exe: $(wildcard ../leaktest/*.cs) libLeakCheckAtExit.dylib
+	/Library/Frameworks/Mono.framework/Versions/Current/Commands/xbuild ../leaktest/leaktest.csproj
+
+debug-auth-leaks: auth-check
+	whoami
+	groups
+	/usr/sbin/DevToolsSecurity -status
+	./auth-check
+
+test-cli-leaks: test-cli ../leaktest/bin/Debug/leaktest.exe debug-auth-leaks
+	mono --version
+	mono --debug ../leaktest/bin/Debug/leaktest.exe $(abspath $<)
+
+test-perf-leaks: perf-cli ../leaktest/bin/Debug/leaktest.exe
+	mono --debug ../leaktest/bin/Debug/leaktest.exe $(abspath $<)
+
+test-xctest-leaks:
+	rm -Rf libmanaged/Tests.xctest
+	xcodebuild  build-for-testing -project libmanaged/*.xcodeproj -scheme Tests CONFIGURATION_BUILD_DIR=$(abspath libmanaged)
+	mono --debug ../leaktest/bin/Debug/leaktest.exe `xcrun -f xctest` -XCTest All $(abspath libmanaged/Tests.xctest)
+
+libLeakCheckAtExit.dylib: leak-at-exit.c
+	clang -arch i386 -arch x86_64 -shared $< -o $@
+
+auth-check: auth-check.c
+	clang $< -o$@ -framework Security

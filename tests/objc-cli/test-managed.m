@@ -22,17 +22,21 @@ int main ()
 		NSLog (@"%s instance property getter", [query answer] == 42 ? "[PASS]" : "[FAIL]");
 		query.answer = 911;
 		NSLog (@"%s instance property setter", [query answer] == 911 ? "[PASS]" : "[FAIL]");
+		[query release];
 			
 		// namespaces
 			
 		id nonamespace = [[ClassWithoutNamespace alloc] init];
 		NSLog (@"%s no namespace", [[nonamespace description] containsString:@"<ClassWithoutNamespace:"] ? "[PASS]" : "[FAIL]");
+		[nonamespace release];
 
 		id singlenamespace = [[First_ClassWithSingleNamespace alloc] init];
 		NSLog (@"%s single namespace", [[singlenamespace description] containsString:@"<First_ClassWithSingleNamespace:"] ? "[PASS]" : "[FAIL]");
+		[singlenamespace release];
 		
 		id nestednamespaces = [[First_Second_ClassWithNestedNamespace alloc] init];
 		NSLog (@"%s nested namespaces", [[nestednamespaces description] containsString:@"<First_Second_ClassWithNestedNamespace:"] ? "[PASS]" : "[FAIL]");
+		[nestednamespaces release];
 	}
 	return 0;
 }
