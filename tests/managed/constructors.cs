@@ -26,6 +26,18 @@ namespace Constructors {
 		public int Id { get; private set; }
 	}
 
+	public class SuperUnique : Unique {
+
+		public SuperUnique () : base (411)
+		{
+		}
+
+		// note: SuperUnique (int id) {} is NOT exposed on purpose - which means it's not available in C#
+		// objc: `init*` are inherited, so it's legal to call `new SuperUnique (42)` because `Unique` as such a .ctor
+
+		// note: `public int Id { get; } should be usable on this type (by inheritance)
+	}
+
 	public class Implicit {
 
 		// default ctor is implicit (in C#) and must be generated
