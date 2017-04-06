@@ -34,8 +34,8 @@ namespace DriverTest {
 		{
 			var valid = new string [] { "ObjC", "Obj-C", "ObjectiveC", "objective-c" };
 			foreach (var t in valid) {
-				Driver.Target = t;
-				Assert.That (Driver.Target, Is.EqualTo ("objc"), t);
+				Driver.SetTarget (t);
+				Assert.That (Driver.TargetLanguage, Is.EqualTo (TargetLanguage.ObjectiveC), t);
 			}
 		}
 
@@ -45,7 +45,7 @@ namespace DriverTest {
 			var notsupported = new string [] { "C", "C++", "Java" };
 			foreach (var t in notsupported) {
 				try {
-					Driver.Target = t;
+					Driver.SetTarget (t);
 				}
 				catch (EmbeddinatorException ee) {
 					Assert.True (ee.Error, "Error");
@@ -58,7 +58,7 @@ namespace DriverTest {
 		public void Target_Invalid ()
 		{
 			try {
-				Driver.Target = "invalid";
+				Driver.SetTarget ("invalid");
 			}
 			catch (EmbeddinatorException ee) {
 				Assert.True (ee.Error, "Error");
@@ -71,8 +71,23 @@ namespace DriverTest {
 		{
 			var valid = new string [] { "OSX", "MacOSX", "MacOS", "Mac" };
 			foreach (var p in valid) {
-				Driver.Platform = p;
-				Assert.That (Driver.Platform, Is.EqualTo ("macos"), p);
+				Driver.SetPlatform (p);
+				Assert.That (Driver.Platform, Is.EqualTo (Platform.macOS), p);
+			}
+
+			foreach (var p in new string [] { "ios", "iOS" }) {
+				Driver.SetPlatform (p);
+				Assert.That (Driver.Platform, Is.EqualTo (Platform.iOS), p);
+			}
+
+			foreach (var p in new string [] { "tvos", "tvOS" }) {
+				Driver.SetPlatform (p);
+				Assert.That (Driver.Platform, Is.EqualTo (Platform.tvOS), p);
+			}
+
+			foreach (var p in new string [] { "watchos", "watchOS" }) {
+				Driver.SetPlatform (p);
+				Assert.That (Driver.Platform, Is.EqualTo (Platform.watchOS), p);
 			}
 		}
 
@@ -82,7 +97,7 @@ namespace DriverTest {
 			var notsupported = new string [] { "Windows", "Android", "iOS", "tvOS", "watchOS" };
 			foreach (var p in notsupported) {
 				try {
-					Driver.Platform = p;
+					Driver.SetPlatform (p);
 				} catch (EmbeddinatorException ee) {
 					Assert.True (ee.Error, "Error");
 					Assert.That (ee.Code, Is.EqualTo (3), "Code");
@@ -94,7 +109,7 @@ namespace DriverTest {
 		public void Platform_Invalid ()
 		{
 			try {
-				Driver.Platform = "invalid";
+				Driver.SetPlatform ("invalid");
 			} catch (EmbeddinatorException ee) {
 				Assert.True (ee.Error, "Error");
 				Assert.That (ee.Code, Is.EqualTo (3), "Code");
@@ -120,6 +135,26 @@ namespace DriverTest {
 			} catch (EmbeddinatorException ee) {
 				Assert.True (ee.Error, "Error");
 				Assert.That (ee.Code, Is.EqualTo (2), "Code");
+			}
+		}
+
+		[Test]
+		public void CompilationTarget ()
+		{
+			Asserts.ThrowsEmbeddinatorException (5, "The compilation target `invalid` is not valid.", () => Driver.Main2 (new [] { "--target=invalid" }));
+			Asserts.ThrowsEmbeddinatorException (5, "The compilation target `invalid` is not valid.", () => Driver.SetCompilationTarget ("invalid"));
+
+			foreach (var ct in new string [] { "library", "sharedlibrary", "dylib" }) {
+				Driver.SetCompilationTarget (ct);
+				Assert.That (Driver.CompilationTarget, Is.EqualTo (global::Embeddinator.CompilationTarget.SharedLibrary), ct);
+			}
+			foreach (var ct in new string [] { "framework" }) {
+				Driver.SetCompilationTarget (ct);
+				Assert.That (Driver.CompilationTarget, Is.EqualTo (global::Embeddinator.CompilationTarget.Framework), ct);
+			}
+			foreach (var ct in new string [] { "static", "staticlibrary" }) {
+				Driver.SetCompilationTarget (ct);
+				Assert.That (Driver.CompilationTarget, Is.EqualTo (global::Embeddinator.CompilationTarget.StaticLibrary), ct);
 			}
 		}
 	}
