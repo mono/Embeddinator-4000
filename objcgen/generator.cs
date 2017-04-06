@@ -35,6 +35,10 @@ namespace Embeddinator {
 		{
 		}
 
+		protected virtual void Generate (MethodInfo mi)
+		{
+		}
+
 		public virtual void Write (string outputDirectory)
 		{
 		}
