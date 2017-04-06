@@ -57,6 +57,10 @@
 	id nestednamespaces = [[First_Second_ClassWithNestedNamespace alloc] init];
 	XCTAssertTrue ([[nestednamespaces description] containsString:@"<First_Second_ClassWithNestedNamespace:"], "nestednamespaces");
 	XCTAssertEqualObjects (@"First.Second.ClassWithNestedNamespace", [nestednamespaces toString], "nestednamespaces toString");
+
+	id nestednamespaces2 = [[First_Second_Third_ClassWithNestedNamespace alloc] init];
+	XCTAssertTrue ([[nestednamespaces2 description] containsString:@"<First_Second_Third_ClassWithNestedNamespace:"], "nestednamespaces");
+	XCTAssertEqualObjects (@"First.Second.Third.ClassWithNestedNamespace", [nestednamespaces2 toString], "nestednamespaces toString");
 }
 
 - (void)testExceptions {
