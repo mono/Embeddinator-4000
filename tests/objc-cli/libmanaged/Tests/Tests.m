@@ -38,17 +38,25 @@
 	XCTAssert ([query answer] == 42, "instance property getter");
 	query.answer = 911;
 	XCTAssert ([query answer] == 911, "instance property setter check");
+
+	XCTAssertFalse ([query isSecret], "instance property getter only 3");
+	// setter only property turned into method, so different syntax
+	[query set_Secret: 1];
+	XCTAssertTrue ([query isSecret], "instance property getter only 4");
 }
 
 - (void)testNamespaces {
 	id nonamespace = [[ClassWithoutNamespace alloc] init];
 	XCTAssertTrue ([[nonamespace description] containsString:@"<ClassWithoutNamespace:"], "nonamespace");
+	XCTAssertEqualObjects (@"ClassWithoutNamespace", [nonamespace toString], "nonamespace toString");
 	
 	id singlenamespace = [[First_ClassWithSingleNamespace alloc] init];
 	XCTAssertTrue ([[singlenamespace description] containsString:@"<First_ClassWithSingleNamespace:"], "singlenamespace");
+	XCTAssertEqualObjects (@"First.ClassWithSingleNamespace", [singlenamespace toString], "singlenamespace toString");
 	
 	id nestednamespaces = [[First_Second_ClassWithNestedNamespace alloc] init];
 	XCTAssertTrue ([[nestednamespaces description] containsString:@"<First_Second_ClassWithNestedNamespace:"], "nestednamespaces");
+	XCTAssertEqualObjects (@"First.Second.ClassWithNestedNamespace", [nestednamespaces toString], "nestednamespaces toString");
 }
 
 - (void)testExceptions {
@@ -67,6 +75,13 @@
 
 	id unique_init_id = [[Constructors_Unique alloc] initWithId:911];
 	XCTAssert ([unique_init_id id] == 911, "id");
+
+	id super_unique_default_init = [[Constructors_SuperUnique alloc] init];
+	XCTAssert ([super_unique_default_init id] == 411, "super id");
+
+	// FIXME - this should not be allowed, that .ctor is not available to call in .NET as it is not re-declared in SuperUnique
+	id super_unique_init_id = [[Constructors_SuperUnique alloc] initWithId:42];
+	XCTAssert ([super_unique_init_id id] == 42, "id");
 	
 	Constructors_Implicit* implicit = [[Constructors_Implicit alloc] init];
 	XCTAssertEqualObjects (@"OK", [implicit testResult], "implicit");
