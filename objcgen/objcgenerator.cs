@@ -105,7 +105,7 @@ namespace ObjC {
 			implementation.WriteLine ();
 
 			foreach (var t in types)
-				implementation.WriteLine ($"static MonoClass* {t.Name}_class = nil;");
+				implementation.WriteLine ($"static MonoClass* {GetObjCName (t)}_class = nil;");
 			implementation.WriteLine ();
 
 			implementation.WriteLine ("static void __initialize_mono ()");
@@ -142,13 +142,13 @@ namespace ObjC {
 		{
 			var has_bound_base_class = types.Contains (t.BaseType);
 
-			var managed_name = t.Name;
+			var managed_name = GetObjCName (t);
 			implementation.WriteLine ($"static void __lookup_class_{managed_name} ()");
 			implementation.WriteLine ("{");
 			implementation.WriteLine ($"\tif (!{managed_name}_class) {{");
 			implementation.WriteLine ("\t\t__initialize_mono ();");
 			implementation.WriteLine ("\t\t__lookup_assembly_managed ();");
-			implementation.WriteLine ($"\t\t{managed_name}_class = mono_class_from_name (__{t.Assembly.GetName ().Name}_image, \"{t.Namespace}\", \"{managed_name}\");");
+			implementation.WriteLine ($"\t\t{managed_name}_class = mono_class_from_name (__{t.Assembly.GetName ().Name}_image, \"{t.Namespace}\", \"{t.Name}\");");
 			implementation.WriteLine ("\t}");
 			implementation.WriteLine ("}");
 			implementation.WriteLine ();
@@ -312,18 +312,17 @@ namespace ObjC {
 			var property_type = GetTypeName (pi.PropertyType);
 			headers.WriteLine ($") {property_type} {name};");
 
-			var managed_type_name = pi.DeclaringType.Name;
-
-			ImplementMethod (getter.IsStatic, getter.ReturnType, name, NoParameters, managed_type_name, getter.Name);
+			ImplementMethod (getter.IsStatic, getter.ReturnType, name, NoParameters, pi.DeclaringType, getter.Name);
 			if (setter == null)
 				return;
 
-			ImplementMethod (setter.IsStatic, setter.ReturnType, "set" + pi.Name, setter.GetParameters (), managed_type_name, setter.Name);
+			ImplementMethod (setter.IsStatic, setter.ReturnType, "set" + pi.Name, setter.GetParameters (), pi.DeclaringType, setter.Name);
 		}
 
 		// TODO override with attribute ? e.g. [ObjC.Selector ("foo")]
-		void ImplementMethod (bool isStatic, Type returnType, string name, ParameterInfo [] parametersInfo, string managed_type_name, string managed_name)
+		void ImplementMethod (bool isStatic, Type returnType, string name, ParameterInfo [] parametersInfo, Type type, string managed_name)
 		{
+			var managed_type_name = GetObjCName (type);
 			var return_type = GetTypeName (returnType);
 			StringBuilder parameters = new StringBuilder ();
 			StringBuilder managed_parameters = new StringBuilder ();
@@ -339,7 +338,7 @@ namespace ObjC {
 			implementation.Write (isStatic ? '+' : '-');
 			implementation.WriteLine ($" ({return_type}) {name}{parameters}");
 			implementation.WriteLine ("{");
-			implementation.WriteLine ($"\tconst char __method_name [] = \"{managed_type_name}:{managed_name}({managed_parameters})\";");
+			implementation.WriteLine ($"\tconst char __method_name [] = \"{type.FullName}:{managed_name}({managed_parameters})\";");
 			implementation.WriteLine ("\tstatic MonoMethod* __method = nil;");
 			implementation.WriteLine ("\tif (!__method) {");
 			implementation.WriteLine ($"\t\t__lookup_class_{managed_type_name} ();");
@@ -396,7 +395,7 @@ namespace ObjC {
 			headers.Write (mi.IsStatic ? '+' : '-');
 			headers.WriteLine ($" ({return_type}) {name}{parameters};");
 
-			ImplementMethod (mi.IsStatic, mi.ReturnType, name, mi.GetParameters (), mi.DeclaringType.Name, mi.Name);
+			ImplementMethod (mi.IsStatic, mi.ReturnType, name, mi.GetParameters (), mi.DeclaringType, mi.Name);
 		}
 
 		void ReturnValue (Type t)
@@ -460,10 +459,10 @@ namespace ObjC {
 					case "Void":
 						return "void";
 					default:
-						return t.FullName.Replace ('.', '_');
+						return GetObjCName (t);
 					}
 				default:
-					return t.FullName.Replace ('.', '_');
+					return GetObjCName (t);
 				}
 			case TypeCode.Boolean:
 				return "bool";
@@ -560,6 +559,12 @@ namespace ObjC {
 			if (s.Length == 0)
 				return String.Empty;
 			return Char.ToUpperInvariant (s [0]) + s.Substring (1, s.Length - 1);
+		}
+
+		// get a name that is safe to use from ObjC code
+		public static string GetObjCName (Type t)
+		{
+			return t.FullName.Replace ('.', '_');
 		}
 	}
 }
