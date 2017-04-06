@@ -17,7 +17,8 @@ namespace ObjC {
 		static TextWriter implementation = new StringWriter ();
 
 		List<Type> types = new List<Type> ();
-		Dictionary<Type,List<ConstructorInfo>> ctors = new Dictionary<Type,List<ConstructorInfo>> ();
+		Dictionary<Type, List<ConstructorInfo>> ctors = new Dictionary<Type, List<ConstructorInfo>> ();
+		Dictionary<Type, List<PropertyInfo>> properties = new Dictionary<Type, List<PropertyInfo>> ();
 
 		public override void Process (IEnumerable<Assembly> assemblies)
 		{
@@ -39,9 +40,15 @@ namespace ObjC {
 					}
 					constructors = constructors.OrderBy ((arg) => arg.ParameterCount).ToList ();
 					ctors.Add (t, constructors);
+
+					var props = new List<PropertyInfo> ();
+					foreach (var pi in t.GetProperties (BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly)) {
+						props.Add (pi);
+					}
+					properties.Add (t, props);
 				}
 			}
-			types = types.OrderBy ((arg) => arg.FullName).ToList ();
+			types = types.OrderBy ((arg) => arg.FullName).OrderBy ((arg) => types.Contains (arg.BaseType)).ToList ();
 			Console.WriteLine ($"\t{types.Count} types found");
 		}
 
@@ -130,7 +137,9 @@ namespace ObjC {
 			headers.WriteLine ();
 			headers.WriteLine ($"// {t.AssemblyQualifiedName}");
 			headers.WriteLine ($"@interface {native_name} : {GetTypeName (t.BaseType)} {{");
-			headers.WriteLine ("\tMonoEmbedObject* _object;");
+			// our internal field is only needed once in the type hierarchy
+			if (!types.Contains (t.BaseType))
+				headers.WriteLine ("\tMonoEmbedObject* _object;");
 			headers.WriteLine ("}");
 			headers.WriteLine ();
 
@@ -230,8 +239,11 @@ namespace ObjC {
 			}
 
 			headers.WriteLine ();
-			foreach (var pi in t.GetProperties ())
-				Generate (pi);
+			List<PropertyInfo> props;
+			if (properties.TryGetValue (t, out props)) {
+				foreach (var pi in props)
+					Generate (pi);
+			}
 
 			headers.WriteLine ("@end");
 			headers.WriteLine ();
