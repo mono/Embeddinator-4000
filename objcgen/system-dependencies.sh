@@ -10,18 +10,38 @@ while ! test -z $1; do
 	case $1 in
 		--provision)
 			PROVISION_MONO=1
+			PROVISION_XI=1
+			PROVISION_XM=1
 			shift
 			;;
 		--provision-mono)
 			PROVISION_MONO=1
 			shift
 			;;
+		--provision-xamarin-ios)
+			PROVISION_XI=1
+			shift
+			;;
+		--provision-xamarin-mac)
+			PROVISION_XM=1
+			shift
+			;;
 		--provision-all)
 			PROVISION_MONO=1
+			PROVISION_XI=1
+			PROVISION_XM=1
 			shift
 			;;
 		--ignore-mono)
 			IGNORE_MONO=1
+			shift
+			;;
+		--ignore-xamarin-ios)
+			IGNORE_XI=1
+			shift
+			;;
+		--ignore-xamarin-mac)
+			IGNORE_XM=1
 			shift
 			;;
 		*)
@@ -171,9 +191,127 @@ function check_mono () {
 	ok "Found Mono $ACTUAL_MONO_VERSION (at least $MIN_MONO_VERSION and not more than $MAX_MONO_VERSION is required)"
 }
 
+function install_pkg () {
+	local PRODUCT=$1
+	local MIN_VERSION=$2
+	local URL=$3
+
+	if test -z $URL; then
+		fail "No url set for $PRODUCT in Make.config, cannot provision"
+		return
+	fi
+
+	mkdir -p $PROVISION_DOWNLOAD_DIR
+	log "Downloading $PRODUCT $MIN_VERSION from $URL to $PROVISION_DOWNLOAD_DIR..."
+	local NAME=`basename $URL`
+	local PKG=$PROVISION_DOWNLOAD_DIR/$NAME
+	curl -L $URL > $PKG
+
+	log "Installing $PRODUCT $MIN_VERSION from $URL..."
+	sudo installer -pkg $PKG -target /
+
+	rm -f $PKG
+}
+
+function install_xamarin_ios () {
+	local URL=`grep MIN_XI_URL= Make.config | sed 's/.*=//'`
+	local MIN_VERSION=`grep MIN_XI_VERSION= Make.config | sed 's/.*=//'`
+
+	install_pkg Xamarin.iOS "$MIN_VERSION" "$URL"
+}
+
+function install_xamarin_mac () {
+	local URL=`grep MIN_XM_URL= Make.config | sed 's/.*=//'`
+	local MIN_VERSION=`grep MIN_XM_VERSION= Make.config | sed 's/.*=//'`
+
+	install_pkg Xamarin.Mac "$MIN_VERSION" "$URL"
+}
+
+function check_xamarin_ios () {
+	if ! test -z $IGNORE_XI; then return; fi
+
+	local MIN_XI_VERSION=$(grep MIN_XI_VERSION= Make.config | sed 's/.*=//')
+	local MAX_XI_VERSION=$(grep MAX_XI_VERSION= Make.config | sed 's/.*=//')
+
+	if ! test -f /Library/Frameworks/Xamarin.iOS.framework/Versions/Current/Version; then
+		if ! test -z $PROVISION_XI; then
+			install_xamarin_ios
+		else
+			fail "You must install Xamarin.iOS ($MIN_XI_VERSION)"
+			return
+		fi
+	else
+		local ACTUAL_XI_VERSION=$(cat /Library/Frameworks/Xamarin.iOS.framework/Versions/Current/Version)
+		if ! is_at_least_version $ACTUAL_XI_VERSION $MIN_XI_VERSION; then
+			if ! test -z $PROVISION_XI; then
+				install_xamarin_ios
+			else
+				fail "You must have at least Xamarin.iOS $MIN_XI_VERSION, found $ACTUAL_XI_VERSION"
+				return
+			fi
+		elif [[ "$ACTUAL_XI_VERSION" == "$MAX_XI_VERSION" ]]; then
+			: # this is ok
+		elif is_at_least_version $ACTUAL_XI_VERSION $MAX_XI_VERSION; then
+			if ! test -z $PROVISION_XI; then
+				install_xamarin_ios
+			else
+				fail "Your Xamarin.iOS version is too new, max version is $MAX_XI_VERSION, found $ACTUAL_XI_VERSION."
+				fail "You may edit Make.config and change MAX_XI_VERSION to your actual version to continue the"
+				fail "build (unless you're on a release branch). Once the build completes successfully, please"
+				fail "commit the new MAX_XI_VERSION value."
+			fi
+		fi
+	fi
+
+	local ACTUAL_XI_VERSION=$(cat /Library/Frameworks/Xamarin.iOS.framework/Versions/Current/Version)
+	ok "Found Xamarin.iOS $ACTUAL_XI_VERSION (at least $MIN_XI_VERSION and not more than $MAX_XI_VERSION is required)"
+}
+
+function check_xamarin_mac () {
+	if ! test -z $IGNORE_XM; then return; fi
+
+	local MIN_XM_VERSION=$(grep MIN_XM_VERSION= Make.config | sed 's/.*=//')
+	local MAX_XM_VERSION=$(grep MAX_XM_VERSION= Make.config | sed 's/.*=//')
+
+	if ! test -f /Library/Frameworks/Xamarin.Mac.framework/Versions/Current/Version; then
+		if ! test -z $PROVISION_XM; then
+			install_xamarin_mac
+		else
+			fail "You must install Xamarin.Mac ($MIN_XM_VERSION)"
+			return
+		fi
+	else
+		local ACTUAL_XM_VERSION=$(cat /Library/Frameworks/Xamarin.Mac.framework/Versions/Current/Version)
+		if ! is_at_least_version $ACTUAL_XM_VERSION $MIN_XM_VERSION; then
+			if ! test -z $PROVISION_XM; then
+				install_xamarin_mac
+			else
+				fail "You must have at least Xamarin.Mac $MIN_XM_VERSION, found $ACTUAL_XM_VERSION"
+				return
+			fi
+		elif [[ "$ACTUAL_XM_VERSION" == "$MAX_XM_VERSION" ]]; then
+			: # this is ok
+		elif is_at_least_version $ACTUAL_XM_VERSION $MAX_XM_VERSION; then
+			if ! test -z $PROVISION_XM; then
+				install_xamarin_mac
+			else
+				fail "Your Xamarin.Mac version is too new, max version is $MAX_XM_VERSION, found $ACTUAL_XM_VERSION."
+				fail "You may edit Make.config and change MAX_XM_VERSION to your actual version to continue the"
+				fail "build (unless you're on a release branch). Once the build completes successfully, please"
+				fail "commit the new MAX_XM_VERSION value."
+			fi
+		fi
+	fi
+
+	local ACTUAL_XM_VERSION=$(cat /Library/Frameworks/Xamarin.Mac.framework/Versions/Current/Version)
+	ok "Found Xamarin.Mac $ACTUAL_XM_VERSION (at least $MIN_XM_VERSION and not more than $MAX_XM_VERSION is required)"
+}
+
 echo "Checking system..."
 
 check_mono
+check_xamarin_ios
+check_xamarin_mac
 
 if test -z $FAIL; then
 	echo "System check succeeded"
