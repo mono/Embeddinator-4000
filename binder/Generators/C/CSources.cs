@@ -230,7 +230,9 @@ namespace MonoEmbeddinator4000.Generators
                 if (Options.GeneratorKind == GeneratorKind.C)
                     WriteLine($"mono_embeddinator_init_object(object, {instanceId});");
                 else
-                    WriteLine($"object->{CGenerator.ObjectInstanceId} = mono_embeddinator_create_object({instanceId});");
+                    WriteLine("object->{0} = ({1}*) mono_embeddinator_create_object({2});",
+                        CGenerator.ObjectInstanceId, GenerateObjectTypesPass.MonoEmbedObject.Name,
+                        instanceId);
             }
             else if (!method.IsStatic)
             {
