@@ -180,6 +180,11 @@ typedef struct
 } mono_embeddinator_error_t;
 
 /**
+ * Converts an error object to its string representation.
+ */
+char* mono_embeddinator_error_to_string(mono_embeddinator_error_t error);
+
+/**
  * Fires an error and calls the installed error hook for handling.
  */
 MONO_EMBEDDINATOR_API

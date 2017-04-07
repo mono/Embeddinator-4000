@@ -233,7 +233,32 @@ void mono_embeddinator_throw_exception(MonoObject *exception)
     mono_embeddinator_error(error);
 }
 
-static mono_embeddinator_error_report_hook_t g_error_report_hook = 0;
+char* mono_embeddinator_error_to_string(mono_embeddinator_error_t error)
+{
+    switch(error.type)
+    {
+    case MONO_EMBEDDINATOR_OK:
+        return "No error";
+    case MONO_EMBEDDINATOR_EXCEPTION_THROWN:
+        return "Mono threw a managed exception";
+    case MONO_EMBEDDINATOR_ASSEMBLY_OPEN_FAILED:
+        return "Mono failed to load assembly";
+    case MONO_EMBEDDINATOR_CLASS_LOOKUP_FAILED:
+        return "Mono failed to lookup class";
+    case MONO_EMBEDDINATOR_METHOD_LOOKUP_FAILED:
+        return "Mono failed to lookup method";
+    }
+
+    g_assert_not_reached();
+}
+
+static void mono_embeddinator_report_error_and_abort(mono_embeddinator_error_t error)
+{
+    fprintf(stderr, "Embeddinator error: %s.\n", mono_embeddinator_error_to_string(error));
+    abort();
+}
+
+static mono_embeddinator_error_report_hook_t g_error_report_hook = mono_embeddinator_report_error_and_abort;
 
 void* mono_embeddinator_install_error_report_hook(mono_embeddinator_error_report_hook_t hook)
 {
