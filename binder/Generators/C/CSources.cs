@@ -293,7 +293,7 @@ namespace MonoEmbeddinator4000.Generators
                 methodId, instanceId, argsId, exceptionId);
             NewLine();
 
-            WriteLine($"if (!{exceptionId})");
+            WriteLine($"if ({exceptionId})");
             WriteLineIndent($"mono_embeddinator_throw_exception({exceptionId});");
 
             foreach (var marshalContext in contexts)
