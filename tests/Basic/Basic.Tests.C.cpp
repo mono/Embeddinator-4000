@@ -1,10 +1,10 @@
 ﻿#define CATCH_CONFIG_MAIN
 #include <catch.hpp>
 
-#include "Basic.Managed.h"
+#include "managed.h"
 #include "glib.h"
 
-TEST_CASE("BuiltinTypes.C", "[C][BuiltinTypes]") {
+TEST_CASE("Types.C", "[C][Types]") {
     BuiltinTypes* bt = BuiltinTypes_new();
     BuiltinTypes_ReturnsVoid(bt);
     REQUIRE(BuiltinTypes_ReturnsBool(bt)   == true);
@@ -48,48 +48,49 @@ TEST_CASE("BuiltinTypes.C", "[C][BuiltinTypes]") {
     REQUIRE(strcmp(RefStr->str, "Mono") == 0);
 }
 
-TEST_CASE("ClassTypes", "[C][ClassTypes]") {
-    ClassProperties* prop = ClassProperties_new();
-    REQUIRE(ClassProperties_get_Int(prop) == 0);
-    ClassProperties_set_Int(prop, 10);
-    REQUIRE(ClassProperties_get_Int(prop) == 10);
+TEST_CASE("Properties", "[C][Properties]") {
+    REQUIRE(Properties_Query_get_UniversalAnswer() == 42);
 
-    REQUIRE(ClassProperties_get_ReadOnlyInt(prop) == 0);
+    Properties_Query* prop = Properties_Query_new();
+    REQUIRE(Properties_Query_get_IsGood(prop) == true);
+    REQUIRE(Properties_Query_get_IsBad(prop) == false);
+
+    REQUIRE(Properties_Query_get_Answer(prop) == 42);
+    Properties_Query_set_Answer(prop, 10);
+    REQUIRE(Properties_Query_get_Answer(prop) == 10);
+
+    Properties_Query_set_Secret(prop, 10);
+    REQUIRE(Properties_Query_get_IsSecret(prop) == true);
 }
 
-TEST_CASE("StaticTypes.C", "[C][StaticTypes]") {
-    REQUIRE(NonStaticClass_StaticMethod() == 0);
-    REQUIRE(StaticClass_StaticMethod() == 0);
+TEST_CASE("Enums.C", "[C][Enums]") {
+    REQUIRE(Enums_EnumTypes_PassEnum(Enum_Two) == 2);
+    REQUIRE(Enums_EnumTypes_PassEnum(Enum_Three) == 3);
+
+    REQUIRE(Enums_EnumTypes_PassEnumByte(EnumByte_Two) == 2);
+    REQUIRE(Enums_EnumTypes_PassEnumByte(EnumByte_Three) == 3);
+
+    REQUIRE(Enums_EnumTypes_PassEnumFlags(EnumFlags_FlagOne) == (1 << 0));
+    REQUIRE(Enums_EnumTypes_PassEnumFlags(EnumFlags_FlagTwo) == (1 << 2));
 }
 
-TEST_CASE("EnumTypes.C", "[C][EnumTypes]") {
-    REQUIRE(EnumTypes_PassEnum(Enum_Two) == 2);
-    REQUIRE(EnumTypes_PassEnum(Enum_Three) == 3);
-
-    REQUIRE(EnumTypes_PassEnumByte(EnumByte_Two) == 2);
-    REQUIRE(EnumTypes_PassEnumByte(EnumByte_Three) == 3);
-
-    REQUIRE(EnumTypes_PassEnumFlags(EnumFlags_FlagOne) == (1 << 0));
-    REQUIRE(EnumTypes_PassEnumFlags(EnumFlags_FlagTwo) == (1 << 2));
-}
-
-TEST_CASE("ArrayTypes.C", "[C][ArrayTypes]") {
+TEST_CASE("Arrays.C", "[C][Arrays]") {
     char _byte_arr[] = { 1, 2, 3 };
     _UnsignedcharArray _byte;
     _byte.array = g_array_sized_new(/*zero_terminated=*/false,
         /*clear=*/true, sizeof(char), G_N_ELEMENTS(_byte_arr));
     g_array_append_vals (_byte.array, _byte_arr, G_N_ELEMENTS(_byte_arr));
 
-    int _sum = ArrayTypes_SumByteArray(_byte);
+    int _sum = Arrays_ArrayTypes_SumByteArray(_byte);
     REQUIRE(_sum == 6);
 
-    _IntArray _int = ArrayTypes_ReturnsIntArray();
+    _IntArray _int = Arrays_ArrayTypes_ReturnsIntArray();
     REQUIRE(_int.array->len == 3);
     REQUIRE(g_array_index(_int.array, int, 0) == 1);
     REQUIRE(g_array_index(_int.array, int, 1) == 2);
     REQUIRE(g_array_index(_int.array, int, 2) == 3);
 
-    _CharArray _string = ArrayTypes_ReturnsStringArray();
+    _CharArray _string = Arrays_ArrayTypes_ReturnsStringArray();
     REQUIRE(_string.array->len == 3);
     REQUIRE(strcmp(g_array_index(_string.array, gchar*, 0), "1") == 0);
     REQUIRE(strcmp(g_array_index(_string.array, gchar*, 1), "2") == 0);

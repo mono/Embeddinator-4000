@@ -2,7 +2,7 @@
 
 local supportdir = path.getabsolute("../support")
 local catchdir = path.getabsolute("../external/catch")
-local exepath = path.join("../../build/lib/Debug/MonoEmbeddinator4000.exe")
+local exepath = "../../../build/lib/Debug/MonoEmbeddinator4000.exe"
 
 function SetupTestProject(name, extraFiles)
   objdir("!obj")
@@ -12,6 +12,7 @@ function SetupTestProject(name, extraFiles)
   SetupTestProjectC(name)
   SetupTestProjectObjC(name)
   SetupTestProjectsCSharp(name, nil, extraFiles)
+  SetupTestProjectsRunner(name)
 end
 
 function SetupManagedTestProject()
@@ -19,7 +20,7 @@ function SetupManagedTestProject()
     language "C#"  
     clr "Unsafe"
     SetupManagedProject()
-    location "."
+    location "mk"
 end
 
 function SetupTestProjectGenerator()
@@ -30,17 +31,21 @@ function SetupTestProjectGenerator()
   end
 end
 
-function SetupTestProjectGeneratorMake()
+function SetupTestProjectGeneratorMake(name, dll)
   project (name .. ".Gen")
-     location "."
+     location "mk"
      kind "Makefile"
      dependson (name .. ".Managed")
 
+     if dll == nil then
+       dll = name .. "Managed.dll"
+     end
+
      buildcommands
      {
-        "mono --debug " .. exepath .. " -gen=c -out=c -p=macos -compile -target=shared " .. name .. ".Managed.dll",
-        "mono --debug " .. exepath .. " -gen=objc -out=objc -p=macos -compile -target=shared " .. name .. ".Managed.dll",
-        "mono --debug " .. exepath .. " -gen=java -out=java -p=macos -target=shared " .. name .. ".Managed.dll"
+        "mono --debug " .. exepath .. " -gen=c -out=c -p=macos -compile -target=shared " .. dll,
+        "mono --debug " .. exepath .. " -gen=objc -out=objc -p=macos -compile -target=shared " .. dll,
+        "mono --debug " .. exepath .. " -gen=java -out=java -p=macos -target=shared " .. dll
      }
 end
 
@@ -114,8 +119,7 @@ function SetupTestProjectC(name, depends)
   end
 
   project(name .. ".C")
-    SetupNativeProject()
-    location "."
+    location "mk"
 
     kind "SharedLib"
     language "C"
@@ -125,10 +129,8 @@ function SetupTestProjectC(name, depends)
     flags { common_flags }
     files
     {
-      path.join("c", name .. ".Managed.h"),
-      path.join("c", name .. ".Managed.c"),
-      path.join(supportdir, "*.h"),
-      path.join(supportdir, "*.c"),
+      path.join("c", "*.h"),
+      path.join("c", "*.c"),
     }
 
     includedirs { supportdir }
@@ -153,21 +155,19 @@ function SetupTestProjectObjC(name, depends)
   end
 
   project(name .. ".ObjC")
-    SetupNativeProject()
-    location "."
+    location "mk"
 
     kind "SharedLib"
-    language "C++"
+    language "C"
 
     defines { "MONO_DLL_IMPORT", "MONO_M2N_DLL_EXPORT" }
 
     flags { common_flags }
     files
     {
-      path.join("objc", name .. ".Managed.h"),
-      path.join("objc", name .. ".Managed.mm"),
-      path.join(supportdir, "*.h"),
-      path.join(supportdir, "*.c"),
+      path.join("objc", "*.h"),
+      path.join("objc", "*.mm"),
+      path.join("objc", "*.c"),
     }
 
     links { "objc" }
@@ -199,11 +199,11 @@ function SetupTestProjectsCSharp(name, depends, extraFiles)
       table.insert(linktable, depends .. ".Managed")
     end
 
-    links(linktable)
+    links(linktable)  
+end
 
+function SetupTestProjectsRunner(name)
   project(name .. ".Tests")
-    SetupNativeProject()
-    location "."
 
     language "C++"
     kind "ConsoleApp"
@@ -229,5 +229,5 @@ function SetupTestProjectsCSharp(name, depends, extraFiles)
     filter { "action:vs*" }
       buildoptions { "/wd4018" } -- eglib signed/unsigned warnings
 
-    filter {}    
+    filter {}  
 end

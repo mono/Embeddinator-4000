@@ -1,6 +1,6 @@
 #include <catch.hpp>
 
-#include "Basic.Managed.h"
+#include "managed.h"
 #include "glib.h"
 
 TEST_CASE("BuiltinTypes.ObjC", "[ObjC][BuiltinTypes]") {
