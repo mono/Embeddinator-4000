@@ -151,15 +151,17 @@ namespace ObjC {
 			var native_name = GetTypeName (t);
 			headers.WriteLine ();
 			headers.WriteLine ($"// {t.AssemblyQualifiedName}");
-			headers.WriteLine ($"@interface {native_name} : {GetTypeName (t.BaseType)}");
+			headers.WriteLine ($"@interface {native_name} : {GetTypeName (t.BaseType)} {{");
+			if (!static_type && !has_bound_base_class) {
+				headers.WriteLine ("\tMonoEmbedObject* _object;");
+			}
+			headers.WriteLine ("}");
 			headers.WriteLine ();
 
 			implementation.WriteLine ();
 			implementation.WriteLine ($"// {t.AssemblyQualifiedName}");
 			implementation.WriteLine ($"@implementation {native_name} {{");
 			// our internal field is only needed once in the type hierarchy
-			if (!static_type && !has_bound_base_class)
-				implementation.WriteLine ("\t@public MonoEmbedObject* _object;");
 			implementation.WriteLine ("}");
 			implementation.WriteLine ();
 

@@ -24,3 +24,6 @@ profile
 *.moved-aside
 DerivedData
 .idea/
+i386
+x86_64
+
