@@ -30,6 +30,8 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="arrays.cs" />
+    <Compile Include="enums.cs" />
     <Compile Include="properties.cs" />
     <Compile Include="namespaces.cs" />
     <Compile Include="types.cs" />
