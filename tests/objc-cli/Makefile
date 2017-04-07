@@ -29,7 +29,7 @@ perf: perf-cli
 	time ./perf-cli
 
 clean:
-	@rm -f *.h *.c bindings.m *.dylib *.dll test-cli perf-cli
+	@rm -f *.h glib.c mono_embeddinator.c bindings.m *.dylib *.dll test-cli perf-cli
 
 xctest:
 	xcodebuild test -project libmanaged/*.xcodeproj -scheme Tests
