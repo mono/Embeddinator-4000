@@ -71,6 +71,17 @@ g_strdup (const gchar *str)
   return NULL;
 }
 
+void
+g_assertion_message (const gchar *format, ...)
+{
+  va_list args;
+
+  va_start (args, format);
+  fprintf (stderr, format, args);
+  va_end (args);
+  exit (0);
+}
+
 #define INITIAL_CAPACITY 16
 
 #define element_offset(p,i) ((p)->array.data + (i) * (p)->element_size)
