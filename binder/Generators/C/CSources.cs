@@ -154,9 +154,8 @@ namespace MonoEmbeddinator4000.Generators
                 assemblyName.Replace('.', '_')));
             WriteLine("{0}();", assemblyLookupId);
 
-            var namespaces = Declaration.GatherNamespaces(@class.Namespace).ToList();
-            namespaces.Reverse();
-            namespaces.Remove(namespaces.First());
+            var namespaces = Declaration.GatherNamespaces(@class.Namespace)
+                .Where(ns => !(ns is TranslationUnit));
 
             var @namespace = string.Join(".", namespaces);
             var ids = string.Join(", ",
