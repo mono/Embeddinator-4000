@@ -204,6 +204,14 @@ MonoClass* mono_embeddinator_search_class(const char* assembly, const char* _nam
     MonoImage* image = mono_assembly_get_image(mono_assembly);
     MonoClass* klass = mono_class_from_name(image, _namespace, name);
 
+    if (klass == 0)
+    {
+        mono_embeddinator_error_t error;
+        error.type = MONO_EMBEDDINATOR_CLASS_LOOKUP_FAILED;
+        error.string = path;
+        mono_embeddinator_error(error);
+    }
+
     return klass;
 }
 

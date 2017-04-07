@@ -164,6 +164,8 @@ typedef enum
     MONO_EMBEDDINATOR_EXCEPTION_THROWN,
     // Mono failed to load assembly
     MONO_EMBEDDINATOR_ASSEMBLY_OPEN_FAILED,
+    // Mono failed to lookup class
+    MONO_EMBEDDINATOR_CLASS_LOOKUP_FAILED,
     // Mono failed to lookup method
     MONO_EMBEDDINATOR_METHOD_LOOKUP_FAILED
 } mono_embeddinator_error_type_t;
