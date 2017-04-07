@@ -228,60 +228,192 @@ namespace Embeddinator {
 			return 0;
 		}
 
+		class BuildInfo
+		{
+			public string Sdk;
+			public string [] Architectures;
+			public string SdkName; // used in -m{SdkName}-version-min
+			public string MinVersion;
+			public string XamariniOSSDK;
+		}
+
 		static int Compile ()
 		{
 			Console.WriteLine ("Compiling binding code...");
 
+			BuildInfo [] build_infos;
+
 			switch (Platform) {
 			case Platform.macOS:
+				build_infos = new BuildInfo [] {
+					new BuildInfo { Sdk = "MacOSX", Architectures = new string [] { "i386", "x86_64" }, SdkName = "macosx", MinVersion = "10.7" },
+				};
 				break;
 			case Platform.iOS:
-			case Platform.watchOS:
+				build_infos = new BuildInfo [] {
+					new BuildInfo { Sdk = "iPhoneOS", Architectures = new string [] { "armv7", "armv7s", "arm64" }, SdkName = "iphoneos", MinVersion = "8.0", XamariniOSSDK = "MonoTouch.iphoneos.sdk" },
+					new BuildInfo { Sdk = "iPhoneSimulator", Architectures = new string [] { "i386", "x86_64" }, SdkName = "ios-simulator", MinVersion = "8.0", XamariniOSSDK = "MonoTouch.iphonesimulator.sdk" },
+				};
+				break;
 			case Platform.tvOS:
-				throw new NotImplementedException ($"platform={Platform}");
+				build_infos = new BuildInfo [] {
+					new BuildInfo { Sdk = "AppleTVOS", Architectures = new string [] { "arm64" }, SdkName = "tvos", MinVersion = "9.0", XamariniOSSDK = "Xamarin.AppleTVOS.sdk" },
+					new BuildInfo { Sdk = "AppleTVSimulator", Architectures = new string [] { "x86_64" }, SdkName = "tvos-simulator", MinVersion = "9.0", XamariniOSSDK = "Xamarin.AppleTVSimulator.sdk" },
+				};
+				break;
+			case Platform.watchOS:
+				build_infos = new BuildInfo [] {
+					new BuildInfo { Sdk = "WatchOS", Architectures = new string [] { "armv7k" }, SdkName = "watchos", MinVersion = "2.0", XamariniOSSDK = "Xamarin.WatchOS.sdk" },
+					new BuildInfo { Sdk = "WatchSimulator", Architectures = new string [] { "i386" }, SdkName = "watchos-simulator", MinVersion = "2.0", XamariniOSSDK = "Xamarin.WatchSimulator.sdk" },
+				};
+				break;
 			default:
 				throw ErrorHelper.CreateError (99, "Internal error: invalid platform {0}. Please file a bug report with a test case (https://github.com/mono/Embeddinator-4000/issues).", Platform);
 			}
 
 			switch (CompilationTarget) {
 			case CompilationTarget.SharedLibrary:
+			case CompilationTarget.StaticLibrary:
 				break;
 			case CompilationTarget.Framework:
-			case CompilationTarget.StaticLibrary:
 				throw new NotImplementedException ($"Compilation target: {CompilationTarget}");
 			default:
 				throw ErrorHelper.CreateError (99, "Internal error: invalid compilation target {0}. Please file a bug report with a test case (https://github.com/mono/Embeddinator-4000/issues).", CompilationTarget);
 			}
 
-			StringBuilder options = new StringBuilder ("clang ");
-			if (Debug)
-				options.Append ("-g -O0 ");
-			options.Append ("-fobjc-arc ");
-			options.Append ("-DMONO_EMBEDDINATOR_DLL_EXPORT ");
-			options.Append ("-framework CoreFoundation ");
-			options.Append ("-framework Foundation ");
-			options.Append ("-I\"/Library/Frameworks/Mono.framework/Versions/Current/include/mono-2.0\" -L\"/Library/Frameworks/Mono.framework/Versions/Current/lib/\" -lmonosgen-2.0 ");
-			options.Append ("glib.c mono_embeddinator.c bindings.m ");
-			options.Append ("-ObjC -lobjc ");
+
+			var lipo_files = new List<string> ();
+			var output_file = string.Empty;
+
+			var files = new string [] {
+				Path.Combine (OutputDirectory, "glib.c"),
+				Path.Combine (OutputDirectory, "mono_embeddinator.c"),
+				Path.Combine (OutputDirectory, "bindings.m")
+			};
+
 			switch (CompilationTarget) {
 			case CompilationTarget.SharedLibrary:
-				options.Append ($"-dynamiclib ");
-				options.Append ($"-install_name @rpath/lib{LibraryName}.dylib ");
-				options.Append ($"-o lib{LibraryName}.dylib ");
+				output_file = $"lib{LibraryName}.dylib";
 				break;
 			case CompilationTarget.StaticLibrary:
-				throw new NotImplementedException ("compile to static library");
-			case CompilationTarget.Framework:
-				throw new NotImplementedException ("compile to framework");
+				output_file = $"{LibraryName}.a";
+				break;
 			default:
 				throw ErrorHelper.CreateError (99, "Internal error: invalid compilation target {0}. Please file a bug report with a test case (https://github.com/mono/Embeddinator-4000/issues).", CompilationTarget);
 			}
 
-			Console.WriteLine ("Compiling binding code...");
-			Console.WriteLine ($"\tInvoking: xcrun {options}");
-			var p = Process.Start ("xcrun", options.ToString ());
-			p.WaitForExit ();
-			return p.ExitCode;
+			int exitCode;
+
+			foreach (var build_info in build_infos) {
+				foreach (var arch in build_info.Architectures) {
+					var archOutputDirectory = Path.Combine (OutputDirectory, arch);
+					Directory.CreateDirectory (archOutputDirectory);
+
+					var common_options = new StringBuilder ("clang ");
+					if (Debug)
+						common_options.Append ("-g -O0 ");
+					common_options.Append ("-fobjc-arc ");
+					common_options.Append ("-ObjC ");
+					common_options.Append ($"-arch {arch} ");
+					common_options.Append ($"-isysroot /Applications/Xcode.app/Contents/Developer/Platforms/{build_info.Sdk}.platform/Developer/SDKs/{build_info.Sdk}.sdk ");
+					common_options.Append ($"-m{build_info.SdkName}-version-min={build_info.MinVersion} ");
+
+					// Build each file to a .o
+					var object_files = new List<string> ();
+					foreach (var file in files) {
+						var static_options = new StringBuilder (common_options.ToString ());
+						static_options.Append ("-I/Library/Frameworks/Mono.framework/Versions/Current/include/mono-2.0 ");
+						static_options.Append ("-DMONO_EMBEDDINATOR_DLL_EXPORT ");
+						static_options.Append ("-c ");
+						static_options.Append (file).Append (" ");
+						var objfile = Path.Combine (archOutputDirectory, Path.ChangeExtension (Path.GetFileName (file), "o"));
+						static_options.Append ($"-o {objfile} ");
+						object_files.Add (objfile);
+						if (!Xcrun (static_options, out exitCode))
+							return exitCode;
+					}
+
+					switch (CompilationTarget) {
+					case CompilationTarget.SharedLibrary:
+						var options = new StringBuilder (common_options.ToString ());
+						options.Append ($"-dynamiclib ");
+						options.Append ("-lobjc ");
+						options.Append ("-framework CoreFoundation ");
+						options.Append ("-framework Foundation ");
+						options.Append ($"-install_name @rpath/{output_file} ");
+
+						foreach (var objfile in object_files)
+							options.Append (objfile).Append (" ");
+						
+						var dynamic_ofile = Path.Combine (archOutputDirectory, output_file);
+						options.Append ($"-o ").Append (dynamic_ofile).Append (" ");
+						lipo_files.Add (dynamic_ofile);
+
+						if (!string.IsNullOrEmpty (build_info.XamariniOSSDK)) {
+							options.Append ($"-L/Library/Frameworks/Xamarin.iOS.framework/Versions/Current/SDKs/{build_info.XamariniOSSDK}/usr/lib ");
+						} else {
+							options.Append ("-L/Library/Frameworks/Mono.framework/Versions/Current/lib/ ");
+						}
+						options.Append ("-lmonosgen-2.0 ");
+						if (!Xcrun (options, out exitCode))
+							return exitCode;
+						break;
+					case CompilationTarget.StaticLibrary:
+						// Collect all the .o files into a .a
+						var archive_options = new StringBuilder ("ar cru ");
+						var static_ofile = Path.Combine (archOutputDirectory, output_file);
+						archive_options.Append (static_ofile).Append (" ");
+						lipo_files.Add (static_ofile);
+						foreach (var objfile in object_files)
+							archive_options.Append (objfile).Append (" ");
+						if (!Xcrun (archive_options, out exitCode))
+							return exitCode;
+						break;
+					case CompilationTarget.Framework:
+						throw new NotImplementedException ("compile to framework");
+					default:
+						throw ErrorHelper.CreateError (99, "Internal error: invalid compilation target {0}. Please file a bug report with a test case (https://github.com/mono/Embeddinator-4000/issues).", CompilationTarget);
+					}
+				}
+			}
+
+			if (lipo_files.Count == 1) {
+				File.Copy (lipo_files [0], Path.Combine (OutputDirectory, output_file), true);
+			} else {
+				var lipo_options = new StringBuilder ("lipo ");
+				foreach (var file in lipo_files)
+					lipo_options.Append (file).Append (" ");
+				lipo_options.Append ("-create -output ");
+				lipo_options.Append (Path.Combine (OutputDirectory, output_file));
+				var rv = RunProcess ("xcrun", lipo_options.ToString ());
+				if (rv != 0)
+					return rv;
+			}
+
+			if (Debug && CompilationTarget != CompilationTarget.StaticLibrary) {
+				var dsymutil_options = new StringBuilder ("dsymutil ");
+				dsymutil_options.Append (Path.Combine (OutputDirectory, output_file));
+				var rv = RunProcess ("xcrun", dsymutil_options.ToString ());
+				if (rv != 0)
+					return rv;
+			}
+
+			return 0;
+		}
+
+		static int RunProcess (string filename, string arguments)
+		{
+			Console.WriteLine ($"\t{filename} {arguments}");
+			using (var p = Process.Start (filename, arguments)) {
+				p.WaitForExit ();
+				return p.ExitCode;
+			}
+		}
+
+		static bool Xcrun (StringBuilder options, out int exitCode)
+		{
+			exitCode = RunProcess ("xcrun", options.ToString ());
+			return exitCode == 0;
 		}
 	}
 }
