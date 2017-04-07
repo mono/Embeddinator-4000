@@ -217,7 +217,7 @@ function SetupTestProjectsRunner(name)
 
     files
     {
-      name .. ".Tests.*",
+      "*Tests.*",
       path.join(supportdir, "glib.*"),
     }
 

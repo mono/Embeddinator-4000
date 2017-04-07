@@ -1,4 +1,3 @@
-.PHONY: all binder managed gen compile run clean
 MAKEFLAGS += --no-builtin-rules
 
 all: binder managed gen compile run 
@@ -26,7 +25,7 @@ compile:
 	make -C mk
 
 run:
-	mk/bin/Debug/Basic.Tests
+	mk/bin/Debug/common.Tests
 
 clean:
-	rm -rf mk *.dylib Basic.Tests
+	rm -rf mk c objc java *.dylib common.Tests
