@@ -3,7 +3,7 @@ all: run-test perf xctest test-leaks
 OBJC_GEN_DIR=../../objcgen
 OBJC_GEN=$(OBJC_GEN_DIR)/bin/Debug/objcgen.exe
 $(OBJC_GEN): $(wildcard $(OBJC_GEN_DIR)/*.cs) $(wildcard ../../support/*)
-	/Library/Frameworks/Mono.framework/Versions/Current/Commands/xbuild /verbosity:quiet /nologo $(OBJC_GEN_DIR)/objcgen.csproj
+	$(MAKE) -C $(OBJC_GEN_DIR)
 
 MANAGED_DLL_DIR=../managed
 MANAGED_DLL=$(MANAGED_DLL_DIR)/bin/Debug/managed.dll
