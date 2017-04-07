@@ -130,6 +130,7 @@ namespace ObjC {
 			implementation.WriteLine ($"\tif (__{name}_image)");
 			implementation.WriteLine ("\t\treturn;");
 			implementation.WriteLine ($"\t__{name}_image = mono_embeddinator_load_assembly (&__mono_context, \"{name}.dll\");");
+			implementation.WriteLine ($"\tassert (__{name}_image && \"Could not load the assembly '{name}.dll'.\");");
 			implementation.WriteLine ("}");
 			implementation.WriteLine ();
 
