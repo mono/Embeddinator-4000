@@ -53,7 +53,7 @@ namespace MonoEmbeddinator4000.Generators
             GenerateFilePreamble(CommentKind.JavaDoc);
 
             GenerateJavaPackage(Declaration);
-            NewLine();
+            GenerateJavaImports();
 
             PushBlock();
             Declaration.Visit(this);
@@ -62,9 +62,19 @@ namespace MonoEmbeddinator4000.Generators
 
         public void GenerateJavaPackage(Declaration decl)
         {
+            PushBlock();
             var package = string.Join(".", GetPackageNames(decl));
             if (!string.IsNullOrWhiteSpace(package))
                 WriteLine($"package {package};");
+            PopBlock(NewLineKind.BeforeNextBlock);
+        }
+
+        public void GenerateJavaImports()
+        {
+            PushBlock();
+            WriteLine("import mono.embeddinator.*;");
+            WriteLine("import com.sun.jna.*;");
+            PopBlock(NewLineKind.BeforeNextBlock);
         }
 
         public override bool VisitDeclContext(DeclarationContext context)
