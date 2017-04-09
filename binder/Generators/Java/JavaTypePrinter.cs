@@ -1,4 +1,4 @@
-using CppSharp.AST;
+﻿using CppSharp.AST;
 using CppSharp.Generators;
 using CppSharp.Generators.CSharp;
 using CppSharp.Parser;
@@ -39,29 +39,6 @@ namespace MonoEmbeddinator4000.Generators
             return GetName(decl);
         }
 
-        static string GetIntegerTypeName(PrimitiveType primitive,
-            ParserTargetInfo targetInfo)
-        {
-            uint width;
-            bool signed;
-
-            GetPrimitiveTypeWidth(primitive, targetInfo, out width, out signed);
-
-            switch (width)
-            {
-                case 8:
-                    return signed ? "byte" : "UnsignedByte";
-                case 16:
-                    return signed ? "short" : "UnsignedShort";
-                case 32:
-                    return signed ? "int" : "UnsignedInt";
-                case 64:
-                    return signed ? "long" : "UnsignedLong";
-                default:
-                    throw new NotImplementedException();
-            }
-        }
-
         public override TypePrinterResult VisitPrimitiveType(PrimitiveType primitive,
             TypeQualifiers quals)
         {
@@ -73,18 +50,17 @@ namespace MonoEmbeddinator4000.Generators
                 case PrimitiveType.Char16:
                 case PrimitiveType.Char32:
                 case PrimitiveType.WideChar: return "com.sun.jna.WString";
-                case PrimitiveType.Char: return "com.sun.jna.String";
-                case PrimitiveType.SChar:
-                case PrimitiveType.UChar:
-                case PrimitiveType.Short:
-                case PrimitiveType.UShort:
-                case PrimitiveType.Int:
-                case PrimitiveType.UInt:
-                case PrimitiveType.Long:
-                case PrimitiveType.ULong:
-                case PrimitiveType.LongLong:
-                case PrimitiveType.ULongLong:
-                    return GetIntegerTypeName(primitive, Context.TargetInfo);
+                case PrimitiveType.Char: return "char";
+                case PrimitiveType.SChar: return "byte";
+                case PrimitiveType.UChar: return "UnsignedByte";
+                case PrimitiveType.Short: return "short";
+                case PrimitiveType.UShort: return "UnsignedShort";
+                case PrimitiveType.Int: return "int";
+                case PrimitiveType.UInt: return "UnsignedInt";
+                case PrimitiveType.Long: return "long";
+                case PrimitiveType.ULong: return "UnsignedLong";
+                case PrimitiveType.LongLong: return "LongLong";
+                case PrimitiveType.ULongLong: return "UnsignedLongLong";
                 case PrimitiveType.Int128: return "__int128";
                 case PrimitiveType.UInt128: return "__uint128_t";
                 case PrimitiveType.Half: return "__fp16";
@@ -94,7 +70,7 @@ namespace MonoEmbeddinator4000.Generators
                 case PrimitiveType.IntPtr:
                 case PrimitiveType.UIntPtr:
                 case PrimitiveType.Null: return "Pointer";
-                case PrimitiveType.String: return "java.lang.String";
+                case PrimitiveType.String: return "String";
             }
 
             throw new NotSupportedException();
