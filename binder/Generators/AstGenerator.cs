@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using IKVM.Reflection;
@@ -389,10 +389,10 @@ namespace MonoEmbeddinator4000.Generators
                 type = new BuiltinType(PrimitiveType.Bool);
                 break;
             case TypeCode.Char:
-                type = new BuiltinType(PrimitiveType.WideChar);
+                type = new BuiltinType(PrimitiveType.Char);
                 break;
             case TypeCode.SByte:
-                type = new BuiltinType(PrimitiveType.Char);
+                type = new BuiltinType(PrimitiveType.SChar);
                 break;
             case TypeCode.Byte:
                 type = new BuiltinType(PrimitiveType.UChar);
@@ -410,10 +410,10 @@ namespace MonoEmbeddinator4000.Generators
                 type = new BuiltinType(PrimitiveType.UInt);
                 break;
             case TypeCode.Int64:
-                type = new BuiltinType(PrimitiveType.LongLong);
+                type = new BuiltinType(PrimitiveType.Long);
                 break;
             case TypeCode.UInt64:
-                type = new BuiltinType(PrimitiveType.ULongLong);
+                type = new BuiltinType(PrimitiveType.ULong);
                 break;
             case TypeCode.Single:
                 type = new BuiltinType(PrimitiveType.Float);
