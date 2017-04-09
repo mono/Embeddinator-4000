@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using CppSharp;
@@ -250,17 +250,12 @@ namespace MonoEmbeddinator4000.Generators
 
                 WriteStartBraceIndent();
 
-                PrimitiveType primitive;
-                var isPrimitive = method.OriginalReturnType.Type.IsPrimitiveType(out primitive);
+	            PrimitiveType primitive;
+	            var isPrimitive = method.OriginalReturnType.Type.IsPrimitiveType(out primitive);
 
                 var hasReturn = primitive != PrimitiveType.Void;
                 if ((!(method.IsConstructor || method.IsDestructor)) && hasReturn)
-                {
-                    if (isPrimitive && primitive != PrimitiveType.String)
-                        WriteLine("return {0};", primitive == PrimitiveType.Bool ? "false" : "0");
-                    else
-                        WriteLine("return null;");
-                }
+                    GenerateMethodReturn(method);
 
                 WriteCloseBraceIndent();
             }
@@ -268,6 +263,60 @@ namespace MonoEmbeddinator4000.Generators
             PopBlock(NewLineKind.BeforeNextBlock);
 
             return true;
+        }
+
+        public void GenerateMethodReturn(Method method)
+        {
+            PrimitiveType primitive;
+            var isPrimitive = method.OriginalReturnType.Type.IsPrimitiveType(out primitive);
+
+            if (primitive == PrimitiveType.Void)
+                return;
+
+            if (!isPrimitive)
+            {
+                WriteLine("return null;");
+                return;
+            }
+
+            switch (primitive)
+            {
+                case PrimitiveType.Null:
+                    WriteLine("return null;");
+                    break;
+                case PrimitiveType.Bool:
+                    WriteLine("return false;");
+                    break;
+                case PrimitiveType.Char:
+                    WriteLine("return Character.MIN_VALUE;");
+                    break;
+                case PrimitiveType.UChar:
+                    WriteLine("return new UnsignedByte(0);");
+                    break;
+                case PrimitiveType.SChar:
+                case PrimitiveType.Short:
+                case PrimitiveType.Int:
+                case PrimitiveType.Long:
+                case PrimitiveType.LongLong:
+                    WriteLine($"return 0;");
+                    break;
+                case PrimitiveType.UShort:
+                case PrimitiveType.UInt:
+                case PrimitiveType.ULong:
+                    var name = primitive.ToString();
+                    WriteLine($"return new Unsigned{name.Substring(1)}(0);");
+                    break;
+                case PrimitiveType.Float:
+                case PrimitiveType.Double:
+                    WriteLine("return 0.0f;");
+                    break;
+                case PrimitiveType.String:
+                    WriteLine("return new String(\"\");");
+                    break;
+                case PrimitiveType.ULongLong:
+                default:
+                    throw new System.NotImplementedException();
+            }
         }
 
         public override bool VisitTypedefDecl(TypedefDecl typedef)
