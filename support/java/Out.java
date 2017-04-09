@@ -29,23 +29,23 @@
  */
 package mono.embeddinator;
 
-public class Ref<T> {
+public class Out<T> {
 
     public Obj<T> Obj = null;
 
-    public Ref(T value) {
+    public Out(T value) {
         Obj = new Obj<T>(value);
     }
 
-    public Ref() {
+    public Out() {
         Obj = new Obj<T>();
     }  
 
     public Out<T> Out() {
-        return(Obj.Out());
+        return(this);
     }
 
     public Ref<T> Ref() {
-        return(this);
+        return(Obj.Ref());
     }
 };
