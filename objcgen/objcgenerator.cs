@@ -129,6 +129,7 @@ namespace ObjC {
 			implementation.WriteLine ("{");
 			implementation.WriteLine ($"\tif (__{name}_image)");
 			implementation.WriteLine ("\t\treturn;");
+			implementation.WriteLine ("\t__initialize_mono ();");
 			implementation.WriteLine ($"\t__{name}_image = mono_embeddinator_load_assembly (&__mono_context, \"{name}.dll\");");
 			implementation.WriteLine ($"\tassert (__{name}_image && \"Could not load the assembly '{name}.dll'.\");");
 			implementation.WriteLine ("}");
@@ -142,36 +143,33 @@ namespace ObjC {
 		protected override void Generate (Type t)
 		{
 			var has_bound_base_class = types.Contains (t.BaseType);
+			var static_type = t.IsSealed && t.IsAbstract;
 
 			var managed_name = GetObjCName (t);
-			implementation.WriteLine ($"static void __lookup_class_{managed_name} ()");
-			implementation.WriteLine ("{");
-			implementation.WriteLine ($"\tif (!{managed_name}_class) {{");
-			implementation.WriteLine ("\t\t__initialize_mono ();");
-			implementation.WriteLine ("\t\t__lookup_assembly_managed ();");
-			implementation.WriteLine ($"\t\t{managed_name}_class = mono_class_from_name (__{t.Assembly.GetName ().Name}_image, \"{t.Namespace}\", \"{t.Name}\");");
-			implementation.WriteLine ("\t}");
-			implementation.WriteLine ("}");
-			implementation.WriteLine ();
 
 			var native_name = GetTypeName (t);
 			headers.WriteLine ();
 			headers.WriteLine ($"// {t.AssemblyQualifiedName}");
-			headers.WriteLine ($"@interface {native_name} : {GetTypeName (t.BaseType)} {{");
-
-			var static_type = t.IsSealed && t.IsAbstract;
-			// our internal field is only needed once in the type hierarchy
-			// and if it's not a static type in .net
-			if (!static_type && !types.Contains (t.BaseType))
-				headers.WriteLine ("\tMonoEmbedObject* _object;");
-			headers.WriteLine ("}");
-			if (!static_type && !has_bound_base_class)
-				headers.WriteLine ("-(void) dealloc;");
+			headers.WriteLine ($"@interface {native_name} : {GetTypeName (t.BaseType)}");
 			headers.WriteLine ();
 
 			implementation.WriteLine ();
 			implementation.WriteLine ($"// {t.AssemblyQualifiedName}");
-			implementation.WriteLine ($"@implementation {native_name}");
+			implementation.WriteLine ($"@implementation {native_name} {{");
+			// our internal field is only needed once in the type hierarchy
+			if (!static_type && !has_bound_base_class)
+				implementation.WriteLine ("\t@public MonoEmbedObject* _object;");
+			implementation.WriteLine ("}");
+			implementation.WriteLine ();
+
+			implementation.WriteLine ("+ (void) initialize");
+			implementation.WriteLine ("{");
+			implementation.WriteLine ($"\tif (self != [{managed_name} class])");
+			implementation.WriteLine ("\t\treturn;");
+			var aname = t.Assembly.GetName ().Name;
+			implementation.WriteLine ($"\t__lookup_assembly_{aname} ();");
+			implementation.WriteLine ($"\t{managed_name}_class = mono_class_from_name (__{aname}_image, \"{t.Namespace}\", \"{t.Name}\");");
+			implementation.WriteLine ("}");
 			implementation.WriteLine ();
 
 			if (!static_type && !has_bound_base_class) {
@@ -216,7 +214,6 @@ namespace ObjC {
 					implementation.WriteLine ($"\tconst char __method_name [] = \"{t.FullName}:{signature}\";");
 					implementation.WriteLine ("\tstatic MonoMethod* __method = nil;");
 					implementation.WriteLine ("\tif (!__method) {");
-					implementation.WriteLine ($"\t\t__lookup_class_{managed_name} ();");
 					implementation.WriteLine ($"\t\t__method = mono_embeddinator_lookup_method (__method_name, {managed_name}_class);");
 					implementation.WriteLine ("\t}");
 					// TODO: this logic will need to be update for managed NSObject types (e.g. from XI / XM) not to call [super init]
@@ -372,7 +369,7 @@ namespace ObjC {
 			implementation.WriteLine ($"\tconst char __method_name [] = \"{type.FullName}:{managed_name}({managed_parameters})\";");
 			implementation.WriteLine ("\tstatic MonoMethod* __method = nil;");
 			implementation.WriteLine ("\tif (!__method) {");
-			implementation.WriteLine ($"\t\t__lookup_class_{managed_type_name} ();");
+			//implementation.WriteLine ($"\t\t__lookup_class_{managed_type_name} ();");
 			implementation.WriteLine ($"\t\t__method = mono_embeddinator_lookup_method (__method_name, {managed_type_name}_class);");
 			implementation.WriteLine ("\t}");
 
