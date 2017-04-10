@@ -32,11 +32,11 @@ import com.sun.jna.*;
 
 public class UnsignedShort extends IntegerType {
     public UnsignedShort() {
-         super(4, true);
+         super(2, true);
     }
 
     public UnsignedShort(long value) {
-         super(4, value, true);
+         super(2, value, true);
     }
 }
 

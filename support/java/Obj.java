@@ -28,6 +28,8 @@
  * Original code from http://stackoverflow.com/a/22537292
  */
 
+package mono.embeddinator;
+
 /**
  *
  * @author jsimms
@@ -69,9 +71,6 @@
     return(Total.Value);
  }
  */
- 
-package mono.embeddinator;
-
 public class Obj<T> {
 
     public T Value;

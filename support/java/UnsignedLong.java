@@ -32,11 +32,11 @@ import com.sun.jna.*;
 
 public class UnsignedLong extends IntegerType {
     public UnsignedLong() {
-         super(4, true);
+         super(8, true);
     }
 
     public UnsignedLong(long value) {
-         super(4, value, true);
+         super(8, value, true);
     }
 }
 
