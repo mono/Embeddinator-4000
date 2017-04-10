@@ -1,4 +1,4 @@
-using CppSharp;
+﻿using CppSharp;
 using CppSharp.AST;
 using CppSharp.AST.Extensions;
 using System.Linq;
@@ -164,6 +164,7 @@ namespace MonoEmbeddinator4000.Generators
                 case PrimitiveType.Bool:
                 case PrimitiveType.WideChar:
                 case PrimitiveType.Char:
+                case PrimitiveType.SChar:
                 case PrimitiveType.UChar:
                 case PrimitiveType.Short:
                 case PrimitiveType.UShort:
@@ -194,7 +195,7 @@ namespace MonoEmbeddinator4000.Generators
                     return true;
             }
 
-            throw new System.NotSupportedException();
+            throw new System.NotImplementedException(primitive.ToString());
         }
     }
 
@@ -462,6 +463,7 @@ namespace MonoEmbeddinator4000.Generators
                 case PrimitiveType.Bool:
                 case PrimitiveType.Char:
                 case PrimitiveType.WideChar:
+                case PrimitiveType.SChar:
                 case PrimitiveType.UChar:
                 case PrimitiveType.Short:
                 case PrimitiveType.UShort:
@@ -483,7 +485,7 @@ namespace MonoEmbeddinator4000.Generators
                     return true;
             }
 
-            throw new System.NotSupportedException();
+            throw new System.NotImplementedException(primitive.ToString());
         }
     }
 }
