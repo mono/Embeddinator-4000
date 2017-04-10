@@ -184,6 +184,7 @@ typedef struct
 /**
  * Converts an error object to its string representation.
  */
+MONO_EMBEDDINATOR_API
 char* mono_embeddinator_error_to_string(mono_embeddinator_error_t error);
 
 /**
