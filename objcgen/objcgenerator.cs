@@ -143,6 +143,7 @@ namespace ObjC {
 		protected override void Generate (Type t)
 		{
 			var has_bound_base_class = types.Contains (t.BaseType);
+			var static_type = t.IsSealed && t.IsAbstract;
 
 			var managed_name = GetObjCName (t);
 
@@ -156,7 +157,7 @@ namespace ObjC {
 			implementation.WriteLine ($"// {t.AssemblyQualifiedName}");
 			implementation.WriteLine ($"@implementation {native_name} {{");
 			// our internal field is only needed once in the type hierarchy
-			if (!types.Contains (t.BaseType))
+			if (!static_type && !has_bound_base_class)
 				implementation.WriteLine ("\t@public MonoEmbedObject* _object;");
 			implementation.WriteLine ("}");
 			implementation.WriteLine ();
@@ -171,7 +172,7 @@ namespace ObjC {
 			implementation.WriteLine ("}");
 			implementation.WriteLine ();
 
-			if (!has_bound_base_class) {
+			if (!static_type && !has_bound_base_class) {
 				implementation.WriteLine ("-(void) dealloc");
 				implementation.WriteLine ("{");
 				implementation.WriteLine ("\tif (_object)");
@@ -254,7 +255,6 @@ namespace ObjC {
 					implementation.WriteLine ("\t\t\treturn nil;");
 					//implementation.WriteLine ("\t\t\tmono_embeddinator_throw_exception (__exception);");
 					implementation.WriteLine ("\t\t_object = mono_embeddinator_create_object (__instance);");
-					implementation.WriteLine ("\t\t_object->_handle = mono_gchandle_new (__instance, /*pinned=*/false);");
 					implementation.WriteLine ("\t}");
 					implementation.WriteLine ("\treturn self = [super init];");
 					implementation.WriteLine ("}");
@@ -262,7 +262,6 @@ namespace ObjC {
 				}
 			}
 
-			var static_type = t.IsSealed && t.IsAbstract;
 			if (!default_init || static_type) {
 				if (static_type)
 					headers.WriteLine ("// a .net static type cannot be initialized");
