@@ -421,7 +421,7 @@ namespace ObjC {
 			var name = CamelCase (mi.Name);
 
 			headers.Write (mi.IsStatic ? '+' : '-');
-			headers.WriteLine ($" ({return_type}) {name}{parameters};");
+			headers.WriteLine ($" ({return_type}){name}{parameters};");
 
 			ImplementMethod (mi.IsStatic, mi.ReturnType, name, mi.GetParameters (), mi.DeclaringType, mi.Name);
 		}
