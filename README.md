@@ -41,6 +41,8 @@ Open the solution in `build/MonoEmbeddinator4000.sln` with Visual Studio or Xama
 
 To generate bindings for a managed library you invoke the `MonoEmbeddinator4000.exe` command line tool.
 
+_Important: please follow the instructions in `objcgen`'s [README](https://github.com/mono/Embeddinator-4000/blob/objc/objcgen/README.md) to use the new and improved Objective-C generator (will eventually fusion with `MonoEmbeddinator4000.exe`._
+
 If you do not pass any arguments, you will get a list of the tool options:
 
 ```
