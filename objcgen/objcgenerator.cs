@@ -259,7 +259,10 @@ namespace ObjC {
 					//implementation.WriteLine ("\t\t\tmono_embeddinator_throw_exception (__exception);");
 					implementation.WriteLine ("\t\t_object = mono_embeddinator_create_object (__instance);");
 					implementation.WriteLine ("\t}");
-					implementation.WriteLine ("\treturn self = [super init];");
+					if (types.Contains (t.BaseType))
+						implementation.WriteLine ("\treturn self = [super initForSuper];");
+					else
+						implementation.WriteLine ("\treturn self = [super init];");
 					implementation.WriteLine ("}");
 					implementation.WriteLine ();
 				}
@@ -269,6 +272,21 @@ namespace ObjC {
 				if (static_type)
 					headers.WriteLine ("// a .net static type cannot be initialized");
 				headers.WriteLine ("- (instancetype)init NS_UNAVAILABLE;");
+			}
+
+			// TODO we should re-use the base `init` when it exists
+			if (!static_type) {
+				headers.WriteLine ("- (instancetype)initForSuper;");
+
+				implementation.WriteLine ("// only when `init` is not generated and we have subclasses");
+				implementation.WriteLine ("- (instancetype) initForSuper {");
+				// calls super's initForSuper until we reach a non-generated type
+				if (types.Contains (t.BaseType))
+					implementation.WriteLine ("\treturn self = [super initForSuper];");
+				else
+					implementation.WriteLine ("\treturn self = [super init];");
+				implementation.WriteLine ("}");
+				implementation.WriteLine ();
 			}
 
 			headers.WriteLine ();
@@ -321,11 +339,22 @@ namespace ObjC {
 			ImplementMethod (setter.IsStatic, setter.ReturnType, "set" + pi.Name, setter.GetParameters (), pi.DeclaringType, setter.Name);
 		}
 
+		public string GetReturnType (Type declaringType, Type returnType)
+		{
+			if (declaringType == returnType)
+				return "instancetype";
+
+			var return_type = GetTypeName (returnType);
+			if (types.Contains (returnType))
+				return_type += "*";
+			return return_type;
+		}
+
 		// TODO override with attribute ? e.g. [ObjC.Selector ("foo")]
 		void ImplementMethod (bool isStatic, Type returnType, string name, ParameterInfo [] parametersInfo, Type type, string managed_name)
 		{
 			var managed_type_name = GetObjCName (type);
-			var return_type = GetTypeName (returnType);
+			var return_type = GetReturnType (type, returnType);
 			StringBuilder parameters = new StringBuilder ();
 			StringBuilder managed_parameters = new StringBuilder ();
 			foreach (var p in parametersInfo) {
@@ -391,7 +420,7 @@ namespace ObjC {
 				parameters.Append (":(").Append (GetTypeName (p.ParameterType)).Append (")").Append (p.Name);
 			}
 
-			var return_type = GetTypeName (mi.ReturnType);
+			var return_type = GetReturnType (mi.DeclaringType, mi.ReturnType);
 			var name = CamelCase (mi.Name);
 
 			headers.Write (mi.IsStatic ? '+' : '-');
@@ -429,7 +458,13 @@ namespace ObjC {
 			case TypeCode.Object:
 				if (t.Namespace == "System" && t.Name == "Void")
 					return;
-				goto default;
+				if (!types.Contains (t))
+					goto default;
+				// TODO: cheating by reusing `initForSuper` - maybe a better name is needed
+				implementation.WriteLine ($"\t{GetTypeName (t)}* __peer = [[{GetTypeName (t)} alloc] initForSuper];");
+				implementation.WriteLine ("\t__peer->_object = mono_embeddinator_create_object (__result);");
+				implementation.WriteLine ("\treturn __peer;");
+				break;
 			default:
 				throw new NotImplementedException ($"Returning type {t.Name} from native code");
 			}

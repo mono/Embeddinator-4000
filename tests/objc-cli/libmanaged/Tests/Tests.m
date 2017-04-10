@@ -71,6 +71,14 @@
 	// .cctor that throw - can't be called directly but it makes the type unusable
 	id static_thrower = [[Exceptions_ThrowInStaticCtor alloc] init];
 	XCTAssertNil (static_thrower, "Exceptions_ThrowInStaticCtor init");
+	
+	// .ctor chaining
+	id sup1 = [[Exceptions_Super alloc] initWithBroken:false];
+	XCTAssertNotNil (sup1, "not broken (as expected)");
+
+	// beside chaining this can detect (possible, it's fine) leaks (e.g. of CGHandle)
+	id sup2 = [[Exceptions_Super alloc] initWithBroken:true];
+	XCTAssertNil (sup2, "broken (exception thrown in managed code)");
 }
 
 - (void)testConstructors {
@@ -101,6 +109,11 @@
 
 	Constructors_AllTypeCode* all4 = [[Constructors_AllTypeCode alloc] initWithF32:FLT_MAX F64:DBL_MAX];
 	XCTAssertTrue ([all4 testResult], "all4");
+}
+
+- (void)testMethods {
+	id static_method = [Methods_Static create: 1];
+	XCTAssert ([static_method id] == 1, "create id");
 }
 
 - (void)testStaticCallPerformance {
