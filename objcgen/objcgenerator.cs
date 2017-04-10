@@ -258,7 +258,6 @@ namespace ObjC {
 					implementation.WriteLine ("\t\t\treturn nil;");
 					//implementation.WriteLine ("\t\t\tmono_embeddinator_throw_exception (__exception);");
 					implementation.WriteLine ("\t\t_object = mono_embeddinator_create_object (__instance);");
-					implementation.WriteLine ("\t\t_object->_handle = mono_gchandle_new (__instance, /*pinned=*/false);");
 					implementation.WriteLine ("\t}");
 					implementation.WriteLine ("\treturn self = [super init];");
 					implementation.WriteLine ("}");
