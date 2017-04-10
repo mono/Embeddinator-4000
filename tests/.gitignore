@@ -6,4 +6,5 @@
 **/java
 **/obj
 **/*.Tests
-**/*.dylib
+*.dylib
+*.jar

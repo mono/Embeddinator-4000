@@ -39,4 +39,5 @@ bindings.m
 /external/ikvm
 packages
 *.dSYM
+*.class
 
