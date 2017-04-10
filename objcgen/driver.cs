@@ -256,6 +256,8 @@ namespace Embeddinator {
 			StringBuilder options = new StringBuilder ("clang ");
 			if (Debug)
 				options.Append ("-g -O0 ");
+			else
+				options.Append ("-O2 -DTOKENLOOKUP ");
 			options.Append ("-fobjc-arc ");
 			options.Append ("-DMONO_EMBEDDINATOR_DLL_EXPORT ");
 			options.Append ("-framework CoreFoundation ");
