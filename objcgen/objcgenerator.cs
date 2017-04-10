@@ -158,11 +158,14 @@ namespace ObjC {
 			headers.WriteLine ();
 			headers.WriteLine ($"// {t.AssemblyQualifiedName}");
 			headers.WriteLine ($"@interface {native_name} : {GetTypeName (t.BaseType)} {{");
+
+			var static_type = t.IsSealed && t.IsAbstract;
 			// our internal field is only needed once in the type hierarchy
-			if (!types.Contains (t.BaseType))
+			// and if it's not a static type in .net
+			if (!static_type && !types.Contains (t.BaseType))
 				headers.WriteLine ("\tMonoEmbedObject* _object;");
 			headers.WriteLine ("}");
-			if (!has_bound_base_class)
+			if (!static_type && !has_bound_base_class)
 				headers.WriteLine ("-(void) dealloc;");
 			headers.WriteLine ();
 
@@ -171,7 +174,7 @@ namespace ObjC {
 			implementation.WriteLine ($"@implementation {native_name}");
 			implementation.WriteLine ();
 
-			if (!has_bound_base_class) {
+			if (!static_type && !has_bound_base_class) {
 				implementation.WriteLine ("-(void) dealloc");
 				implementation.WriteLine ("{");
 				implementation.WriteLine ("\tif (_object)");
@@ -263,7 +266,6 @@ namespace ObjC {
 				}
 			}
 
-			var static_type = t.IsSealed && t.IsAbstract;
 			if (!default_init || static_type) {
 				if (static_type)
 					headers.WriteLine ("// a .net static type cannot be initialized");
