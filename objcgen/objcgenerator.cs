@@ -281,6 +281,7 @@ namespace ObjC {
 				if (static_type)
 					headers.WriteLine ("// a .net static type cannot be initialized");
 				headers.WriteLine ("- (instancetype)init NS_UNAVAILABLE;");
+				headers.WriteLine ("+ (instancetype)new NS_UNAVAILABLE;");
 			}
 
 			// TODO we should re-use the base `init` when it exists
