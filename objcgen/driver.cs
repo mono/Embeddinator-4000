@@ -277,7 +277,6 @@ namespace Embeddinator {
 				throw ErrorHelper.CreateError (99, "Internal error: invalid compilation target {0}. Please file a bug report with a test case (https://github.com/mono/Embeddinator-4000/issues).", CompilationTarget);
 			}
 
-			Console.WriteLine ("Compiling binding code...");
 			Console.WriteLine ($"\tInvoking: xcrun {options}");
 			var p = Process.Start ("xcrun", options.ToString ());
 			p.WaitForExit ();
