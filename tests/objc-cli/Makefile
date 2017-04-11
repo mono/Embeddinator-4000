@@ -56,7 +56,7 @@ xctest:
 test-leaks: test-cli-leaks test-perf-leaks test-xctest-leaks
 
 ../leaktest/bin/Debug/leaktest.exe: $(wildcard ../leaktest/*.cs) libLeakCheckAtExit.dylib
-	/Library/Frameworks/Mono.framework/Versions/Current/Commands/xbuild /verbosity:quiet /nologo ../leaktest/leaktest.csproj
+	/Library/Frameworks/Mono.framework/Versions/Current/Commands/msbuild /verbosity:quiet /nologo ../leaktest/leaktest.csproj
 
 test-cli-leaks: test-cli ../leaktest/bin/Debug/leaktest.exe
 	mono --debug ../leaktest/bin/Debug/leaktest.exe $(abspath $<)
