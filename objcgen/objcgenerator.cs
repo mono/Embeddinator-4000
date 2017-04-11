@@ -523,7 +523,7 @@ namespace ObjC {
 			case TypeCode.UInt64:
 				return "unsigned long long";
 			case TypeCode.String:
-				return "NSString*";
+				return "NSString *";
 			default:
 				throw new NotImplementedException ($"Converting type {t.Name} to a native type name");
 			}
