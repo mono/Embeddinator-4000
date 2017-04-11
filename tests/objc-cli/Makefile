@@ -1,5 +1,7 @@
 all: run-test perf xctest test-leaks test-static test-dynamic
 
+MONO=/Library/Frameworks/Mono.framework/Versions/Current/Commands/mono
+
 OBJC_GEN_DIR=../../objcgen
 OBJC_GEN=$(OBJC_GEN_DIR)/bin/Debug/objcgen.exe
 $(OBJC_GEN): $(wildcard $(OBJC_GEN_DIR)/*.cs) $(wildcard ../../support/*)
@@ -12,24 +14,41 @@ $(MANAGED_DLL): $(wildcard $(MANAGED_DLL_DIR)/*.cs)
 
 managed.dll: $(MANAGED_DLL)
 	cp $< $@
+	mkdir release
+	cp $< release/
 
 libmanaged.dylib: managed.dll $(OBJC_GEN)
-	/Library/Frameworks/Mono.framework/Versions/Current/Commands/mono --debug $(OBJC_GEN) --debug managed.dll -c
+	$(MONO) --debug $(OBJC_GEN) --debug managed.dll -c
+
+release/libmanaged.dylib: managed.dll $(OBJC_GEN)
+	$(MONO) --debug $(OBJC_GEN) managed.dll -c -o release
 
 test-cli: test-managed.m libmanaged.dylib
-	clang -g $< -lmanaged -L. -framework Foundation -o $@ -rpath @executable_path -fobjc-arc
+	clang -g -O0 $< -lmanaged -L. -framework Foundation -o $@ -rpath @executable_path -fobjc-arc
+
+release/test-cli: test-managed.m release/libmanaged.dylib
+	clang -O2 $< -lmanaged -Lrelease -framework Foundation -o $@ -rpath @executable_path -fobjc-arc
 
 perf-cli: perf-test.m libmanaged.dylib
-	clang -g $< -lmanaged -L. -framework Foundation -o $@ -rpath @executable_path -fobjc-arc
+	clang -g -O0 $< -lmanaged -L. -framework Foundation -o $@ -rpath @executable_path -fobjc-arc
 
-run-test: test-cli
+release/perf-cli: perf-test.m release/libmanaged.dylib
+	clang -O2 $< -lmanaged -Lrelease -framework Foundation -o $@ -rpath @executable_path -fobjc-arc
+
+run-test: test-cli release/test-cli
+	@echo "Test (Debug)"
 	./test-cli
+	@echo "Test (Release)"
+	./release/test-cli
 
-perf: perf-cli
+perf: perf-cli release/perf-cli
+	@echo "Performance (Debug)"
 	time ./perf-cli
+	@echo "Performance (Release)"
+	time ./release/perf-cli
 
 clean:
-	@rm -f *.h glib.c mono_embeddinator.c bindings.m *.dylib *.dll test-cli perf-cli
+	@rm -rf *.h glib.c mono_embeddinator.c bindings.m *.dylib *.dll test-cli perf-cli release
 
 xctest:
 	xcodebuild test -project libmanaged/*.xcodeproj -scheme Tests

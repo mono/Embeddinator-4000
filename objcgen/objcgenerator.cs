@@ -171,7 +171,12 @@ namespace ObjC {
 			implementation.WriteLine ("\t\treturn;");
 			var aname = t.Assembly.GetName ().Name;
 			implementation.WriteLine ($"\t__lookup_assembly_{aname} ();");
+
+			implementation.WriteLine ("#if TOKENLOOKUP");
+			implementation.WriteLine ($"\t{managed_name}_class = mono_class_get (__{aname}_image, 0x{t.MetadataToken:X8});");
+			implementation.WriteLine ("#else");
 			implementation.WriteLine ($"\t{managed_name}_class = mono_class_from_name (__{aname}_image, \"{t.Namespace}\", \"{t.Name}\");");
+			implementation.WriteLine ("#endif");
 			implementation.WriteLine ("}");
 			implementation.WriteLine ();
 
@@ -214,10 +219,14 @@ namespace ObjC {
 
 					implementation.WriteLine ($"- (instancetype){name}");
 					implementation.WriteLine ("{");
-					implementation.WriteLine ($"\tconst char __method_name [] = \"{t.FullName}:{signature}\";");
 					implementation.WriteLine ("\tstatic MonoMethod* __method = nil;");
 					implementation.WriteLine ("\tif (!__method) {");
+					implementation.WriteLine ("#if TOKENLOOKUP");
+					implementation.WriteLine ($"\t\t__method = mono_get_method (__{aname}_image, 0x{ctor.MetadataToken:X8}, {managed_name}_class);");
+					implementation.WriteLine ("#else");
+					implementation.WriteLine ($"\t\tconst char __method_name [] = \"{t.FullName}:{signature}\";");
 					implementation.WriteLine ($"\t\t__method = mono_embeddinator_lookup_method (__method_name, {managed_name}_class);");
+					implementation.WriteLine ("#endif");
 					implementation.WriteLine ("\t}");
 					// TODO: this logic will need to be update for managed NSObject types (e.g. from XI / XM) not to call [super init]
 					implementation.WriteLine ("\tif (!_object) {");
@@ -332,11 +341,11 @@ namespace ObjC {
 			var property_type = GetTypeName (pi.PropertyType);
 			headers.WriteLine ($") {property_type} {name};");
 
-			ImplementMethod (getter.IsStatic, getter.ReturnType, name, NoParameters, pi.DeclaringType, getter.Name);
+			ImplementMethod (getter.IsStatic, getter.ReturnType, name, NoParameters, pi.DeclaringType, getter.Name, getter.MetadataToken);
 			if (setter == null)
 				return;
 
-			ImplementMethod (setter.IsStatic, setter.ReturnType, "set" + pi.Name, setter.GetParameters (), pi.DeclaringType, setter.Name);
+			ImplementMethod (setter.IsStatic, setter.ReturnType, "set" + pi.Name, setter.GetParameters (), pi.DeclaringType, setter.Name, setter.MetadataToken);
 		}
 
 		public string GetReturnType (Type declaringType, Type returnType)
@@ -351,7 +360,7 @@ namespace ObjC {
 		}
 
 		// TODO override with attribute ? e.g. [ObjC.Selector ("foo")]
-		void ImplementMethod (bool isStatic, Type returnType, string name, ParameterInfo [] parametersInfo, Type type, string managed_name)
+		void ImplementMethod (bool isStatic, Type returnType, string name, ParameterInfo [] parametersInfo, Type type, string managed_name, int token)
 		{
 			var managed_type_name = GetObjCName (type);
 			var return_type = GetReturnType (type, returnType);
@@ -369,11 +378,15 @@ namespace ObjC {
 			implementation.Write (isStatic ? '+' : '-');
 			implementation.WriteLine ($" ({return_type}) {name}{parameters}");
 			implementation.WriteLine ("{");
-			implementation.WriteLine ($"\tconst char __method_name [] = \"{type.FullName}:{managed_name}({managed_parameters})\";");
 			implementation.WriteLine ("\tstatic MonoMethod* __method = nil;");
 			implementation.WriteLine ("\tif (!__method) {");
-			//implementation.WriteLine ($"\t\t__lookup_class_{managed_type_name} ();");
+			implementation.WriteLine ("#if TOKENLOOKUP");
+			var aname = type.Assembly.GetName ().Name;
+			implementation.WriteLine ($"\t\t__method = mono_get_method (__{aname}_image, 0x{token:X8}, {managed_type_name}_class);");
+			implementation.WriteLine ("#else");
+			implementation.WriteLine ($"\t\tconst char __method_name [] = \"{type.FullName}:{managed_name}({managed_parameters})\";");
 			implementation.WriteLine ($"\t\t__method = mono_embeddinator_lookup_method (__method_name, {managed_type_name}_class);");
+			implementation.WriteLine ("#endif");
 			implementation.WriteLine ("\t}");
 
 			var args = "nil";
@@ -426,7 +439,7 @@ namespace ObjC {
 			headers.Write (mi.IsStatic ? '+' : '-');
 			headers.WriteLine ($" ({return_type}){name}{parameters};");
 
-			ImplementMethod (mi.IsStatic, mi.ReturnType, name, mi.GetParameters (), mi.DeclaringType, mi.Name);
+			ImplementMethod (mi.IsStatic, mi.ReturnType, name, mi.GetParameters (), mi.DeclaringType, mi.Name, mi.MetadataToken);
 		}
 
 		void ReturnValue (Type t)

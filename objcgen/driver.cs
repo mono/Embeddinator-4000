@@ -334,6 +334,8 @@ namespace Embeddinator {
 					var common_options = new StringBuilder ("clang ");
 					if (Debug)
 						common_options.Append ("-g -O0 ");
+					else
+						common_options.Append ("-O2 -DTOKENLOOKUP ");
 					common_options.Append ("-fobjc-arc ");
 					common_options.Append ("-ObjC ");
 					common_options.Append ($"-arch {arch} ");
