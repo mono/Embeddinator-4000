@@ -228,6 +228,26 @@ namespace Embeddinator {
 			return 0;
 		}
 
+		static string xcode_app;
+		static string XcodeApp {
+			get {
+				if (string.IsNullOrEmpty (xcode_app)) {
+					using (var process = new Process ()) {
+						process.StartInfo.FileName = "xcode-select";
+						process.StartInfo.Arguments = "-p";
+						process.StartInfo.UseShellExecute = false;
+						process.StartInfo.RedirectStandardOutput = true;
+						process.Start ();
+						var output = process.StandardOutput.ReadToEnd ();
+						if (process.ExitCode != 0)
+							throw ErrorHelper.CreateError (6, "Could not find the Xcode location.");
+						xcode_app = Path.GetDirectoryName (Path.GetDirectoryName (output.Trim ()));
+					}
+				}
+				return xcode_app;
+			}
+		}
+
 		class BuildInfo
 		{
 			public string Sdk;
@@ -317,7 +337,7 @@ namespace Embeddinator {
 					common_options.Append ("-fobjc-arc ");
 					common_options.Append ("-ObjC ");
 					common_options.Append ($"-arch {arch} ");
-					common_options.Append ($"-isysroot /Applications/Xcode.app/Contents/Developer/Platforms/{build_info.Sdk}.platform/Developer/SDKs/{build_info.Sdk}.sdk ");
+					common_options.Append ($"-isysroot {XcodeApp}/Contents/Developer/Platforms/{build_info.Sdk}.platform/Developer/SDKs/{build_info.Sdk}.sdk ");
 					common_options.Append ($"-m{build_info.SdkName}-version-min={build_info.MinVersion} ");
 					common_options.Append ("-I/Library/Frameworks/Mono.framework/Versions/Current/include/mono-2.0 ");
 
