@@ -33,7 +33,7 @@ public class Person {
 // this requires 3 calls / transitions to initialize the instance
 Person *p = [[Person alloc] init];
 p.firstName = @"Sebastien";
-p.LastName = @"Pouliot";
+p.lastName = @"Pouliot";
 ```
 
 **Chunky**
@@ -45,7 +45,7 @@ public class Person {
 
 ```
 // a single call / transition will perform better
-Person *p = [[Person alloc] initWithFirstName:@"Sebastien" LastName:"Pouliot"];
+Person *p = [[Person alloc] initWithFirstName:@"Sebastien" lastName:@"Pouliot"];
 ```
 
 Since the number of transitions is smaller the performance will be better. It also requires less code to be generated so this will produce a smaller native library as well.
@@ -89,10 +89,12 @@ id reader = [[XAMXmlConfigReader alloc] init];
 
 Even good .NET names might not be ideal for an ObjC API.
 
+Naming conventions in ObjC are different than .NET (camel case instead of pascal case, more verbose).
+Please read the [coding guidelines for Cocoa](https://developer.apple.com/library/content/documentation/Cocoa/Conceptual/CodingGuidelines/Articles/NamingMethods.html#//apple_ref/doc/uid/20001282-BCIGIJJF).
+
 From an ObjC developer point of view a method with a `Get` prefix implies you do not own the instance, i.e. the [get rule](https://developer.apple.com/library/content/documentation/CoreFoundation/Conceptual/CFMemoryMgmt/Concepts/Ownership.html#//apple_ref/doc/uid/20001148-SW1).
 
 This naming rule has not match in the .NET GC world, just a .NET method with a `Create` prefix will behave identically in .NET. However, for ObjC developers, it normally means you own the returned instance, i.e. the [create rule](https://developer.apple.com/library/content/documentation/CoreFoundation/Conceptual/CFMemoryMgmt/Concepts/Ownership.html#//apple_ref/doc/uid/20001148-103029).
-
 
 # Exceptions
 

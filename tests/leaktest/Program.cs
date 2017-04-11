@@ -32,8 +32,9 @@ class LeakTester
 			return 1;
 		}
 
-		var ready_file = Path.GetFullPath (".stamp-ready"); // this file is removed when the test app is ready for leak check
-		var done_file = Path.GetFullPath (".stamp-done"); // this file is removed when the leak check is complete, this means the test app can exit
+		var pid = Process.GetCurrentProcess ().Id;
+		var ready_file = Path.GetFullPath ($".stamp-ready-{pid}"); // this file is removed when the test app is ready for leak check
+		var done_file = Path.GetFullPath ($".stamp-done-{pid}"); // this file is removed when the leak check is complete, this means the test app can exit
 
 		File.WriteAllText (ready_file, string.Empty);
 		File.WriteAllText (done_file, string.Empty);

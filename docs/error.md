@@ -36,6 +36,10 @@ The tool does not support the platform `X`. It is possible that another version 
 
 The tool does not support the target `X`. It is possible that another version of the tool supports it or that it does not apply in this environment.
 
+<h3><a name="EM0005"/>EM0005: The compilation target `X` is not valid.</h3>
+
+The tool does not support the compilation target `X`. It is possible that another version of the tool supports it or that it does not apply in this environment.
+
 <h3><a name="EM0099"/>EM0099: Internal error *. Please file a bug report with a test case (https://github.com/mono/Embeddinator-4000/issues).</h3>
 
 This error message is reported when an internal consistency check in the Embeddinator-4000 fails.

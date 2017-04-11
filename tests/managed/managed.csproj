@@ -37,6 +37,7 @@
     <Compile Include="types.cs" />
     <Compile Include="exceptions.cs" />
     <Compile Include="constructors.cs" />
+    <Compile Include="methods.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
