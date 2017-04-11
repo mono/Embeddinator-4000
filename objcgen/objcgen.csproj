@@ -341,6 +341,10 @@
       <Link>support\main.c</Link>
       <LogicalName>main.c</LogicalName>
     </EmbeddedResource>
+    <EmbeddedResource Include="..\support\mono-support.h">
+      <Link>support\mono-support.h</Link>
+      <LogicalName>mono-support.h</LogicalName>
+    </EmbeddedResource>
     <EmbeddedResource Include="..\support\objc-support.h">
       <Link>support\objc-support.h</Link>
       <LogicalName>objc-support.h</LogicalName>

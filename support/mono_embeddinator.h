@@ -59,17 +59,7 @@
 #endif
 
 #include "embeddinator.h"
-typedef uint16_t gunichar2;
-
-typedef struct _GArray GArray;
-typedef struct _GString GString;
-
-typedef struct _MonoDomain MonoDomain;
-typedef struct _MonoException MonoException;
-typedef struct _MonoClass MonoClass;
-typedef struct _MonoObject MonoObject;
-typedef struct _MonoImage MonoImage;
-typedef struct _MonoMethod MonoMethod;
+#include "mono-support.h"
 
 MONO_EMBEDDINATOR_BEGIN_DECLS
 

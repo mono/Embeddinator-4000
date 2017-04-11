@@ -1,5 +1,5 @@
 /*
- * ObjC support code
+ * Mono support code
  *
  * Copyright (C) 2017 Microsoft Inc.
  *
@@ -23,21 +23,20 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#pragma once
+#include <mono/jit/jit.h>
+#include <mono/metadata/mono-config.h>
+#include <mono/metadata/assembly.h>
+#include <mono/metadata/debug-helpers.h>
+#include <mono/metadata/object.h>
 
-#include "mono_embeddinator.h"
-#include "glib.h"
-#include "mono-support.h"
+typedef uint16_t gunichar2;
 
-#import <Foundation/Foundation.h>
+typedef struct _GArray GArray;
+typedef struct _GString GString;
 
-MONO_EMBEDDINATOR_BEGIN_DECLS
-
-MONO_EMBEDDINATOR_API
-NSString* mono_embeddinator_get_nsstring (MonoString* string);
-
-MONO_EMBEDDINATOR_API
-NSComparisonResult mono_embeddinator_compare_to (MonoEmbedObject *object, MonoMethod *method, MonoEmbedObject *other);
-
-MONO_EMBEDDINATOR_END_DECLS
-	
+typedef struct _MonoDomain MonoDomain;
+typedef struct _MonoException MonoException;
+typedef struct _MonoClass MonoClass;
+typedef struct _MonoObject MonoObject;
+typedef struct _MonoImage MonoImage;
+typedef struct _MonoMethod MonoMethod;
