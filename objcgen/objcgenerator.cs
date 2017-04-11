@@ -90,6 +90,7 @@ namespace ObjC {
 
 			implementation.WriteLine ("#include \"bindings.h\"");
 			implementation.WriteLine ("#include \"glib.h\"");
+			implementation.WriteLine ("#include \"objc-support.h\"");
 			implementation.WriteLine ("#include <mono/jit/jit.h>");
 			implementation.WriteLine ("#include <mono/metadata/assembly.h>");
 			implementation.WriteLine ("#include <mono/metadata/object.h>");
@@ -430,11 +431,7 @@ namespace ObjC {
 		{
 			switch (Type.GetTypeCode (t)) {
 			case TypeCode.String:
-				implementation.WriteLine ("\tif (__result == NULL)");
-				implementation.WriteLine ("\t\treturn NULL;");
-				implementation.WriteLine ("\tint length = mono_string_length ((MonoString *) __result);");
-				implementation.WriteLine ("\tgunichar2 *str = mono_string_chars ((MonoString *) __result);");
-				implementation.WriteLine ("\treturn [[NSString alloc] initWithBytes: str length: length * 2 encoding: NSUTF16LittleEndianStringEncoding];");
+				implementation.WriteLine ("\treturn mono_embeddinator_get_nsstring ((MonoString *) __result);");
 				break;
 			case TypeCode.Boolean:
 			case TypeCode.Char:

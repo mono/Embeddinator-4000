@@ -331,6 +331,14 @@
       <Link>support\main.c</Link>
       <LogicalName>main.c</LogicalName>
     </EmbeddedResource>
+    <EmbeddedResource Include="..\support\objc-support.h">
+      <Link>support\objc-support.h</Link>
+      <LogicalName>objc-support.h</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\support\objc-support.m">
+      <Link>support\objc-support.m</Link>
+      <LogicalName>objc-support.m</LogicalName>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
