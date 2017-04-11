@@ -338,6 +338,7 @@ namespace Embeddinator {
 						common_options.Append ("-O2 -DTOKENLOOKUP ");
 					common_options.Append ("-fobjc-arc ");
 					common_options.Append ("-ObjC ");
+					common_options.Append ("-Wall ");
 					common_options.Append ($"-arch {arch} ");
 					common_options.Append ($"-isysroot {XcodeApp}/Contents/Developer/Platforms/{build_info.Sdk}.platform/Developer/SDKs/{build_info.Sdk}.sdk ");
 					common_options.Append ($"-m{build_info.SdkName}-version-min={build_info.MinVersion} ");
