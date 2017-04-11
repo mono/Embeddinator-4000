@@ -152,8 +152,6 @@ MonoImage* mono_embeddinator_load_assembly(mono_embeddinator_context_t* ctx, con
 
     MonoAssembly* mono_assembly = mono_domain_assembly_open(ctx->domain, path);
 
-    g_free (path);
-
     if (!mono_assembly)
     {
         mono_embeddinator_error_t error;
@@ -161,8 +159,12 @@ MonoImage* mono_embeddinator_load_assembly(mono_embeddinator_context_t* ctx, con
         error.string = path;
         mono_embeddinator_error(error);
 
+        g_free (path);
+
         return 0;
     }
+
+    g_free (path);
 
     return mono_assembly_get_image(mono_assembly);
 }
@@ -184,7 +186,6 @@ MonoClass* mono_embeddinator_search_class(const char* assembly, const char* _nam
 
     char* path = mono_embeddinator_search_assembly(assembly);
     MonoAssembly* mono_assembly = mono_domain_assembly_open(ctx->domain, path);
-    g_free (path);
 
     if (mono_assembly == 0)
     {
@@ -193,6 +194,8 @@ MonoClass* mono_embeddinator_search_class(const char* assembly, const char* _nam
         error.string = path;
         mono_embeddinator_error(error);
     }
+
+    g_free (path);
 
     MonoImage* image = mono_assembly_get_image(mono_assembly);
     MonoClass* klass = mono_class_from_name(image, _namespace, name);
