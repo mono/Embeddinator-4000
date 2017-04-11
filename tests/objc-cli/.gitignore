@@ -6,6 +6,7 @@ objc-support.m
 objc-support.h
 perf-cli
 test-cli
+release/
 # Xcode
 .DS_Store
 build/
