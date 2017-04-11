@@ -178,7 +178,6 @@ namespace MonoEmbeddinator4000.Generators
         public override bool VisitClassDecl(Class @class)
         {
             GenerateClassSpecifier(@class);
-            Write(" ");
 
             WriteStartBraceIndent();
             VisitDeclContext(@class);
@@ -250,8 +249,8 @@ namespace MonoEmbeddinator4000.Generators
 
                 WriteStartBraceIndent();
 
-	            PrimitiveType primitive;
-	            var isPrimitive = method.OriginalReturnType.Type.IsPrimitiveType(out primitive);
+                PrimitiveType primitive;
+                var isPrimitive = method.OriginalReturnType.Type.IsPrimitiveType(out primitive);
 
                 var hasReturn = primitive != PrimitiveType.Void;
                 if ((!(method.IsConstructor || method.IsDestructor)) && hasReturn)
