@@ -25,8 +25,7 @@ namespace MonoEmbeddinator4000.Generators
         public static IEnumerable<string> GetPackageNames(Declaration decl)
         {
             var namespaces = Declaration.GatherNamespaces(decl.Namespace)
-                .ToList();
-            namespaces.Remove(namespaces.First());
+                .Where(ns => !(ns is TranslationUnit));
 
             return namespaces.Select(n => n.Name.ToLowerInvariant());
         }
