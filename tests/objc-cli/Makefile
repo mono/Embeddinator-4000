@@ -1,4 +1,4 @@
-all: run-test perf xctest test-leaks
+all: run-test perf xctest test-leaks test-static test-dynamic
 
 OBJC_GEN_DIR=../../objcgen
 OBJC_GEN=$(OBJC_GEN_DIR)/bin/Debug/objcgen.exe
@@ -52,3 +52,13 @@ test-xctest-leaks: ../leaktest/bin/Debug/leaktest.exe $(MANAGED_DLL) libmanaged.
 
 libLeakCheckAtExit.dylib: leak-at-exit.c
 	clang -arch i386 -arch x86_64 -shared $< -o $@
+
+test-static: test-static-macos test-static-ios test-static-tvos test-static-watchos
+
+test-static-%: managed.dll $(OBJC_GEN)
+	/Library/Frameworks/Mono.framework/Versions/Current/Commands/mono --debug $(OBJC_GEN) --debug managed.dll -c --outdir=build/$@-temp-dir --target=staticlibrary --platform=$*
+
+test-dynamic: test-dynamic-macos test-dynamic-ios test-dynamic-tvos test-dynamic-watchos
+
+test-dynamic-%: managed.dll $(OBJC_GEN)
+	/Library/Frameworks/Mono.framework/Versions/Current/Commands/mono --debug $(OBJC_GEN) --debug managed.dll -c --outdir=build/$@-temp-dir --target=dylib --platform=$*

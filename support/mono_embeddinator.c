@@ -35,14 +35,11 @@
 #include <string.h>
 
 #if defined(__APPLE__)
-#include <errno.h>
-#include <libproc.h>
-#include <unistd.h>
+#include <mach-o/dyld.h>
 #endif
 
 #if defined(__OBJC__)
 #include <objc/runtime.h>
-#include <objc/objc-runtime.h>
 #endif
 
 #ifdef _WIN32
@@ -101,14 +98,10 @@ static GString* get_current_executable_path()
     if (path_override)
         return path_override;
 #if defined(__APPLE__)
-    int ret;
-    pid_t pid; 
-    char pathbuf[PROC_PIDPATHINFO_MAXSIZE];
-
-    pid = getpid();
-    ret = proc_pidpath (pid, pathbuf, sizeof(pathbuf));
-
-   return (ret > 0) ? g_string_new(pathbuf) : 0;
+    char pathbuf [1024];
+    uint32_t bufsize = sizeof (pathbuf);
+    int ret = _NSGetExecutablePath (pathbuf, &bufsize);
+    return ret == 0 ? g_string_new (pathbuf) : 0;
 #elif defined(_WIN32)
     HMODULE hModule = GetModuleHandleW(0);
     CHAR pathbuf[MAX_PATH];

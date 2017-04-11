@@ -90,6 +90,7 @@ namespace ObjC {
 
 			implementation.WriteLine ("#include \"bindings.h\"");
 			implementation.WriteLine ("#include \"glib.h\"");
+			implementation.WriteLine ("#include \"objc-support.h\"");
 			implementation.WriteLine ("#include <mono/jit/jit.h>");
 			implementation.WriteLine ("#include <mono/metadata/assembly.h>");
 			implementation.WriteLine ("#include <mono/metadata/object.h>");
@@ -150,15 +151,17 @@ namespace ObjC {
 			var native_name = GetTypeName (t);
 			headers.WriteLine ();
 			headers.WriteLine ($"// {t.AssemblyQualifiedName}");
-			headers.WriteLine ($"@interface {native_name} : {GetTypeName (t.BaseType)}");
+			headers.WriteLine ($"@interface {native_name} : {GetTypeName (t.BaseType)} {{");
+			if (!static_type && !has_bound_base_class) {
+				headers.WriteLine ("\tMonoEmbedObject* _object;");
+			}
+			headers.WriteLine ("}");
 			headers.WriteLine ();
 
 			implementation.WriteLine ();
 			implementation.WriteLine ($"// {t.AssemblyQualifiedName}");
 			implementation.WriteLine ($"@implementation {native_name} {{");
 			// our internal field is only needed once in the type hierarchy
-			if (!static_type && !has_bound_base_class)
-				implementation.WriteLine ("\t@public MonoEmbedObject* _object;");
 			implementation.WriteLine ("}");
 			implementation.WriteLine ();
 
@@ -434,7 +437,7 @@ namespace ObjC {
 			var name = CamelCase (mi.Name);
 
 			headers.Write (mi.IsStatic ? '+' : '-');
-			headers.WriteLine ($" ({return_type}) {name}{parameters};");
+			headers.WriteLine ($" ({return_type}){name}{parameters};");
 
 			ImplementMethod (mi.IsStatic, mi.ReturnType, name, mi.GetParameters (), mi.DeclaringType, mi.Name, mi.MetadataToken);
 		}
@@ -443,11 +446,7 @@ namespace ObjC {
 		{
 			switch (Type.GetTypeCode (t)) {
 			case TypeCode.String:
-				implementation.WriteLine ("\tif (__result == NULL)");
-				implementation.WriteLine ("\t\treturn NULL;");
-				implementation.WriteLine ("\tint length = mono_string_length ((MonoString *) __result);");
-				implementation.WriteLine ("\tgunichar2 *str = mono_string_chars ((MonoString *) __result);");
-				implementation.WriteLine ("\treturn [[NSString alloc] initWithBytes: str length: length * 2 encoding: NSUTF16LittleEndianStringEncoding];");
+				implementation.WriteLine ("\treturn mono_embeddinator_get_nsstring ((MonoString *) __result);");
 				break;
 			case TypeCode.Boolean:
 			case TypeCode.Char:
