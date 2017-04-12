@@ -23,6 +23,29 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+#if defined (XAMARIN_IOS) || defined (XAMARIN_MAC)
+#include <xamarin/xamarin.h>
+typedef uint16_t    mono_unichar2;
+
+typedef struct _MonoMethodDesc MonoMethodDesc;
+typedef uint16_t    mono_unichar2;
+typedef struct _GArray GArray;
+
+MONO_EMBEDDINATOR_BEGIN_DECLS
+MonoMethodDesc* mono_method_desc_new (const char *name, mono_bool include_namespace);
+void            mono_method_desc_free (MonoMethodDesc *desc);
+MonoMethod*     mono_method_desc_search_in_class (MonoMethodDesc *desc, MonoClass *klass);
+void            mono_jit_cleanup           (MonoDomain *domain);
+MonoAssembly *  mono_domain_assembly_open  (MonoDomain *domain, const char *name);
+int             mono_string_length (MonoString *s);
+mono_unichar2 * mono_string_chars  (MonoString *s);
+MonoObject *    mono_field_get_value_object (MonoDomain *domain, MonoClassField *field, MonoObject *obj);
+void            mono_field_set_value (MonoObject *obj, MonoClassField *field, void *value);
+MonoVTable *    mono_class_vtable          (MonoDomain *domain, MonoClass *klass);
+void            mono_field_static_set_value (MonoVTable *vt, MonoClassField *field, void *value);
+
+MONO_EMBEDDINATOR_END_DECLS
+#else
 #include <mono/jit/jit.h>
 #include <mono/metadata/mono-config.h>
 #include <mono/metadata/assembly.h>
@@ -40,3 +63,4 @@ typedef struct _MonoClass MonoClass;
 typedef struct _MonoObject MonoObject;
 typedef struct _MonoImage MonoImage;
 typedef struct _MonoMethod MonoMethod;
+#endif

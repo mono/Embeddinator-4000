@@ -44,6 +44,10 @@ The tool does not support the compilation target `X`. It is possible that anothe
 
 The tool could not find the currently selected Xcode location using the `xcode-select -p` command. Please verify that this command succeeds, and returns the correct Xcode location.
 
+<h3><a name="EM0007"/>EM0007: Could not get the sdk version for '{sdk}'.</h3>
+
+The tool could not get the SDK version using the `xcrun --show-sdk-version --sdk {sdk}` command. Please verify that this command succeeds, and returns the SDK version.
+
 <h3><a name="EM0008"/>EM0008: The architecture '{arch}' is not valid for {platform}. Valid architectures for {platform} are: '{architectures}'.</h3>
 
 The architecture in the error message is not valid for the targeted platform. Please verify that the --abi option is passed a valid architecture.
@@ -51,6 +55,12 @@ The architecture in the error message is not valid for the targeted platform. Pl
 <h3><a name="EM0009"/>EM0009: The feature `X` is not currently implemented by the generator</h3>
 
 This is a known issue that we intend to fix in a future release of the generator. Contributions are welcome.
+
+<h3><a name="EM0010"/>EM0010: Can't merge the frameworks '{simulatorFramework}' and '{deviceFramework}' because the file '{file}' exists in both.</h3>
+
+The tool could not merge the frameworks mentioned in the error message, because there's a common file between them.
+
+This might indicate a bug in the Embeddinator-4000; please file a bug report at [https://github.com/mono/Embeddinator-4000/issues](https://github.com/mono/Embeddinator-4000/issues) with a test case.
 
 <h3><a name="EM0099"/>EM0099: Internal error *. Please file a bug report with a test case (https://github.com/mono/Embeddinator-4000/issues).</h3>
 
