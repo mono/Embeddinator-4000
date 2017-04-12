@@ -13,7 +13,7 @@ $(MANAGED_DLL): $(wildcard $(MANAGED_DLL_DIR)/*.cs)
 	make -C $(MANAGED_DLL_DIR)
 
 %/managed.dll: $(MANAGED_DLL)
-	mkdir $(dir $@)
+	mkdir -p $(dir $@)
 	cp $< $@
 
 debug/libmanaged.dylib: debug/managed.dll $(OBJC_GEN)
