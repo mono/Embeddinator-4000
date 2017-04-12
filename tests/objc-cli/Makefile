@@ -49,7 +49,7 @@ perf: run-debug-perf-test run-release-perf-test
 clean:
 	@rm -rf debug release
 
-xctest:
+xctest: debug/libmanaged.dylib
 	xcodebuild test -project libmanaged/*.xcodeproj -scheme Tests
 
 test-leaks: test-cli-leaks test-perf-leaks test-xctest-leaks
