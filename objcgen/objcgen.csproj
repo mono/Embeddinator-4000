@@ -311,6 +311,10 @@
     <Folder Include="support\" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="..\support\embeddinator.h">
+      <Link>support\embeddinator.h</Link>
+      <LogicalName>embeddinator.h</LogicalName>
+    </EmbeddedResource>
     <EmbeddedResource Include="..\support\glib.c">
       <Link>support\glib.c</Link>
       <LogicalName>glib.c</LogicalName>
