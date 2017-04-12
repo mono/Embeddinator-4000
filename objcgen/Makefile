@@ -6,4 +6,4 @@ OBJCGEN_FILES := \
 
 bin/Debug/objcgen.exe: $(OBJCGEN_FILES)
 	nuget restore ../generator.sln
-	xbuild objcgen.csproj
+	msbuild objcgen.csproj
