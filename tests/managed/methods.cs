@@ -30,5 +30,17 @@ namespace Methods {
 				return first;
 			return first + second;
 		}
+
+		public static void Ref (ref bool boolean, ref string @string)
+		{
+			boolean = !boolean;
+			@string = @string == null ? "hello" : null;
+		}
+
+		public static void Out (string @string, out int length, out string upper)
+		{
+			length = @string == null ? 0 : @string.Length;
+			upper =  @string == null ? null : @string.ToUpperInvariant ();
+		}
 	}
 }
