@@ -19,4 +19,16 @@ namespace Methods {
 		// only getter will be generated
 		public int Id { get; private set; }
 	}
+
+	public class Parameters {
+
+		public static string Concat (string first, string second)
+		{
+			if (first == null)
+				return second;
+			if (second == null)
+				return first;
+			return first + second;
+		}
+	}
 }
