@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.IO;
 using IKVM.Reflection;
 using Type = IKVM.Reflection.Type;
@@ -64,6 +65,11 @@ namespace Embeddinator {
 				{ "c|compile", "Compiles the generated output", v => embedder.CompileCode = true },
 				{ "d|debug", "Build the native library with debug information.", v => embedder.Debug = true },
 				{ "gen=", $"Target generator (default {embedder.TargetLanguage})", v => embedder.SetTarget (v) },
+				{ "abi=", "A comma-separated list of ABIs to compile. If not specified, all ABIs applicable to the selected platform will be built. Valid values (also depends on platform): i386, x86_64, armv7, armv7s, armv7k, arm64.", (v) =>
+					{
+						embedder.ABIs.AddRange (v.Split (',').Select ((a) => a.ToLowerInvariant ()));
+					}
+				},
 				{ "o|out|outdir=", "Output directory", v => embedder.OutputDirectory = v },
 				{ "p|platform=", $"Target platform (iOS, macOS [default], watchOS, tvOS)", v => embedder.SetPlatform (v) },
 				{ "dll|shared", "Compiles as a shared library (default)", v => embedder.CompilationTarget = CompilationTarget.SharedLibrary },
@@ -135,6 +141,8 @@ namespace Embeddinator {
 		public bool Shared { get { return CompilationTarget == CompilationTarget.SharedLibrary; } }
 
 		public string LibraryName { get; set; }
+
+		public List<string> ABIs { get; private set; } = new List<string> ();
 
 		public void SetPlatform (string platform)
 		{
@@ -300,6 +308,21 @@ namespace Embeddinator {
 				throw ErrorHelper.CreateError (99, "Internal error: invalid platform {0}. Please file a bug report with a test case (https://github.com/mono/Embeddinator-4000/issues).", Platform);
 			}
 
+			// filter/validate ABIs
+			if (ABIs.Count > 0) {
+				// Validate
+				var all_architectures = build_infos.SelectMany ((v) => v.Architectures);
+				var invalid_architectures = ABIs.Except (all_architectures).ToArray ();
+				if (invalid_architectures.Length > 0) {
+					var arch = invalid_architectures [0];
+					throw ErrorHelper.CreateError (8, $"The architecture '{arch}' is not valid for {Platform}. Valid architectures for {Platform} are: {string.Join (", ", all_architectures)}");
+				}
+
+				// Filter
+				foreach (var info in build_infos)
+					info.Architectures = info.Architectures.Where ((v) => ABIs.Contains (v)).ToArray ();
+			}
+
 			switch (CompilationTarget) {
 			case CompilationTarget.SharedLibrary:
 			case CompilationTarget.StaticLibrary:
@@ -434,6 +457,21 @@ namespace Embeddinator {
 				return "Xamarin.WatchOS,v1.0";
 			default:
 				throw ErrorHelper.CreateError (99, "Internal error: invalid platform {0}. Please file a bug report with a test case (https://github.com/mono/Embeddinator-4000/issues).", Platform);
+			}
+		}
+		
+		public static bool RunProcess (string filename, string arguments, out int exitCode, out string stdout)
+		{
+			Console.WriteLine($"\t{filename} {arguments}");
+			using (var p = new Process ()) {
+				p.StartInfo.FileName = filename;
+				p.StartInfo.Arguments = arguments;
+				p.StartInfo.UseShellExecute = false;
+				p.StartInfo.RedirectStandardOutput = true;
+				p.Start();
+				stdout = p.StandardOutput.ReadToEnd();
+				exitCode = p.ExitCode;
+				return exitCode == 0;
 			}
 		}
 

@@ -34,6 +34,7 @@
     <Compile Include="ObjCGeneratorTest.cs" />
     <Compile Include="DriverTest.cs" />
     <Compile Include="Asserts.cs" />
+    <Compile Include="EmbedderTest.cs" />
     <Compile Include="Cache.cs" />
   </ItemGroup>
   <ItemGroup>
