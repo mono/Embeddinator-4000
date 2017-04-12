@@ -42,6 +42,7 @@ namespace Embeddinator {
 
 	public static class Driver
 	{
+		public static Embedder CurrentEmbedder { get; private set; }
 		static int Main (string [] args)
 		{
 			try {
@@ -52,23 +53,26 @@ namespace Embeddinator {
 			}
 		}
 
-		public static int Main2 (string [] args)
+		public static int Main2 (params string [] args)
 		{
 			var action = Action.None;
+			var embedder = new Embedder ();
+
+			CurrentEmbedder = embedder;
 
 			var os = new OptionSet {
-				{ "c|compile", "Compiles the generated output", v => CompileCode = true },
-				{ "d|debug", "Build the native library with debug information.", v => Debug = true },
-				{ "gen=", $"Target generator (default {TargetLanguage})", v => SetTarget (v) },
-				{ "o|out|outdir=", "Output directory", v => OutputDirectory = v },
-				{ "p|platform=", $"Target platform (iOS, macOS [default], watchOS, tvOS)", v => SetPlatform (v) },
-				{ "dll|shared", "Compiles as a shared library (default)", v => CompilationTarget = CompilationTarget.SharedLibrary },
-				{ "static", "Compiles as a static library (unsupported)", v => CompilationTarget = CompilationTarget.StaticLibrary },
+				{ "c|compile", "Compiles the generated output", v => embedder.CompileCode = true },
+				{ "d|debug", "Build the native library with debug information.", v => embedder.Debug = true },
+				{ "gen=", $"Target generator (default {embedder.TargetLanguage})", v => embedder.SetTarget (v) },
+				{ "o|out|outdir=", "Output directory", v => embedder.OutputDirectory = v },
+				{ "p|platform=", $"Target platform (iOS, macOS [default], watchOS, tvOS)", v => embedder.SetPlatform (v) },
+				{ "dll|shared", "Compiles as a shared library (default)", v => embedder.CompilationTarget = CompilationTarget.SharedLibrary },
+				{ "static", "Compiles as a static library (unsupported)", v => embedder.CompilationTarget = CompilationTarget.StaticLibrary },
 				{ "vs=", $"Visual Studio version for compilation (unsupported)", v => { throw new EmbeddinatorException (2, $"Option `--vs` is not supported"); } },
 				{ "h|?|help", "Displays the help", v => action = Action.Help },
 				{ "v|verbose", "generates diagnostic verbose output", v => ErrorHelper.Verbosity++ },
 				{ "version", "Display the version information.", v => action = Action.Version },
-				{ "target=", "The compilation target (static, shared, framework).", v => SetCompilationTarget (v) },
+				{ "target=", "The compilation target (static, shared, framework).", v => embedder.SetCompilationTarget (v) },
 			};
 
 			var assemblies = os.Parse (args);
@@ -91,9 +95,9 @@ namespace Embeddinator {
 				return 0;
 			case Action.Generate:
 				try {
-					var result = Generate (assemblies);
-					if (CompileCode && (result == 0))
-						result = Compile ();
+					var result = embedder.Generate (assemblies);
+					if (embedder.CompileCode && (result == 0))
+						result = embedder.Compile ();
 					Console.WriteLine ("Done");
 					return result;
 				} catch (NotImplementedException e) {
@@ -103,10 +107,13 @@ namespace Embeddinator {
 				throw ErrorHelper.CreateError (99, "Internal error: invalid action {0}. Please file a bug report with a test case (https://github.com/mono/Embeddinator-4000/issues)", action);
 			}
 		}
+	}
 
-		static string outputDirectory = ".";
+	public class Embedder {
 
-		public static string OutputDirectory {
+		string outputDirectory = ".";
+
+		public string OutputDirectory {
 			get { return outputDirectory; }
 			set {
 				if (!Directory.Exists (value)) {
@@ -121,15 +128,15 @@ namespace Embeddinator {
 			}
 		}
 
-		static bool CompileCode { get; set; }
+		public bool CompileCode { get; set; }
 
-		static bool Debug { get; set; }
+		public bool Debug { get; set; }
 
-		static bool Shared { get { return CompilationTarget == CompilationTarget.SharedLibrary; } }
+		public bool Shared { get { return CompilationTarget == CompilationTarget.SharedLibrary; } }
 
-		static string LibraryName { get; set; }
+		public string LibraryName { get; set; }
 
-		public static void SetPlatform (string platform)
+		public void SetPlatform (string platform)
 		{
 			switch (platform.ToLowerInvariant ()) {
 			case "osx":
@@ -152,7 +159,7 @@ namespace Embeddinator {
 			}
 		}
 
-		public static void SetTarget (string value)
+		public void SetTarget (string value)
 		{
 			switch (value.ToLowerInvariant ()) {
 			case "objc":
@@ -166,7 +173,7 @@ namespace Embeddinator {
 			}
 		}
 
-		public static void SetCompilationTarget (string value)
+		public void SetCompilationTarget (string value)
 		{
 			switch (value.ToLowerInvariant ()) {
 			case "library":
@@ -186,11 +193,11 @@ namespace Embeddinator {
 			}
 		}
 
-		public static Platform Platform { get; set; } = Platform.macOS;
-		public static TargetLanguage TargetLanguage { get; private set; } = TargetLanguage.ObjectiveC;
-		public static CompilationTarget CompilationTarget { get; set; } = CompilationTarget.SharedLibrary;
+		public Platform Platform { get; set; } = Platform.macOS;
+		public TargetLanguage TargetLanguage { get; private set; } = TargetLanguage.ObjectiveC;
+		public CompilationTarget CompilationTarget { get; set; } = CompilationTarget.SharedLibrary;
 
-		static int Generate (List<string> args)
+		public int Generate (List<string> args)
 		{
 			Console.WriteLine ("Parsing assemblies...");
 
@@ -259,7 +266,7 @@ namespace Embeddinator {
 			public string LinkerFlags;
 		}
 
-		static int Compile ()
+		public int Compile ()
 		{
 			Console.WriteLine ("Compiling binding code...");
 
@@ -338,6 +345,7 @@ namespace Embeddinator {
 						common_options.Append ("-O2 -DTOKENLOOKUP ");
 					common_options.Append ("-fobjc-arc ");
 					common_options.Append ("-ObjC ");
+					common_options.Append ("-Wall ");
 					common_options.Append ($"-arch {arch} ");
 					common_options.Append ($"-isysroot {XcodeApp}/Contents/Developer/Platforms/{build_info.Sdk}.platform/Developer/SDKs/{build_info.Sdk}.sdk ");
 					common_options.Append ($"-m{build_info.SdkName}-version-min={build_info.MinVersion} ");
@@ -413,7 +421,7 @@ namespace Embeddinator {
 			return 0;
 		}
 
-		static string GetTargetFramework ()
+		string GetTargetFramework ()
 		{
 			switch (Platform) {
 			case Platform.macOS:
@@ -429,7 +437,7 @@ namespace Embeddinator {
 			}
 		}
 
-		static int RunProcess (string filename, string arguments)
+		public static int RunProcess (string filename, string arguments)
 		{
 			Console.WriteLine ($"\t{filename} {arguments}");
 			using (var p = Process.Start (filename, arguments)) {
@@ -438,18 +446,18 @@ namespace Embeddinator {
 			}
 		}
 
-		static bool RunProcess (string filename, string arguments, out int exitCode)
+		public static bool RunProcess (string filename, string arguments, out int exitCode)
 		{
 			exitCode = RunProcess (filename, arguments);
 			return exitCode == 0;
 		}
 
-		static bool Xcrun (StringBuilder options, out int exitCode)
+		public static bool Xcrun (StringBuilder options, out int exitCode)
 		{
 			return RunProcess ("xcrun", options.ToString (), out exitCode);
 		}
 
-		static bool DSymUtil (string input, out int exitCode)
+		bool DSymUtil (string input, out int exitCode)
 		{
 			exitCode = 0;
 
@@ -473,7 +481,7 @@ namespace Embeddinator {
 			return Xcrun (dsymutil_options, out exitCode);
 		}
 
-		static bool Lipo (List<string> inputs, string output, out int exitCode)
+		public static bool Lipo (List<string> inputs, string output, out int exitCode)
 		{
 			Directory.CreateDirectory (Path.GetDirectoryName (output));
 			if (inputs.Count == 1) {

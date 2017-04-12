@@ -72,15 +72,13 @@ namespace ObjC {
 
 		public override void Generate (IEnumerable<Assembly> assemblies)
 		{
-			headers.WriteLine ("#include \"mono_embeddinator.h\"");
+			headers.WriteLine ("#include \"embeddinator.h\"");
 			headers.WriteLine ("#import <Foundation/Foundation.h>");
 			headers.WriteLine ();
 			headers.WriteLine ();
 			headers.WriteLine ("#if !__has_feature(objc_arc)");
 			headers.WriteLine ("#error Embeddinator code must be built with ARC.");
 			headers.WriteLine ("#endif");
-			headers.WriteLine ();
-			headers.WriteLine ("MONO_EMBEDDINATOR_BEGIN_DECLS");
 			headers.WriteLine ();
 
 			headers.WriteLine ("// forward declarations");
@@ -91,6 +89,7 @@ namespace ObjC {
 			implementation.WriteLine ("#include \"bindings.h\"");
 			implementation.WriteLine ("#include \"glib.h\"");
 			implementation.WriteLine ("#include \"objc-support.h\"");
+			implementation.WriteLine ("#include \"mono_embeddinator.h\"");
 			implementation.WriteLine ("#include <mono/jit/jit.h>");
 			implementation.WriteLine ("#include <mono/metadata/assembly.h>");
 			implementation.WriteLine ("#include <mono/metadata/object.h>");
@@ -118,9 +117,6 @@ namespace ObjC {
 			implementation.WriteLine ();
 
 			base.Generate (assemblies);
-
-			headers.WriteLine ();
-			headers.WriteLine ("MONO_EMBEDDINATOR_END_DECLS");
 		}
 
 		protected override void Generate (Assembly a)
