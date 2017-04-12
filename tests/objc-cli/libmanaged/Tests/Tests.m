@@ -41,7 +41,7 @@
 
 	XCTAssertFalse ([query isSecret], "instance property getter only 3");
 	// setter only property turned into method, so different syntax
-	[query set_Secret: 1];
+	[query setSecret: 1];
 	XCTAssertTrue ([query isSecret], "instance property getter only 4");
 }
 
@@ -98,22 +98,27 @@
 	Constructors_Implicit* implicit = [[Constructors_Implicit alloc] init];
 	XCTAssertEqualObjects (@"OK", [implicit testResult], "implicit");
 	
-	Constructors_AllTypeCode* all1 = [[Constructors_AllTypeCode alloc] initWithB1:true C2:USHRT_MAX S:@"Mono"];
+	Constructors_AllTypeCode* all1 = [[Constructors_AllTypeCode alloc] initWithB1:true c2:USHRT_MAX s:@"Mono"];
 	XCTAssertTrue ([all1 testResult], "all1");
 
-	Constructors_AllTypeCode* all2 = [[Constructors_AllTypeCode alloc] initWithI8:SCHAR_MAX I16:SHRT_MAX I32:INT_MAX I64:LONG_MAX];
+	Constructors_AllTypeCode* all2 = [[Constructors_AllTypeCode alloc] initWithI8:SCHAR_MAX i16:SHRT_MAX i32:INT_MAX i64:LONG_MAX];
 	XCTAssertTrue ([all2 testResult], "all2");
 
-	Constructors_AllTypeCode* all3 = [[Constructors_AllTypeCode alloc] initWithU8:UCHAR_MAX U16:USHRT_MAX U32:UINT_MAX U64:ULONG_MAX];
+	Constructors_AllTypeCode* all3 = [[Constructors_AllTypeCode alloc] initWithU8:UCHAR_MAX u16:USHRT_MAX u32:UINT_MAX u64:ULONG_MAX];
 	XCTAssertTrue ([all3 testResult], "all3");
 
-	Constructors_AllTypeCode* all4 = [[Constructors_AllTypeCode alloc] initWithF32:FLT_MAX F64:DBL_MAX];
+	Constructors_AllTypeCode* all4 = [[Constructors_AllTypeCode alloc] initWithF32:FLT_MAX f64:DBL_MAX];
 	XCTAssertTrue ([all4 testResult], "all4");
 }
 
 - (void)testMethods {
-	id static_method = [Methods_Static create: 1];
+	id static_method = [Methods_Static createId: 1];
 	XCTAssert ([static_method id] == 1, "create id");
+	
+	XCTAssertNil ([Methods_Parameters concatFirst:nil second:nil], "string input nil + nil]");
+	XCTAssertEqualObjects (@"first", [Methods_Parameters concatFirst:@"first" second:nil], "string first + nil");
+	XCTAssertEqualObjects (@"second", [Methods_Parameters concatFirst:nil second:@"second"], "string nil + second");
+	XCTAssertEqualObjects (@"firstsecond", [Methods_Parameters concatFirst:@"first" second:@"second"], "string first + second");
 }
 
 - (void)testStaticCallPerformance {

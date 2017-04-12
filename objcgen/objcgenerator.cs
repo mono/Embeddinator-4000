@@ -141,6 +141,38 @@ namespace ObjC {
 			}
 		}
 
+		void GetSignatures (string objName, string monoName, MemberInfo info, ParameterInfo[] parameters, out string objcSignature, out string monoSignature)
+		{
+			var method = (info as MethodBase); // else it's a PropertyInfo
+			// special case for setter-only - the underscore looks ugly
+			if ((method != null) && method.IsSpecialName)
+				objName = objName.Replace ("_", String.Empty);
+			StringBuilder objc = new StringBuilder (objName);
+			var mono = new StringBuilder (monoName);
+			mono.Append ('(');
+			int n = 0;
+			foreach (var p in parameters) {
+				if (objc.Length > objName.Length) {
+					objc.Append (' ');
+					mono.Append (',');
+				}
+				if (method != null) {
+					if (n == 0) {
+						if (method.IsConstructor || !method.IsSpecialName)
+							objc.Append (PascalCase (p.Name));
+					} else
+						objc.Append (p.Name.ToLowerInvariant ());
+				}
+				objc.Append (":(").Append (GetTypeName (p.ParameterType)).Append (") ").Append (p.Name);
+				mono.Append (GetMonoName (p.ParameterType));
+				n++;
+			}
+			mono.Append (')');
+
+			objcSignature = objc.ToString ();
+			monoSignature = mono.ToString ();
+		}
+
 		protected override void Generate (Type t)
 		{
 			var has_bound_base_class = types.Contains (t.BaseType);
@@ -197,23 +229,10 @@ namespace ObjC {
 					default_init |= pcount == 0;
 
 					var parameters = ctor.GetParameters ();
-					StringBuilder name = new StringBuilder ("init");
-					foreach (var p in parameters) {
-						if (name.Length == 4)
-							name.Append ("With");
-						else
-							name.Append (' ');
-						name.Append (PascalCase (p.Name));
-						name.Append (":(").Append (GetTypeName (p.ParameterType)).Append (") ").Append (p.Name);
-					}
-
-					var signature = new StringBuilder (".ctor(");
-					foreach (var p in parameters) {
-						if (signature.Length > 6)
-							signature.Append (',');
-						signature.Append (GetMonoName (p.ParameterType));
-					}
-					signature.Append (")");
+					string name = "init";
+					string signature = ".ctor()";
+					if (parameters.Length > 0)
+						GetSignatures ("initWith", ctor.Name, ctor, parameters, out name, out signature);
 
 					headers.WriteLine ($"- (instancetype){name};");
 
@@ -234,31 +253,7 @@ namespace ObjC {
 					implementation.WriteLine ("\t\tMonoObject* __exception = nil;");
 					var args = "nil";
 					if (pcount > 0) {
-						implementation.WriteLine ($"\t\tvoid* __args [{pcount}];");
-						for (int i = 0; i < pcount; i++) {
-							var p = parameters [i];
-							switch (Type.GetTypeCode (p.ParameterType)) {
-							case TypeCode.String:
-								implementation.WriteLine ($"\t\t__args [{i}] = mono_string_new (__mono_context.domain, [{p.Name} UTF8String]);");
-								break;
-							case TypeCode.Boolean:
-							case TypeCode.Char:
-							case TypeCode.SByte:
-							case TypeCode.Int16:
-							case TypeCode.Int32:
-							case TypeCode.Int64:
-							case TypeCode.Byte:
-							case TypeCode.UInt16:
-							case TypeCode.UInt32:
-							case TypeCode.UInt64:
-							case TypeCode.Single:
-							case TypeCode.Double:
-								implementation.WriteLine ($"\t\t__args [{i}] = &{p.Name};");
-								break;
-							default:
-								throw new NotImplementedException ($"Converting type {p.ParameterType.FullName} to mono code");
-							}
-						}
+						Generate (parameters);
 						args = "__args";
 					}
 					implementation.WriteLine ($"\t\tmono_runtime_invoke (__method, __instance, {args}, &__exception);");
@@ -322,6 +317,36 @@ namespace ObjC {
 			implementation.WriteLine ();
 		}
 
+		void Generate (ParameterInfo [] parameters)
+		{
+			var pcount = parameters.Length;
+			implementation.WriteLine ($"\t\tvoid* __args [{pcount}];");
+			for (int i = 0; i < pcount; i++) {
+				var p = parameters [i];
+				switch (Type.GetTypeCode (p.ParameterType)) {
+				case TypeCode.String:
+					implementation.WriteLine ($"\t\t__args [{i}] = {p.Name} ? mono_string_new (__mono_context.domain, [{p.Name} UTF8String]) : nil;");
+					break;
+				case TypeCode.Boolean:
+				case TypeCode.Char:
+				case TypeCode.SByte:
+				case TypeCode.Int16:
+				case TypeCode.Int32:
+				case TypeCode.Int64:
+				case TypeCode.Byte:
+				case TypeCode.UInt16:
+				case TypeCode.UInt32:
+				case TypeCode.UInt64:
+				case TypeCode.Single:
+				case TypeCode.Double:
+					implementation.WriteLine ($"\t\t__args [{i}] = &{p.Name};");
+					break;
+				default:
+					throw new NotImplementedException ($"Converting type {p.ParameterType.FullName} to mono code");
+				}
+			}
+		}
+
 		protected override void Generate (PropertyInfo pi)
 		{
 			var getter = pi.GetGetMethod ();
@@ -342,11 +367,11 @@ namespace ObjC {
 			var property_type = GetTypeName (pi.PropertyType);
 			headers.WriteLine ($") {property_type} {name};");
 
-			ImplementMethod (getter.IsStatic, getter.ReturnType, name, NoParameters, pi.DeclaringType, getter.Name, getter.MetadataToken);
+			ImplementMethod (getter, name, pi);
 			if (setter == null)
 				return;
 
-			ImplementMethod (setter.IsStatic, setter.ReturnType, "set" + pi.Name, setter.GetParameters (), pi.DeclaringType, setter.Name, setter.MetadataToken);
+			ImplementMethod (setter, "set" + pi.Name, pi);
 		}
 
 		public string GetReturnType (Type declaringType, Type returnType)
@@ -361,59 +386,58 @@ namespace ObjC {
 		}
 
 		// TODO override with attribute ? e.g. [ObjC.Selector ("foo")]
-		void ImplementMethod (bool isStatic, Type returnType, string name, ParameterInfo [] parametersInfo, Type type, string managed_name, int token)
+		void ImplementMethod (MethodInfo info, string name, PropertyInfo pi = null)
 		{
+			var type = info.DeclaringType;
 			var managed_type_name = GetObjCName (type);
-			var return_type = GetReturnType (type, returnType);
-			StringBuilder parameters = new StringBuilder ();
-			StringBuilder managed_parameters = new StringBuilder ();
-			foreach (var p in parametersInfo) {
-				if (parameters.Length > 0) {
-					parameters.Append (' ');
-					managed_parameters.Append (' ');
-				}
-				parameters.Append (":(").Append (GetTypeName (p.ParameterType)).Append (")").Append (p.Name);
-				managed_parameters.Append (GetMonoName (p.ParameterType));
+			var managed_name = info.Name;
+			var return_type = GetReturnType (type, info.ReturnType);
+			var parametersInfo = info.GetParameters ();
+
+			string objcsig;
+			string monosig;
+			GetSignatures (name, managed_name, (MemberInfo) pi ?? info, parametersInfo, out objcsig, out monosig);
+
+			if (pi == null) {
+				headers.Write (info.IsStatic ? '+' : '-');
+				headers.WriteLine ($" ({return_type}){objcsig};");
 			}
 
-			implementation.Write (isStatic ? '+' : '-');
-			implementation.WriteLine ($" ({return_type}) {name}{parameters}");
+			implementation.Write (info.IsStatic ? '+' : '-');
+			implementation.WriteLine ($" ({return_type}) {objcsig}");
 			implementation.WriteLine ("{");
 			implementation.WriteLine ("\tstatic MonoMethod* __method = nil;");
 			implementation.WriteLine ("\tif (!__method) {");
 			implementation.WriteLine ("#if TOKENLOOKUP");
 			var aname = type.Assembly.GetName ().Name;
-			implementation.WriteLine ($"\t\t__method = mono_get_method (__{aname}_image, 0x{token:X8}, {managed_type_name}_class);");
+			implementation.WriteLine ($"\t\t__method = mono_get_method (__{aname}_image, 0x{info.MetadataToken:X8}, {managed_type_name}_class);");
 			implementation.WriteLine ("#else");
-			implementation.WriteLine ($"\t\tconst char __method_name [] = \"{type.FullName}:{managed_name}({managed_parameters})\";");
+			implementation.WriteLine ($"\t\tconst char __method_name [] = \"{type.FullName}:{monosig})\";");
 			implementation.WriteLine ($"\t\t__method = mono_embeddinator_lookup_method (__method_name, {managed_type_name}_class);");
 			implementation.WriteLine ("#endif");
 			implementation.WriteLine ("\t}");
 
 			var args = "nil";
 			if (parametersInfo.Length > 0) {
+				Generate (parametersInfo);
 				args = "__args";
-				implementation.WriteLine ($"\tvoid* __args [{parametersInfo.Length}];");
-				for (int i = 0; i < parametersInfo.Length; i++) {
-					implementation.WriteLine ($"\t__args [{i}] = &{parametersInfo [i].Name};");
-				}
 			}
 
 			implementation.WriteLine ("\tMonoObject* __exception = nil;");
 			var instance = "nil";
-			if (!isStatic) {
+			if (!info.IsStatic) {
 				implementation.WriteLine ($"\tMonoObject* instance = mono_gchandle_get_target (_object->_handle);");
 				instance = "instance";
 			}
 
 			implementation.Write ("\t");
-			if (!IsVoid (returnType))
+			if (!IsVoid (info.ReturnType))
 				implementation.Write ("MonoObject* __result = ");
 			implementation.WriteLine ($"mono_runtime_invoke (__method, {instance}, {args}, &__exception);");
 
 			implementation.WriteLine ("\tif (__exception)");
 			implementation.WriteLine ("\t\tmono_embeddinator_throw_exception (__exception);");
-			ReturnValue (returnType);
+			ReturnValue (info.ReturnType);
 			implementation.WriteLine ("}");
 			implementation.WriteLine ();
 		}
@@ -427,20 +451,8 @@ namespace ObjC {
 
 		protected override void Generate (MethodInfo mi)
 		{
-			StringBuilder parameters = new StringBuilder ();
-			foreach (var p in mi.GetParameters ()) {
-				if (parameters.Length > 0)
-					parameters.Append (' ');
-				parameters.Append (":(").Append (GetTypeName (p.ParameterType)).Append (")").Append (p.Name);
-			}
-
-			var return_type = GetReturnType (mi.DeclaringType, mi.ReturnType);
 			var name = CamelCase (mi.Name);
-
-			headers.Write (mi.IsStatic ? '+' : '-');
-			headers.WriteLine ($" ({return_type}){name}{parameters};");
-
-			ImplementMethod (mi.IsStatic, mi.ReturnType, name, mi.GetParameters (), mi.DeclaringType, mi.Name, mi.MetadataToken);
+			ImplementMethod (mi, name);
 		}
 
 		void ReturnValue (Type t)
