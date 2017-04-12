@@ -29,8 +29,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		7E3455791E92B06100FCAD74 /* libmanaged.dylib.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = libmanaged.dylib.dSYM; path = ../libmanaged.dylib.dSYM; sourceTree = "<group>"; };
-		7E5081F01E928C24008125B5 /* libmanaged.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libmanaged.dylib; path = ../libmanaged.dylib; sourceTree = "<group>"; };
+		7E3455791E92B06100FCAD74 /* libmanaged.dylib.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = libmanaged.dylib.dSYM; path = ../debug/libmanaged.dylib.dSYM; sourceTree = "<group>"; };
+		7E5081F01E928C24008125B5 /* libmanaged.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libmanaged.dylib; path = ../debug/libmanaged.dylib; sourceTree = "<group>"; };
 		D1B0CD801E904EA6008FF17D /* managed.dll */ = {isa = PBXFileReference; lastKnownFileType = file; name = managed.dll; path = ../../../managed/bin/Debug/managed.dll; sourceTree = "<group>"; };
 		D1B0CD811E904EA6008FF17D /* managed.pdb */ = {isa = PBXFileReference; lastKnownFileType = file; name = managed.pdb; path = ../../../managed/bin/Debug/managed.pdb; sourceTree = "<group>"; };
 		D1E2B21F1E8F4FBB00846AF8 /* Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -166,7 +166,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "make -C .. libmanaged.dylib\n";
+			shellScript = "make -C .. debug/libmanaged.dylib\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -276,11 +276,11 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				COMBINE_HIDPI_IMAGES = YES;
-				HEADER_SEARCH_PATHS = ..;
+				HEADER_SEARCH_PATHS = ../debug;
 				INFOPLIST_FILE = Tests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				LIBRARY_SEARCH_PATHS = (
-					..,
+					../debug,
 					"$(PROJECT_DIR)",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.xamarin.Tests;
@@ -294,11 +294,11 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				COMBINE_HIDPI_IMAGES = YES;
-				HEADER_SEARCH_PATHS = ..;
+				HEADER_SEARCH_PATHS = ../debug;
 				INFOPLIST_FILE = Tests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				LIBRARY_SEARCH_PATHS = (
-					..,
+					../debug,
 					"$(PROJECT_DIR)",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.xamarin.Tests;

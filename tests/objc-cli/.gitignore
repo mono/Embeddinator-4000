@@ -1,12 +1,4 @@
-glib.c
-glib.h
-mono_embeddinator.c
-mono_embeddinator.h
-embeddinator.h
-objc-support.m
-objc-support.h
-perf-cli
-test-cli
+debug
 release/
 # Xcode
 .DS_Store
