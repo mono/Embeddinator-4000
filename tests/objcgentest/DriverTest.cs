@@ -168,5 +168,16 @@ namespace DriverTest {
 				Assert.That (embedder.CompilationTarget, Is.EqualTo (global::Embeddinator.CompilationTarget.StaticLibrary), ct);
 			}
 		}
+
+		[Test]
+		public void ABI ()
+		{
+			Driver.Main2 (new string [] { "--abi=armv7" });
+			CollectionAssert.AreEquivalent (new string [] { "armv7" }, Driver.CurrentEmbedder.ABIs, "armv7");
+
+			// We don't validate when setting the option
+			Driver.Main2 (new string [] { "--abi=any" });
+			CollectionAssert.AreEquivalent (new string [] { "any" }, Driver.CurrentEmbedder.ABIs, "any");
+		}
 	}
 }
