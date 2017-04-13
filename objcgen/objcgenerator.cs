@@ -11,7 +11,7 @@ using Embeddinator;
 
 namespace ObjC {
 	
-	public class ObjCGenerator : Generator {
+	public partial class ObjCGenerator : Generator {
 
 		static TextWriter headers = new StringWriter ();
 		static TextWriter implementation = new StringWriter ();
@@ -137,38 +137,6 @@ namespace ObjC {
 			}
 		}
 
-		void GetSignatures (string objName, string monoName, MemberInfo info, ParameterInfo[] parameters, out string objcSignature, out string monoSignature)
-		{
-			var method = (info as MethodBase); // else it's a PropertyInfo
-			// special case for setter-only - the underscore looks ugly
-			if ((method != null) && method.IsSpecialName)
-				objName = objName.Replace ("_", String.Empty);
-			StringBuilder objc = new StringBuilder (objName);
-			var mono = new StringBuilder (monoName);
-			mono.Append ('(');
-			int n = 0;
-			foreach (var p in parameters) {
-				if (objc.Length > objName.Length) {
-					objc.Append (' ');
-					mono.Append (',');
-				}
-				if (method != null) {
-					if (n == 0) {
-						if (method.IsConstructor || !method.IsSpecialName)
-							objc.Append (PascalCase (p.Name));
-					} else
-						objc.Append (p.Name.ToLowerInvariant ());
-				}
-				objc.Append (":(").Append (GetTypeName (p.ParameterType)).Append (") ").Append (p.Name);
-				mono.Append (GetMonoName (p.ParameterType));
-				n++;
-			}
-			mono.Append (')');
-
-			objcSignature = objc.ToString ();
-			monoSignature = mono.ToString ();
-		}
-
 		protected override void Generate (Type t)
 		{
 			var has_bound_base_class = types.Contains (t.BaseType);
@@ -220,6 +188,23 @@ namespace ObjC {
 			var default_init = false;
 			List<ConstructorInfo> constructors;
 			if (ctors.TryGetValue (t, out constructors)) {
+				// First get the unavailable init ctor selectors in parent class
+				var unavailableCtors = GetUnavailableParentCtors (t, constructors);
+				if (unavailableCtors.Count () > 0) {
+					// TODO: Print a #pragma mark once we have a well defined header structure http://nshipster.com/pragma/
+					headers.WriteLine ("// List of unavailable initializers. See Constructors v.s. Initializers in our docs");
+					headers.WriteLine ("// https://github.com/mono/Embeddinator-4000/blob/master/docs/ObjC.md");
+					foreach (var uctor in unavailableCtors) {
+						var ctorparams = uctor.GetParameters ();
+						string name = "init";
+						string signature = ".ctor()";
+						if (ctorparams.Length > 0)
+							GetSignatures ("initWith", uctor.Name, uctor, ctorparams, out name, out signature);
+						headers.WriteLine ($"- (instancetype){name} NS_UNAVAILABLE;");
+					}
+					headers.WriteLine ();
+				}
+
 				foreach (var ctor in constructors) {
 					var pcount = ctor.ParameterCount;
 					default_init |= pcount == 0;
@@ -614,12 +599,6 @@ namespace ObjC {
 			if (s.Length == 0)
 				return String.Empty;
 			return Char.ToUpperInvariant (s [0]) + s.Substring (1, s.Length - 1);
-		}
-
-		// get a name that is safe to use from ObjC code
-		public static string GetObjCName (Type t)
-		{
-			return t.FullName.Replace ('.', '_');
 		}
 	}
 }
