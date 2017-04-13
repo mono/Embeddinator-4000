@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using CppSharp;
@@ -111,13 +111,18 @@ namespace MonoEmbeddinator4000.Generators
                 WriteLine("#include <{0}>", include);
         }
 
-        public virtual void GenerateMethodSignature(Method method, bool isSource = true)
+        public static string GetMethodIdentifier(Method method)
         {
             var @class = method.Namespace as Class;
+            return $"{@class.QualifiedName}_{method.Name}";
+        }
+
+        public virtual void GenerateMethodSignature(Method method, bool isSource = true)
+        {
             var retType = method.ReturnType.Visit(CTypePrinter);
 
-            Write("{0}{1} {2}_{3}(", isSource ? string.Empty : "MONO_EMBEDDINATOR_API ",
-                retType, @class.QualifiedName, method.Name);
+            Write("{0}{1} {2}(", isSource ? string.Empty : "MONO_EMBEDDINATOR_API ",
+                retType, GetMethodIdentifier(method));
 
             Write(CTypePrinter.VisitParameters(method.Parameters));
 
