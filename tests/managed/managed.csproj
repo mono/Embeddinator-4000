@@ -37,6 +37,7 @@
     <Compile Include="constructors.cs" />
     <Compile Include="methods.cs" />
     <Compile Include="structs.cs" />
+    <Compile Include="enums.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
