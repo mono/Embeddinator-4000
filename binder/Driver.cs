@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using CppSharp;
@@ -88,13 +88,6 @@ namespace MonoEmbeddinator4000
                 new GenerateArrayTypes(),
                 new CheckIgnoredDeclsPass { CheckDecayedTypes = false }
             };
-
-            if (Options.GeneratorKind == GeneratorKind.C ||
-                Options.GeneratorKind == GeneratorKind.ObjectiveC)
-            {
-                passes.Add(new RenameEnumItemsPass());
-                passes.Add(new FixMethodParametersPass());
-            }
 
             Generator.SetupPasses();
 

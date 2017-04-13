@@ -4,6 +4,8 @@ using System.Linq;
 using CppSharp;
 using CppSharp.AST;
 using CppSharp.Generators;
+using CppSharp.Passes;
+using MonoEmbeddinator4000.Passes;
 
 namespace MonoEmbeddinator4000.Generators
 {
@@ -66,7 +68,14 @@ namespace MonoEmbeddinator4000.Generators
 
         public override bool SetupPasses()
         {
+            SetupPasses(Context.TranslationUnitPasses);
             return true;
+        }
+
+        public static void SetupPasses(PassBuilder<TranslationUnitPass> passes)
+        {
+            passes.AddPass(new RenameEnumItemsPass());
+            passes.AddPass(new FixMethodParametersPass());
         }
 
         protected override string TypePrinterDelegate(CppSharp.AST.Type type)
