@@ -232,9 +232,10 @@ namespace ObjC {
 					implementation.WriteLine ("\tif (!_object) {");
 					implementation.WriteLine ($"\t\tMonoObject* __instance = mono_object_new (__mono_context.domain, {managed_name}_class);");
 					implementation.WriteLine ("\t\tMonoObject* __exception = nil;");
+					string postInvoke = String.Empty;
 					var args = "nil";
 					if (pcount > 0) {
-						Generate (parameters);
+						Generate (parameters, out postInvoke);
 						args = "__args";
 					}
 					implementation.WriteLine ($"\t\tmono_runtime_invoke (__method, __instance, {args}, &__exception);");
@@ -242,6 +243,7 @@ namespace ObjC {
 					// TODO: Apple often do NSLog (or asserts but they are more brutal) and returning nil is allowed (and common)
 					implementation.WriteLine ("\t\t\treturn nil;");
 					//implementation.WriteLine ("\t\t\tmono_embeddinator_throw_exception (__exception);");
+					implementation.Write (postInvoke);
 					implementation.WriteLine ("\t\t_object = mono_embeddinator_create_object (__instance);");
 					implementation.WriteLine ("\t}");
 					if (types.Contains (t.BaseType))
@@ -298,15 +300,27 @@ namespace ObjC {
 			implementation.WriteLine ();
 		}
 
-		void Generate (ParameterInfo [] parameters)
+		void Generate (ParameterInfo [] parameters, out string postInvoke)
 		{
+			StringBuilder post = new StringBuilder ();
 			var pcount = parameters.Length;
 			implementation.WriteLine ($"\t\tvoid* __args [{pcount}];");
 			for (int i = 0; i < pcount; i++) {
 				var p = parameters [i];
-				switch (Type.GetTypeCode (p.ParameterType)) {
+
+				var pt = p.ParameterType;
+				var is_by_ref = pt.IsByRef;
+				if (is_by_ref)
+					pt = pt.GetElementType ();
+
+				switch (Type.GetTypeCode (pt)) {
 				case TypeCode.String:
-					implementation.WriteLine ($"\t\t__args [{i}] = {p.Name} ? mono_string_new (__mono_context.domain, [{p.Name} UTF8String]) : nil;");
+					if (is_by_ref) {
+						implementation.WriteLine ($"\t\tMonoString* __string = *{p.Name} ? mono_string_new (__mono_context.domain, [*{p.Name} UTF8String]) : nil;");
+						implementation.WriteLine ($"\t\t__args [{i}] = &__string;");
+						post.AppendLine ($"\t\t*{p.Name} = mono_embeddinator_get_nsstring (__string);");
+					} else
+						implementation.WriteLine ($"\t\t__args [{i}] = {p.Name} ? mono_string_new (__mono_context.domain, [{p.Name} UTF8String]) : nil;");
 					break;
 				case TypeCode.Boolean:
 				case TypeCode.Char:
@@ -320,12 +334,16 @@ namespace ObjC {
 				case TypeCode.UInt64:
 				case TypeCode.Single:
 				case TypeCode.Double:
-					implementation.WriteLine ($"\t\t__args [{i}] = &{p.Name};");
+					if (is_by_ref)
+						implementation.WriteLine ($"\t\t__args [{i}] = {p.Name};");
+					else
+						implementation.WriteLine ($"\t\t__args [{i}] = &{p.Name};");
 					break;
 				default:
 					throw new NotImplementedException ($"Converting type {p.ParameterType.FullName} to mono code");
 				}
 			}
+			postInvoke = post.ToString ();
 		}
 
 		protected override void Generate (PropertyInfo pi)
@@ -398,9 +416,10 @@ namespace ObjC {
 			implementation.WriteLine ("#endif");
 			implementation.WriteLine ("\t}");
 
+			string postInvoke = String.Empty;
 			var args = "nil";
 			if (parametersInfo.Length > 0) {
-				Generate (parametersInfo);
+				Generate (parametersInfo, out postInvoke);
 				args = "__args";
 			}
 
@@ -418,6 +437,8 @@ namespace ObjC {
 
 			implementation.WriteLine ("\tif (__exception)");
 			implementation.WriteLine ("\t\tmono_embeddinator_throw_exception (__exception);");
+			// ref and out parameters might need to be converted back
+			implementation.Write (postInvoke);
 			ReturnValue (info.ReturnType);
 			implementation.WriteLine ("}");
 			implementation.WriteLine ();
@@ -489,6 +510,9 @@ namespace ObjC {
 		// TODO override with attribute ? e.g. [Obj.Name ("XAMType")]
 		public static string GetTypeName (Type t)
 		{
+			if (t.IsByRef)
+				return GetTypeName (t.GetElementType ()) + "*";
+
 			switch (Type.GetTypeCode (t)) {
 			case TypeCode.Object:
 				switch (t.Namespace) {
@@ -537,6 +561,9 @@ namespace ObjC {
 
 		public static string GetMonoName (Type t)
 		{
+			if (t.IsByRef)
+				return GetMonoName (t.GetElementType ()) + "&";
+
 			switch (Type.GetTypeCode (t)) {
 			case TypeCode.Object:
 				switch (t.Namespace) {

@@ -115,6 +115,25 @@
 	XCTAssertEqualObjects (@"first", [Methods_Parameters concatFirst:@"first" second:nil], "string first + nil");
 	XCTAssertEqualObjects (@"second", [Methods_Parameters concatFirst:nil second:@"second"], "string nil + second");
 	XCTAssertEqualObjects (@"firstsecond", [Methods_Parameters concatFirst:@"first" second:@"second"], "string first + second");
+	
+	bool b = true;
+	NSString* s = nil;
+	[Methods_Parameters refBoolean:&b string:&s];
+	XCTAssertFalse (b, "ref bool 1");
+	XCTAssertEqualObjects (@"hello", s, "ref string 1");
+
+	[Methods_Parameters refBoolean:&b string:&s];
+	XCTAssertTrue (b, "ref bool 2");
+	XCTAssertNil (s, "ref string 2");
+	
+	int l;
+	[Methods_Parameters outString:nil length:&l upper:&s];
+	XCTAssert (l == 0, "out int 1");
+	XCTAssertNil (s, "out string 1");
+
+	[Methods_Parameters outString:@"Xamarin" length:&l upper:&s];
+	XCTAssert (l == 7, "out int 2");
+	XCTAssertEqualObjects (@"XAMARIN", s, "ref string 2");
 }
 
 - (void)testStaticCallPerformance {
