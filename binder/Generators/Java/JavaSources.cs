@@ -190,15 +190,6 @@ namespace MonoEmbeddinator4000.Generators
             return true;
         }
 
-        private string FormatMethodParameters(IEnumerable<Parameter> @params)
-        {
-            return string.Join(", ",
-                from param in @params
-                where param.Kind != ParameterKind.IndirectReturnType && !param.Ignore
-                let typeName = param.CSharpType(TypePrinter)
-                select string.Format("{0} {1}", typeName, param.Name));
-        }
-
         public override void GenerateMethodSpecifier(Method method, Class @class)
         {
             var keywords = new List<string>();
@@ -231,7 +222,7 @@ namespace MonoEmbeddinator4000.Generators
             else
                 Write("{0} {1}(", method.ReturnType, functionName);
 
-            Write(FormatMethodParameters(method.Parameters));
+            Write("{0}", TypePrinter.VisitParameters(method.Parameters, hasNames: true));
 
             Write(")");
         }
