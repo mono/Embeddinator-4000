@@ -307,6 +307,7 @@
     <Compile Include="ErrorHelper.cs" />
     <Compile Include="Version.generated.cs" />
     <Compile Include="objcgenerator-helpers.cs" />
+    <Compile Include="objcgenerator-processor.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="support\" />

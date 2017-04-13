@@ -107,7 +107,7 @@ namespace Embeddinator {
 					Console.WriteLine ("Done");
 					return result;
 				} catch (NotImplementedException e) {
-					throw new EmbeddinatorException (1000, $"The feature `{e.Message}` is not currently supported by the tool");
+					throw new EmbeddinatorException (9, $"The feature `{e.Message}` is not currently supported by the tool");
 				}
 			default:
 				throw ErrorHelper.CreateError (99, "Internal error: invalid action {0}. Please file a bug report with a test case (https://github.com/mono/Embeddinator-4000/issues)", action);

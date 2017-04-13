@@ -16,60 +16,6 @@ namespace ObjC {
 		static TextWriter headers = new StringWriter ();
 		static TextWriter implementation = new StringWriter ();
 
-		static ParameterInfo [] NoParameters = new ParameterInfo [0];
-
-		List<Type> types = new List<Type> ();
-		Dictionary<Type, List<ConstructorInfo>> ctors = new Dictionary<Type, List<ConstructorInfo>> ();
-		Dictionary<Type, List<MethodInfo>> methods = new Dictionary<Type, List<MethodInfo>> ();
-		Dictionary<Type, List<PropertyInfo>> properties = new Dictionary<Type, List<PropertyInfo>> ();
-
-		public override void Process (IEnumerable<Assembly> assemblies)
-		{
-			foreach (var a in assemblies) {
-				foreach (var t in a.GetTypes ()) {
-					if (!t.IsPublic)
-						continue;
-					// gather types for forward declarations
-					types.Add (t);
-
-					var constructors = new List<ConstructorInfo> ();
-					foreach (var ctor in t.GetConstructors ()) {
-						// .cctor not to be called directly by native code
-						if (ctor.IsStatic)
-							continue;
-						if (!ctor.IsPublic)
-							continue;
-						constructors.Add (ctor);
-					}
-					constructors = constructors.OrderBy ((arg) => arg.ParameterCount).ToList ();
-					ctors.Add (t, constructors);
-
-					var meths = new List<MethodInfo> ();
-					foreach (var mi in t.GetMethods (BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly)) {
-						meths.Add (mi);
-					}
-					methods.Add (t, meths);
-
-					var props = new List<PropertyInfo> ();
-					foreach (var pi in t.GetProperties (BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly)) {
-						var getter = pi.GetGetMethod ();
-						var setter = pi.GetSetMethod ();
-						// setter only property are valid in .NET and we need to generate a method in ObjC (there's no writeonly properties)
-						if (getter == null)
-							continue;
-						// we can do better than methods for the more common cases (readonly and readwrite)
-						meths.Remove (getter);
-						meths.Remove (setter);
-						props.Add (pi);
-					}
-					props = props.OrderBy ((arg) => arg.Name).ToList ();
-					properties.Add (t, props);
-				}
-			}
-			types = types.OrderBy ((arg) => arg.FullName).OrderBy ((arg) => types.Contains (arg.BaseType)).ToList ();
-			Console.WriteLine ($"\t{types.Count} types found");
-		}
-
 		public override void Generate (IEnumerable<Assembly> assemblies)
 		{
 			headers.WriteLine ("#include \"embeddinator.h\"");
@@ -340,7 +286,11 @@ namespace ObjC {
 						implementation.WriteLine ($"\t\t__args [{i}] = &{p.Name};");
 					break;
 				default:
-					throw new NotImplementedException ($"Converting type {p.ParameterType.FullName} to mono code");
+					if (types.Contains (pt))
+						implementation.WriteLine ($"\t\t__args [{i}] = {p.Name};");
+					else
+						throw new NotImplementedException ($"Converting type {pt.FullName} to mono code");
+					break;
 				}
 			}
 			postInvoke = post.ToString ();
@@ -569,15 +519,13 @@ namespace ObjC {
 				switch (t.Namespace) {
 				case "System":
 					switch (t.Name) {
-					case "Object":
-						return "object";
 					case "Void":
 						return "void";
 					default:
-						throw new NotImplementedException ($"Converting type {t.Name} to a mono type name");
+						return "object";
 					}
 				default:
-					throw new NotImplementedException ($"Converting type {t.Name} to a mono type name");
+					return "object";
 				}
 			case TypeCode.Boolean:
 				return "bool";
