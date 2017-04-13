@@ -292,7 +292,7 @@ namespace ObjC {
 					break;
 				default:
 					if (pt.IsValueType)
-						implementation.WriteLine ($"\t\t__args [{i}] = mono_object_unbox ({p.Name}->_object);");
+						implementation.WriteLine ($"\t\t__args [{i}] = mono_object_unbox (mono_gchandle_get_target ({p.Name}->_object->_handle));");
 					else if (types.Contains (pt))
 						implementation.WriteLine ($"\t\t__args [{i}] = {p.Name};");
 					else
