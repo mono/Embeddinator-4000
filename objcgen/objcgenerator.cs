@@ -184,7 +184,12 @@ namespace ObjC {
 						Generate (parameters, out postInvoke);
 						args = "__args";
 					}
-					implementation.WriteLine ($"\t\tmono_runtime_invoke (__method, __instance, {args}, &__exception);");
+					var instance = "__instance";
+					if (t.IsValueType) {
+						implementation.WriteLine ($"\t\tvoid* __unboxed = mono_object_unbox (__instance);");
+						instance = "__unboxed";
+					}
+					implementation.WriteLine ($"\t\tmono_runtime_invoke (__method, {instance}, {args}, &__exception);");
 					implementation.WriteLine ("\t\tif (__exception)");
 					// TODO: Apple often do NSLog (or asserts but they are more brutal) and returning nil is allowed (and common)
 					implementation.WriteLine ("\t\t\treturn nil;");
@@ -286,7 +291,9 @@ namespace ObjC {
 						implementation.WriteLine ($"\t\t__args [{i}] = &{p.Name};");
 					break;
 				default:
-					if (types.Contains (pt))
+					if (pt.IsValueType)
+						implementation.WriteLine ($"\t\t__args [{i}] = mono_object_unbox (mono_gchandle_get_target ({p.Name}->_object->_handle));");
+					else if (types.Contains (pt))
 						implementation.WriteLine ($"\t\t__args [{i}] = {p.Name};");
 					else
 						throw new NotImplementedException ($"Converting type {pt.FullName} to mono code");
@@ -313,7 +320,10 @@ namespace ObjC {
 				headers.Write (", readonly");
 			else
 				headers.Write (", readwrite");
-			var property_type = GetTypeName (pi.PropertyType);
+			var pt = pi.PropertyType;
+			var property_type = GetTypeName (pt);
+			if (types.Contains (pt))
+				property_type += " *";
 			headers.WriteLine ($") {property_type} {name};");
 
 			ImplementMethod (getter, name, pi);
@@ -376,8 +386,13 @@ namespace ObjC {
 			implementation.WriteLine ("\tMonoObject* __exception = nil;");
 			var instance = "nil";
 			if (!info.IsStatic) {
-				implementation.WriteLine ($"\tMonoObject* instance = mono_gchandle_get_target (_object->_handle);");
-				instance = "instance";
+				implementation.WriteLine ($"\tMonoObject* __instance = mono_gchandle_get_target (_object->_handle);");
+				if (type.IsValueType) {
+					implementation.WriteLine ($"\t\tvoid* __unboxed = mono_object_unbox (__instance);");
+					instance = "__unboxed";
+				} else {
+					instance = "__instance";
+				}
 			}
 
 			implementation.Write ("\t");
@@ -469,6 +484,7 @@ namespace ObjC {
 				case "System":
 					switch (t.Name) {
 					case "Object":
+					case "ValueType":
 						return "NSObject";
 					case "Void":
 						return "void";
@@ -525,7 +541,7 @@ namespace ObjC {
 						return "object";
 					}
 				default:
-					return "object";
+					return t.IsValueType ? t.FullName : "object";
 				}
 			case TypeCode.Boolean:
 				return "bool";

@@ -136,6 +136,20 @@
 	XCTAssertEqualObjects (@"XAMARIN", s, "ref string 2");
 }
 
+- (void) testStructs {
+	id p1 = [[Structs_Point alloc] initWithX:1.0f y:-1.0f];
+	XCTAssert ([p1 x] == 1.0f, "x 1");
+	XCTAssert ([p1 y] == -1.0f, "y 1");
+
+	id p2 = [[Structs_Point alloc] initWithX:2.0f y:-2.0f];
+	XCTAssert ([p2 x] == 2.0f, "x 2");
+	XCTAssert ([p2 y] == -2.0f, "y 2");
+
+	XCTAssert ([Structs_Point opEquality:p1 right:p1], "p1 == p1");
+	XCTAssert ([Structs_Point opEquality:p2 right:p2], "p2 == p2");
+	XCTAssert ([Structs_Point opInequality:p1 right:p2], "p1 != p2");
+}
+
 - (void)testStaticCallPerformance {
 	const int iterations = 1000000;
 	[self measureBlock:^{

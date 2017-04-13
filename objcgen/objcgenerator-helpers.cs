@@ -38,7 +38,11 @@ namespace ObjC {
 					} else
 						objc.Append (p.Name.ToLowerInvariant ());
 				}
-				objc.Append (":(").Append (GetTypeName (p.ParameterType)).Append (") ").Append (p.Name);
+				var pt = p.ParameterType;
+				var ptname = GetTypeName (p.ParameterType);
+				if (types.Contains (pt))
+					ptname += " *";
+				objc.Append (":(").Append (ptname).Append (") ").Append (p.Name);
 				mono.Append (GetMonoName (p.ParameterType));
 				n++;
 			}
