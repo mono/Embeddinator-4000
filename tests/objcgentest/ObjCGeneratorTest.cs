@@ -79,13 +79,6 @@ namespace ObjCGeneratorTest {
 		}
 
 		[Test]
-		public void IsVoid ()
-		{
-			Assert.True (ObjCGenerator.IsVoid (mscorlib.GetType ("System.Void")), "void");
-			Assert.False (ObjCGenerator.IsVoid (mscorlib.GetType ("System.Object")), "object");
-		}
-
-		[Test]
 		public void GetObjCName ()
 		{
 			Assert.That (ObjCGenerator.GetObjCName (mscorlib.GetType ("System.Collections.ArrayList")), Is.EqualTo ("System_Collections_ArrayList"), "ArrayList");
