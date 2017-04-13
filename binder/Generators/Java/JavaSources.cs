@@ -12,9 +12,14 @@ namespace MonoEmbeddinator4000.Generators
     public class JavaSources : CSharpSources
     {
         public JavaSources(BindingContext context, Declaration decl)
-            : base(context, new List<TranslationUnit> { decl.TranslationUnit })
+            : this(context, decl.TranslationUnit)
         {
             Declaration = decl;
+        }
+
+        public JavaSources(BindingContext context, TranslationUnit unit)
+            : base(context, new List<TranslationUnit> { unit })
+        {
             TypePrinter = new JavaTypePrinter(context);
         }
 
