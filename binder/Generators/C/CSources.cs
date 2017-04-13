@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using CppSharp;
 using CppSharp.AST;
@@ -99,15 +99,15 @@ namespace MonoEmbeddinator4000.Generators
         public void GenerateMonoInitialization()
         {
             PushBlock();
-            WriteLine("static void {0}()", GeneratedIdentifier("initialize_mono"));
+            WriteLine($"static void {GeneratedIdentifier("initialize_mono")}()");
             WriteStartBraceIndent();
 
             var contextId = GeneratedIdentifier("mono_context");
-            WriteLine("if ({0}.domain)", contextId);
+            WriteLine($"if ({contextId}.domain)");
             WriteLineIndent("return;");
 
             var domainName = "mono_embeddinator_binding";
-            WriteLine("mono_embeddinator_init(&{0}, \"{1}\");", contextId, domainName);
+            WriteLine($"mono_embeddinator_init(&{contextId}, \"{domainName}\");");
 
             WriteCloseBraceIndent();
             PopBlock(NewLineKind.BeforeNextBlock);
@@ -116,11 +116,10 @@ namespace MonoEmbeddinator4000.Generators
         public void GenerateAssemblyLoad()
         {
             var assemblyName = Unit.FileName;
-            var assemblyLookupId = GeneratedIdentifier(string.Format("lookup_assembly_{0}",
-                assemblyName.Replace('.', '_')));
+            var assemblyLookupId = GeneratedIdentifier($"lookup_assembly_{assemblyName.Replace('.', '_')}");
 
             PushBlock();
-            WriteLine("static void {0}()", assemblyLookupId);
+            WriteLine($"static void {assemblyLookupId}()");
             WriteStartBraceIndent();
 
             var monoImageName = string.Format("{0}_image", AssemblyId);
@@ -138,21 +137,19 @@ namespace MonoEmbeddinator4000.Generators
         {
             PushBlock();
 
-            var classLookupId = GeneratedIdentifier(string.Format("lookup_class_{0}",
-                @class.QualifiedName.Replace('.', '_')));
+            var classLookupId = GeneratedIdentifier($"lookup_class_{@class.QualifiedName.Replace('.', '_')}");
             WriteLine("static void {0}()", classLookupId);
             WriteStartBraceIndent();
 
             var classId = $"class_{@class.QualifiedName}";
-            WriteLine("if ({0} == 0)", classId);
+            WriteLine($"if ({classId} == 0)");
             WriteStartBraceIndent();
 
-            WriteLine("{0}();", GeneratedIdentifier("initialize_mono"));
+            WriteLine($"{GeneratedIdentifier("initialize_mono")}();");
 
             var assemblyName = Unit.FileName;
-            var assemblyLookupId = GeneratedIdentifier(string.Format("lookup_assembly_{0}",
-                assemblyName.Replace('.', '_')));
-            WriteLine("{0}();", assemblyLookupId);
+            var assemblyLookupId = GeneratedIdentifier($"lookup_assembly_{assemblyName.Replace('.', '_')}");
+            WriteLine($"{assemblyLookupId}();");
 
             var namespaces = Declaration.GatherNamespaces(@class.Namespace)
                 .Where(ns => !(ns is TranslationUnit));
@@ -173,7 +170,7 @@ namespace MonoEmbeddinator4000.Generators
         public void GenerateMethodLookup(Method method)
         {
             var methodNameId = GeneratedIdentifier("method_name");
-            WriteLine("const char {0}[] = \"{1}\";", methodNameId, method.OriginalName);
+            WriteLine($"const char {methodNameId}[] = \"{method.OriginalName}\";");
 
             var methodId = GeneratedIdentifier("method");
             WriteLine($"static MonoMethod *{methodId} = 0;");
@@ -184,8 +181,7 @@ namespace MonoEmbeddinator4000.Generators
             WriteStartBraceIndent();
 
             var @class = method.Namespace as Class;
-            var classLookupId = GeneratedIdentifier(string.Format("lookup_class_{0}",
-                @class.QualifiedName.Replace('.', '_')));
+            var classLookupId = GeneratedIdentifier($"lookup_class_{@class.QualifiedName.Replace('.', '_')}");
             WriteLine($"{classLookupId}();");
 
             var classId = $"class_{@class.QualifiedName}";
