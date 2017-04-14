@@ -409,7 +409,7 @@ namespace ObjC {
 			var aname = type.Assembly.GetName ().Name;
 			implementation.WriteLine ($"\t\t__method = mono_get_method (__{aname}_image, 0x{info.MetadataToken:X8}, {managed_type_name}_class);");
 			implementation.WriteLine ("#else");
-			implementation.WriteLine ($"\t\tconst char __method_name [] = \"{type.FullName}:{monosig})\";");
+			implementation.WriteLine ($"\t\tconst char __method_name [] = \"{type.FullName}:{monosig}\";");
 			implementation.WriteLine ($"\t\t__method = mono_embeddinator_lookup_method (__method_name, {managed_type_name}_class);");
 			implementation.WriteLine ("#endif");
 			implementation.WriteLine ("\t}");
@@ -449,7 +449,11 @@ namespace ObjC {
 
 		protected override void Generate (MethodInfo mi)
 		{
-			var name = CamelCase (mi.Name);
+			string name;
+			if (mi.IsSpecialName && mi.IsStatic && mi.Name.StartsWith ("op_", StringComparison.Ordinal))
+				name = CamelCase (mi.Name.Substring (3));
+			else
+				name = CamelCase (mi.Name);
 			ImplementMethod (mi, name);
 		}
 
