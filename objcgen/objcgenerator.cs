@@ -133,7 +133,7 @@ namespace ObjC {
 			headers.WriteLine ($"// {t.AssemblyQualifiedName}");
 			headers.WriteLine ($"@interface {native_name} : {GetTypeName (t.BaseType)} {{");
 			if (!static_type && !has_bound_base_class) {
-				headers.WriteLine ("\tMonoEmbedObject* _object;");
+				headers.WriteLine ("\t@public MonoEmbedObject* _object;");
 			}
 			headers.WriteLine ("}");
 			headers.WriteLine ();
@@ -332,7 +332,7 @@ namespace ObjC {
 					if (pt.IsValueType)
 						implementation.WriteLine ($"\t\t__args [{i}] = mono_object_unbox (mono_gchandle_get_target ({p.Name}->_object->_handle));");
 					else if (types.Contains (pt))
-						implementation.WriteLine ($"\t\t__args [{i}] = {p.Name};");
+						implementation.WriteLine ($"\t\t__args [{i}] = mono_gchandle_get_target ({p.Name}->_object->_handle);");
 					else
 						throw new NotImplementedException ($"Converting type {pt.FullName} to mono code");
 					break;
