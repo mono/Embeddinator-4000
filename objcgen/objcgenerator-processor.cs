@@ -22,13 +22,6 @@ namespace ObjC {
 			if (unsupported.Contains (t))
 				return false;
 
-			// FIXME enums
-			if (t.IsEnum) {
-				delayed.Add (ErrorHelper.CreateWarning (1010, $"Type `{t}` is not generated because `enums` are not supported."));
-				unsupported.Add (t);
-				return false;
-			}
-
 			// FIXME protocols
 			if (t.IsInterface) {
 				delayed.Add (ErrorHelper.CreateWarning (1010, $"Type `{t}` is not generated because `interfaces` are not supported."));
@@ -140,6 +133,7 @@ namespace ObjC {
 			}
 		}
 
+		List<Type> enums = new List<Type> ();
 		List<Type> types = new List<Type> ();
 		Dictionary<Type, List<ConstructorInfo>> ctors = new Dictionary<Type, List<ConstructorInfo>> ();
 		Dictionary<Type, List<MethodInfo>> methods = new Dictionary<Type, List<MethodInfo>> ();
@@ -149,8 +143,10 @@ namespace ObjC {
 		{
 			foreach (var a in assemblies) {
 				foreach (var t in GetTypes (a)) {
-					// gather types for forward declarations
-					types.Add (t);
+					if (t.IsEnum)
+						enums.Add (t);
+					else
+						types.Add (t);
 
 					var constructors = GetConstructors (t).OrderBy ((arg) => arg.ParameterCount).ToList ();
 					ctors.Add (t, constructors);

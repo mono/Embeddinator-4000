@@ -78,9 +78,47 @@ namespace ObjC {
 			implementation.WriteLine ("}");
 			implementation.WriteLine ();
 
+			foreach (var t in enums) {
+				GenerateEnum (t);
+			}
+
 			foreach (var t in types) {
 				Generate (t);
 			}
+		}
+
+		void GenerateEnum (Type t)
+		{
+			var managed_name = GetObjCName (t);
+			var underlying_type = t.GetEnumUnderlyingType ();
+			var base_type = GetTypeName (underlying_type);
+
+			// it's nicer to expose flags as unsigned integers - but .NET defaults to `int`
+			bool flags = t.HasCustomAttribute ("System", "FlagsAttribute");
+			if (flags) {
+				switch (Type.GetTypeCode (underlying_type)) {
+				case TypeCode.SByte:
+				case TypeCode.Int16:
+				case TypeCode.Int32:
+				case TypeCode.Int64:
+					base_type = "unsigned " + base_type;
+					break;
+				}
+			}
+
+			var macro = flags ? "NS_OPTIONS" : "NS_ENUM";
+			headers.WriteLine ($"typedef {macro}({base_type}, {managed_name}) {{");
+			foreach (var name in t.GetEnumNames ()) {
+				var value = t.GetField (name).GetRawConstantValue ();
+				headers.Write ($"\t{managed_name}{name} = ");
+				if (flags)
+					headers.Write ($"0x{value:x}");
+				else
+					headers.Write (value);
+				headers.WriteLine (',');
+			}
+			headers.WriteLine ("};");
+			headers.WriteLine ();
 		}
 
 		protected override void Generate (Type t)
@@ -396,7 +434,7 @@ namespace ObjC {
 			}
 
 			implementation.Write ("\t");
-			if (!IsVoid (info.ReturnType))
+			if (!info.ReturnType.Is ("System", "Void"))
 				implementation.Write ("MonoObject* __result = ");
 			implementation.WriteLine ($"mono_runtime_invoke (__method, {instance}, {args}, &__exception);");
 
@@ -407,13 +445,6 @@ namespace ObjC {
 			ReturnValue (info.ReturnType);
 			implementation.WriteLine ("}");
 			implementation.WriteLine ();
-		}
-
-		public static bool IsVoid (Type t)
-		{
-			if (t.Name != "Void")
-				return false;
-			return (t.Namespace == "System");
 		}
 
 		protected override void Generate (MethodInfo mi)
@@ -478,6 +509,9 @@ namespace ObjC {
 			if (t.IsByRef)
 				return GetTypeName (t.GetElementType ()) + "*";
 
+			if (t.IsEnum)
+				return GetObjCName (t);
+
 			switch (Type.GetTypeCode (t)) {
 			case TypeCode.Object:
 				switch (t.Namespace) {
@@ -529,6 +563,9 @@ namespace ObjC {
 		{
 			if (t.IsByRef)
 				return GetMonoName (t.GetElementType ()) + "&";
+
+			if (t.IsEnum)
+				return t.FullName;
 
 			switch (Type.GetTypeCode (t)) {
 			case TypeCode.Object:

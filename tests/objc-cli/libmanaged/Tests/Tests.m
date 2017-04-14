@@ -150,6 +150,19 @@
 	XCTAssert ([Structs_Point opInequality:p1 right:p2], "p1 != p2");
 }
 
+- (void) testEnums {
+	Enums_IntEnum i = Enums_IntEnumMin;
+	Enums_ShortEnum s;
+	Enums_ByteFlags f = [Enums_Enumer testB:Enums_ByteEnumMax i:&i s:&s];
+	XCTAssert (f == 0x22, "return flag 1");
+	XCTAssert (i == Enums_IntEnumMax, "ref enum 1");
+	XCTAssert (s == Enums_ShortEnumMax, "out enum 1");
+
+	f = [Enums_Enumer testB:Enums_ByteEnumZero i:&i s:&s];
+	XCTAssert (i == Enums_IntEnumMin, "ref enum 2");
+	XCTAssert (s == Enums_ShortEnumMin, "out enum 2");
+}
+
 - (void)testStaticCallPerformance {
 	const int iterations = 1000000;
 	[self measureBlock:^{
