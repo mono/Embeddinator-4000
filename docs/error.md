@@ -1,4 +1,4 @@
-id:{932C3F0C-D968-42D1-BB14-D97C73361983}
+﻿id:{932C3F0C-D968-42D1-BB14-D97C73361983}
 title:Embeddinator-4000 errors
 
 [//]: # (The original file resides under https://github.com/mono/Embeddinator-4000/tree/master/docs/error.md)
@@ -91,6 +91,13 @@ There should be an earlier warning giving more information why type `T` is not s
 Note: Supported features will evolve with new versions of the tool.
 
 
+<h3><a name="EM1021"/>Constructor `C` parameter `P` has a default value that is not supported.</h3>
+
+This is a **warning** that the default parameters of constructor `C` are not generating any extra code.
+
+Note: Supported features will evolve with new versions of the tool.
+
+
 <h3><a name="EM1030"/>Method `M` is not generated because return type `T` is not supported.</h3>
 
 This is a **warning** that the method `M` will be ignored (i.e. nothing will be generated) because it's return type `T` is not supported.
@@ -105,6 +112,13 @@ Note: Supported features will evolve with new versions of the tool.
 This is a **warning** that the method `M` will be ignored (i.e. nothing will be generated) because a parameter of type `T` is not supported.
 
 There should be an earlier warning giving more information why type `T` is not supported.
+
+Note: Supported features will evolve with new versions of the tool.
+
+
+<h3><a name="EM1032"/>Method `M` parameter `P` has a default value that is not supported.</h3>
+
+This is a **warning** that the default parameters of method `M` are not generating any extra code.
 
 Note: Supported features will evolve with new versions of the tool.
 
