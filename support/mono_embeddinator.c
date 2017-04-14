@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Mono managed-to-native support code.
  *
  * Author:
@@ -33,6 +33,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #if defined(__APPLE__)
 #include <mach-o/dyld.h>
@@ -72,6 +73,10 @@ int mono_embeddinator_init(mono_embeddinator_context_t* ctx, const char* domain)
     ctx->domain = mono_jit_init_version(domain, "v4.0.30319");
 
     mono_embeddinator_set_context(ctx);
+
+    char cwd[PATH_MAX];
+    getcwd(cwd, PATH_MAX);
+    mono_domain_set_config(ctx->domain, cwd, "app.config");
 
     return true;
 }
