@@ -85,6 +85,8 @@ namespace ObjC {
 					if (!IsSupported (pt)) {
 						delayed.Add (ErrorHelper.CreateWarning (1020, $"Constructor `{ctor}` is not generated because of parameter type `{pt}` is not supported."));
 						pcheck = false;
+					} else if (p.HasDefaultValue) {
+						delayed.Add (ErrorHelper.CreateWarning (1021, $"Constructor `{ctor}` parameter `{p.Name}` has a default value that is not supported."));
 					}
 				}
 				if (!pcheck)
@@ -112,6 +114,8 @@ namespace ObjC {
 					if (!IsSupported (pt)) {
 						delayed.Add (ErrorHelper.CreateWarning (1031, $"Method `{mi}` is not generated because of parameter type `{pt}` is not supported."));
 						pcheck = false;
+					} else if (p.HasDefaultValue) {
+						delayed.Add (ErrorHelper.CreateWarning (1032, $"Method `{mi}` parameter `{p.Name}` has a default value that is not supported."));
 					}
 				}
 				if (!pcheck)
