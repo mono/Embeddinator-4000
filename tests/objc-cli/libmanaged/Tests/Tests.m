@@ -134,6 +134,9 @@
 	[Methods_Parameters outString:@"Xamarin" length:&l upper:&s];
 	XCTAssert (l == 7, "out int 2");
 	XCTAssertEqualObjects (@"XAMARIN", s, "ref string 2");
+
+	id item = [Methods_Factory createItemId:1];
+	XCTAssert ([item integer] == 1, "indirect creation 1");
 }
 
 - (void) testStructs {

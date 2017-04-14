@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Methods {
 	
@@ -41,6 +42,25 @@ namespace Methods {
 		{
 			length = @string == null ? 0 : @string.Length;
 			upper =  @string == null ? null : @string.ToUpperInvariant ();
+		}
+	}
+
+	public class Item {
+
+		// not generated
+		internal Item (int id)
+		{
+			Integer = id;
+		}
+
+		public int Integer { get; private set; }
+	}
+
+	public static class Factory {
+
+		public static Item CreateItem (int id)
+		{
+			return new Item (id);
 		}
 	}
 }
