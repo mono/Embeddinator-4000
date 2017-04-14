@@ -137,6 +137,23 @@
 
 	id item = [Methods_Factory createItemId:1];
 	XCTAssert ([item integer] == 1, "indirect creation 1");
+
+	Methods_Collection *collection = [[Methods_Collection alloc] init];
+	XCTAssert ([collection count] == 0, "count 0");
+	[collection addItem:item];
+	XCTAssert ([collection count] == 1, "count 1");
+	XCTAssert ([[collection getItem:0] integer] == [item integer], "get 1");
+
+	id item2 = [Methods_Factory createItemId:2];
+	[collection setItem:0 value:item2];
+	XCTAssert ([collection count] == 1, "count 2");
+	XCTAssert ([[collection getItem:0] integer] == [item2 integer], "get 2");
+	
+	[collection removeItem:item]; // not there
+	XCTAssert ([collection count] == 1, "count 3");
+
+	[collection removeItem:item2];
+	XCTAssert ([collection count] == 0, "count 4");
 }
 
 - (void) testStructs {

@@ -63,4 +63,26 @@ namespace Methods {
 			return new Item (id);
 		}
 	}
+
+	public class Collection {
+
+		List<Item> c = new List<Item> ();
+
+		public void Add (Item item)
+		{
+			c.Add (item);
+		}
+
+		public void Remove (Item item)
+		{
+			c.Remove (item);
+		}
+
+		public int Count => c.Count;
+
+		public Item this [int index] {
+			get { return c [index]; }
+			set { c [index] = value; }
+		}
+	}
 }

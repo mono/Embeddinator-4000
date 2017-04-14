@@ -161,6 +161,9 @@ namespace ObjC {
 						// setter only property are valid in .NET and we need to generate a method in ObjC (there's no writeonly properties)
 						if (getter == null)
 							continue;
+						// indexers are implemented as methods
+						if ((getter.ParameterCount > 0) || ((setter != null) && setter.ParameterCount > 1))
+							continue;
 						// we can do better than methods for the more common cases (readonly and readwrite)
 						meths.Remove (getter);
 						meths.Remove (setter);

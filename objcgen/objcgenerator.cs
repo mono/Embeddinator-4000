@@ -582,7 +582,7 @@ namespace ObjC {
 						return "object";
 					}
 				default:
-					return t.IsValueType ? t.FullName : "object";
+					return t.FullName;
 				}
 			case TypeCode.Boolean:
 				return "bool";
