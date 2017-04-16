@@ -4,6 +4,8 @@ namespace Structs {
 
 	public struct Point {
 
+		public static readonly Point Zero;
+
 		public Point (float x, float y)
 		{
 			X = x;
