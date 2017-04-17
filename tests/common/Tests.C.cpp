@@ -68,6 +68,19 @@ TEST_CASE("Properties", "[C][Properties]") {
     REQUIRE(Properties_Query_get_IsSecret(prop) == true);
 }
 
+TEST_CASE("Namespaces.C", "[C][Namespaces]") {
+    ClassWithoutNamespace* nonamespace = ClassWithoutNamespace_new();
+    REQUIRE(strcmp(ClassWithoutNamespace_ToString(nonamespace), "ClassWithoutNamespace") == 0);
+
+    First_ClassWithSingleNamespace* singlenamespace = First_ClassWithSingleNamespace_new();
+    REQUIRE(strcmp(First_ClassWithSingleNamespace_ToString(singlenamespace), "First.ClassWithSingleNamespace") == 0);
+
+    First_Second_ClassWithNestedNamespace* nestednamespaces = First_Second_ClassWithNestedNamespace_new();
+    REQUIRE(strcmp(First_Second_ClassWithNestedNamespace_ToString(nestednamespaces), "First.Second.ClassWithNestedNamespace") == 0);
+
+    First_Second_Third_ClassWithNestedNamespace* nestednamespaces2 = First_Second_Third_ClassWithNestedNamespace_new();
+    REQUIRE(strcmp(First_Second_Third_ClassWithNestedNamespace_ToString(nestednamespaces2), "First.Second.Third.ClassWithNestedNamespace") == 0);
+}
 TEST_CASE("Enums.C", "[C][Enums]") {
     REQUIRE(Enums_EnumTypes_PassEnum(Enum_Two) == 2);
     REQUIRE(Enums_EnumTypes_PassEnum(Enum_Three) == 3);
