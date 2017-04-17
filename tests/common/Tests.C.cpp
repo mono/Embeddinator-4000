@@ -4,6 +4,8 @@
 #include "managed.h"
 #include "glib.h"
 
+#include "float.h"
+
 TEST_CASE("Types.C", "[C][Types]") {
     BuiltinTypes* bt = BuiltinTypes_new();
     BuiltinTypes_ReturnsVoid(bt);
@@ -81,6 +83,33 @@ TEST_CASE("Namespaces.C", "[C][Namespaces]") {
     First_Second_Third_ClassWithNestedNamespace* nestednamespaces2 = First_Second_Third_ClassWithNestedNamespace_new();
     REQUIRE(strcmp(First_Second_Third_ClassWithNestedNamespace_ToString(nestednamespaces2), "First.Second.Third.ClassWithNestedNamespace") == 0);
 }
+
+TEST_CASE("Constructors.C", "[C][Constructors]") {
+    Constructors_Unique* unique = Constructors_Unique_new_1();
+    REQUIRE(Constructors_Unique_get_Id(unique) == 1);
+
+    Constructors_Unique* unique_init_id = Constructors_Unique_new_2(911);
+    REQUIRE(Constructors_Unique_get_Id(unique_init_id) == 911);
+
+    Constructors_SuperUnique* super_unique_default_init = Constructors_SuperUnique_new();
+    REQUIRE(Constructors_Unique_get_Id(super_unique_default_init) == 411);
+
+    Constructors_Implicit* implicit = Constructors_Implicit_new();
+    REQUIRE(strcmp(Constructors_Implicit_get_TestResult(implicit), "OK") == 0);
+
+    Constructors_AllTypeCode* all1 = Constructors_AllTypeCode_new(true, USHRT_MAX, "Mono");
+    REQUIRE(Constructors_AllTypeCode_get_TestResult(all1) == true);
+
+    Constructors_AllTypeCode* all2 = Constructors_AllTypeCode_new_1(SCHAR_MAX, SHRT_MAX, INT_MAX, LONG_MAX);
+    REQUIRE(Constructors_AllTypeCode_get_TestResult(all2) == true);
+
+    Constructors_AllTypeCode* all3 = Constructors_AllTypeCode_new_2(UCHAR_MAX, USHRT_MAX, UINT_MAX, ULONG_MAX);
+    REQUIRE(Constructors_AllTypeCode_get_TestResult(all3) == true);
+
+    Constructors_AllTypeCode* all4 = Constructors_AllTypeCode_new_3(FLT_MAX, DBL_MAX);
+    REQUIRE(Constructors_AllTypeCode_get_TestResult(all4) == true);
+}
+
 TEST_CASE("Enums.C", "[C][Enums]") {
     REQUIRE(Enums_EnumTypes_PassEnum(Enum_Two) == 2);
     REQUIRE(Enums_EnumTypes_PassEnum(Enum_Three) == 3);
