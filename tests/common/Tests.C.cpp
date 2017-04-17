@@ -88,7 +88,7 @@ TEST_CASE("Types.C", "[C][Types]") {
     REQUIRE(strcmp(RefStr->str, "Mono") == 0);
 }
 
-TEST_CASE("Properties", "[C][Properties]") {
+TEST_CASE("Properties.C", "[C][Properties]") {
     REQUIRE(Platform_get_IsWindows() == false);
 
     Platform_set_ExitCode(255);
@@ -166,14 +166,17 @@ TEST_CASE("Constructors.C", "[C][Constructors]") {
 }
 
 TEST_CASE("Enums.C", "[C][Enums]") {
-    REQUIRE(Enums_EnumTypes_PassEnum(Enum_Two) == 2);
-    REQUIRE(Enums_EnumTypes_PassEnum(Enum_Three) == 3);
+    Enums_IntEnum i = Enums_IntEnum_Min;
+    Enums_ShortEnum s;
+    Enums_ByteFlags f = Enums_Enumer_Test(Enums_ByteEnum_Max, &i, &s);
 
-    REQUIRE(Enums_EnumTypes_PassEnumByte(EnumByte_Two) == 2);
-    REQUIRE(Enums_EnumTypes_PassEnumByte(EnumByte_Three) == 3);
+    REQUIRE(f == 0x22);
+    REQUIRE(i == Enums_IntEnum_Max);
+    REQUIRE(s == Enums_ShortEnum_Max);
 
-    REQUIRE(Enums_EnumTypes_PassEnumFlags(EnumFlags_FlagOne) == (1 << 0));
-    REQUIRE(Enums_EnumTypes_PassEnumFlags(EnumFlags_FlagTwo) == (1 << 2));
+    f = Enums_Enumer_Test(Enums_ByteEnum_Zero, &i, &s);
+    REQUIRE(i == Enums_IntEnum_Min);
+    REQUIRE(s == Enums_ShortEnum_Min);
 }
 
 TEST_CASE("Arrays.C", "[C][Arrays]") {
