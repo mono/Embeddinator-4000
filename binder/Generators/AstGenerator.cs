@@ -146,14 +146,12 @@ namespace MonoEmbeddinator4000.Generators
             var @enum = new Enumeration
             {
                 Name = UnmangleTypeName(type.Name),
-                Type = VisitType(underlyingType).Type
+                BuiltinType = VisitType(underlyingType).Type as BuiltinType
             };
             HandleNamespace(type, @enum);
 
             if (Options.GeneratorKind == GeneratorKind.CPlusPlus)
                 @enum.Modifiers = Enumeration.EnumModifiers.Scoped;
-
-            var builtinType = @enum.Type as BuiltinType;
 
             foreach (var item in type.DeclaredFields)
             {
@@ -169,7 +167,7 @@ namespace MonoEmbeddinator4000.Generators
 
                 var rawValue = item.GetRawConstantValue();
 
-                if (builtinType.IsUnsigned)
+                if (@enum.BuiltinType.IsUnsigned)
                     enumItem.Value = Convert.ToUInt64(rawValue);
                 else
                     enumItem.Value = (ulong) Convert.ToInt64(rawValue);
@@ -367,6 +365,12 @@ namespace MonoEmbeddinator4000.Generators
                 }
 
                 throw new NotImplementedException();
+            }
+
+            if (managedType.IsEnum)
+            {
+                var @enum = Visit(managedType.GetTypeInfo());
+                return new QualifiedType(new TagType(@enum));
             }
 
             CppSharp.AST.Type type = null;

@@ -1,4 +1,4 @@
-using CppSharp;
+﻿using CppSharp;
 using CppSharp.AST;
 using CppSharp.Generators;
 using System.Linq;
@@ -68,7 +68,7 @@ namespace MonoEmbeddinator4000.Generators
         {
             PushBlock();
 
-            Write("enum {0}", @enum.Name);
+            Write("typedef enum {0}", @enum.Name);
 
             if (Options.GeneratorKind == GeneratorKind.CPlusPlus)
             {
@@ -96,7 +96,7 @@ namespace MonoEmbeddinator4000.Generators
 
             NewLine();
             PopIndent();
-            WriteLine("};");
+            WriteLine("}} {0};", @enum.Name);
 
             PopBlock(NewLineKind.BeforeNextBlock);
 

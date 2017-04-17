@@ -131,6 +131,12 @@ namespace MonoEmbeddinator4000.Generators
             return false;
         }
 
+        public override bool VisitEnumDecl(Enumeration @enum)
+        {
+            VisitPrimitiveType(@enum.BuiltinType.Type);
+            return true;
+        }
+
         public override bool VisitClassDecl(Class @class)
         {
             var typeName = @class.Visit(CTypePrinter);
@@ -385,6 +391,12 @@ namespace MonoEmbeddinator4000.Generators
             return true;
         }
 
+        public override bool VisitEnumDecl(Enumeration @enum)
+        {
+            Context.Return.Write("&{0}", Context.ArgName);
+            return true;
+        }
+
         public override bool VisitClassDecl(Class @class)
         {
             var instanceId = CGenerator.GenId($"{Context.ArgName}_instance");
@@ -440,10 +452,47 @@ namespace MonoEmbeddinator4000.Generators
             return VisitPrimitiveType(builtin.Type);
         }
 
+        public void HandleRefOutNonDefaultIntegerEnum(Enumeration @enum)
+        {
+            // This deals with marshaling of managed enums with non-C default
+            // backing types (ie. enum : short).
+
+            // Unlike C++ or Objective-C, C enums always have the default integer
+            // type size, so we need to create a local variable of the right type
+            // for marshaling with the managed runtime and cast it back to the
+            // correct type.
+
+            var backingType = @enum.BuiltinType.Type;
+            var typePrinter = new CppTypePrinter();
+            var integerType = typePrinter.VisitPrimitiveType(backingType);
+            var newArgName = CGenerator.GenId(Context.ArgName);
+            Context.SupportBefore.WriteLine("{0} {1} = *(({0}*) {2});",
+                integerType, newArgName, Context.ArgName);
+            Context.Return.Write("&{0}", newArgName);
+            Context.SupportAfter.WriteLine("*{0} = ({1}) {2};", Context.ArgName,
+                @enum.Name, newArgName);
+        }
+
         public override bool VisitPointerType(PointerType pointer,
             TypeQualifiers quals)
         {
-            if (pointer.Pointee is ArrayType)
+            var pointee = pointer.Pointee;
+
+            Enumeration @enum;
+            if (pointee.TryGetEnum(out @enum))
+            {
+                var backingType = @enum.BuiltinType.Type;
+                if (backingType != PrimitiveType.Int)
+                {
+                    HandleRefOutNonDefaultIntegerEnum(@enum);
+                    return true;
+                }
+
+                Context.Return.Write("{0}", Context.ArgName);
+                return true;
+            }
+
+            if (pointee is ArrayType)
             {
                 // TODO: Handle out/ref array types.
                 Context.Return.Write("0");

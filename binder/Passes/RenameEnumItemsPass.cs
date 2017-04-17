@@ -1,4 +1,4 @@
-using CppSharp;
+﻿using CppSharp;
 using CppSharp.AST;
 using CppSharp.Passes;
 
@@ -12,7 +12,9 @@ namespace MonoEmbeddinator4000.Passes
                 return false;
 
             foreach (var item in @enum.Items)
-                item.Name = string.Format("{0}_{1}", @enum.Name, item.Name);
+                item.Name = string.Format("{0}_{1}", @enum.QualifiedName, item.Name);
+
+            @enum.Name = @enum.QualifiedName;
 
             return true;
         }
@@ -20,6 +22,6 @@ namespace MonoEmbeddinator4000.Passes
         public override bool VisitParameterDecl(Parameter param)
         {
             return true;
-        }        
+        }
     }
 }
