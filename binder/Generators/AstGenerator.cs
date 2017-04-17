@@ -316,7 +316,7 @@ namespace MonoEmbeddinator4000.Generators
             }
 
             return string.Format("{0}:{1}({2})", method.DeclaringType.FullName,
-                method.Name, string.Join(", ", @params));
+                method.Name, string.Join(",", @params));
         }
 
         Method VisitMethod(MethodInfo methodInfo, Class @class)
