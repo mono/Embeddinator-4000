@@ -10,12 +10,23 @@ using System.IO;
 
 namespace MonoEmbeddinator4000.Generators
 {
+    public static class DeclarationExtensions
+    {
+        public static string ManagedQualifiedName(this Declaration decl)
+        {
+            return ASTGenerator.ManagedNames[decl];
+        }
+    }
+
     public class ASTGenerator
     {
         ASTContext ASTContext { get; set; }
         Options Options { get; set; }
 
         private Assembly CurrentAssembly;
+
+        public static Dictionary<Declaration, string> ManagedNames
+            = new Dictionary<Declaration, string>();
 
         public ASTGenerator(ASTContext context, Options options)
         {
@@ -466,7 +477,8 @@ namespace MonoEmbeddinator4000.Generators
                 IsFinal = methodBase.IsFinal
             };
             method.Name = UnmangleTypeName(methodBase.Name);
-            method.OriginalName = GetInternalMethodName(methodBase);
+
+            ManagedNames[method] = GetInternalMethodName(methodBase);
 
             var parameters = methodBase.GetParameters();
             foreach (var param in parameters)

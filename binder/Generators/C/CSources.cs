@@ -170,7 +170,7 @@ namespace MonoEmbeddinator4000.Generators
         public void GenerateMethodLookup(Method method)
         {
             var methodNameId = GeneratedIdentifier("method_name");
-            WriteLine($"const char {methodNameId}[] = \"{method.OriginalName}\";");
+            WriteLine($"const char {methodNameId}[] = \"{method.ManagedQualifiedName()}\";");
 
             var methodId = GeneratedIdentifier("method");
             WriteLine($"static MonoMethod *{methodId} = 0;");
