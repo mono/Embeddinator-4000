@@ -1,11 +1,5 @@
-glib.c
-glib.h
-mono_embeddinator.c
-mono_embeddinator.h
-objc-support.m
-objc-support.h
-perf-cli
-test-cli
+debug
+release/
 # Xcode
 .DS_Store
 build/
@@ -24,3 +18,6 @@ profile
 *.moved-aside
 DerivedData
 .idea/
+i386
+x86_64
+

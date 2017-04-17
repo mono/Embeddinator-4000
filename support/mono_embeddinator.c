@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Mono managed-to-native support code.
  *
  * Author:
@@ -33,16 +33,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #if defined(__APPLE__)
-#include <errno.h>
-#include <libproc.h>
-#include <unistd.h>
+#include <mach-o/dyld.h>
 #endif
 
 #if defined(__OBJC__)
 #include <objc/runtime.h>
-#include <objc/objc-runtime.h>
 #endif
 
 #ifdef _WIN32
@@ -76,6 +74,10 @@ int mono_embeddinator_init(mono_embeddinator_context_t* ctx, const char* domain)
 
     mono_embeddinator_set_context(ctx);
 
+    char cwd[PATH_MAX];
+    getcwd(cwd, PATH_MAX);
+    mono_domain_set_config(ctx->domain, cwd, "app.config");
+
     return true;
 }
 
@@ -101,14 +103,10 @@ static GString* get_current_executable_path()
     if (path_override)
         return path_override;
 #if defined(__APPLE__)
-    int ret;
-    pid_t pid; 
-    char pathbuf[PROC_PIDPATHINFO_MAXSIZE];
-
-    pid = getpid();
-    ret = proc_pidpath (pid, pathbuf, sizeof(pathbuf));
-
-   return (ret > 0) ? g_string_new(pathbuf) : 0;
+    char pathbuf [1024];
+    uint32_t bufsize = sizeof (pathbuf);
+    int ret = _NSGetExecutablePath (pathbuf, &bufsize);
+    return ret == 0 ? g_string_new (pathbuf) : 0;
 #elif defined(_WIN32)
     HMODULE hModule = GetModuleHandleW(0);
     CHAR pathbuf[MAX_PATH];
@@ -159,8 +157,6 @@ MonoImage* mono_embeddinator_load_assembly(mono_embeddinator_context_t* ctx, con
 
     MonoAssembly* mono_assembly = mono_domain_assembly_open(ctx->domain, path);
 
-    g_free (path);
-
     if (!mono_assembly)
     {
         mono_embeddinator_error_t error;
@@ -168,8 +164,12 @@ MonoImage* mono_embeddinator_load_assembly(mono_embeddinator_context_t* ctx, con
         error.string = path;
         mono_embeddinator_error(error);
 
+        g_free (path);
+
         return 0;
     }
+
+    g_free (path);
 
     return mono_assembly_get_image(mono_assembly);
 }
@@ -191,7 +191,6 @@ MonoClass* mono_embeddinator_search_class(const char* assembly, const char* _nam
 
     char* path = mono_embeddinator_search_assembly(assembly);
     MonoAssembly* mono_assembly = mono_domain_assembly_open(ctx->domain, path);
-    g_free (path);
 
     if (mono_assembly == 0)
     {
@@ -200,6 +199,8 @@ MonoClass* mono_embeddinator_search_class(const char* assembly, const char* _nam
         error.string = path;
         mono_embeddinator_error(error);
     }
+
+    g_free (path);
 
     MonoImage* image = mono_assembly_get_image(mono_assembly);
     MonoClass* klass = mono_class_from_name(image, _namespace, name);

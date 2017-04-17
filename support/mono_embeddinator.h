@@ -58,6 +58,7 @@
     #define MONO_EMBEDDINATOR_API MONO_EMBEDDINATOR_API_IMPORT
 #endif
 
+#include "embeddinator.h"
 typedef uint16_t gunichar2;
 
 typedef struct _GArray GArray;
@@ -202,24 +203,17 @@ typedef void (*mono_embeddinator_error_report_hook_t)(mono_embeddinator_error_t)
 MONO_EMBEDDINATOR_API
 void* mono_embeddinator_install_error_report_hook(mono_embeddinator_error_report_hook_t hook);
 
-/** 
- * Arrays
- */
 
-typedef struct
+struct MonoEmbedArray
 {
     GArray* array;
-} MonoEmbedArray;
+};
 
-/**
- * Objects
- */
-
-typedef struct
+struct MonoEmbedObject
 {
     MonoClass* _class;
     uint32_t _handle;
-} MonoEmbedObject;
+};
 
 /**
  * Creates a MonoEmbedObject support object from a Mono object instance.

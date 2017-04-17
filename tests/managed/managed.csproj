@@ -31,13 +31,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="arrays.cs" />
-    <Compile Include="enums.cs" />
     <Compile Include="properties.cs" />
     <Compile Include="namespaces.cs" />
     <Compile Include="types.cs" />
     <Compile Include="exceptions.cs" />
     <Compile Include="constructors.cs" />
     <Compile Include="methods.cs" />
+    <Compile Include="structs.cs" />
+    <Compile Include="enums.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

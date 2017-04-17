@@ -306,11 +306,18 @@
     <Compile Include="error.cs" />
     <Compile Include="ErrorHelper.cs" />
     <Compile Include="Version.generated.cs" />
+    <Compile Include="objcgenerator-helpers.cs" />
+    <Compile Include="objcgenerator-processor.cs" />
+    <Compile Include="extensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="support\" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="..\support\embeddinator.h">
+      <Link>support\embeddinator.h</Link>
+      <LogicalName>embeddinator.h</LogicalName>
+    </EmbeddedResource>
     <EmbeddedResource Include="..\support\glib.c">
       <Link>support\glib.c</Link>
       <LogicalName>glib.c</LogicalName>

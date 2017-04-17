@@ -47,7 +47,7 @@ namespace ObjCGeneratorTest {
 			Assert.That (ObjCGenerator.GetTypeName (mscorlib.GetType ("System.UInt64")), Is.EqualTo ("unsigned long long"), "ulong");
 			Assert.That (ObjCGenerator.GetTypeName (mscorlib.GetType ("System.Single")), Is.EqualTo ("float"), "float");
 			Assert.That (ObjCGenerator.GetTypeName (mscorlib.GetType ("System.Double")), Is.EqualTo ("double"), "double");
-			Assert.That (ObjCGenerator.GetTypeName (mscorlib.GetType ("System.String")), Is.EqualTo ("NSString*"), "string");
+			Assert.That (ObjCGenerator.GetTypeName (mscorlib.GetType ("System.String")), Is.EqualTo ("NSString *"), "string");
 			Assert.That (ObjCGenerator.GetTypeName (mscorlib.GetType ("System.Object")), Is.EqualTo ("NSObject"), "object");
 			Assert.That (ObjCGenerator.GetTypeName (mscorlib.GetType ("System.Void")), Is.EqualTo ("void"), "void");
 		}
@@ -76,13 +76,6 @@ namespace ObjCGeneratorTest {
 			Assert.That (ObjCGenerator.GetMonoName (mscorlib.GetType ("System.String")), Is.EqualTo ("string"), "string");
 			Assert.That (ObjCGenerator.GetMonoName (mscorlib.GetType ("System.Void")), Is.EqualTo ("void"), "void");
 			Assert.That (ObjCGenerator.GetMonoName (mscorlib.GetType ("System.Object")), Is.EqualTo ("object"), "object");
-		}
-
-		[Test]
-		public void IsVoid ()
-		{
-			Assert.True (ObjCGenerator.IsVoid (mscorlib.GetType ("System.Void")), "void");
-			Assert.False (ObjCGenerator.IsVoid (mscorlib.GetType ("System.Object")), "object");
 		}
 
 		[Test]
