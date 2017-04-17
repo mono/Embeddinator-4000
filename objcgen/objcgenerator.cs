@@ -266,20 +266,25 @@ namespace ObjC {
 				implementation.WriteLine ();
 			}
 
-			headers.WriteLine ();
 			List<PropertyInfo> props;
 			if (properties.TryGetValue (t, out props)) {
+				headers.WriteLine ();
 				foreach (var pi in props)
 					Generate (pi);
-				headers.WriteLine ();
 			}
 
-			headers.WriteLine ();
+			List<FieldInfo> f;
+			if (fields.TryGetValue (t, out f)) {
+				headers.WriteLine ();
+				foreach (var fi in f)
+					Generate (fi);
+			}
+
 			List<MethodInfo> meths;
 			if (methods.TryGetValue (t, out meths)) {
+				headers.WriteLine ();
 				foreach (var mi in meths)
 					Generate (mi);
-				headers.WriteLine ();
 			}
 
 			headers.WriteLine ("@end");
@@ -369,6 +374,59 @@ namespace ObjC {
 				return;
 
 			ImplementMethod (setter, "set" + pi.Name, pi);
+		}
+
+		protected void Generate (FieldInfo fi)
+		{
+			bool read_only = ((fi.Attributes & FieldAttributes.InitOnly) == FieldAttributes.InitOnly);
+
+			headers.Write ("@property (nonatomic");
+			if (fi.IsStatic)
+				headers.Write (", class");
+			if (read_only)
+				headers.Write (", readonly");
+			else
+				headers.Write (", readwrite");
+			var ft = fi.FieldType;
+			var field_type = GetTypeName (ft);
+			if (types.Contains (ft))
+				field_type += " *";
+
+			var name = CamelCase (fi.Name);
+			headers.WriteLine ($") {field_type} {name};");
+
+			// it's similar, but different from implementing a method
+
+			var type = fi.DeclaringType;
+			var managed_type_name = GetObjCName (type);
+			var return_type = GetReturnType (type, fi.FieldType);
+
+			implementation.Write (fi.IsStatic ? '+' : '-');
+			implementation.WriteLine ($" ({return_type}) {CamelCase (fi.Name)}");
+			implementation.WriteLine ("{");
+			implementation.WriteLine ("\tstatic MonoClassField* __field = nil;");
+			implementation.WriteLine ("\tif (!__field) {");
+			implementation.WriteLine ("#if TOKENLOOKUP");
+			var aname = type.Assembly.GetName ().Name;
+			implementation.WriteLine ($"\t\t__field = mono_class_get_field ({managed_type_name}_class, 0x{fi.MetadataToken:X8});");
+			implementation.WriteLine ("#else");
+			implementation.WriteLine ($"\t\tconst char __field_name [] = \"{fi.Name}\";");
+			implementation.WriteLine ($"\t\t__field = mono_class_get_field_from_name ({managed_type_name}_class, __field_name);");
+			implementation.WriteLine ("#endif");
+			implementation.WriteLine ("\t}");
+			var instance = "nil";
+			if (!fi.IsStatic) {
+				implementation.WriteLine ($"\tMonoObject* __instance = mono_gchandle_get_target (_object->_handle);");
+				instance = "__instance";
+			}
+			implementation.WriteLine ($"\tMonoObject* __result = mono_field_get_value_object (__mono_context.domain, __field, {instance});");
+			ReturnValue (fi.FieldType);
+			implementation.WriteLine ("}");
+			implementation.WriteLine ();
+
+			if (read_only)
+				return;
+			// TODO write support
 		}
 
 		public string GetReturnType (Type declaringType, Type returnType)

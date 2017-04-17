@@ -175,6 +175,10 @@
 
 	id p4 = [Structs_Point subtraction:p3 right:p2];
 	XCTAssert ([Structs_Point equality:p4 right:p1], "p4 == p1");
+
+	id z = [Structs_Point zero];
+	XCTAssert ([z x] == 0.0f, "x 4");
+	XCTAssert ([z y] == 0.0f, "y 4");
 }
 
 - (void) testEnums {

@@ -137,11 +137,26 @@ namespace ObjC {
 			}
 		}
 
+		protected IEnumerable<FieldInfo> GetFields (Type t)
+		{
+			foreach (var fi in t.GetFields (BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly)) {
+				if (!fi.IsPublic)
+					continue;
+				var ft = fi.FieldType;
+				if (!IsSupported (ft)) {
+					delayed.Add (ErrorHelper.CreateWarning (1050, $"Field `{fi}` is not generated because of field type `{ft}` is not supported."));
+					continue;
+				}
+				yield return fi;
+			}
+		}
+
 		List<Type> enums = new List<Type> ();
 		List<Type> types = new List<Type> ();
 		Dictionary<Type, List<ConstructorInfo>> ctors = new Dictionary<Type, List<ConstructorInfo>> ();
 		Dictionary<Type, List<MethodInfo>> methods = new Dictionary<Type, List<MethodInfo>> ();
 		Dictionary<Type, List<PropertyInfo>> properties = new Dictionary<Type, List<PropertyInfo>> ();
+		Dictionary<Type, List<FieldInfo>> fields = new Dictionary<Type, List<FieldInfo>> ();
 
 		public override void Process (IEnumerable<Assembly> assemblies)
 		{
@@ -153,10 +168,12 @@ namespace ObjC {
 						types.Add (t);
 
 					var constructors = GetConstructors (t).OrderBy ((arg) => arg.ParameterCount).ToList ();
-					ctors.Add (t, constructors);
+					if (constructors.Count > 0)
+						ctors.Add (t, constructors);
 
 					var meths = GetMethods (t).OrderBy ((arg) => arg.Name).ToList ();
-					methods.Add (t, meths);
+					if (meths.Count > 0)
+						methods.Add (t, meths);
 
 					var props = new List<PropertyInfo> ();
 					foreach (var pi in GetProperties (t)) {
@@ -174,7 +191,15 @@ namespace ObjC {
 						props.Add (pi);
 					}
 					props = props.OrderBy ((arg) => arg.Name).ToList ();
-					properties.Add (t, props);
+					if (props.Count > 0)
+						properties.Add (t, props);
+
+					// fields will need to be wrapped within properties - except for enums
+					if (!t.IsEnum) {
+						var f = GetFields (t).OrderBy ((arg) => arg.Name).ToList ();
+						if (f.Count > 0)
+							fields.Add (t, f);
+					}
 				}
 			}
 			types = types.OrderBy ((arg) => arg.FullName).OrderBy ((arg) => types.Contains (arg.BaseType)).ToList ();
