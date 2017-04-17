@@ -49,17 +49,22 @@ TEST_CASE("Types.C", "[C][Types]") {
 }
 
 TEST_CASE("Properties", "[C][Properties]") {
+    REQUIRE(Platform_get_IsWindows() == false);
+
+    Platform_set_ExitCode(255);
+    REQUIRE(Platform_get_ExitCode() == 255);
+
     REQUIRE(Properties_Query_get_UniversalAnswer() == 42);
 
     Properties_Query* prop = Properties_Query_new();
     REQUIRE(Properties_Query_get_IsGood(prop) == true);
     REQUIRE(Properties_Query_get_IsBad(prop) == false);
-
     REQUIRE(Properties_Query_get_Answer(prop) == 42);
-    Properties_Query_set_Answer(prop, 10);
-    REQUIRE(Properties_Query_get_Answer(prop) == 10);
+    Properties_Query_set_Answer(prop, 911);
+    REQUIRE(Properties_Query_get_Answer(prop) == 911);
 
-    Properties_Query_set_Secret(prop, 10);
+    REQUIRE(Properties_Query_get_IsSecret(prop) == false);
+    Properties_Query_set_Secret(prop, 1);
     REQUIRE(Properties_Query_get_IsSecret(prop) == true);
 }
 
