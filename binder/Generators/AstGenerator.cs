@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using IKVM.Reflection;
-using CppSharp;
 using CppSharp.AST;
 using CppSharp.AST.Extensions;
 using CppSharp.Generators;
-using System.IO;
+using IKVM.Reflection;
 
 namespace MonoEmbeddinator4000.Generators
 {
