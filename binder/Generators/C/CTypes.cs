@@ -1,4 +1,4 @@
-using CppSharp;
+﻿using CppSharp;
 using CppSharp.AST;
 using System.Linq;
 
@@ -43,7 +43,7 @@ namespace MonoEmbeddinator4000.Generators
 
         public override string VisitPrimitiveType(PrimitiveType primitive)
         {
-            if (primitive == PrimitiveType.WideChar)
+            if (primitive == PrimitiveType.Char)
                 return "gunichar2";
 
             return base.VisitPrimitiveType(primitive);
