@@ -132,6 +132,21 @@ There should be an earlier warning giving more information why type `T` is not s
 Note: Supported features will evolve with new versions of the tool.
 
 
+<h3><a name="EM1050"/>Property `P` is not generated because of field type `T` is not supported.</h3>
+
+This is a **warning** that the property `P` will be ignored (i.e. nothing will be generated) because field type `T` is not supported.
+
+There should be an earlier warning giving more information why type `T` is not supported.
+
+Note: Supported features will evolve with new versions of the tool.
+
+
+<h3><a name="EM1060"/>Property `P` is not generated because multiple indexed properties not supported.</h3>
+
+This is a **warning** that the property `P` will be ignored (i.e. nothing will be generated) because multiple indexed properties not supported.
+
+Note: Supported features will evolve with new versions of the tool.
+
 <!-- 2xxx: code generation -->
 
 # EM2xxx: Code Generation

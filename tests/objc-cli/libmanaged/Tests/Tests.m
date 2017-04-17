@@ -246,4 +246,110 @@
     XCTAssertEqualObjects (@"Hello World", [Type_String nonEmptyString], "non-empty string");
 }
 
+- (void) testObjectIndexedSubscripting {
+    Subscripts_BoolCollection *boolCollection = [[Subscripts_BoolCollection alloc] init];
+    XCTAssert ([boolCollection count] == 0, "count 0");
+    [boolCollection addItem:YES];
+    XCTAssert ([boolCollection count] == 1, "count 1");
+    XCTAssert ([boolCollection [0] isEqual:@YES], "get 0");
+    boolCollection[0] = NO;
+    XCTAssert ([boolCollection [0] isEqual:@NO], "get 1");
+    
+    Subscripts_SbyteCollection *sbyteCollection = [[Subscripts_SbyteCollection alloc] init];
+    XCTAssert ([sbyteCollection count] == 0, "count 2");
+    [sbyteCollection addItem:42];
+    XCTAssert ([sbyteCollection count] == 1, "count 3");
+    XCTAssert ([sbyteCollection [0] isEqual:@42], "get 2");
+    sbyteCollection[0] = @13;
+    XCTAssert ([sbyteCollection [0] isEqual:@13], "get 3");
+    
+    Subscripts_ByteCollection *byteCollection = [[Subscripts_ByteCollection alloc] init];
+    XCTAssert ([byteCollection count] == 0, "count 4");
+    [byteCollection addItem:42];
+    XCTAssert ([byteCollection count] == 1, "count 5");
+    XCTAssert ([byteCollection [0] isEqual:@42], "get 4");
+    byteCollection[0] = @13;
+    XCTAssert ([byteCollection [0] isEqual:@13], "get 5");
+    
+    Subscripts_ShortCollection *shortCollection = [[Subscripts_ShortCollection alloc] init];
+    XCTAssert ([shortCollection count] == 0, "count 6");
+    [shortCollection addItem:42];
+    XCTAssert ([shortCollection count] == 1, "count 7");
+    XCTAssert ([shortCollection [0] isEqual:@42], "get 6");
+    shortCollection[0] = @13;
+    XCTAssert ([shortCollection [0] isEqual:@13], "get 7");
+    
+    Subscripts_UshortCollection *ushortCollection = [[Subscripts_UshortCollection alloc] init];
+    XCTAssert ([ushortCollection count] == 0, "count 8");
+    [ushortCollection addItem:42];
+    XCTAssert ([ushortCollection count] == 1, "count 9");
+    XCTAssert ([ushortCollection [0] isEqual:@42], "get 8");
+    ushortCollection[0] = @13;
+    XCTAssert ([ushortCollection [0] isEqual:@13], "get 9");
+    
+    Subscripts_IntCollection *intCollection = [[Subscripts_IntCollection alloc] init];
+    XCTAssert ([intCollection count] == 0, "count 10");
+    [intCollection addItem:42];
+    XCTAssert ([intCollection count] == 1, "count 11");
+    XCTAssert ([intCollection [0] isEqual:@42], "get 10");
+    intCollection[0] = @13;
+    XCTAssert ([intCollection [0] isEqual:@13], "get 11");
+    
+    Subscripts_UintCollection *uintCollection = [[Subscripts_UintCollection alloc] init];
+    XCTAssert ([uintCollection count] == 0, "count 12");
+    [uintCollection addItem:42];
+    XCTAssert ([uintCollection count] == 1, "count 13");
+    XCTAssert ([uintCollection [0] isEqual:@42], "get 12");
+    uintCollection[0] = @13;
+    XCTAssert ([uintCollection [0] isEqual:@13], "get 13");
+    
+    Subscripts_LongCollection *longCollection = [[Subscripts_LongCollection alloc] init];
+    XCTAssert ([longCollection count] == 0, "count 14");
+    [longCollection addItem:42];
+    XCTAssert ([longCollection count] == 1, "count 15");
+    XCTAssert ([longCollection [0] isEqual:@42], "get 14");
+    longCollection[0] = @13;
+    XCTAssert ([longCollection [0] isEqual:@13], "get 15");
+    
+    Subscripts_UlongCollection *ulongCollection = [[Subscripts_UlongCollection alloc] init];
+    XCTAssert ([ulongCollection count] == 0, "count 16");
+    [ulongCollection addItem:42];
+    XCTAssert ([ulongCollection count] == 1, "count 17");
+    XCTAssert ([ulongCollection [0] isEqual:@42], "get 16");
+    ulongCollection[0] = @13;
+    XCTAssert ([ulongCollection [0] isEqual:@13], "get 17");
+    
+    Subscripts_FloatCollection *floatCollection = [[Subscripts_FloatCollection alloc] init];
+    XCTAssert ([floatCollection count] == 0, "count 18");
+    [floatCollection addItem:42];
+    XCTAssert ([floatCollection count] == 1, "count 19");
+    XCTAssert ([floatCollection [0] isEqual:@42], "get 18");
+    floatCollection[0] = @13;
+    XCTAssert ([floatCollection [0] isEqual:@13], "get 19");
+    
+    Subscripts_DoubleCollection *doubleCollection = [[Subscripts_DoubleCollection alloc] init];
+    XCTAssert ([doubleCollection count] == 0, "count 20");
+    [doubleCollection addItem:42];
+    XCTAssert ([doubleCollection count] == 1, "count 21");
+    XCTAssert ([doubleCollection [0] isEqual:@42], "get 20");
+    doubleCollection[0] = @13;
+    XCTAssert ([doubleCollection [0] isEqual:@13], "get 21");
+    
+    Subscripts_CharCollection *charCollection = [[Subscripts_CharCollection alloc] init];
+    XCTAssert ([charCollection count] == 0, "count 22");
+    [charCollection addItem:42];
+    XCTAssert ([charCollection count] == 1, "count 23");
+    XCTAssert ([charCollection [0] isEqual:@42], "get 22");
+    charCollection[0] = @13;
+    XCTAssert ([charCollection [0] isEqual:@13], "get 23");
+    
+    Subscripts_StringCollection *stringCollection = [[Subscripts_StringCollection alloc] init];
+    XCTAssert ([stringCollection count] == 0, "count 24");
+    [stringCollection addItem:@"asdf"];
+    XCTAssert ([stringCollection count] == 1, "count 25");
+    XCTAssert ([stringCollection [0] isEqual:@"asdf"], "get 24");
+    stringCollection[0] = @"fdsa";
+    XCTAssert ([stringCollection [0] isEqual:@"fdsa"], "get 25");
+}
+
 @end

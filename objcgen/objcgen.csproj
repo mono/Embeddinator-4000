@@ -309,6 +309,7 @@
     <Compile Include="objcgenerator-helpers.cs" />
     <Compile Include="objcgenerator-processor.cs" />
     <Compile Include="extensions.cs" />
+    <Compile Include="objcgenerator-subscripts.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="support\" />

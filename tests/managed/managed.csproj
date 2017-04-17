@@ -38,6 +38,15 @@
     <Compile Include="methods.cs" />
     <Compile Include="structs.cs" />
     <Compile Include="enums.cs" />
+    <Compile Include="subscripts.cs">
+      <DependentUpon>subscripts.tt</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="subscripts.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>subscripts.cs</LastGenOutput>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
