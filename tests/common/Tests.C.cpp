@@ -122,6 +122,23 @@ TEST_CASE("Namespaces.C", "[C][Namespaces]") {
     REQUIRE(strcmp(First_Second_Third_ClassWithNestedNamespace_ToString(nestednamespaces2), "First.Second.Third.ClassWithNestedNamespace") == 0);
 }
 
+TEST_CASE("Exceptions.C", "[C][Exceptions]") {
+    // .ctor that throws
+    Exceptions_Throwers* throwers = Exceptions_Throwers_new();
+    REQUIRE(throwers == 0);
+
+    // .cctor that throw - can't be called directly but it makes the type unusable
+    Exceptions_ThrowInStaticCtor* static_thrower = Exceptions_ThrowInStaticCtor_new_1();
+    REQUIRE(static_thrower == 0);
+
+    // .ctor chaining
+    Exceptions_Super* sup1 = Exceptions_Super_new(false);
+    REQUIRE(sup1 != 0);
+
+    Exceptions_Super* sup2 = Exceptions_Super_new(true);
+    REQUIRE(static_thrower == 0);
+}
+
 TEST_CASE("Constructors.C", "[C][Constructors]") {
     Constructors_Unique* unique = Constructors_Unique_new_1();
     REQUIRE(Constructors_Unique_get_Id(unique) == 1);
