@@ -247,17 +247,11 @@ namespace Embeddinator {
 		static string XcodeApp {
 			get {
 				if (string.IsNullOrEmpty (xcode_app)) {
-					using (var process = new Process ()) {
-						process.StartInfo.FileName = "xcode-select";
-						process.StartInfo.Arguments = "-p";
-						process.StartInfo.UseShellExecute = false;
-						process.StartInfo.RedirectStandardOutput = true;
-						process.Start ();
-						var output = process.StandardOutput.ReadToEnd ();
-						if (process.ExitCode != 0)
-							throw ErrorHelper.CreateError (6, "Could not find the Xcode location.");
-						xcode_app = Path.GetDirectoryName (Path.GetDirectoryName (output.Trim ()));
-					}
+					int exitCode;
+					string output;
+					if (!RunProcess ("xcode-select", "-p", out exitCode, out output))
+						throw ErrorHelper.CreateError (6, "Could not find the Xcode location.");
+					xcode_app = Path.GetDirectoryName (Path.GetDirectoryName (output.Trim ()));
 				}
 				return xcode_app;
 			}
