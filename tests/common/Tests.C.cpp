@@ -1,4 +1,4 @@
-﻿#define CATCH_CONFIG_MAIN
+﻿#define CATCH_CONFIG_RUNNER
 #include <catch.hpp>
 
 #include "managed.h"
@@ -180,4 +180,13 @@ TEST_CASE("Arrays.C", "[C][Arrays]") {
     REQUIRE(strcmp(g_array_index(_string.array, gchar*, 0), "1") == 0);
     REQUIRE(strcmp(g_array_index(_string.array, gchar*, 1), "2") == 0);
     REQUIRE(strcmp(g_array_index(_string.array, gchar*, 2), "3") == 0);
+}
+
+int main( int argc, char* argv[] )
+{
+    // Setup a null error handler so we can test exceptions.
+    mono_embeddinator_install_error_report_hook(0);
+
+    int result = Catch::Session().run(argc, argv);
+    return (result < 0xff ? result : 0xff);
 }
