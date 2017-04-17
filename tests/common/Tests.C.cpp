@@ -7,6 +7,44 @@
 #include "float.h"
 
 TEST_CASE("Types.C", "[C][Types]") {
+    REQUIRE(Type_Char_get_Min() == 0);
+    REQUIRE(Type_Char_get_Max() == USHRT_MAX);
+    REQUIRE(Type_Char_get_Zero() == 0);
+
+    REQUIRE(Type_SByte_get_Min() == SCHAR_MIN);
+    REQUIRE(Type_SByte_get_Max() == SCHAR_MAX);
+
+    REQUIRE(Type_Byte_get_Min() == 0);
+    REQUIRE(Type_Byte_get_Max() == UCHAR_MAX);
+
+    REQUIRE(Type_Int16_get_Min() == SHRT_MIN);
+    REQUIRE(Type_Int16_get_Max() == SHRT_MAX);
+
+    REQUIRE(Type_Int32_get_Min() == INT_MIN);
+    REQUIRE(Type_Int32_get_Max() == INT_MAX);
+
+    REQUIRE(Type_Int64_get_Min() == LONG_MIN);
+    REQUIRE(Type_Int64_get_Max() == LONG_MAX);
+    
+    REQUIRE(Type_UInt16_get_Min() == 0);
+    REQUIRE(Type_UInt16_get_Max() == USHRT_MAX);
+
+    REQUIRE(Type_UInt32_get_Min() == 0);
+    REQUIRE(Type_UInt32_get_Max() == UINT_MAX);
+
+    REQUIRE(Type_UInt64_get_Min() == 0);
+    REQUIRE(Type_UInt64_get_Max() == ULONG_MAX);
+
+    REQUIRE(Type_Single_get_Min() == -FLT_MAX);
+    REQUIRE(Type_Single_get_Max() == FLT_MAX);
+
+    REQUIRE(Type_Double_get_Min() == -DBL_MAX);
+    REQUIRE(Type_Double_get_Max() == DBL_MAX);
+
+    REQUIRE(Type_String_get_NullString() == NULL);
+    REQUIRE(strcmp(Type_String_get_EmptyString(), "") == 0);
+    REQUIRE(strcmp(Type_String_get_NonEmptyString(), "Hello World") == 0);
+
     BuiltinTypes* bt = BuiltinTypes_new();
     BuiltinTypes_ReturnsVoid(bt);
     REQUIRE(BuiltinTypes_ReturnsBool(bt)   == true);
