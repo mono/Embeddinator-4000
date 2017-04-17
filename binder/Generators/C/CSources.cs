@@ -290,7 +290,17 @@ namespace MonoEmbeddinator4000.Generators
             NewLine();
 
             WriteLine($"if ({exceptionId})");
-            WriteLineIndent($"mono_embeddinator_throw_exception({exceptionId});");
+            WriteStartBraceIndent();
+
+            if (method.IsConstructor)
+                WriteLine("free(object);");
+
+            WriteLine($"mono_embeddinator_throw_exception({exceptionId});");
+
+            if (method.IsConstructor)
+                WriteLine("return 0;");
+
+            WriteCloseBraceIndent();
 
             foreach (var marshalContext in contexts)
             {
