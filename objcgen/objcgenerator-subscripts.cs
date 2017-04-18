@@ -28,13 +28,32 @@ namespace ObjC
 				GenerateIndexedSubscripting (indexType, paramType);
 				return;
 			default:
-				GenerateKeyedSubscripting (paramType);
+				GenerateKeyedSubscripting (indexType, paramType);
 				return;
 			}
 		}
 
-		protected void GenerateKeyedSubscripting (Type paramType)
+		protected void GenerateKeyedSubscripting (Type indexType, Type propertyType)
 		{
+			string indexTypeString = GetTypeName (indexType);
+
+			// TODO - Technically the argument here can be anything, not just id
+			headers.WriteLine ($"- (id)objectForKeyedSubscript:(id)key;");
+
+			implementation.WriteLine ($"- (id)objectForKeyedSubscript:(id)key;");
+			implementation.WriteLine ("{");
+			implementation.WriteLine ($"\treturn {ToNSObject (propertyType, "[self getItem:key]")};");
+			implementation.WriteLine ("}");
+			implementation.WriteLine ();
+
+			// TODO - Technically the argument here can be anything, not just id
+			headers.WriteLine ($"- (void)setObject:(id)obj forKeyedSubscript:(id)key;");
+
+			implementation.WriteLine ($"- (void)setObject:(id)obj forKeyedSubscript:(id)key;");
+			implementation.WriteLine ("{");
+			implementation.WriteLine ($"\t[self setItem:key value:{FromNSObject (propertyType, "obj")}];");
+			implementation.WriteLine ("}");
+			implementation.WriteLine ();
 		}
 
 		protected void GenerateIndexedSubscripting (Type indexType, Type propertyType)
@@ -45,7 +64,7 @@ namespace ObjC
 
 			implementation.WriteLine ($"- (id)objectAtIndexedSubscript:({indexTypeString})idx");
 			implementation.WriteLine ("{");
-			implementation.WriteLine ($"\treturn {ToNSNumber (propertyType, "[self getItem:idx]")};");
+			implementation.WriteLine ($"\treturn {ToNSObject (propertyType, "[self getItem:idx]")};");
 			implementation.WriteLine ("}");
 			implementation.WriteLine ();
 
@@ -53,12 +72,12 @@ namespace ObjC
 
 			implementation.WriteLine ($"- (void)setObject:(id)obj atIndexedSubscript: ({indexTypeString})idx");
 			implementation.WriteLine ("{");
-			implementation.WriteLine ($"\t[self setItem:idx value:{FromNSNumber (propertyType, "obj")}];");
+			implementation.WriteLine ($"\t[self setItem:idx value:{FromNSObject (propertyType, "obj")}];");
 			implementation.WriteLine ("}");
 			implementation.WriteLine ();
 		}
 
-		internal string ToNSNumber (Type type, string code)
+		internal string ToNSObject (Type type, string code)
 		{
 			switch (Type.GetTypeCode (type)) {
 			case TypeCode.Boolean:
@@ -93,7 +112,7 @@ namespace ObjC
 			}
 		}
 
-		internal string FromNSNumber (Type type, string code)
+		internal string FromNSObject (Type type, string code)
 		{
 			switch (Type.GetTypeCode (type)) {
 			case TypeCode.Boolean:

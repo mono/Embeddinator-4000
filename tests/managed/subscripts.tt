@@ -31,5 +31,27 @@ namespace Subscripts
 		}
 	}
 
+	public class <#=Char.ToUpperInvariant (t[0]) + t.Substring(1).ToLowerInvariant()  #>DictionaryCollection
+	{
+		Dictionary <string, <#=t#>> c = new Dictionary <string, <#=t#>> ();
+
+		public void Add (string key, <#=t#> item)
+		{
+			c.Add (key, item);
+		}
+
+		public void Remove (string key)
+		{
+			c.Remove (key);
+		}
+
+		public int Count => c.Count;
+
+		public <#=t#> this[string key] {
+			get { return c[key]; }
+			set { c[key] = value; }
+		}
+	}
+
 <# } #>
 }
