@@ -355,15 +355,15 @@
 - (void) testObjectKeyedSubscripting {
     Subscripts_BoolDictionaryCollection *BoolCollection = [[Subscripts_BoolDictionaryCollection alloc] init];
     XCTAssert ([BoolCollection count] == 0, "count 0");
-    [BoolCollection addKey:@"asdf" item:YES];
+    BoolCollection[@"asdf"] = @YES;
     XCTAssert ([BoolCollection count] == 1, "count 1");
     XCTAssert ([BoolCollection [@"asdf"] isEqual:@YES], "get 0");
-    BoolCollection[@"asdf"] = NO;
+    BoolCollection[@"asdf"] = @NO;
     XCTAssert ([BoolCollection [@"asdf"] isEqual:@NO], "get 1");
     
     Subscripts_SbyteDictionaryCollection *SbyteCollection = [[Subscripts_SbyteDictionaryCollection alloc] init];
     XCTAssert ([SbyteCollection count] == 0, "count 2");
-    [SbyteCollection addKey:@"asdf" item:42];
+    SbyteCollection[@"asdf"] = @42;
     XCTAssert ([SbyteCollection count] == 1, "count 3");
     XCTAssert ([SbyteCollection [@"asdf"] isEqual:@42], "get 2");
     SbyteCollection[@"asdf"] = @13;
@@ -371,7 +371,7 @@
     
     Subscripts_ByteDictionaryCollection *ByteCollection = [[Subscripts_ByteDictionaryCollection alloc] init];
     XCTAssert ([ByteCollection count] == 0, "count 4");
-    [ByteCollection addKey:@"asdf" item:42];
+    ByteCollection[@"asdf"] = @42;
     XCTAssert ([ByteCollection count] == 1, "count 5");
     XCTAssert ([ByteCollection [@"asdf"] isEqual:@42], "get 4");
     ByteCollection[@"asdf"] = @13;
@@ -379,7 +379,7 @@
     
     Subscripts_ShortDictionaryCollection *ShortCollection = [[Subscripts_ShortDictionaryCollection alloc] init];
     XCTAssert ([ShortCollection count] == 0, "count 6");
-    [ShortCollection addKey:@"asdf" item:42];
+    ShortCollection[@"asdf"] = @42;
     XCTAssert ([ShortCollection count] == 1, "count 7");
     XCTAssert ([ShortCollection [@"asdf"] isEqual:@42], "get 6");
     ShortCollection[@"asdf"] = @13;
@@ -387,7 +387,7 @@
     
     Subscripts_UshortDictionaryCollection *UshortCollection = [[Subscripts_UshortDictionaryCollection alloc] init];
     XCTAssert ([UshortCollection count] == 0, "count 8");
-    [UshortCollection addKey:@"asdf" item:42];
+    UshortCollection[@"asdf"] = @42;
     XCTAssert ([UshortCollection count] == 1, "count 9");
     XCTAssert ([UshortCollection [@"asdf"] isEqual:@42], "get 8");
     UshortCollection[@"asdf"] = @13;
@@ -395,7 +395,7 @@
     
     Subscripts_IntDictionaryCollection *IntCollection = [[Subscripts_IntDictionaryCollection alloc] init];
     XCTAssert ([IntCollection count] == 0, "count 10");
-    [IntCollection addKey:@"asdf" item:42];
+    IntCollection[@"asdf"] = @42;
     XCTAssert ([IntCollection count] == 1, "count 11");
     XCTAssert ([IntCollection [@"asdf"] isEqual:@42], "get 10");
     IntCollection[@"asdf"] = @13;
@@ -403,7 +403,7 @@
     
     Subscripts_UintDictionaryCollection *UintCollection = [[Subscripts_UintDictionaryCollection alloc] init];
     XCTAssert ([UintCollection count] == 0, "count 12");
-    [UintCollection addKey:@"asdf" item:42];
+    UintCollection[@"asdf"] = @42;
     XCTAssert ([UintCollection count] == 1, "count 13");
     XCTAssert ([UintCollection [@"asdf"] isEqual:@42], "get 12");
     UintCollection[@"asdf"] = @13;
@@ -411,7 +411,7 @@
     
     Subscripts_LongDictionaryCollection *LongCollection = [[Subscripts_LongDictionaryCollection alloc] init];
     XCTAssert ([LongCollection count] == 0, "count 14");
-    [LongCollection addKey:@"asdf" item:42];
+    LongCollection[@"asdf"] = @42;
     XCTAssert ([LongCollection count] == 1, "count 15");
     XCTAssert ([LongCollection [@"asdf"] isEqual:@42], "get 14");
     LongCollection[@"asdf"] = @13;
@@ -419,7 +419,7 @@
     
     Subscripts_UlongDictionaryCollection *UlongCollection = [[Subscripts_UlongDictionaryCollection alloc] init];
     XCTAssert ([UlongCollection count] == 0, "count 16");
-    [UlongCollection addKey:@"asdf" item:42];
+    UlongCollection[@"asdf"] = @42;
     XCTAssert ([UlongCollection count] == 1, "count 17");
     XCTAssert ([UlongCollection [@"asdf"] isEqual:@42], "get 16");
     UlongCollection[@"asdf"] = @13;
@@ -427,7 +427,7 @@
     
     Subscripts_FloatDictionaryCollection *FloatCollection = [[Subscripts_FloatDictionaryCollection alloc] init];
     XCTAssert ([FloatCollection count] == 0, "count 18");
-    [FloatCollection addKey:@"asdf" item:42];
+    FloatCollection[@"asdf"] = @42;
     XCTAssert ([FloatCollection count] == 1, "count 19");
     XCTAssert ([FloatCollection [@"asdf"] isEqual:@42], "get 18");
     FloatCollection[@"asdf"] = @13;
@@ -435,7 +435,7 @@
     
     Subscripts_DoubleDictionaryCollection *DoubleCollection = [[Subscripts_DoubleDictionaryCollection alloc] init];
     XCTAssert ([DoubleCollection count] == 0, "count 20");
-    [DoubleCollection addKey:@"asdf" item:42];
+    DoubleCollection[@"asdf"] = @42;
     XCTAssert ([DoubleCollection count] == 1, "count 21");
     XCTAssert ([DoubleCollection [@"asdf"] isEqual:@42], "get 20");
     DoubleCollection[@"asdf"] = @13;
@@ -443,7 +443,7 @@
     
     Subscripts_CharDictionaryCollection *CharCollection = [[Subscripts_CharDictionaryCollection alloc] init];
     XCTAssert ([CharCollection count] == 0, "count 22");
-    [CharCollection addKey:@"asdf" item:42];
+    CharCollection[@"asdf"] = @42;
     XCTAssert ([CharCollection count] == 1, "count 23");
     XCTAssert ([CharCollection [@"asdf"] isEqual:@42], "get 22");
     CharCollection[@"asdf"] = @13;
@@ -451,7 +451,7 @@
     
     Subscripts_StringDictionaryCollection *StringCollection = [[Subscripts_StringDictionaryCollection alloc] init];
     XCTAssert ([StringCollection count] == 0, "count 24");
-    [StringCollection addKey:@"asdf" item:@"one"];
+    StringCollection[@"asdf"] = @"one";
     XCTAssert ([StringCollection count] == 1, "count 25");
     XCTAssert ([StringCollection [@"asdf"] isEqual:@"one"], "get 24");
     StringCollection[@"asdf"] = @"two";
