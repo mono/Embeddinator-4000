@@ -74,7 +74,6 @@ namespace MonoEmbeddinator4000.Generators
 
         public static void SetupPasses(PassBuilder<TranslationUnitPass> passes)
         {
-            passes.AddPass(new RenameEnumItemsPass());
             passes.AddPass(new FixMethodParametersPass());
         }
 

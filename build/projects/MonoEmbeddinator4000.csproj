@@ -123,9 +123,6 @@
     <Compile Include="../../binder/Passes/RenameDuplicatedDecls.cs">
       <Link>binder/Passes/RenameDuplicatedDecls.cs</Link>
     </Compile>
-    <Compile Include="../../binder/Passes/RenameEnumItemsPass.cs">
-      <Link>binder/Passes/RenameEnumItemsPass.cs</Link>
-    </Compile>
     <Compile Include="../../binder/Project.cs">
       <Link>binder/Project.cs</Link>
     </Compile>

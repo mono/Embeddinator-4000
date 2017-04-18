@@ -427,7 +427,7 @@ namespace MonoEmbeddinator4000.Generators
                 integerType, newArgName, Context.ArgName);
             Context.Return.Write("&{0}", newArgName);
             Context.SupportAfter.WriteLine("*{0} = ({1}) {2};", Context.ArgName,
-                @enum.Name, newArgName);
+                @enum.QualifiedName, newArgName);
         }
 
         public override bool VisitPointerType(PointerType pointer,

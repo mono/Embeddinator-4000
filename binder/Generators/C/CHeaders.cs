@@ -68,7 +68,10 @@ namespace MonoEmbeddinator4000.Generators
         {
             PushBlock();
 
-            Write("typedef enum {0}", @enum.Name);
+            var enumName = Options.GeneratorKind != GeneratorKind.CPlusPlus ?
+                @enum.QualifiedName : @enum.Name;
+            
+            Write($"typedef enum {enumName}");
 
             if (Options.GeneratorKind == GeneratorKind.CPlusPlus)
             {
@@ -77,7 +80,7 @@ namespace MonoEmbeddinator4000.Generators
                     @enum.BuiltinType.Type, new TypeQualifiers());
 
                 if (@enum.BuiltinType.Type != PrimitiveType.Int)
-                    Write(" : {0}", typeName);
+                    Write($" : {typeName}");
             }
 
             NewLine();
@@ -85,10 +88,13 @@ namespace MonoEmbeddinator4000.Generators
 
             foreach (var item in @enum.Items)
             {
-                Write(string.Format("{0}", item.Name));
+                var enumItemName = Options.GeneratorKind != GeneratorKind.CPlusPlus ?
+                    $"{@enum.QualifiedName}_{item.Name}" : item.Name;
+
+                Write(enumItemName);
 
                 if (item.ExplicitValue)
-                    Write(string.Format(" = {0}", @enum.GetItemValueAsString(item)));
+                    Write($" = {@enum.GetItemValueAsString(item)}");
 
                 if (item != @enum.Items.Last())
                     WriteLine(",");
@@ -96,7 +102,7 @@ namespace MonoEmbeddinator4000.Generators
 
             NewLine();
             PopIndent();
-            WriteLine("}} {0};", @enum.Name);
+            WriteLine($"}} {enumName};");
 
             PopBlock(NewLineKind.BeforeNextBlock);
 
