@@ -495,21 +495,19 @@ namespace MonoEmbeddinator4000.Generators
                 {
                     var argId = $"{CGenerator.GenId(Context.ArgName)}_{Context.ParameterIndex}";
                     var contextId = CGenerator.GenId("mono_context");
-                    var stringText = Context.ArgName;
+                    var @string = Context.ArgName;
 
                     var isByRef = param != null && (param.IsOut || param.IsInOut);
                     if (isByRef)
                     {
-                        stringText = string.Format ("({0}->len != 0) ? {0}->str : \"\"",
-                            Context.ArgName);
-
+                        @string = $"{Context.ArgName}->str";
                         Context.SupportAfter.WriteLine ("g_string_truncate({0}, 0);", Context.ArgName);
                         Context.SupportAfter.WriteLine ("g_string_append({0}, mono_string_to_utf8(" +
                             "(MonoString*) {1}));", Context.ArgName, argId);
                     }
 
                     Context.SupportBefore.WriteLine("MonoString* {0} = ({2}) ? mono_string_new({1}.domain, {2}) : 0;",
-                        argId, contextId, stringText);
+                        argId, contextId, @string);
                     Context.Return.Write("{0}{1}", isByRef ? "&" : string.Empty, argId);
                     return true;
                 }
