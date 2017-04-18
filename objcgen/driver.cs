@@ -470,6 +470,7 @@ namespace Embeddinator {
 				p.StartInfo.RedirectStandardOutput = true;
 				p.Start();
 				stdout = p.StandardOutput.ReadToEnd();
+				p.WaitForExit ();
 				exitCode = p.ExitCode;
 				return exitCode == 0;
 			}
