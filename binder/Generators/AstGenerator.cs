@@ -436,11 +436,7 @@ namespace MonoEmbeddinator4000.Generators
                 type = new BuiltinType(PrimitiveType.Double);
                 break;
             case TypeCode.String:
-                // TODO: Convert C and Obj-C generators to use primitive type strings.
-                if (Options.GeneratorKind == GeneratorKind.Java)
-                    type = new BuiltinType(PrimitiveType.String);
-                else
-                    type = new CILType(typeof(string));
+                type = new BuiltinType(PrimitiveType.String);
                 break;
             }
 

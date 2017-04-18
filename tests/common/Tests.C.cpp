@@ -195,7 +195,7 @@ TEST_CASE("Arrays.C", "[C][Arrays]") {
     REQUIRE(g_array_index(_int.array, int, 1) == 2);
     REQUIRE(g_array_index(_int.array, int, 2) == 3);
 
-    _CharArray _string = Arrays_ArrayTypes_ReturnsStringArray();
+    _StringArray _string = Arrays_ArrayTypes_ReturnsStringArray();
     REQUIRE(_string.array->len == 3);
     REQUIRE(strcmp(g_array_index(_string.array, gchar*, 0), "1") == 0);
     REQUIRE(strcmp(g_array_index(_string.array, gchar*, 1), "2") == 0);

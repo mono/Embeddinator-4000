@@ -20,14 +20,6 @@ namespace MonoEmbeddinator4000.Generators
 
         public override string VisitCILType(CILType type, TypeQualifiers quals)
         {
-            if (type.Type == typeof(string))
-            {
-                if (param != null && (param.IsOut || param.IsInOut))
-                    return "GString*";
-
-                return quals.IsConst ? "const char*" : "char*";
-            }
-
             throw new System.NotImplementedException(
                 string.Format("Unhandled .NET type: {0}", type.Type));
         }
@@ -45,6 +37,14 @@ namespace MonoEmbeddinator4000.Generators
         {
             if (primitive == PrimitiveType.Char)
                 return "gunichar2";
+
+            if (primitive == PrimitiveType.String)
+            {
+                if (param != null && (param.IsOut || param.IsInOut))
+                    return "GString*";
+
+                return "const char*";
+            }
 
             return base.VisitPrimitiveType(primitive);
         }
@@ -65,6 +65,14 @@ namespace MonoEmbeddinator4000.Generators
             typeName = StringHelpers.Capitalize(typeName);
 
             return string.Format("{0}Array", typeName);
+        }
+
+        public override string VisitPrimitiveType(PrimitiveType primitive)
+        {
+            if (primitive == PrimitiveType.String)
+                return "string";
+
+            return base.VisitPrimitiveType(primitive);
         }
     }
 }

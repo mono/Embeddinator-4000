@@ -64,7 +64,7 @@ namespace MonoEmbeddinator4000.Generators
             typePrinter.PrintScopeKind = TypePrintScopeKind.Qualified;
             var arrayElementName = array.Array.Type.Visit(typePrinter);
             var elementSize = $"sizeof({arrayElementName})";
-
+    
             var nativeArrayId = CGenerator.GenId($"{Context.ArgName}_native_array");
             support.WriteLine("{0} {1};", arrayTypedefName, nativeArrayId);
             support.WriteLine("{0}.array = g_array_sized_new(/*zero_terminated=*/FALSE," +
@@ -114,23 +114,6 @@ namespace MonoEmbeddinator4000.Generators
             return false;
         }
 
-        bool HandleSpecialCILType(CILType cilType)
-        {
-            var type = cilType.Type;
-
-            if (type == typeof(string))
-            {
-                var stringId = CGenerator.GenId("string");
-                Context.SupportBefore.WriteLine("char* {0} = mono_string_to_utf8(" +
-                    "(MonoString*) {1});", stringId, Context.ArgName);
-
-                Context.Return.Write("{0}", stringId);
-                return true;
-            }
-
-            return false;
-        }
-
         public override bool VisitEnumDecl(Enumeration @enum)
         {
             VisitPrimitiveType(@enum.BuiltinType.Type);
@@ -149,9 +132,6 @@ namespace MonoEmbeddinator4000.Generators
 
         public override bool VisitCILType(CILType type, TypeQualifiers quals)
         {
-            if (HandleSpecialCILType(type))
-                return true;
-
             return base.VisitCILType(type, quals);
         }
 
@@ -184,6 +164,7 @@ namespace MonoEmbeddinator4000.Generators
                 case PrimitiveType.Double:
                 case PrimitiveType.LongDouble:
                 case PrimitiveType.Null:
+                {
                     var typePrinter = CTypePrinter;
                     var typeName = Context.ReturnType.Visit(typePrinter);
 
@@ -199,6 +180,16 @@ namespace MonoEmbeddinator4000.Generators
 
                     Context.Return.Write("*(({0}*){1})", typeName, valueId);
                     return true;
+                }
+                case PrimitiveType.String:
+                {
+	                var stringId = CGenerator.GenId("string");
+	                Context.SupportBefore.WriteLine("char* {0} = mono_string_to_utf8(" +
+	                    "(MonoString*) {1});", stringId, Context.ArgName);
+	
+	                Context.Return.Write("{0}", stringId);
+	                return true;
+                }
             }
 
             throw new System.NotImplementedException(primitive.ToString());
@@ -311,7 +302,7 @@ namespace MonoEmbeddinator4000.Generators
         {
             type = type.Desugar();
 
-            if (type is BuiltinType)
+            if (type is BuiltinType && !type.IsPrimitiveType(PrimitiveType.String))
                 return true;
 
             if (!(type is TagType))
@@ -407,42 +398,8 @@ namespace MonoEmbeddinator4000.Generators
             return true;
         }
 
-        bool HandleSpecialCILType(CILType cilType)
-        {
-            var type = cilType.Type;
-
-            if (type == typeof(string))
-            {
-                var argId = $"{CGenerator.GenId(Context.ArgName)}_{Context.ParameterIndex}";
-                var contextId = CGenerator.GenId("mono_context");
-                var stringText = Context.ArgName;
-
-                var param = Context.Parameter;
-                var isByRef = param != null && (param.IsOut || param.IsInOut);
-                if (isByRef)
-                {
-                    stringText = string.Format ("({0}->len != 0) ? {0}->str : \"\"",
-                        Context.ArgName);
-
-                    Context.SupportAfter.WriteLine ("g_string_truncate({0}, 0);", Context.ArgName);
-                    Context.SupportAfter.WriteLine ("g_string_append({0}, mono_string_to_utf8(" +
-                        "(MonoString*) {1}));", Context.ArgName, argId);
-                }
-
-                Context.SupportBefore.WriteLine("MonoString* {0} = mono_string_new({1}.domain, {2});",
-                    argId, contextId, stringText);
-                Context.Return.Write("{0}{1}", isByRef ? "&" : string.Empty, argId);
-                return true;
-            }
-
-            return false;
-        }
-
         public override bool VisitCILType(CILType type, TypeQualifiers quals)
         {
-            if (HandleSpecialCILType(type))
-                return true;
-
             return base.VisitCILType(type, quals);
         }
 
@@ -526,12 +483,36 @@ namespace MonoEmbeddinator4000.Generators
                 case PrimitiveType.Double:
                 case PrimitiveType.LongDouble:
                 case PrimitiveType.Null:
+                {
                     var prefix = "&";
                     if ((param != null && (param.IsInOut || param.IsOut))
                         || PrimitiveValuesByValue)
                         prefix = string.Empty;
                     Context.Return.Write ("{0}{1}", prefix, Context.ArgName);
                     return true;
+                }
+                case PrimitiveType.String:
+                {
+                    var argId = $"{CGenerator.GenId(Context.ArgName)}_{Context.ParameterIndex}";
+                    var contextId = CGenerator.GenId("mono_context");
+                    var stringText = Context.ArgName;
+
+                    var isByRef = param != null && (param.IsOut || param.IsInOut);
+                    if (isByRef)
+                    {
+                        stringText = string.Format ("({0}->len != 0) ? {0}->str : \"\"",
+                            Context.ArgName);
+
+                        Context.SupportAfter.WriteLine ("g_string_truncate({0}, 0);", Context.ArgName);
+                        Context.SupportAfter.WriteLine ("g_string_append({0}, mono_string_to_utf8(" +
+                            "(MonoString*) {1}));", Context.ArgName, argId);
+                    }
+
+                    Context.SupportBefore.WriteLine("MonoString* {0} = ({2}) ? mono_string_new({1}.domain, {2}) : 0;",
+                        argId, contextId, stringText);
+                    Context.Return.Write("{0}{1}", isByRef ? "&" : string.Empty, argId);
+                    return true;
+                }
             }
 
             throw new System.NotImplementedException(primitive.ToString());
