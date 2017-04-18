@@ -165,6 +165,60 @@ TEST_CASE("Constructors.C", "[C][Constructors]") {
     REQUIRE(Constructors_AllTypeCode_get_TestResult(all4) == true);
 }
 
+TEST_CASE("Methods.C", "[C][Methods]") {
+    Methods_Static* static_method = Methods_Static_Create(1);
+    REQUIRE(Methods_Static_get_Id(static_method) == 1);
+
+    REQUIRE(Methods_Parameters_Concat(NULL, NULL) == NULL);
+    REQUIRE(strcmp(Methods_Parameters_Concat("first", NULL), "first") == 0);
+    REQUIRE(strcmp(Methods_Parameters_Concat(NULL, "second"), "second") == 0);
+    REQUIRE(strcmp(Methods_Parameters_Concat("first", "second"), "firstsecond") == 0);
+
+    bool b = true;
+    GString* s = g_string_new(NULL);
+    Methods_Parameters_Ref(&b, s);
+    REQUIRE(b == false);
+    REQUIRE(strcmp(s->str, "hello") == 0);
+
+    Methods_Parameters_Ref(&b, s);
+    REQUIRE(b == true);
+    REQUIRE(s->str == 0);
+
+    int l;
+    Methods_Parameters_Out(NULL, &l, s);
+    REQUIRE(l == 0);
+    REQUIRE(s->str == 0);
+
+    Methods_Parameters_Out("Xamarin", &l, s);
+    REQUIRE(l == 7);
+    REQUIRE(strcmp(s->str, "XAMARIN") == 0);
+
+    Methods_Item* item = Methods_Factory_CreateItem(1);
+    REQUIRE(Methods_Item_get_Integer(item) == 1);
+
+    Methods_Collection* collection = Methods_Collection_new();
+    REQUIRE(Methods_Collection_get_Count(collection) == 0);
+
+    Methods_Collection_Add(collection, item);
+    REQUIRE(Methods_Collection_get_Count(collection) == 1);
+
+    int int0 = Methods_Item_get_Integer(Methods_Collection_get_Item(collection, 0));
+    REQUIRE(int0 == Methods_Item_get_Integer(item));
+
+    Methods_Item* item2 = Methods_Factory_CreateItem(2);
+    Methods_Collection_set_Item(collection, 0, item2);
+    REQUIRE(Methods_Collection_get_Count(collection) == 1);
+
+    int0 = Methods_Item_get_Integer(Methods_Collection_get_Item(collection, 0));
+    REQUIRE(int0 == Methods_Item_get_Integer(item2));
+
+    Methods_Collection_Remove(collection, item);
+    REQUIRE(Methods_Collection_get_Count(collection) == 1);
+
+    Methods_Collection_Remove(collection, item2);
+    REQUIRE(Methods_Collection_get_Count(collection) == 0);
+}
+
 TEST_CASE("Enums.C", "[C][Enums]") {
     Enums_IntEnum i = Enums_IntEnum_Min;
     Enums_ShortEnum s;
