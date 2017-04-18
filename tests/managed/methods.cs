@@ -62,6 +62,8 @@ namespace Methods {
 		{
 			return new Item (id);
 		}
+
+		public static Item ReturnNull () => null;
 	}
 
 	public class Collection {

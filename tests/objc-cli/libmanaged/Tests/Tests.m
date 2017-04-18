@@ -148,7 +148,10 @@
 	[collection setItem:0 value:item2];
 	XCTAssert ([collection count] == 1, "count 2");
 	XCTAssert ([[collection getItem:0] integer] == [item2 integer], "get 2");
-	
+
+	Methods_Item *nilitem = [Methods_Factory returnNull];
+	XCTAssertNil(nilitem);
+
 	[collection removeItem:item]; // not there
 	XCTAssert ([collection count] == 1, "count 3");
 
@@ -157,11 +160,11 @@
 }
 
 - (void) testStructs {
-	id p1 = [[Structs_Point alloc] initWithX:1.0f y:-1.0f];
+	Structs_Point* p1 = [[Structs_Point alloc] initWithX:1.0f y:-1.0f];
 	XCTAssert ([p1 x] == 1.0f, "x 1");
 	XCTAssert ([p1 y] == -1.0f, "y 1");
 
-	id p2 = [[Structs_Point alloc] initWithX:2.0f y:-2.0f];
+	Structs_Point* p2 = [[Structs_Point alloc] initWithX:2.0f y:-2.0f];
 	XCTAssert ([p2 x] == 2.0f, "x 2");
 	XCTAssert ([p2 y] == -2.0f, "y 2");
 
@@ -169,14 +172,14 @@
 	XCTAssert ([Structs_Point equality:p2 right:p2], "p2 == p2");
 	XCTAssert ([Structs_Point inequality:p1 right:p2], "p1 != p2");
 
-	id p3 = [Structs_Point addition:p1 right:p2];
+	Structs_Point* p3 = [Structs_Point addition:p1 right:p2];
 	XCTAssert ([p3 x] == 3.0f, "x 3");
 	XCTAssert ([p3 y] == -3.0f, "y 3");
 
-	id p4 = [Structs_Point subtraction:p3 right:p2];
+	Structs_Point* p4 = [Structs_Point subtraction:p3 right:p2];
 	XCTAssert ([Structs_Point equality:p4 right:p1], "p4 == p1");
 
-	id z = [Structs_Point zero];
+	Structs_Point* z = [Structs_Point zero];
 	XCTAssert ([z x] == 0.0f, "x 4");
 	XCTAssert ([z y] == 0.0f, "y 4");
 }
@@ -192,6 +195,64 @@
 	f = [Enums_Enumer testB:Enums_ByteEnumZero i:&i s:&s];
 	XCTAssert (i == Enums_IntEnumMin, "ref enum 2");
 	XCTAssert (s == Enums_ShortEnumMin, "out enum 2");
+}
+
+- (void) testFieldsInReference {
+	XCTAssert ([Fields_Class maxLong] == LONG_MAX, "class const");
+
+	XCTAssert (Fields_Class.integer == 0, "static field unset");
+	Fields_Class.integer = 1;
+	XCTAssert (Fields_Class.integer == 1, "static field set");
+
+	XCTAssertTrue (Fields_Class.scratch.boolean, "scratch default");
+
+	Fields_Class.scratch = [[Fields_Class alloc] initWithEnabled:false];
+	XCTAssertFalse (Fields_Class.scratch.boolean, "scratch re-assign");
+
+	Fields_Class *ref1 = [[Fields_Class alloc] initWithEnabled:true];
+	XCTAssertTrue (ref1.boolean, "init / boolean / true");
+	ref1.boolean = false;
+	XCTAssertFalse (ref1.boolean, "init / boolean / set 1");
+
+	XCTAssertNotNil (ref1.structure, "init / class initialized 1");
+	XCTAssertFalse (ref1.structure.boolean, "init / class / boolean / default");
+	ref1.structure = [[Fields_Struct alloc] initWithEnabled:true];
+	XCTAssertTrue (ref1.structure.boolean, "init / class / boolean / true");
+
+	Fields_Class *ref2 = [[Fields_Class alloc] initWithEnabled:false];
+	XCTAssertNotNil ([ref2 structure], "init / class initialized 2");
+	XCTAssertFalse ([ref2 boolean], "init / boolean / false");
+}
+
+- (void) testFieldsInValueType {
+	XCTAssert (Fields_Struct.integer == 0, "static valuetype field unset");
+	Fields_Struct.integer = 1;
+	XCTAssert (Fields_Struct.integer == 1, "static valuetype field set");
+
+	XCTAssertFalse (Fields_Struct.scratch.boolean, "scratch default");
+
+	Fields_Struct.scratch = [[Fields_Struct alloc] initWithEnabled:true];
+	XCTAssertTrue (Fields_Struct.scratch.boolean, "scratch re-assign");
+
+	Fields_Struct *empty = [Fields_Struct empty];
+	XCTAssertNotNil (empty, "empty / struct static readonly");
+	XCTAssertNil ([empty class], "empty / class uninitialized");
+
+	Fields_Struct *struct1 = [[Fields_Struct alloc] initWithEnabled:true];
+	XCTAssertTrue (struct1.boolean, "init / boolean / true");
+	struct1.boolean = false;
+	XCTAssertFalse (struct1.boolean, "init / boolean / set 1");
+
+	XCTAssertNotNil (struct1.class, "init / class initialized 1");
+	XCTAssertFalse (struct1.class.boolean, "init / class / boolean / default");
+	struct1.class = nil;
+	XCTAssertNil (struct1.class, "init / class set 1");
+	struct1.class = [[Fields_Class alloc] initWithEnabled:true];
+	XCTAssertTrue (struct1.class.boolean, "init / class / boolean / true");
+
+	Fields_Struct *struct2 = [[Fields_Struct alloc] initWithEnabled:false];
+	XCTAssertNotNil ([struct2 class], "init / class initialized 2");
+	XCTAssertFalse ([struct2 boolean], "init / boolean / false");
 }
 
 - (void)testStaticCallPerformance {

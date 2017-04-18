@@ -163,10 +163,12 @@ namespace ObjC {
 		{
 			foreach (var a in assemblies) {
 				foreach (var t in GetTypes (a)) {
-					if (t.IsEnum)
+					if (t.IsEnum) {
 						enums.Add (t);
-					else
-						types.Add (t);
+						continue;
+					}
+
+					types.Add (t);
 
 					var constructors = GetConstructors (t).OrderBy ((arg) => arg.ParameterCount).ToList ();
 					if (constructors.Count > 0)
@@ -207,12 +209,10 @@ namespace ObjC {
 						subscriptProperties.Add (t, subscriptProps);
 					}
 
-					// fields will need to be wrapped within properties - except for enums
-					if (!t.IsEnum) {
-						var f = GetFields (t).OrderBy ((arg) => arg.Name).ToList ();
-						if (f.Count > 0)
-							fields.Add (t, f);
-					}
+					// fields will need to be wrapped within properties
+					var f = GetFields (t).OrderBy ((arg) => arg.Name).ToList ();
+					if (f.Count > 0)
+						fields.Add (t, f);
 				}
 			}
 			types = types.OrderBy ((arg) => arg.FullName).OrderBy ((arg) => types.Contains (arg.BaseType)).ToList ();

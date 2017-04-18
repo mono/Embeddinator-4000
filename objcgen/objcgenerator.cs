@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -308,49 +308,53 @@ namespace ObjC {
 			implementation.WriteLine ($"\t\tvoid* __args [{pcount}];");
 			for (int i = 0; i < pcount; i++) {
 				var p = parameters [i];
-
-				var pt = p.ParameterType;
-				var is_by_ref = pt.IsByRef;
-				if (is_by_ref)
-					pt = pt.GetElementType ();
-
-				switch (Type.GetTypeCode (pt)) {
-				case TypeCode.String:
-					if (is_by_ref) {
-						implementation.WriteLine ($"\t\tMonoString* __string = *{p.Name} ? mono_string_new (__mono_context.domain, [*{p.Name} UTF8String]) : nil;");
-						implementation.WriteLine ($"\t\t__args [{i}] = &__string;");
-						post.AppendLine ($"\t\t*{p.Name} = mono_embeddinator_get_nsstring (__string);");
-					} else
-						implementation.WriteLine ($"\t\t__args [{i}] = {p.Name} ? mono_string_new (__mono_context.domain, [{p.Name} UTF8String]) : nil;");
-					break;
-				case TypeCode.Boolean:
-				case TypeCode.Char:
-				case TypeCode.SByte:
-				case TypeCode.Int16:
-				case TypeCode.Int32:
-				case TypeCode.Int64:
-				case TypeCode.Byte:
-				case TypeCode.UInt16:
-				case TypeCode.UInt32:
-				case TypeCode.UInt64:
-				case TypeCode.Single:
-				case TypeCode.Double:
-					if (is_by_ref)
-						implementation.WriteLine ($"\t\t__args [{i}] = {p.Name};");
-					else
-						implementation.WriteLine ($"\t\t__args [{i}] = &{p.Name};");
-					break;
-				default:
-					if (pt.IsValueType)
-						implementation.WriteLine ($"\t\t__args [{i}] = mono_object_unbox (mono_gchandle_get_target ({p.Name}->_object->_handle));");
-					else if (types.Contains (pt))
-						implementation.WriteLine ($"\t\t__args [{i}] = mono_gchandle_get_target ({p.Name}->_object->_handle);");
-					else
-						throw new NotImplementedException ($"Converting type {pt.FullName} to mono code");
-					break;
-				}
+				GenerateArgument (p.Name, $"__args[{i}]", p.ParameterType, ref post);
 			}
 			postInvoke = post.ToString ();
+		}
+
+		void GenerateArgument (string paramaterName, string argumentName, Type t, ref StringBuilder post)
+		{
+			var is_by_ref = t.IsByRef;
+			if (is_by_ref)
+				t = t.GetElementType ();
+			
+			switch (Type.GetTypeCode (t)) {
+			case TypeCode.String:
+				if (is_by_ref) {
+					implementation.WriteLine ($"\t\tMonoString* __string = *{paramaterName} ? mono_string_new (__mono_context.domain, [*{paramaterName} UTF8String]) : nil;");
+					implementation.WriteLine ($"\t\t{argumentName} = &__string;");
+					post.AppendLine ($"\t\t*{paramaterName} = mono_embeddinator_get_nsstring (__string);");
+				} else
+					implementation.WriteLine ($"\t\t{argumentName} = {paramaterName} ? mono_string_new (__mono_context.domain, [{paramaterName} UTF8String]) : nil;");
+				break;
+			case TypeCode.Boolean:
+			case TypeCode.Char:
+			case TypeCode.SByte:
+			case TypeCode.Int16:
+			case TypeCode.Int32:
+			case TypeCode.Int64:
+			case TypeCode.Byte:
+			case TypeCode.UInt16:
+			case TypeCode.UInt32:
+			case TypeCode.UInt64:
+			case TypeCode.Single:
+			case TypeCode.Double:
+				if (is_by_ref)
+					implementation.WriteLine ($"\t\t{argumentName} = {paramaterName};");
+				else
+					implementation.WriteLine ($"\t\t{argumentName} = &{paramaterName};");
+				break;
+			default:
+				if (t.IsValueType)
+					implementation.WriteLine ($"\t\t{argumentName} = mono_object_unbox (mono_gchandle_get_target ({paramaterName}->_object->_handle));");
+				else 
+				if (types.Contains (t))
+					implementation.WriteLine ($"\t\t{argumentName} = {paramaterName} ? mono_gchandle_get_target ({paramaterName}->_object->_handle): nil;");
+				else
+					throw new NotImplementedException ($"Converting type {t.FullName} to mono code");
+				break;
+			}
 		}
 
 		protected override void Generate (PropertyInfo pi)
@@ -368,8 +372,6 @@ namespace ObjC {
 				headers.Write (", class");
 			if (setter == null)
 				headers.Write (", readonly");
-			else
-				headers.Write (", readwrite");
 			var pt = pi.PropertyType;
 			var property_type = GetTypeName (pt);
 			if (types.Contains (pt))
@@ -385,18 +387,20 @@ namespace ObjC {
 
 		protected void Generate (FieldInfo fi)
 		{
-			bool read_only = ((fi.Attributes & FieldAttributes.InitOnly) == FieldAttributes.InitOnly);
+			bool read_only = fi.IsInitOnly || fi.IsLiteral;
 
 			headers.Write ("@property (nonatomic");
 			if (fi.IsStatic)
 				headers.Write (", class");
 			if (read_only)
 				headers.Write (", readonly");
-			else
-				headers.Write (", readwrite");
 			var ft = fi.FieldType;
+			var bound = types.Contains (ft);
+			if (bound && ft.IsValueType)
+				headers.Write (", nonnull");
+
 			var field_type = GetTypeName (ft);
-			if (types.Contains (ft))
+			if (bound)
 				field_type += " *";
 
 			var name = CamelCase (fi.Name);
@@ -427,13 +431,41 @@ namespace ObjC {
 				instance = "__instance";
 			}
 			implementation.WriteLine ($"\tMonoObject* __result = mono_field_get_value_object (__mono_context.domain, __field, {instance});");
+			if (types.Contains (ft)) {
+				implementation.WriteLine ("\tif (!__result)");
+				implementation.WriteLine ("\t\treturn nil;");
+			}
 			ReturnValue (fi.FieldType);
 			implementation.WriteLine ("}");
 			implementation.WriteLine ();
 
 			if (read_only)
 				return;
-			// TODO write support
+			implementation.Write (fi.IsStatic ? '+' : '-');
+			implementation.WriteLine ($" (void) set{fi.Name}:({field_type})value");
+			implementation.WriteLine ("{");
+			implementation.WriteLine ("\tstatic MonoClassField* __field = nil;");
+			implementation.WriteLine ("\tif (!__field) {");
+			implementation.WriteLine ("#if TOKENLOOKUP");
+			aname = type.Assembly.GetName ().Name;
+			implementation.WriteLine ($"\t\t__field = mono_class_get_field ({managed_type_name}_class, 0x{fi.MetadataToken:X8});");
+			implementation.WriteLine ("#else");
+			implementation.WriteLine ($"\t\tconst char __field_name [] = \"{fi.Name}\";");
+			implementation.WriteLine ($"\t\t__field = mono_class_get_field_from_name ({managed_type_name}_class, __field_name);");
+			implementation.WriteLine ("#endif");
+			implementation.WriteLine ("\t}");
+			StringBuilder sb = null;
+			implementation.WriteLine ($"\t\tvoid* __value;");
+			GenerateArgument ("value", "__value", fi.FieldType, ref sb);
+			if (fi.IsStatic) {
+				implementation.WriteLine ($"\tMonoVTable *__vtable = mono_class_vtable (__mono_context.domain, {managed_type_name}_class);");
+				implementation.WriteLine ("\tmono_field_static_set_value (__vtable, __field, __value);");
+			} else {
+				implementation.WriteLine ($"\tMonoObject* __instance = mono_gchandle_get_target (_object->_handle);");
+				implementation.WriteLine ("\tmono_field_set_value (__instance, __field, __value);");
+			}
+			implementation.WriteLine ("}");
+			implementation.WriteLine ();
 		}
 
 		public string GetReturnType (Type declaringType, Type returnType)
@@ -549,6 +581,9 @@ namespace ObjC {
 					return;
 				if (!types.Contains (t))
 					goto default;
+
+				implementation.WriteLine ($"\tif (!__result)");
+				implementation.WriteLine ($"\t\t return nil;");
 				// TODO: cheating by reusing `initForSuper` - maybe a better name is needed
 				implementation.WriteLine ($"\t{GetTypeName (t)}* __peer = [[{GetTypeName (t)} alloc] initForSuper];");
 				implementation.WriteLine ("\t__peer->_object = mono_embeddinator_create_object (__result);");

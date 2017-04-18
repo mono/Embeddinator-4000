@@ -38,6 +38,7 @@
     <Compile Include="methods.cs" />
     <Compile Include="structs.cs" />
     <Compile Include="enums.cs" />
+    <Compile Include="fields.cs" />
     <Compile Include="subscripts.cs">
       <DependentUpon>subscripts.tt</DependentUpon>
     </Compile>
