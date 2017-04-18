@@ -202,7 +202,7 @@ namespace ObjC {
 
 					if (subscriptProps.Count > 0) {
 						if (subscriptProps.Count > 1)
-							delayed.Add (ErrorHelper.CreateWarning (1060, $"Property `fi` is not generated because multiple indexed properties not supported."));
+							delayed.Add (ErrorHelper.CreateWarning (1041, $"Indexed properties on {t.Name} is not generated because multiple indexed properties not supported."));
 
 						subscriptProperties.Add (t, subscriptProps);
 					}
