@@ -357,9 +357,9 @@
     XCTAssert ([BoolCollection count] == 0, "count 0");
     [BoolCollection addKey:@"asdf" item:YES];
     XCTAssert ([BoolCollection count] == 1, "count 1");
-    XCTAssert ([BoolCollection [@"asdf"] isEqual:YES], "get 0");
+    XCTAssert ([BoolCollection [@"asdf"] isEqual:@YES], "get 0");
     BoolCollection[@"asdf"] = NO;
-    XCTAssert ([BoolCollection [@"asdf"] isEqual:NO], "get 1");
+    XCTAssert ([BoolCollection [@"asdf"] isEqual:@NO], "get 1");
     
     Subscripts_SbyteDictionaryCollection *SbyteCollection = [[Subscripts_SbyteDictionaryCollection alloc] init];
     XCTAssert ([SbyteCollection count] == 0, "count 2");
