@@ -302,10 +302,14 @@ g_string_new_len (const gchar *init, gssize len)
 {
   GString *ret = g_new (GString, 1);
 
-  if (init == NULL)
+  if (init == NULL) {
     ret->len = 0;
-  else
-    ret->len = len < 0 ? strlen(init) : len;
+    ret->allocated_len = 0;
+    ret->str = 0;
+    return ret;
+  }
+  
+  ret->len = len < 0 ? strlen(init) : len;
   ret->allocated_len = MAX(ret->len + 1, 16);
   ret->str = g_malloc(ret->allocated_len);
   if (init)
