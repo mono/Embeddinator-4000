@@ -501,9 +501,8 @@ namespace MonoEmbeddinator4000.Generators
                     if (isByRef)
                     {
                         @string = $"{Context.ArgName}->str";
-                        Context.SupportAfter.WriteLine ("g_string_truncate({0}, 0);", Context.ArgName);
-                        Context.SupportAfter.WriteLine ("g_string_append({0}, mono_string_to_utf8(" +
-                            "(MonoString*) {1}));", Context.ArgName, argId);
+                        Context.SupportAfter.WriteLine("mono_embeddinator_marshal_string_to_gstring({0}, {1});",
+                            Context.ArgName, argId);
                     }
 
                     Context.SupportBefore.WriteLine("MonoString* {0} = ({2}) ? mono_string_new({1}.domain, {2}) : 0;",

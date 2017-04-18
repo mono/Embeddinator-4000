@@ -70,6 +70,7 @@ typedef struct _MonoClass MonoClass;
 typedef struct _MonoObject MonoObject;
 typedef struct _MonoImage MonoImage;
 typedef struct _MonoMethod MonoMethod;
+typedef struct _MonoString MonoString;
 
 MONO_EMBEDDINATOR_BEGIN_DECLS
 
@@ -232,5 +233,11 @@ void mono_embeddinator_init_object(MonoEmbedObject* object, MonoObject* instance
  */
 MONO_EMBEDDINATOR_API
 void mono_embeddinator_destroy_object(MonoEmbedObject *object);
+
+/**
+ * Performs marshaling of a given MonoString to a GLib string.
+ */
+MONO_EMBEDDINATOR_API
+void mono_embeddinator_marshal_string_to_gstring(GString* g_string, MonoString* mono_string);
 
 MONO_EMBEDDINATOR_END_DECLS
