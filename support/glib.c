@@ -297,6 +297,17 @@ g_array_set_size (GArray *array, gint length)
   } \
 }
 
+void
+g_string_null (GString *string)
+{
+  if (string->str)
+      g_free(string->str);
+
+  string->str = 0;
+  string->len = 0;
+  string->allocated_len = 0;
+}
+
 GString *
 g_string_new_len (const gchar *init, gssize len)
 {
