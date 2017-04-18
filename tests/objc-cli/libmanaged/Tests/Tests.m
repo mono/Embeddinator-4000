@@ -148,7 +148,10 @@
 	[collection setItem:0 value:item2];
 	XCTAssert ([collection count] == 1, "count 2");
 	XCTAssert ([[collection getItem:0] integer] == [item2 integer], "get 2");
-	
+
+	Methods_Item *nilitem = [Methods_Factory returnNull];
+	XCTAssertNil(nilitem);
+
 	[collection removeItem:item]; // not there
 	XCTAssert ([collection count] == 1, "count 3");
 

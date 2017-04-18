@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -574,6 +574,9 @@ namespace ObjC {
 					return;
 				if (!types.Contains (t))
 					goto default;
+
+				implementation.WriteLine ($"\tif (!__result)");
+				implementation.WriteLine ($"\t\t return nil;");
 				// TODO: cheating by reusing `initForSuper` - maybe a better name is needed
 				implementation.WriteLine ($"\t{GetTypeName (t)}* __peer = [[{GetTypeName (t)} alloc] initForSuper];");
 				implementation.WriteLine ("\t__peer->_object = mono_embeddinator_create_object (__result);");
