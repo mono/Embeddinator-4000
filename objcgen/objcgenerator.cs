@@ -361,8 +361,6 @@ namespace ObjC {
 				headers.Write (", class");
 			if (setter == null)
 				headers.Write (", readonly");
-			else
-				headers.Write (", readwrite");
 			var pt = pi.PropertyType;
 			var property_type = GetTypeName (pt);
 			if (types.Contains (pt))
@@ -385,8 +383,6 @@ namespace ObjC {
 				headers.Write (", class");
 			if (read_only)
 				headers.Write (", readonly");
-			else
-				headers.Write (", readwrite");
 			var ft = fi.FieldType;
 			var field_type = GetTypeName (ft);
 			if (types.Contains (ft))
