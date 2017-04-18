@@ -157,11 +157,11 @@
 }
 
 - (void) testStructs {
-	id p1 = [[Structs_Point alloc] initWithX:1.0f y:-1.0f];
+	Structs_Point* p1 = [[Structs_Point alloc] initWithX:1.0f y:-1.0f];
 	XCTAssert ([p1 x] == 1.0f, "x 1");
 	XCTAssert ([p1 y] == -1.0f, "y 1");
 
-	id p2 = [[Structs_Point alloc] initWithX:2.0f y:-2.0f];
+	Structs_Point* p2 = [[Structs_Point alloc] initWithX:2.0f y:-2.0f];
 	XCTAssert ([p2 x] == 2.0f, "x 2");
 	XCTAssert ([p2 y] == -2.0f, "y 2");
 
@@ -169,14 +169,14 @@
 	XCTAssert ([Structs_Point equality:p2 right:p2], "p2 == p2");
 	XCTAssert ([Structs_Point inequality:p1 right:p2], "p1 != p2");
 
-	id p3 = [Structs_Point addition:p1 right:p2];
+	Structs_Point* p3 = [Structs_Point addition:p1 right:p2];
 	XCTAssert ([p3 x] == 3.0f, "x 3");
 	XCTAssert ([p3 y] == -3.0f, "y 3");
 
-	id p4 = [Structs_Point subtraction:p3 right:p2];
+	Structs_Point* p4 = [Structs_Point subtraction:p3 right:p2];
 	XCTAssert ([Structs_Point equality:p4 right:p1], "p4 == p1");
 
-	id z = [Structs_Point zero];
+	Structs_Point* z = [Structs_Point zero];
 	XCTAssert ([z x] == 0.0f, "x 4");
 	XCTAssert ([z y] == 0.0f, "y 4");
 }
