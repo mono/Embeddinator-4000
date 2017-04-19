@@ -204,6 +204,9 @@ namespace MonoEmbeddinator4000.Generators
             {
                 WriteLine("public {0} __object;", JavaGenerator.IntPtrType);
                 NewLine();
+                
+                WriteLine($"{@class.Name}(com.sun.jna.Pointer object) {{ this.__object = object; }}");
+                NewLine();
             }
 
             VisitDeclContext(@class);
@@ -244,7 +247,8 @@ namespace MonoEmbeddinator4000.Generators
             else
                 Write("{0} {1}(", method.ReturnType, functionName);
 
-            Write("{0}", TypePrinter.VisitParameters(method.Parameters, hasNames: true));
+            var @params = method.Parameters.Where(m => !m.IsImplicit);
+            Write("{0}", TypePrinter.VisitParameters(@params, hasNames: true));
 
             Write(")");
         }
@@ -309,9 +313,15 @@ namespace MonoEmbeddinator4000.Generators
             var hasReturn = primitive != PrimitiveType.Void && !(method.IsConstructor || method.IsDestructor);
             if (hasReturn)
             {
+                TypePrinter.PushContext(TypePrinterContextKind.Native);
                 var typeName = method.ReturnType.Visit(TypePrinter);
+                TypePrinter.PopContext();
+
                 Write("{0} __ret = ", typeName.Type);
             }
+
+            if (method.IsConstructor)
+                Write("__object = ");
 
             var unit = method.TranslationUnit;
             var package = string.Join(".", GetPackageNames(unit));

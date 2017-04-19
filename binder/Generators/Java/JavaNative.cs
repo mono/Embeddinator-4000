@@ -76,8 +76,8 @@ namespace MonoEmbeddinator4000.Generators
 
             TypePrinter.PushContext(TypePrinterContextKind.Native);
 
-            var @class = method.Namespace as Class;
-            Write($"public {method.ReturnType} {GetCMethodIdentifier(method)}(");
+            var returnTypeName = method.ReturnType.Visit(TypePrinter);
+            Write($"public {returnTypeName} {GetCMethodIdentifier(method)}(");
             Write(TypePrinter.VisitParameters(method.Parameters, hasNames: true).ToString());
             Write(");");
 
