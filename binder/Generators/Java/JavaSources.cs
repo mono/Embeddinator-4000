@@ -109,8 +109,8 @@ namespace MonoEmbeddinator4000.Generators
             var typeName = TypePrinter.VisitPrimitiveType(@enum.BuiltinType.Type,
                                                           new TypeQualifiers());
             WriteLine($"private final {typeName} id;");
-            WriteLine($"{@enum.Name}(int id) {{ this.id = id; }}");
-            WriteLine("public int getValue() { return id; }");
+            WriteLine($"{@enum.Name}({typeName} id) {{ this.id = id; }}");
+            WriteLine($"public {typeName} getValue() {{ return id; }}");
 
             WriteCloseBraceIndent();
             PopBlock(NewLineKind.BeforeNextBlock);
@@ -120,8 +120,11 @@ namespace MonoEmbeddinator4000.Generators
 
         public override void GenerateEnumItems(Enumeration @enum)
         {
-            base.GenerateEnumItems(@enum);
-            WriteLine(";");
+            for (int i = 0; i < @enum.Items.Count; i++)
+            {
+                @enum.Items[i].Visit(this);
+                WriteLine(i == @enum.Items.Count - 1 ? ";" : ",");
+            }
         }
 
         public override bool VisitEnumItemDecl(Enumeration.Item item)
@@ -132,8 +135,17 @@ namespace MonoEmbeddinator4000.Generators
             Write(item.Name);
 
             var @enum = item.Namespace as Enumeration;
+            var typeName = TypePrinter.VisitPrimitiveType(@enum.BuiltinType.Type,
+                                                          new TypeQualifiers());
             if (item.ExplicitValue)
-                Write("({0})", @enum.GetItemValueAsString(item));
+            {
+                var value = @enum.GetItemValueAsString(item);
+
+                if (@enum.BuiltinType.IsUnsigned)
+                    Write($"(new {typeName}({value}))");
+                else
+                    Write($"(({typeName}){value})");
+            }
 
             return true;
         }
