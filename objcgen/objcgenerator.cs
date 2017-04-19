@@ -289,6 +289,19 @@ namespace ObjC {
 					Generate (mi);
 			}
 
+			MethodInfo m;
+			if (icomparable.TryGetValue (t, out m)) {
+				var builder = new ComparableHelper (headers, implementation) {
+					ObjCSignature = $"compare:({managed_name} *)other",
+					AssemblyName = aname,
+					MetadataToken = m.MetadataToken,
+					ObjCTypeName = managed_name,
+					ManagedTypeName = t.FullName,
+				};
+				builder.WriteHeaders ();
+				builder.WriteImplementation ();
+			}
+
 			headers.WriteLine ("@end");
 			headers.WriteLine ();
 

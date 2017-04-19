@@ -5,8 +5,8 @@ namespace ObjC {
 
 	public class MethodHelper {
 
-		TextWriter headers;
-		TextWriter implementation;
+		protected TextWriter headers;
+		protected TextWriter implementation;
 
 		public MethodHelper (TextWriter headers, TextWriter implementation)
 		{

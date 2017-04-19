@@ -255,6 +255,21 @@
 	XCTAssertFalse ([struct2 boolean], "init / boolean / false");
 }
 
+- (void) testComparable {
+	// nil behaviour check
+	NSDate *d1 = [[NSDate alloc] initWithTimeIntervalSinceNow:0];
+	NSDate *d2 = nil;
+	XCTAssert ([d1 compare:d2] == NSOrderedSame, "foundation / compare w/nil");
+
+	Comparable_Class *c1 = [[Comparable_Class alloc] initWithI:1];
+	XCTAssert ([c1 compare:nil] == NSOrderedSame, "compare w/nil");
+	XCTAssert ([c1 compare:c1] == NSOrderedSame, "compare self");
+
+	Comparable_Class *c2 = [[Comparable_Class alloc] initWithI:2];
+	XCTAssert ([c1 compare:c2] == NSOrderedAscending, "compare <");
+	XCTAssert ([c2 compare:c1] == NSOrderedDescending, "compare >");
+}
+
 - (void)testStaticCallPerformance {
 	const int iterations = 1000000;
 	[self measureBlock:^{

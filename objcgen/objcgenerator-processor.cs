@@ -96,11 +96,19 @@ namespace ObjC {
 			}
 		}
 
+		Dictionary<Type,MethodInfo> icomparable = new Dictionary<Type, MethodInfo> ();
+
 		protected IEnumerable<MethodInfo> GetMethods (Type t)
 		{
 			foreach (var mi in t.GetMethods (BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly)) {
 				if (!mi.IsPublic)
 					continue;
+
+				// handle special cases where we can implement something better, e.g. a better match
+				if (implement_system_icomparable && mi.Match ("System.Int32", "CompareTo", "System.Object")) {
+					icomparable.Add (t, mi);
+					continue;
+				}
 
 				var rt = mi.ReturnType;
 				if (!IsSupported (rt)) {
@@ -159,6 +167,9 @@ namespace ObjC {
 		Dictionary<Type, List<FieldInfo>> fields = new Dictionary<Type, List<FieldInfo>> ();
 		Dictionary<Type, List<PropertyInfo>> subscriptProperties = new Dictionary<Type, List<PropertyInfo>> ();
 
+		// special cases
+		bool implement_system_icomparable;
+
 		public override void Process (IEnumerable<Assembly> assemblies)
 		{
 			foreach (var a in assemblies) {
@@ -169,6 +180,8 @@ namespace ObjC {
 					}
 
 					types.Add (t);
+
+					implement_system_icomparable = t.Implements ("System", "IComparable");
 
 					var constructors = GetConstructors (t).OrderBy ((arg) => arg.ParameterCount).ToList ();
 					if (constructors.Count > 0)
