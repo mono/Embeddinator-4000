@@ -39,6 +39,16 @@
     <Compile Include="structs.cs" />
     <Compile Include="enums.cs" />
     <Compile Include="fields.cs" />
+    <Compile Include="subscripts.cs">
+      <DependentUpon>subscripts.tt</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="subscripts.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>subscripts.cs</LastGenOutput>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="CustomBuildActions.targets" />
 </Project>

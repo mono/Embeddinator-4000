@@ -131,6 +131,11 @@ There should be an earlier warning giving more information why type `T` is not s
 
 Note: Supported features will evolve with new versions of the tool.
 
+<h3><a name="EM1041"/>Indexed properties on `T` is not generated because multiple indexed properties are not supported.</h3>
+
+This is a **warning** that the indexed properties on `T` will be ignored (i.e. nothing will be generated) because multiple indexed properties are not supported.
+
+
 
 <h3><a name="EM1050"/>Field `F` is not generated because of field type `T` is not supported.</h3>
 
