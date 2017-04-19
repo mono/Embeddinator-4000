@@ -72,6 +72,9 @@
     <Compile Include="../../binder/Generators/Java/JavaGenerator.cs">
       <Link>binder/Generators/Java/JavaGenerator.cs</Link>
     </Compile>
+    <Compile Include="../../binder/Generators/Java/JavaMarshal.cs">
+      <Link>binder/Generators/Java/JavaMarshal.cs</Link>
+    </Compile>
     <Compile Include="../../binder/Generators/Java/JavaNative.cs">
       <Link>binder/Generators/Java/JavaNative.cs</Link>
     </Compile>
