@@ -1,4 +1,5 @@
 import managed_dll.*;
+import managed_dll.properties.*;
 
 import static org.junit.Assert.*;
 import org.junit.*;
@@ -6,6 +7,27 @@ import org.junit.*;
 public class Tests {
     private static boolean doublesAreEqual(double value1, double value2) {
         return Double.doubleToLongBits(value1) == Double.doubleToLongBits(value2);
+    }
+
+    @Test
+    public void testProperties() {
+        assertFalse(Platform.getIsWindows());
+
+        Platform.setExitCode(255);
+        assertEquals(Platform.getExitCode(), 255);
+
+        assertEquals(Query.getUniversalAnswer(), 42);
+
+        Query query = new Query();
+        assertTrue(query.getIsGood());
+        assertFalse(query.getIsBad());
+        assertEquals(query.getAnswer(), 42);
+        query.setAnswer(911);
+        assertEquals(query.getAnswer(), 911);
+
+        assertFalse(query.getIsSecret());
+        query.setSecret(1);
+        assertTrue(query.getIsSecret());
     }
 
     @Test
