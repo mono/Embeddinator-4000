@@ -64,14 +64,25 @@ namespace MonoEmbeddinator4000.Generators
             return ret;
         }
 
+        public static string GetCMethodIdentifier(Method method)
+        {
+            var @class = method.Namespace as Class;
+            var name = (method.IsConstructor) ? method.Name : method.OriginalName;
+            return $"{@class.QualifiedOriginalName}_{name}";
+        }
+
         public override bool VisitMethodDecl(Method method)
         {
             PushBlock(BlockKind.Method, method);
 
+            TypePrinter.PushContext(TypePrinterContextKind.Native);
+
             var @class = method.Namespace as Class;
-            Write($"public {method.ReturnType} {CCodeGenerator.GetMethodIdentifier(method)}(");
+            Write($"public {method.ReturnType} {GetCMethodIdentifier(method)}(");
             Write(TypePrinter.VisitParameters(method.Parameters, hasNames: true).ToString());
             Write(");");
+
+            TypePrinter.PopContext();
 
             PopBlock(NewLineKind.Never);
             return true;
