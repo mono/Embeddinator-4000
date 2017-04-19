@@ -52,10 +52,9 @@ namespace MonoEmbeddinator4000.Generators
             WriteLine($"public interface {ClassName} extends com.sun.jna.Library");
             WriteStartBraceIndent();
 
-            WriteLine($"{ClassName} INSTANCE = ({ClassName})");
+            WriteLine($"{ClassName} INSTANCE = ");
             var libName = unit.FileNameWithoutExtension;
-            WriteLineIndent($"Native.loadLibrary((com.sun.jna.Platform.isWindows() ? \"{libName}.dll\" : \"lib{libName}.dylib\"),");
-            WriteLineIndent($"{ClassName}.class);");
+            WriteLineIndent($"mono.embeddinator.Runtime.loadLibrary(\"{libName}\", {ClassName}.class);");
             NewLine();
 
             var ret = base.VisitTranslationUnit(unit);
