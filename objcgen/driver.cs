@@ -510,6 +510,7 @@ namespace Embeddinator {
 					case Platform.watchOS:
 						var mtouch = new StringBuilder ();
 						var appdir = Path.GetFullPath (Path.Combine (OutputDirectory, build_info.Sdk, "appdir"));
+						var cachedir = Path.GetFullPath (Path.Combine (outputDirectory, build_info.Sdk, "mtouch-cache"));
 						mtouch.Append (build_info.IsSimulator ? "--sim " : "--dev ");
 						mtouch.Append ($"{Quote (appdir)} ");
 						mtouch.Append ($"--abi={string.Join (",", build_info.Architectures)} ");
@@ -523,7 +524,7 @@ namespace Embeddinator {
 						mtouch.Append ($"--sdk {GetSdkVersion (build_info.Sdk.ToLower ())} ");
 						mtouch.Append ("--linksdkonly ");
 						mtouch.Append ("--registrar:static ");
-						mtouch.Append ($"--cache {Quote (Path.GetFullPath (Path.Combine (outputDirectory, build_info.Sdk, "mtouch-cache")))} ");
+						mtouch.Append ($"--cache {Quote (cachedir)} ");
 						if (Debug)
 							mtouch.Append ("--debug ");
 						mtouch.Append ($"--assembly-build-target=@all=framework={LibraryName}.framework ");
@@ -542,7 +543,25 @@ namespace Embeddinator {
 						File.WriteAllText (Path.Combine (headers, LibraryName + ".h"),
 @"
 #include ""bindings.h""
+#if defined(__i386__)
+#include ""registrar-i386.h""
+#elif defined(__x86_64__)
+#include ""registrar-x86_64.h""
+#elif defined(__arm__)
+#include ""registrar-arm32.h"" // this includes all 32-bit arm architectures.
+#elif defined(__aarch64__)
+#include ""registrar-arm64.h""
+#else
+#error Unknown architecture
+#endif
 ");
+						if (build_info.IsSimulator) {
+							FileCopyIfExists (Path.Combine (cachedir, "32", "registrar.h"), Path.Combine (headers, "registrar-i386.h"));
+							FileCopyIfExists (Path.Combine (cachedir, "64", "registrar.h"), Path.Combine (headers, "registrar-x86_64.h"));
+						} else {
+							FileCopyIfExists (Path.Combine (cachedir, "32", "registrar.h"), Path.Combine (headers, "registrar-arm32.h"));
+							FileCopyIfExists (Path.Combine (cachedir, "64", "registrar.h"), Path.Combine (headers, "registrar-arm64.h"));
+						}
 						// Move the framework to the output directory
 						var fwpath = Path.Combine (OutputDirectory, build_info.Sdk, $"{LibraryName}.framework");
 						if (Directory.Exists (fwpath))
@@ -571,6 +590,13 @@ namespace Embeddinator {
 			}
 
 			return 0;
+		}
+
+		static void FileCopyIfExists (string source, string target)
+		{
+			if (!File.Exists (source))
+				return;
+			File.Copy (source, target, true);
 		}
 
 		// All files from both frameworks will be included.
