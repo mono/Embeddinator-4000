@@ -57,7 +57,7 @@ namespace ObjC {
 			implementation.WriteLine ("\tstatic MonoMethod* __method = nil;");
 			implementation.WriteLine ("\tif (!__method) {");
 			implementation.WriteLine ("#if TOKENLOOKUP");
-			implementation.WriteLine ($"\t\t__method = mono_get_method (__{AssemblyName}_image, 0x{MetadataToken:X8}, {ObjCTypeName}_class);");
+			implementation.WriteLine ($"\t\t__method = mono_get_method (__{ObjCGenerator.SanitizeName (AssemblyName)}_image, 0x{MetadataToken:X8}, {ObjCTypeName}_class);");
 			implementation.WriteLine ("#else");
 			implementation.WriteLine ($"\t\tconst char __method_name [] = \"{ManagedTypeName}:{MonoSignature}\";");
 			implementation.WriteLine ($"\t\t__method = mono_embeddinator_lookup_method (__method_name, {ObjCTypeName}_class);");
