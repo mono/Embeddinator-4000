@@ -1,3 +1,5 @@
+import managed_dll.*;
+
 import static org.junit.Assert.*;
 import org.junit.*;
 

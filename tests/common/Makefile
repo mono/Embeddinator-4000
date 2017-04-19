@@ -1,7 +1,7 @@
 MAKEFLAGS += --no-builtin-rules
 .PHONY: java
 
-all: binder managed gen compile_c_objc run 
+all: binder managed gen compile_c_objc compile_java run 
 
 binder:
 	msbuild /nologo /v:minimal ../../build/MonoEmbeddinator4000.sln || xbuild /nologo /v:minimal ../../build/MonoEmbeddinator4000.sln
