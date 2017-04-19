@@ -263,15 +263,9 @@ namespace MonoEmbeddinator4000.Generators
             else
             {
                 Write(" ");
-
                 WriteStartBraceIndent();
 
-                PrimitiveType primitive;
-                var isPrimitive = method.OriginalReturnType.Type.IsPrimitiveType(out primitive);
-
-                var hasReturn = primitive != PrimitiveType.Void;
-                if ((!(method.IsConstructor || method.IsDestructor)) && hasReturn)
-                    GenerateMethodReturn(method);
+                GenerateMethodInvocation(method);
 
                 WriteCloseBraceIndent();
             }
@@ -281,57 +275,76 @@ namespace MonoEmbeddinator4000.Generators
             return true;
         }
 
-        public void GenerateMethodReturn(Method method)
+        public void GenerateMethodInvocation(Method method)
         {
-            PrimitiveType primitive;
-            var isPrimitive = method.OriginalReturnType.Type.IsPrimitiveType(out primitive);
+            var contexts = new List<MarshalContext>();
+            var @params = new List<string>();
 
-            if (primitive == PrimitiveType.Void)
-                return;
+            if (!method.IsStatic && !(method.IsConstructor || method.IsDestructor))
+                @params.Add("__object");
 
-            if (!isPrimitive)
+            int paramIndex = 0;
+            foreach (var param in method.Parameters.Where(m => !m.IsImplicit))
             {
-                WriteLine("return null;");
-                return;
+                var ctx = new MarshalContext(Context)
+                {
+                    ArgName = param.Name,
+                    Parameter = param,
+                    ParameterIndex = paramIndex++
+                };
+                contexts.Add(ctx);
+
+                var marshal = new JavaMarshalManagedToNative(ctx);
+                param.QualifiedType.Visit(marshal);
+
+                if (!string.IsNullOrWhiteSpace(marshal.Context.SupportBefore))
+                        Write(marshal.Context.SupportBefore);
+
+                @params.Add(marshal.Context.Return);
             }
 
-            switch (primitive)
+            PrimitiveType primitive;
+            method.ReturnType.Type.IsPrimitiveType(out primitive);
+
+            var hasReturn = primitive != PrimitiveType.Void && !(method.IsConstructor || method.IsDestructor);
+            if (hasReturn)
             {
-                case PrimitiveType.Null:
-                    WriteLine("return null;");
-                    break;
-                case PrimitiveType.Bool:
-                    WriteLine("return false;");
-                    break;
-                case PrimitiveType.Char:
-                    WriteLine("return Character.MIN_VALUE;");
-                    break;
-                case PrimitiveType.UChar:
-                    WriteLine("return new UnsignedByte(0);");
-                    break;
-                case PrimitiveType.SChar:
-                case PrimitiveType.Short:
-                case PrimitiveType.Int:
-                case PrimitiveType.Long:
-                case PrimitiveType.LongLong:
-                    WriteLine($"return 0;");
-                    break;
-                case PrimitiveType.UShort:
-                case PrimitiveType.UInt:
-                case PrimitiveType.ULong:
-                    var name = primitive.ToString();
-                    WriteLine($"return new Unsigned{name.Substring(1)}(0);");
-                    break;
-                case PrimitiveType.Float:
-                case PrimitiveType.Double:
-                    WriteLine("return 0.0f;");
-                    break;
-                case PrimitiveType.String:
-                    WriteLine("return new String(\"\");");
-                    break;
-                case PrimitiveType.ULongLong:
-                default:
-                    throw new System.NotImplementedException();
+                var typeName = method.ReturnType.Visit(TypePrinter);
+                Write("{0} __ret = ", typeName.Type);
+            }
+
+            var unit = method.TranslationUnit;
+            var package = string.Join(".", GetPackageNames(unit));
+            Write($"{package}.{JavaNative.GetNativeLibClassName(unit)}.INSTANCE.{JavaNative.GetCMethodIdentifier(method)}(");
+
+            Write(string.Join(", ", @params));
+
+            WriteLine(");");
+
+            foreach (var marshal in contexts)
+            {
+                if (!string.IsNullOrWhiteSpace(marshal.SupportAfter))
+                    Write(marshal.SupportAfter);
+            }
+
+            if (hasReturn)
+            {
+                var ctx = new MarshalContext(Context)
+                {
+                    ReturnType = method.ReturnType,
+                    ReturnVarName = "__ret"
+                };
+
+                var marshal = new JavaMarshalNativeToManaged(ctx);
+                method.ReturnType.Visit(marshal);
+
+                if (marshal.Context.Return.ToString().Length == 0)
+                    throw new System.Exception();
+
+                if (!string.IsNullOrWhiteSpace(marshal.Context.SupportBefore))
+                        Write(marshal.Context.SupportBefore);
+
+                WriteLine($"return {marshal.Context.Return};");
             }
         }
 
