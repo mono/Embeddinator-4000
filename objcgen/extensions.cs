@@ -12,6 +12,37 @@ namespace Embeddinator {
 			return (self.Namespace == @namespace) && (self.Name == name);
 		}
 
+		public static bool Implements (this Type self, string @namespace, string name)
+		{
+			if (self.Is ("System", "Object"))
+				return false;
+			foreach (var intf in self.GetInterfaces ()) {
+				if (intf.Is (@namespace, name))
+					return true;
+			}
+			return self.BaseType.Implements (@namespace, name);
+		}
+
+		public static bool Match (this MethodInfo self, string returnType, string name, params string[] parameterTypes)
+		{
+			if (self.Name != name)
+				return false;
+			var pc = self.ParameterCount;
+			if (pc != parameterTypes.Length)
+				return false;
+			if (self.ReturnType.FullName != returnType)
+				return false;
+			var parameters = self.GetParameters ();
+			for (int i = 0; i < pc; i++) {
+				// parameter type not specified, useful for generics
+				if (parameterTypes [i] == null)
+					continue;
+				if (parameterTypes [i] != parameters [i].ParameterType.FullName)
+					return false;
+			}
+			return true;
+		}
+
 		public static bool HasCustomAttribute (this Type self, string @namespace, string name)
 		{
 			foreach (var ca in self.CustomAttributes) {

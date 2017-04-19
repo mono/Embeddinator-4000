@@ -311,6 +311,7 @@
     <Compile Include="extensions.cs" />
     <Compile Include="methodhelper.cs" />
     <Compile Include="objcgenerator-subscripts.cs" />
+    <Compile Include="comparablehelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="support\" />

@@ -36,5 +36,8 @@ MONO_EMBEDDINATOR_BEGIN_DECLS
 MONO_EMBEDDINATOR_API
 NSString* mono_embeddinator_get_nsstring (MonoString* string);
 
+MONO_EMBEDDINATOR_API
+NSComparisonResult mono_embeddinator_compare_to (MonoEmbedObject *object, MonoMethod *method, MonoEmbedObject *other);
+
 MONO_EMBEDDINATOR_END_DECLS
 	

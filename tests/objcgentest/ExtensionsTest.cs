@@ -23,11 +23,30 @@ namespace ObjCGeneratorTest {
 		}
 
 		[Test]
-		public void HasAttribute ()
+		public void HasCustomAttribute ()
 		{
 			var fa = mscorlib.GetType ("System.IO.FileAccess");
 			Assert.True (fa.HasCustomAttribute ("System", "FlagsAttribute"), "Has");
 			Assert.False (fa.HasCustomAttribute ("System", "Flags"), "Has Not");
+		}
+
+		[Test]
+		public void Implements ()
+		{
+			Assert.True (mscorlib.GetType ("System.Int32").Implements ("System", "IComparable`1"), "int");
+			Assert.False (mscorlib.GetType ("System.Object").Implements ("System", "IComparable"), "object");
+		}
+
+		[Test]
+		public void Match ()
+		{
+			var o = mscorlib.GetType ("System.Object");
+			var m1 = o.GetMethod ("GetHashCode");
+			Assert.True (m1.Match ("System.Int32", "GetHashCode"), "GetHashCode");
+
+			var m2 = o.GetMethod ("ReferenceEquals");
+			Assert.False (m2.Match ("System.Boolean", "ReferenceEquals"), "ReferenceEquals - no param");
+			Assert.True (m2.Match ("System.Boolean", "ReferenceEquals", "System.Object", "System.Object"), "Equals");
 		}
 	}
 }

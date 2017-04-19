@@ -39,6 +39,7 @@
     <Compile Include="structs.cs" />
     <Compile Include="enums.cs" />
     <Compile Include="fields.cs" />
+    <Compile Include="icomparable.cs" />
     <Compile Include="subscripts.cs">
       <DependentUpon>subscripts.tt</DependentUpon>
     </Compile>
