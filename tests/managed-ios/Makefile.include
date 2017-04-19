@@ -1,0 +1,4 @@
+TESTS_MANAGED_IOS_DLL_DIR=$(TOP)/tests/managed-ios
+TESTS_MANAGED_IOS_DLL=$(TESTS_MANAGED_IOS_DLL_DIR)/bin/Debug/managed-ios.dll
+$(TESTS_MANAGED_IOS_DLL): $(wildcard $(TESTS_MANAGED_IOS_DLL_DIR)/*.cs) $(wildcard $(TESTS_MANAGED_IOS_DLL_DIR)/*.cs) $(TESTS_MANAGED_IOS_DLL_DIR)/managed-ios.csproj
+	/Library/Frameworks/Mono.framework/Versions/Current/Commands/msbuild $(TESTS_MANAGED_IOS_DLL_DIR)/managed-ios.csproj

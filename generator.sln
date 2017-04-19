@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "managed", "tests\managed\ma
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "leaktest", "tests\leaktest\leaktest.csproj", "{33D1E7E3-A123-43F0-B047-163C6E75D3BF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "managed-ios", "tests\managed-ios\managed-ios.csproj", "{0D7BFE1A-730A-48B0-A99A-F6E6A6C134DC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -33,10 +35,15 @@ Global
 		{33D1E7E3-A123-43F0-B047-163C6E75D3BF}.Debug|x86.Build.0 = Debug|x86
 		{33D1E7E3-A123-43F0-B047-163C6E75D3BF}.Release|x86.ActiveCfg = Release|x86
 		{33D1E7E3-A123-43F0-B047-163C6E75D3BF}.Release|x86.Build.0 = Release|x86
+		{0D7BFE1A-730A-48B0-A99A-F6E6A6C134DC}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{0D7BFE1A-730A-48B0-A99A-F6E6A6C134DC}.Debug|x86.Build.0 = Debug|Any CPU
+		{0D7BFE1A-730A-48B0-A99A-F6E6A6C134DC}.Release|x86.ActiveCfg = Release|Any CPU
+		{0D7BFE1A-730A-48B0-A99A-F6E6A6C134DC}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{076A871B-0C13-47D8-8923-B9242995BFF8} = {21776062-DBDA-4408-BF22-9DCB2682DCBC}
 		{D56A7E3F-FF5C-4EC2-879F-1260ABBD1903} = {21776062-DBDA-4408-BF22-9DCB2682DCBC}
 		{33D1E7E3-A123-43F0-B047-163C6E75D3BF} = {21776062-DBDA-4408-BF22-9DCB2682DCBC}
+		{0D7BFE1A-730A-48B0-A99A-F6E6A6C134DC} = {21776062-DBDA-4408-BF22-9DCB2682DCBC}
 	EndGlobalSection
 EndGlobal

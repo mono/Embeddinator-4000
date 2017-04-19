@@ -1,3 +1,7 @@
+TOP=../..
+
+include $(TOP)/tests/managed-ios/Makefile.include
+
 all: run-test perf xctest test-leaks test-static test-dynamic test-framework-ios xctest-ios-simulator
 
 MONO=/Library/Frameworks/Mono.framework/Versions/Current/Commands/mono
@@ -15,6 +19,9 @@ $(MANAGED_DLL): $(wildcard $(MANAGED_DLL_DIR)/*.cs)
 %/managed.dll: $(MANAGED_DLL)
 	mkdir -p $(dir $@)
 	cp $< $@
+
+debug/libmanaged-ios-framework/managed-ios.framework: $(TESTS_MANAGED_IOS_DLL) $(OBJC_GEN)
+	$(MONO) --debug $(abspath $(OBJC_GEN)) --debug $(abspath $<) -c --outdir=$(abspath $(dir $@)) --target=framework --platform=ios
 
 debug/libmanaged.dylib: debug/managed.dll $(OBJC_GEN)
 	$(MONO) --debug $(OBJC_GEN) --debug debug/managed.dll -c -o debug
@@ -86,13 +93,14 @@ test-framework: test-framework-macos test-framework-ios test-framework-tvos test
 test-framework-%: debug/managed.dll $(OBJC_GEN)
 	/Library/Frameworks/Mono.framework/Versions/Current/Commands/mono --debug $(abspath $(OBJC_GEN)) --debug $(abspath debug/managed.dll) -c --outdir=$(abspath build/$@-temp-dir) --target=framework --platform=$*
 
-xctest-ios-simulator: test-framework-ios
+xctest-ios-simulator: debug/libmanaged-ios-framework/managed-ios.framework
 	xcodebuild -quiet test -project libmanaged-ios/libmanaged-ios.xcodeproj -scheme libmanaged-ios -destination 'platform=iOS Simulator,name=iPhone 6,OS=latest'
 
-xctest-ios-device: build/ios-device-id test-framework-ios
+xctest-ios-device: build/ios-device-id debug/libmanaged-ios-framework/managed-ios.framework
 	xcodebuild test -project libmanaged-ios/libmanaged-ios.xcodeproj -scheme libmanaged-ios -destination 'platform=iOS,id=$(shell cat build/ios-device-id)'
 
 build/device-list.xml:
+	@mkdir -p build
 	/Library/Frameworks/Xamarin.iOS.framework/Versions/Current/bin/mlaunch --listdev=$@ --output-format=xml
 
 build/ios-device-id: build/device-list.xml
