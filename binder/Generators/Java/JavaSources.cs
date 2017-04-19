@@ -32,7 +32,10 @@ namespace MonoEmbeddinator4000.Generators
             var namespaces = Declaration.GatherNamespaces(decl.Namespace)
                 .Where(ns => !(ns is TranslationUnit));
 
-            return namespaces.Select(n => n.Name.ToLowerInvariant());
+            var names = namespaces.Select(n => n.Name.ToLowerInvariant()).ToList();
+            names.Insert(0, JavaGenerator.GetNativeLibPackageName(decl.TranslationUnit));
+
+            return names;
         }
 
         public override string FilePath

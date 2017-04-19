@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
+using System.IO;
 using CppSharp;
 using CppSharp.AST;
 using CppSharp.Generators;
-using CppSharp.Generators.CSharp;
 
 namespace MonoEmbeddinator4000.Generators
 {
@@ -18,9 +17,25 @@ namespace MonoEmbeddinator4000.Generators
         {
         }
 
-        public string ClassName => $"Native_{TranslationUnit.FileName.Replace('.', '_')}";
+        public static string GetNativeLibClassName(TranslationUnit unit) =>
+            $"Native_{unit.FileName.Replace('.', '_')}";
 
-        public override string FilePath => $"{ClassName}.{FileExtension}";
+        public string ClassName => GetNativeLibClassName(TranslationUnit);
+
+        public override string FilePath
+        {
+            get
+            {
+                var names = new List<string>
+                {
+                    JavaGenerator.GetNativeLibPackageName(TranslationUnit),
+                    ClassName
+                };
+
+                var filePath = string.Join(Path.DirectorySeparatorChar.ToString(), names);
+                return $"{filePath}.{FileExtension}";
+            }
+        }
 
         public override void Process()
         {

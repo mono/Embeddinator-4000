@@ -12,6 +12,10 @@ namespace MonoEmbeddinator4000.Generators
 {
     public class JavaGenerator : Generator
     {
+
+        public static string GetNativeLibPackageName(TranslationUnit unit) =>
+            unit.FileName.Replace('.', '_').ToLowerInvariant();
+
         public JavaGenerator(BindingContext context) : base(context)
         {
         }
