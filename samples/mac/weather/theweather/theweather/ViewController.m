@@ -25,9 +25,9 @@
 
 
 - (IBAction)getWeather:(NSButton *)sender {
-    XAM_WeatherFetcher * fetcher = [[XAM_WeatherFetcher alloc] initWithCity:_cityField.stringValue state:_stateField.stringValue];
+    XAMWeatherFetcher * fetcher = [[XAMWeatherFetcher alloc] initWithCity:_cityField.stringValue state:_stateField.stringValue];
 
-    XAM_WeatherResult * result = [fetcher getWeather];
+    XAMWeatherResult * result = [fetcher getWeather];
 
     if (result) {
         _descriptionLabel.stringValue = [result text];
