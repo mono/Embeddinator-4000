@@ -199,39 +199,35 @@ namespace ObjC {
 					if (parameters.Length > 0)
 						GetSignatures ("initWith", ctor.Name, ctor, parameters, out name, out signature);
 
-					headers.WriteLine ($"- (instancetype){name};");
+					var builder = new MethodHelper (headers, implementation) {
+						AssemblyName = aname,
+						ReturnType = "instancetype",
+						ManagedTypeName = t.FullName,
+						MetadataToken = ctor.MetadataToken,
+						MonoSignature = signature,
+						ObjCSignature = name,
+						ObjCTypeName = managed_name,
+						IsConstructor = true,
+						IsValueType = t.IsValueType,
+						IgnoreException = true,
+					};
 
-					implementation.WriteLine ($"- (instancetype){name}");
-					implementation.WriteLine ("{");
-					implementation.WriteLine ("\tstatic MonoMethod* __method = nil;");
-					implementation.WriteLine ("\tif (!__method) {");
-					implementation.WriteLine ("#if TOKENLOOKUP");
-					implementation.WriteLine ($"\t\t__method = mono_get_method (__{aname}_image, 0x{ctor.MetadataToken:X8}, {managed_name}_class);");
-					implementation.WriteLine ("#else");
-					implementation.WriteLine ($"\t\tconst char __method_name [] = \"{t.FullName}:{signature}\";");
-					implementation.WriteLine ($"\t\t__method = mono_embeddinator_lookup_method (__method_name, {managed_name}_class);");
-					implementation.WriteLine ("#endif");
-					implementation.WriteLine ("\t}");
+					builder.WriteHeaders ();
+
+					builder.BeginImplementation ();
+					builder.WriteMethodLookup ();
+
 					// TODO: this logic will need to be update for managed NSObject types (e.g. from XI / XM) not to call [super init]
 					implementation.WriteLine ("\tif (!_object) {");
 					implementation.WriteLine ($"\t\tMonoObject* __instance = mono_object_new (__mono_context.domain, {managed_name}_class);");
-					implementation.WriteLine ("\t\tMonoObject* __exception = nil;");
+
 					string postInvoke = String.Empty;
 					var args = "nil";
 					if (pcount > 0) {
 						Generate (parameters, out postInvoke);
 						args = "__args";
 					}
-					var instance = "__instance";
-					if (t.IsValueType) {
-						implementation.WriteLine ($"\t\tvoid* __unboxed = mono_object_unbox (__instance);");
-						instance = "__unboxed";
-					}
-					implementation.WriteLine ($"\t\tmono_runtime_invoke (__method, {instance}, {args}, &__exception);");
-					implementation.WriteLine ("\t\tif (__exception)");
-					// TODO: Apple often do NSLog (or asserts but they are more brutal) and returning nil is allowed (and common)
-					implementation.WriteLine ("\t\t\treturn nil;");
-					//implementation.WriteLine ("\t\t\tmono_embeddinator_throw_exception (__exception);");
+					builder.WriteInvoke (args);
 					implementation.Write (postInvoke);
 					implementation.WriteLine ("\t\t_object = mono_embeddinator_create_object (__instance);");
 					implementation.WriteLine ("\t}");
@@ -239,8 +235,7 @@ namespace ObjC {
 						implementation.WriteLine ("\treturn self = [super initForSuper];");
 					else
 						implementation.WriteLine ("\treturn self = [super init];");
-					implementation.WriteLine ("}");
-					implementation.WriteLine ();
+					builder.EndImplementation ();
 				}
 			}
 
@@ -484,32 +479,30 @@ namespace ObjC {
 		{
 			var type = info.DeclaringType;
 			var managed_type_name = GetObjCName (type);
-			var managed_name = info.Name;
-			var return_type = GetReturnType (type, info.ReturnType);
-			var parametersInfo = info.GetParameters ();
 
 			string objcsig;
 			string monosig;
-			GetSignatures (name, managed_name, (MemberInfo) pi ?? info, parametersInfo, out objcsig, out monosig);
+			var managed_name = info.Name;
+			var parametersInfo = info.GetParameters ();
+			GetSignatures (name, managed_name, (MemberInfo)pi ?? info, parametersInfo, out objcsig, out monosig);
 
-			if (pi == null) {
-				headers.Write (info.IsStatic ? '+' : '-');
-				headers.WriteLine ($" ({return_type}){objcsig};");
-			}
+			var builder = new MethodHelper (headers, implementation) {
+				AssemblyName = type.Assembly.GetName ().Name,
+				IsStatic = info.IsStatic,
+				ReturnType = GetReturnType (type, info.ReturnType),
+				ManagedTypeName = type.FullName,
+				MetadataToken = info.MetadataToken,
+				MonoSignature = monosig,
+				ObjCSignature = objcsig,
+				ObjCTypeName = managed_type_name,
+				IsValueType = type.IsValueType,
+			};
 
-			implementation.Write (info.IsStatic ? '+' : '-');
-			implementation.WriteLine ($" ({return_type}) {objcsig}");
-			implementation.WriteLine ("{");
-			implementation.WriteLine ("\tstatic MonoMethod* __method = nil;");
-			implementation.WriteLine ("\tif (!__method) {");
-			implementation.WriteLine ("#if TOKENLOOKUP");
-			var aname = type.Assembly.GetName ().Name;
-			implementation.WriteLine ($"\t\t__method = mono_get_method (__{aname}_image, 0x{info.MetadataToken:X8}, {managed_type_name}_class);");
-			implementation.WriteLine ("#else");
-			implementation.WriteLine ($"\t\tconst char __method_name [] = \"{type.FullName}:{monosig}\";");
-			implementation.WriteLine ($"\t\t__method = mono_embeddinator_lookup_method (__method_name, {managed_type_name}_class);");
-			implementation.WriteLine ("#endif");
-			implementation.WriteLine ("\t}");
+			if (pi == null)
+				builder.WriteHeaders ();
+			
+			builder.BeginImplementation ();
+			builder.WriteMethodLookup ();
 
 			string postInvoke = String.Empty;
 			var args = "nil";
@@ -518,30 +511,12 @@ namespace ObjC {
 				args = "__args";
 			}
 
-			implementation.WriteLine ("\tMonoObject* __exception = nil;");
-			var instance = "nil";
-			if (!info.IsStatic) {
-				implementation.WriteLine ($"\tMonoObject* __instance = mono_gchandle_get_target (_object->_handle);");
-				if (type.IsValueType) {
-					implementation.WriteLine ($"\t\tvoid* __unboxed = mono_object_unbox (__instance);");
-					instance = "__unboxed";
-				} else {
-					instance = "__instance";
-				}
-			}
+			builder.WriteInvoke (args);
 
-			implementation.Write ("\t");
-			if (!info.ReturnType.Is ("System", "Void"))
-				implementation.Write ("MonoObject* __result = ");
-			implementation.WriteLine ($"mono_runtime_invoke (__method, {instance}, {args}, &__exception);");
-
-			implementation.WriteLine ("\tif (__exception)");
-			implementation.WriteLine ("\t\tmono_embeddinator_throw_exception (__exception);");
 			// ref and out parameters might need to be converted back
 			implementation.Write (postInvoke);
 			ReturnValue (info.ReturnType);
-			implementation.WriteLine ("}");
-			implementation.WriteLine ();
+			builder.EndImplementation ();
 		}
 
 		protected override void Generate (MethodInfo mi)
