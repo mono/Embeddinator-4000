@@ -4,6 +4,7 @@ using CppSharp.Generators.CSharp;
 using CppSharp.Parser;
 using System;
 using System.Collections.Generic;
+using CppSharp.AST.Extensions;
 
 namespace MonoEmbeddinator4000.Generators
 {
@@ -37,6 +38,18 @@ namespace MonoEmbeddinator4000.Generators
         public override TypePrinterResult VisitDeclaration(Declaration decl)
         {
             return GetName(decl);
+        }
+
+        public override TypePrinterResult VisitPointerType(PointerType pointer,
+            TypeQualifiers quals)
+        {
+            var pointee = pointer.Pointee;
+
+            Class @class;
+            if (pointee.TryGetClass(out @class) && ContextKind == TypePrinterContextKind.Native)
+                return JavaGenerator.IntPtrType;
+
+            return pointer.QualifiedPointee.Visit(this);
         }
 
         public override TypePrinterResult VisitPrimitiveType(PrimitiveType primitive,
