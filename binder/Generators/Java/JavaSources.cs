@@ -199,6 +199,13 @@ namespace MonoEmbeddinator4000.Generators
             GenerateClassSpecifier(@class);
 
             WriteStartBraceIndent();
+
+            if (!@class.IsStatic && !@class.HasBase)
+            {
+                WriteLine("public {0} __object;", JavaGenerator.IntPtrType);
+                NewLine();
+            }
+
             VisitDeclContext(@class);
             WriteCloseBraceIndent();
 
