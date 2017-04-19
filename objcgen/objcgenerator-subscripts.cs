@@ -1,18 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
 
 using IKVM.Reflection;
 using Type = IKVM.Reflection.Type;
 
 using Embeddinator;
 
-namespace ObjC
-{
-	public partial class ObjCGenerator
-	{
+namespace ObjC {
+	
+	public partial class ObjCGenerator {
+		
 		protected void GenerateSubscript (PropertyInfo pi)
 		{
 			Type indexType = pi.GetSetMethod ().GetParameters ()[0].ParameterType;
@@ -25,6 +21,7 @@ namespace ObjC
 			case TypeCode.UInt64:
 			case TypeCode.Int16:
 			case TypeCode.Int32:
+			case TypeCode.Int64:
 				GenerateIndexedSubscripting (indexType, paramType);
 				return;
 			default:
@@ -88,6 +85,7 @@ namespace ObjC
 				return $"[[NSNumber alloc] initWithUnsignedChar: {code}]";
 			case TypeCode.Int16:
 				return $"[[NSNumber alloc] initWithShort: {code}]";
+			case TypeCode.Char:
 			case TypeCode.UInt16:
 				return $"[[NSNumber alloc] initWithUnsignedShort: {code}]";
 			case TypeCode.Int32:
@@ -102,13 +100,11 @@ namespace ObjC
 				return $"[[NSNumber alloc] initWithFloat: {code}]";
 			case TypeCode.Double:
 				return $"[[NSNumber alloc] initWithDouble: {code}]";
-			case TypeCode.Char:
-				return $"[[NSNumber alloc] initWithUnsignedChar: {code}]"; // TODO - Not sure on this
 			case TypeCode.String:
 			case TypeCode.Object:
 				return code;
 			default:
-				throw new NotSupportedException ();
+				throw new EmbeddinatorException (99, $"Internal error `unexpected type {type} in subscript generation`. Please file a bug report with a test case (https://github.com/mono/Embeddinator-4000/issues");
 			}
 		}
 
@@ -123,6 +119,7 @@ namespace ObjC
 				return $"[{code} unsignedCharValue]";
 			case TypeCode.Int16:
 				return $"[{code} shortValue]";
+			case TypeCode.Char:
 			case TypeCode.UInt16:
 				return $"[{code} unsignedShortValue]";
 			case TypeCode.Int32:
@@ -137,13 +134,11 @@ namespace ObjC
 				return $"[{code} floatValue]";
 			case TypeCode.Double:
 				return $"[{code} doubleValue]";
-			case TypeCode.Char:
-				return $"[{code} unsignedCharValue]"; // TODO - Not sure on this
 			case TypeCode.String:
 			case TypeCode.Object:
 				return code;
 			default:
-				throw new NotSupportedException ();
+				throw new EmbeddinatorException (99, $"Internal error `unexpected type {type} in subscript generation`. Please file a bug report with a test case (https://github.com/mono/Embeddinator-4000/issues");
 			}
 		}
 	}

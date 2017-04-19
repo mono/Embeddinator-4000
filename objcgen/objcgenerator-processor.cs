@@ -203,9 +203,10 @@ namespace ObjC {
 						properties.Add (t, props);
 
 					if (subscriptProps.Count > 0) {
-						if (subscriptProps.Count > 1)
+						if (subscriptProps.Count > 1) {
 							delayed.Add (ErrorHelper.CreateWarning (1041, $"Indexed properties on {t.Name} is not generated because multiple indexed properties not supported."));
-
+							subscriptProps.RemoveRange (1, subscriptProps.Count - 1);
+						}
 						subscriptProperties.Add (t, subscriptProps);
 					}
 
