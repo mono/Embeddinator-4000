@@ -6,9 +6,9 @@ using Type = IKVM.Reflection.Type;
 using Embeddinator;
 
 namespace ObjC {
-	
+
 	public partial class ObjCGenerator {
-		
+
 		protected void GenerateSubscript (PropertyInfo pi)
 		{
 			Type indexType = pi.GetSetMethod ().GetParameters ()[0].ParameterType;
