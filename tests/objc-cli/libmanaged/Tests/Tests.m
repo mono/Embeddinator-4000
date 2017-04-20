@@ -268,6 +268,30 @@
 	Comparable_Class *c2 = [[Comparable_Class alloc] initWithI:2];
 	XCTAssert ([c1 compare:c2] == NSOrderedAscending, "compare <");
 	XCTAssert ([c2 compare:c1] == NSOrderedDescending, "compare >");
+
+	Comparable_Generic *g1 = [[Comparable_Generic alloc] initWithI:-3];
+	XCTAssert ([g1 compare:nil] == NSOrderedSame, "generic / compare w/nil");
+	XCTAssert ([g1 compare:g1] == NSOrderedSame, "generic / compare self");
+
+	Comparable_Generic *g2 = [[Comparable_Generic alloc] initWithI:-1];
+	XCTAssert ([g1 compare:g2] == NSOrderedAscending, "generic / compare <");
+	XCTAssert ([g2 compare:g1] == NSOrderedDescending, "generic / compare >");
+
+	Comparable_Both *b1 = [[Comparable_Both alloc] initWithI:10];
+	XCTAssert ([b1 compare:nil] == NSOrderedSame, "both / compare w/nil");
+	XCTAssert ([b1 compare:b1] == NSOrderedSame, "both / compare self");
+
+	Comparable_Both *b2 = [[Comparable_Both alloc] initWithI:20];
+	XCTAssert ([b1 compare:b2] == NSOrderedAscending, "both / compare <");
+	XCTAssert ([b2 compare:b1] == NSOrderedDescending, "both / compare >");
+
+	// normally bound methods for IComparable<T> where T is not the current type
+	Comparable_Different *d = [[Comparable_Different alloc] initWithI:-2];
+	XCTAssert ([d compareToGeneric:g2] == NSOrderedAscending, "different generic / compare <");
+	XCTAssert ([d compareToGeneric:g1] == NSOrderedDescending, "different generic / compare >");
+
+	XCTAssert ([d compareToInteger:10] == NSOrderedAscending, "different int / compare <");
+	XCTAssert ([d compareToInteger:-10] == NSOrderedDescending, "different int / compare >");
 }
 
 - (void)testStaticCallPerformance {

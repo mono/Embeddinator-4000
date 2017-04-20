@@ -292,12 +292,14 @@ namespace ObjC {
 
 			MethodInfo m;
 			if (icomparable.TryGetValue (t, out m)) {
+				var pt = m.GetParameters () [0].ParameterType;
 				var builder = new ComparableHelper (headers, implementation) {
 					ObjCSignature = $"compare:({managed_name} *)other",
 					AssemblyName = aname,
 					MetadataToken = m.MetadataToken,
 					ObjCTypeName = managed_name,
 					ManagedTypeName = t.FullName,
+					MonoSignature = $"CompareTo({GetMonoName (pt)})",
 				};
 				builder.WriteHeaders ();
 				builder.WriteImplementation ();
