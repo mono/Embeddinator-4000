@@ -23,6 +23,10 @@
 	[super tearDown];
 }
 
+#pragma clang diagnostic push
+// our unit tests are _abusing_ nil since we know the internals of the managed code we call
+#pragma clang diagnostic ignored "-Wnonnull"
+
 - (void)testProperties {
 	XCTAssertFalse ([Platform isWindows], "static class property getter only");
 	XCTAssert ([Platform exitCode] == 0, "static class property getter");
@@ -557,4 +561,7 @@
     StringCollection[@"asdf"] = @"two";
     XCTAssert ([StringCollection [@"asdf"] isEqual:@"two"], "get 25");
 }
+
+#pragma clang diagnostic pop
+
 @end

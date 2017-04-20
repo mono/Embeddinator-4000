@@ -31,6 +31,8 @@ namespace ObjC {
 			foreach (var t in types)
 				headers.WriteLine ($"@class {GetTypeName (t)};");
 			headers.WriteLine ();
+			headers.WriteLine ("NS_ASSUME_NONNULL_BEGIN");
+			headers.WriteLine ();
 
 			implementation.WriteLine ("#include \"bindings.h\"");
 			implementation.WriteLine ("#include \"glib.h\"");
@@ -63,6 +65,9 @@ namespace ObjC {
 			implementation.WriteLine ();
 
 			base.Generate (assemblies);
+
+			headers.WriteLine ("NS_ASSUME_NONNULL_END");
+			headers.WriteLine ();
 		}
 
 		protected override void Generate (Assembly a)
@@ -209,7 +214,7 @@ namespace ObjC {
 
 					var builder = new MethodHelper (headers, implementation) {
 						AssemblyName = aname,
-						ReturnType = "instancetype",
+						ReturnType = "nullable instancetype",
 						ManagedTypeName = t.FullName,
 						MetadataToken = ctor.MetadataToken,
 						MonoSignature = signature,
@@ -269,7 +274,7 @@ namespace ObjC {
 				headers.WriteLine (" */");
 				headers.WriteLine ("- (nullable instancetype)initForSuper;");
 
-				implementation.WriteLine ("- (instancetype) initForSuper {");
+				implementation.WriteLine ("- (nullable instancetype) initForSuper {");
 				// calls super's initForSuper until we reach a non-generated type
 				if (types.Contains (t.BaseType))
 					implementation.WriteLine ("\treturn self = [super initForSuper];");
@@ -311,7 +316,7 @@ namespace ObjC {
 			if (icomparable.TryGetValue (t, out m)) {
 				var pt = m.GetParameters () [0].ParameterType;
 				var builder = new ComparableHelper (headers, implementation) {
-					ObjCSignature = $"compare:({managed_name} *)other",
+					ObjCSignature = $"compare:({managed_name} * _Nullable)other",
 					AssemblyName = aname,
 					MetadataToken = m.MetadataToken,
 					ObjCTypeName = managed_name,
@@ -618,8 +623,10 @@ namespace ObjC {
 		// TODO override with attribute ? e.g. [Obj.Name ("XAMType")]
 		public static string GetTypeName (Type t)
 		{
-			if (t.IsByRef)
-				return GetTypeName (t.GetElementType ()) + "*";
+			if (t.IsByRef) {
+				var et = t.GetElementType ();
+				return GetTypeName (et) + (et.IsValueType ? " " : " _Nonnull ") + "* _Nullable";
+			}
 
 			if (t.IsEnum)
 				return GetObjCName (t);
