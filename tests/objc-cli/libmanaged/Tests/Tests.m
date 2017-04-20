@@ -161,6 +161,24 @@
 
 	[collection removeItem:item2];
 	XCTAssert ([collection count] == 0, "count 4");
+
+	XCTAssertEqualObjects (@"", [Methods_SomeExtensions notAnExtensionMethod], "empty string");
+}
+
+- (void)testCategories {
+	Methods_Collection *collection = [[Methods_Collection alloc] init];
+	[collection addItem:nil];
+	id item = [Methods_Factory createItemId:1];
+	[collection addItem:item];
+	XCTAssert ([collection count] == 2, "count 0");
+
+	XCTAssert ([collection countNull] == 1, "count null");
+	XCTAssert ([collection countNonNull] == 1, "count non null");
+
+	NSString *s1 = @"";
+	XCTAssertTrue ([s1 isEmptyButNotNull], "isEmptyButNotNullString 1");
+	NSString *s2 = @"Category";
+	XCTAssertFalse ([s2 isEmptyButNotNull], "isEmptyButNotNullString 2");
 }
 
 - (void) testStructs {

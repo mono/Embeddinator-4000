@@ -17,6 +17,7 @@ namespace ObjC {
 		public string AssemblyName { get; set; }
 
 		public bool IsConstructor { get; set; }
+		public bool IsExtension { get; set; }
 		public bool IsStatic { get; set; }
 		public bool IsValueType { get; set; }
 
@@ -35,7 +36,7 @@ namespace ObjC {
 
 		void WriteSignature (TextWriter writer)
 		{
-			writer.Write (IsStatic ? '+' : '-');
+			writer.Write (IsStatic && !IsExtension ? '+' : '-');
 			writer.Write ($" ({ReturnType}){ObjCSignature}");
 		}
 

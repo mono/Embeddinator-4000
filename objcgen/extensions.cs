@@ -43,9 +43,9 @@ namespace Embeddinator {
 			return true;
 		}
 
-		public static bool HasCustomAttribute (this Type self, string @namespace, string name)
+		public static bool HasCustomAttribute (this MemberInfo self, string @namespace, string name)
 		{
-			foreach (var ca in self.CustomAttributes) {
+			foreach (var ca in CustomAttributeData.GetCustomAttributes (self)) {
 				if (ca.AttributeType.Is (@namespace, name))
 					return true;
 			}
