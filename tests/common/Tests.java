@@ -1,5 +1,7 @@
 import managed_dll.*;
 import managed_dll.properties.*;
+import managed_dll.first.*;
+import managed_dll.first.second.*;
 
 import static org.junit.Assert.*;
 import org.junit.*;
@@ -28,6 +30,21 @@ public class Tests {
         assertFalse(query.getIsSecret());
         query.setSecret(1);
         assertTrue(query.getIsSecret());
+    }
+
+    @Test
+    public void testNamespaces() {
+        ClassWithoutNamespace nonamespace = new ClassWithoutNamespace();
+        assertEquals(nonamespace.toString(), "ClassWithoutNamespace");
+
+        ClassWithSingleNamespace singlenamespace = new ClassWithSingleNamespace();
+        assertEquals(singlenamespace.toString(), "First.ClassWithSingleNamespace");
+
+        ClassWithNestedNamespace nestednamespaces = new ClassWithNestedNamespace();
+        assertEquals(nestednamespaces.toString(), "First.Second.ClassWithNestedNamespace");
+
+        managed_dll.first.second.third.ClassWithNestedNamespace nestednamespaces2 = new managed_dll.first.second.third.ClassWithNestedNamespace();
+        assertEquals(nestednamespaces2.toString(), "First.Second.Third.ClassWithNestedNamespace");
     }
 
     @Test
