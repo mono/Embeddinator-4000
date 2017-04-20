@@ -68,7 +68,7 @@ namespace Methods {
 
 	public class Collection {
 
-		List<Item> c = new List<Item> ();
+		internal List<Item> c = new List<Item> ();
 
 		public void Add (Item item)
 		{
@@ -85,6 +85,38 @@ namespace Methods {
 		public Item this [int index] {
 			get { return c [index]; }
 			set { c [index] = value; }
+		}
+	}
+
+	// Three extensions on two different types and a _normal_ static method
+	// objc: categories are per type (2 different here) and one should be a _normal_ method
+	public static class SomeExtensions {
+
+		public static int CountNonNull (this Collection collection)
+		{
+			int n = 0;
+			foreach (var i in collection.c) {
+				if (i != null)
+					n++;
+			}
+			return n;
+		}
+
+		public static int CountNull (this Collection collection)
+		{
+			return collection.Count - collection.CountNonNull ();
+		}
+
+		public static bool IsEmptyButNotNull (this string @string)
+		{
+			if (@string == null)
+				return false;
+			return @string.Length == 0;
+		}
+
+		public static string NotAnExtensionMethod ()
+		{
+			return String.Empty;
 		}
 	}
 }

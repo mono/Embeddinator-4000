@@ -98,6 +98,9 @@ namespace ObjC {
 
 		Dictionary<Type,MethodInfo> icomparable = new Dictionary<Type, MethodInfo> ();
 
+		// defining type / extended type / methods
+		Dictionary<Type, Dictionary<Type, List<MethodInfo>>> extensions_methods = new Dictionary<Type, Dictionary<Type, List<MethodInfo>>> ();
+
 		protected IEnumerable<MethodInfo> GetMethods (Type t)
 		{
 			foreach (var mi in t.GetMethods (BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly)) {
@@ -116,6 +119,23 @@ namespace ObjC {
 					// don't replace CompareTo(T) with CompareTo(Object)
 					if (!icomparable.ContainsKey (t))
 						icomparable.Add (t, mi);
+					continue;
+				}
+
+				// handle extension methods
+				if (extension_type && mi.HasCustomAttribute ("System.Runtime.CompilerServices", "ExtensionAttribute")) {
+					Dictionary<Type, List<MethodInfo>> extensions;
+					if (!extensions_methods.TryGetValue (t, out extensions)) {
+						extensions = new Dictionary<Type, List<MethodInfo>> ();
+						extensions_methods.Add (t, extensions);
+					}
+					var extended_type = mi.GetParameters () [0].ParameterType;
+					List<MethodInfo> methods;
+					if (!extensions.TryGetValue (extended_type, out methods)) {
+						methods = new List<MethodInfo> ();
+						extensions.Add (extended_type, methods);
+					}
+					methods.Add (mi);
 					continue;
 				}
 
@@ -179,6 +199,7 @@ namespace ObjC {
 		// special cases
 		bool implement_system_icomparable;
 		bool implement_system_icomparable_t;
+		bool extension_type;
 
 		public override void Process (IEnumerable<Assembly> assemblies)
 		{
@@ -190,6 +211,8 @@ namespace ObjC {
 					}
 
 					types.Add (t);
+
+					extension_type = t.HasCustomAttribute ("System.Runtime.CompilerServices", "ExtensionAttribute");
 
 					implement_system_icomparable = t.Implements ("System", "IComparable");
 					implement_system_icomparable_t = t.Implements("System", "IComparable`1");
