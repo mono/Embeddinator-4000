@@ -331,6 +331,8 @@ namespace MonoEmbeddinator4000.Generators
 
             WriteLine(");");
 
+            WriteLine("mono.embeddinator.Runtime.checkExceptions();");
+
             foreach (var marshal in contexts)
             {
                 if (!string.IsNullOrWhiteSpace(marshal.SupportAfter))
