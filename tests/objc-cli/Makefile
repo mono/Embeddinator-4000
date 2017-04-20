@@ -1,4 +1,4 @@
-all: run-test perf xctest test-leaks test-static test-dynamic xctest-ios-simulator
+all: run-test perf xctest test-leaks test-static test-dynamic test-framework-ios xctest-ios-simulator
 
 MONO=/Library/Frameworks/Mono.framework/Versions/Current/Commands/mono
 
