@@ -28,7 +28,7 @@ compile_c_objc:
 JAVA_FILES=`find ../../support/java -name "*.java"` `find java -name "*.java"`
 JUNIT_CLASSPATH=../../external/junit/hamcrest-core-1.3.jar:../../external/junit/junit-4.12.jar
 JNA_CLASSPATH=../../external/jna/jna-4.3.0.jar
-JAVAC_FLAGS=-d mk/java -Xlint:deprecation
+JAVAC_FLAGS=-d mk/java -Xdiags:verbose -Xlint:deprecation
 
 compile_java:
 	mono --debug $(EMBEDDINATOR_EXE) -gen=java -out=java -p=macos -target=shared $(MANAGED_DLL)
