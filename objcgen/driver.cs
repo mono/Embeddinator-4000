@@ -355,7 +355,7 @@ namespace Embeddinator {
 			 * For dynamic libraries we
 			 * * Compile all source files to .o files, per architecture.
 			 * * Then we link all .o files per architecture into a .dylib.
-			 * * Then we lipo .dylib files into per-sdk fat .dylib, then we lipo all .dylbi into a global .dylib file. So we end up with one fat .dylib for device, one fat .dylib for simulator, and one very fat .dylib for both simulator and device.
+			 * * Then we lipo .dylib files into per-sdk fat .dylib, then we lipo all .dylib into a global .dylib file. So we end up with one fat .dylib for device, one fat .dylib for simulator, and one very fat .dylib for both simulator and device.
 			 * * Finally we dsymutil the global .dylib
 			 * 
 			 * For frameworks we
