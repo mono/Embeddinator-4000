@@ -502,6 +502,11 @@ namespace Embeddinator {
 						Directory.CreateDirectory (headers);
 						File.Copy (Path.Combine (OutputDirectory, "embeddinator.h"), Path.Combine (headers, "embeddinator.h"), true);
 						File.Copy (Path.Combine (OutputDirectory, "bindings.h"), Path.Combine (headers, $"bindings.h"), true);
+						// Create an umbrella header for the everything in the framework.
+						File.WriteAllText (Path.Combine (headers, LibraryName + ".h"),
+@"
+#include ""bindings.h""
+");
 						// Move the framework to the output directory
 						var fwpath = Path.Combine (OutputDirectory, build_info.Sdk, $"{LibraryName}.framework");
 						if (Directory.Exists (fwpath))
