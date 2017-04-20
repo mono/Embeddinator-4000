@@ -316,7 +316,7 @@ namespace ObjC {
 			if (icomparable.TryGetValue (t, out m)) {
 				var pt = m.GetParameters () [0].ParameterType;
 				var builder = new ComparableHelper (headers, implementation) {
-					ObjCSignature = $"compare:({managed_name} *)other",
+					ObjCSignature = $"compare:({managed_name} * _Nullable)other",
 					AssemblyName = aname,
 					MetadataToken = m.MetadataToken,
 					ObjCTypeName = managed_name,
