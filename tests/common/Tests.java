@@ -85,6 +85,11 @@ public class Tests {
     }
 
     @Test
+    static long UCHAR_MAX = (long)(Math.pow(2, Byte.SIZE) - 1);
+    static long USHRT_MAX = (long)(Math.pow(2, Short.SIZE) - 1);
+    static long UINT_MAX = (long)(Math.pow(2, Integer.SIZE) - 1);
+    static long ULONG_MAX = (long)(Math.pow(2, Long.SIZE) - 1);
+
     public void testTypes() {
         assertEquals(Byte.MIN_VALUE, Type_SByte.getMin());
         assertEquals(Byte.MAX_VALUE, Type_SByte.getMax());
@@ -99,17 +104,17 @@ public class Tests {
         assertEquals(Long.MAX_VALUE, Type_Int64.getMax());
 
         assertEquals(0, Type_Byte.getMin().longValue());
-        assertEquals((long)(Math.pow(2, Byte.SIZE) - 1), Type_Byte.getMax().longValue());
+        assertEquals(UCHAR_MAX, Type_Byte.getMax().longValue());
 
         assertEquals(0, Type_UInt16.getMin().longValue());
-        assertEquals((long)(Math.pow(2, Short.SIZE) - 1), Type_UInt16.getMax().longValue());
+        assertEquals(USHRT_MAX, Type_UInt16.getMax().longValue());
 
         assertEquals(0, Type_UInt32.getMin().longValue());
-        assertEquals((long)(Math.pow(2, Integer.SIZE) - 1), Type_UInt32.getMax().longValue());
+        assertEquals(UINT_MAX, Type_UInt32.getMax().longValue());
 
         assertEquals(0, Type_UInt64.getMin().longValue());
         // TODO: Use BigDecimal for unsigned 64-bit integer types.
-        //assertEquals((long)(Math.pow(2, Long.SIZE) - 1), Type_UInt64.getMax().longValue());
+        //assertEquals(ULONG_MAX, Type_UInt64.getMax().longValue());
 
         doublesAreEqual(-Float.MAX_VALUE, Type_Single.getMin());
         doublesAreEqual(Float.MAX_VALUE, Type_Single.getMax());
