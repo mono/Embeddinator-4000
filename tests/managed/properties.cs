@@ -51,4 +51,15 @@ namespace Properties {
 			get { return secret != 0; }
 		}
 	}
+
+	public class DuplicateIndexedProperties {
+		public int this[int i] { get { return 42; } }
+		public int this[string i] { get { return 42; } }
+	}
+	
+	public class DuplicateMethods {
+		public int DoIt () { return 42; }
+		public int DoIt (int i) { return 42; }
+		public int DoIt (string s) { return 42; }
+	}
 }

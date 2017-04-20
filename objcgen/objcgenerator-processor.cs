@@ -154,8 +154,8 @@ namespace ObjC {
 		List<Type> enums = new List<Type> ();
 		List<Type> types = new List<Type> ();
 		Dictionary<Type, List<ConstructorInfo>> ctors = new Dictionary<Type, List<ConstructorInfo>> ();
-		Dictionary<Type, List<MethodInfo>> methods = new Dictionary<Type, List<MethodInfo>> ();
-		Dictionary<Type, List<PropertyInfo>> properties = new Dictionary<Type, List<PropertyInfo>> ();
+		Dictionary<Type, List<ProcessedMethod>> methods = new Dictionary<Type, List<ProcessedMethod>> ();
+		Dictionary<Type, List<ProcessedProperty>> properties = new Dictionary<Type, List<ProcessedProperty>> ();
 		Dictionary<Type, List<FieldInfo>> fields = new Dictionary<Type, List<FieldInfo>> ();
 		Dictionary<Type, List<PropertyInfo>> subscriptProperties = new Dictionary<Type, List<PropertyInfo>> ();
 
@@ -175,8 +175,9 @@ namespace ObjC {
 						ctors.Add (t, constructors);
 
 					var meths = GetMethods (t).OrderBy ((arg) => arg.Name).ToList ();
-					if (meths.Count > 0)
-						methods.Add (t, meths);
+					var processedMethods = PostProcessMethods (meths).ToList ();
+					if (processedMethods.Count > 0)
+						methods.Add (t, processedMethods);
 
 					var props = new List<PropertyInfo> ();
 					var subscriptProps = new List<PropertyInfo> ();
@@ -194,13 +195,14 @@ namespace ObjC {
 						}
 
 						// we can do better than methods for the more common cases (readonly and readwrite)
-						meths.Remove (getter);
-						meths.Remove (setter);
+						processedMethods.RemoveAll (x => x.Method == getter);
+						processedMethods.RemoveAll (x => x.Method == setter);
 						props.Add (pi);
 					}
 					props = props.OrderBy ((arg) => arg.Name).ToList ();
-					if (props.Count > 0)
-						properties.Add (t, props);
+					var processedProperties = PostProcessProperties (props).ToList ();
+					if (processedProperties.Count > 0)
+						properties.Add (t, processedProperties);
 
 					if (subscriptProps.Count > 0) {
 						if (subscriptProps.Count > 1)

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using IKVM.Reflection;
+using ObjC;
 using Type = IKVM.Reflection.Type;
 
 namespace Embeddinator {
@@ -31,11 +32,11 @@ namespace Embeddinator {
 		{
 		}
 
-		protected virtual void Generate (PropertyInfo pi)
+		protected virtual void Generate (ProcessedProperty property)
 		{
 		}
 
-		protected virtual void Generate (MethodInfo mi)
+		protected virtual void Generate (ProcessedMethod method)
 		{
 		}
 

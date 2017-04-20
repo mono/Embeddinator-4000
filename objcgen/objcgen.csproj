@@ -311,6 +311,8 @@
     <Compile Include="extensions.cs" />
     <Compile Include="methodhelper.cs" />
     <Compile Include="objcgenerator-subscripts.cs" />
+    <Compile Include="processedtypes.cs" />
+    <Compile Include="objcgenerator-postprocessor.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="support\" />

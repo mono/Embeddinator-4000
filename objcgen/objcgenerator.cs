@@ -183,7 +183,7 @@ namespace ObjC {
 						string name = "init";
 						string signature = ".ctor()";
 						if (ctorparams.Length > 0)
-							GetSignatures ("initWith", uctor.Name, uctor, ctorparams, out name, out signature);
+							GetSignatures ("initWith", uctor.Name, uctor, ctorparams, false, out name, out signature);
 						headers.WriteLine ($"- (instancetype){name} NS_UNAVAILABLE;");
 					}
 					headers.WriteLine ();
@@ -197,7 +197,7 @@ namespace ObjC {
 					string name = "init";
 					string signature = ".ctor()";
 					if (parameters.Length > 0)
-						GetSignatures ("initWith", ctor.Name, ctor, parameters, out name, out signature);
+						GetSignatures ("initWith", ctor.Name, ctor, parameters, false, out name, out signature);
 
 					var builder = new MethodHelper (headers, implementation) {
 						AssemblyName = aname,
@@ -261,7 +261,7 @@ namespace ObjC {
 				implementation.WriteLine ();
 			}
 
-			List<PropertyInfo> props;
+			List<ProcessedProperty> props;
 			if (properties.TryGetValue (t, out props)) {
 				headers.WriteLine ();
 				foreach (var pi in props)
@@ -282,7 +282,7 @@ namespace ObjC {
 					GenerateSubscript (si);
 			}
 
-			List<MethodInfo> meths;
+			List<ProcessedMethod> meths;
 			if (methods.TryGetValue (t, out meths)) {
 				headers.WriteLine ();
 				foreach (var mi in meths)
@@ -352,8 +352,9 @@ namespace ObjC {
 			}
 		}
 
-		protected override void Generate (PropertyInfo pi)
+		protected override void Generate (ProcessedProperty property)
 		{
+			PropertyInfo pi = property.Property;
 			var getter = pi.GetGetMethod ();
 			var setter = pi.GetSetMethod ();
 			// setter-only properties are handled as methods (and should not reach this code)
@@ -475,7 +476,7 @@ namespace ObjC {
 		}
 
 		// TODO override with attribute ? e.g. [ObjC.Selector ("foo")]
-		void ImplementMethod (MethodInfo info, string name, PropertyInfo pi = null)
+		void ImplementMethod (MethodInfo info, string name, PropertyInfo pi = null, bool useTypeNames = false)
 		{
 			var type = info.DeclaringType;
 			var managed_type_name = GetObjCName (type);
@@ -484,7 +485,7 @@ namespace ObjC {
 			string monosig;
 			var managed_name = info.Name;
 			var parametersInfo = info.GetParameters ();
-			GetSignatures (name, managed_name, (MemberInfo)pi ?? info, parametersInfo, out objcsig, out monosig);
+			GetSignatures (name, managed_name, (MemberInfo)pi ?? info, parametersInfo, useTypeNames, out objcsig, out monosig);
 
 			var builder = new MethodHelper (headers, implementation) {
 				AssemblyName = type.Assembly.GetName ().Name,
@@ -519,14 +520,21 @@ namespace ObjC {
 			builder.EndImplementation ();
 		}
 
-		protected override void Generate (MethodInfo mi)
+		protected override void Generate (ProcessedMethod method)
 		{
+			MethodInfo mi = method.Method;
 			string name;
+
 			if (mi.IsSpecialName && mi.IsStatic && mi.Name.StartsWith ("op_", StringComparison.Ordinal))
 				name = CamelCase (mi.Name.Substring (3));
 			else
 				name = CamelCase (mi.Name);
-			ImplementMethod (mi, name);
+
+			if (method.FallBackToTypeName && method.Method.ParameterCount == 1) {
+				name += method.Method.GetParameters ()[0].ParameterType.Name.Replace ('.', '_');
+			}
+
+			ImplementMethod (mi, name, useTypeNames: method.FallBackToTypeName);
 		}
 
 		void ReturnValue (Type t)

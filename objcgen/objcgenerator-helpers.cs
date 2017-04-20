@@ -16,7 +16,7 @@ namespace ObjC {
 			return t.FullName.Replace ('.', '_');
 		}
 
-		void GetSignatures (string objName, string monoName, MemberInfo info, ParameterInfo [] parameters, out string objcSignature, out string monoSignature)
+		void GetSignatures (string objName, string monoName, MemberInfo info, ParameterInfo [] parameters, bool useTypeNames, out string objcSignature, out string monoSignature)
 		{
 			var method = (info as MethodBase); // else it's a PropertyInfo
 			// special case for setter-only - the underscore looks ugly
@@ -31,12 +31,13 @@ namespace ObjC {
 					objc.Append (' ');
 					mono.Append (',');
 				}
+				string paramName = useTypeNames ? p.ParameterType.Name : p.Name;
 				if (method != null) {
 					if (n == 0) {
 						if (method.IsConstructor || !method.IsSpecialName)
-							objc.Append (PascalCase (p.Name));
+							objc.Append (PascalCase (paramName));
 					} else
-						objc.Append (p.Name.ToLowerInvariant ());
+						objc.Append (paramName.ToLowerInvariant ());
 				}
 				var pt = p.ParameterType;
 				var ptname = GetTypeName (p.ParameterType);
