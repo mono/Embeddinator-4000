@@ -238,6 +238,7 @@ void mono_embeddinator_throw_exception(MonoObject *exception)
     mono_embeddinator_error_t error;
     error.type = MONO_EMBEDDINATOR_EXCEPTION_THROWN;
     error.exception = (MonoException*) exception;
+    error.string = 0;
 
     mono_embeddinator_error(error);
 }
