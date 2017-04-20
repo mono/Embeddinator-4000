@@ -116,6 +116,16 @@ namespace MonoEmbeddinator4000.Generators
                          name.Replace(new char[] {'`', '<', '>' }, "_");
         }
 
+        public void HandleBaseType(IKVM.Reflection.Type type, Class @class)
+        {
+            if (type.FullName == "System.Object" || type.FullName == "System.ValueType")
+                return;
+
+            var baseClass = Visit(type.GetTypeInfo()) as Class;
+            var specifier = new BaseClassSpecifier { Type = new TagType(baseClass) };
+            @class.Bases.Add(specifier);
+        }
+
         public Class VisitRecord(TypeInfo type)
         {
             var @class = new Class
@@ -127,6 +137,12 @@ namespace MonoEmbeddinator4000.Generators
 
             HandleNamespace(type, @class);
             VisitMembers(type, @class);
+
+            if (type.BaseType != null)
+                HandleBaseType(type.BaseType, @class);
+
+            foreach (var @interface in type.ImplementedInterfaces)
+                HandleBaseType(@interface, @class);
 
             return @class;
         }
