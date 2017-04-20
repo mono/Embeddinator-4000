@@ -270,6 +270,9 @@ namespace MonoEmbeddinator4000.Generators
                 Write(" ");
                 WriteStartBraceIndent();
 
+                if (method.IsConstructor && @class.HasBase)
+                    WriteLine("super((com.sun.jna.Pointer)null);");
+
                 GenerateMethodInvocation(method);
 
                 WriteCloseBraceIndent();
