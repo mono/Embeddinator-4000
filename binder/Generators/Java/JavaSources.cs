@@ -173,7 +173,7 @@ namespace MonoEmbeddinator4000.Generators
 
             keywords = keywords.Where(s => !string.IsNullOrWhiteSpace(s)).ToList();
             if (keywords.Count != 0)
-                Write("{0} ", string.Join(" ", keywords));
+                Write("{0}", string.Join(" ", keywords));
 
             var bases = new List<BaseClassSpecifier>();
 
@@ -198,6 +198,7 @@ namespace MonoEmbeddinator4000.Generators
         {
             GenerateClassSpecifier(@class);
 
+            Write(" ");
             WriteStartBraceIndent();
 
             if (!@class.IsStatic && !@class.HasBase)
