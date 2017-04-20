@@ -3,6 +3,7 @@ import managed_dll.properties.*;
 import managed_dll.first.*;
 import managed_dll.first.second.*;
 import managed_dll.exceptions.*;
+import managed_dll.constructors.*;
 
 import mono.embeddinator.*;
 
@@ -85,11 +86,40 @@ public class Tests {
     }
 
     @Test
+    public void testConstructors() {
+        Unique unique = new Unique();
+        assertEquals(1, unique.getId());
+
+        Unique unique_init_id = new Unique(911);
+        assertEquals(911, unique_init_id.getId());
+
+        SuperUnique super_unique_default_init = new SuperUnique();
+        assertEquals(411, super_unique_default_init.getId());
+
+        Implicit implicit = new Implicit();
+        assertEquals("OK", implicit.getTestResult());
+
+        AllTypeCode all1 = new AllTypeCode(true, (char)USHRT_MAX, "Mono");
+        assertTrue(all1.getTestResult());
+
+        AllTypeCode all2 = new AllTypeCode(Byte.MAX_VALUE, Short.MAX_VALUE, Integer.MAX_VALUE, Long.MAX_VALUE);
+        assertTrue(all2.getTestResult());
+
+        // TODO: Use BigDecimal for unsigned 64-bit integer types.
+        //AllTypeCode all3 = new AllTypeCode(new UnsignedByte(UCHAR_MAX), new UnsignedShort(USHRT_MAX),
+        //    new UnsignedInt(UINT_MAX), new UnsignedLong(ULONG_MAX));
+        //assertTrue(all3.getTestResult());
+
+        AllTypeCode all4 = new AllTypeCode(Float.MAX_VALUE, Double.MAX_VALUE);
+        assertTrue(all4.getTestResult());
+    }
+
     static long UCHAR_MAX = (long)(Math.pow(2, Byte.SIZE) - 1);
     static long USHRT_MAX = (long)(Math.pow(2, Short.SIZE) - 1);
     static long UINT_MAX = (long)(Math.pow(2, Integer.SIZE) - 1);
     static long ULONG_MAX = (long)(Math.pow(2, Long.SIZE) - 1);
 
+    @Test
     public void testTypes() {
         assertEquals(Byte.MIN_VALUE, Type_SByte.getMin());
         assertEquals(Byte.MAX_VALUE, Type_SByte.getMax());
