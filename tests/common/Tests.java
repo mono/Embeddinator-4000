@@ -2,6 +2,9 @@ import managed_dll.*;
 import managed_dll.properties.*;
 import managed_dll.first.*;
 import managed_dll.first.second.*;
+import managed_dll.exceptions.*;
+
+import mono.embeddinator.*;
 
 import static org.junit.Assert.*;
 import org.junit.*;
@@ -45,6 +48,40 @@ public class Tests {
 
         managed_dll.first.second.third.ClassWithNestedNamespace nestednamespaces2 = new managed_dll.first.second.third.ClassWithNestedNamespace();
         assertEquals(nestednamespaces2.toString(), "First.Second.Third.ClassWithNestedNamespace");
+    }
+
+    @Test
+    public void testExceptions() {
+        Throwable e = null;
+
+        try {
+            Throwers throwers = new Throwers();
+        } catch(Exception ex) {
+            e = ex;
+        }
+        assertTrue(e instanceof mono.embeddinator.RuntimeException);
+
+        e = null;
+        try {
+            ThrowInStaticCtor static_thrower = new ThrowInStaticCtor();
+        } catch(Exception ex) {
+            e = ex;
+        }
+        assertTrue(e instanceof mono.embeddinator.RuntimeException);
+
+        try {
+            Super sup1 = new Super(false);
+        } catch(Exception ex) {
+            fail();
+        }
+
+        e = null;
+        try {
+            Super sup2 = new Super(true);
+        } catch(Exception ex) {
+            e = ex;
+        }
+        assertTrue(e instanceof mono.embeddinator.RuntimeException);
     }
 
     @Test
