@@ -8,7 +8,6 @@ namespace ObjC {
 		public ComparableHelper (TextWriter headers, TextWriter implementation) :
 			base (headers, implementation)
 		{
-			MonoSignature = "CompareTo(object)";
 			ReturnType = "NSComparisonResult";
 		}
 
