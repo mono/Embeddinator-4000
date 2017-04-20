@@ -108,6 +108,9 @@ namespace ObjC {
 			}
 
 			var macro = flags ? "NS_OPTIONS" : "NS_ENUM";
+			headers.WriteLine ($"/** Enumeration {managed_name}");
+			headers.WriteLine ($" *  Corresponding .NET Qualified Name: `{t.AssemblyQualifiedName}`");
+			headers.WriteLine (" */");
 			headers.WriteLine ($"typedef {macro}({base_type}, {managed_name}) {{");
 			foreach (var name in t.GetEnumNames ()) {
 				var value = t.GetField (name).GetRawConstantValue ();
@@ -131,7 +134,9 @@ namespace ObjC {
 
 			var native_name = GetTypeName (t);
 			headers.WriteLine ();
-			headers.WriteLine ($"// {t.AssemblyQualifiedName}");
+			headers.WriteLine ($"/** Class {native_name}");
+			headers.WriteLine ($" *  Corresponding .NET Qualified Name: `{t.AssemblyQualifiedName}`");
+			headers.WriteLine (" */");
 			headers.WriteLine ($"@interface {native_name} : {GetTypeName (t.BaseType)} {{");
 			if (!static_type && !has_bound_base_class) {
 				headers.WriteLine ("\t@public MonoEmbedObject* _object;");
@@ -140,9 +145,10 @@ namespace ObjC {
 			headers.WriteLine ();
 
 			implementation.WriteLine ();
-			implementation.WriteLine ($"// {t.AssemblyQualifiedName}");
+			implementation.WriteLine ($"/** Class {native_name}");
+			implementation.WriteLine ($" *  Corresponding .NET Qualified Name: `{t.AssemblyQualifiedName}`");
+			implementation.WriteLine (" */");
 			implementation.WriteLine ($"@implementation {native_name} {{");
-			// our internal field is only needed once in the type hierarchy
 			implementation.WriteLine ("}");
 			implementation.WriteLine ();
 
@@ -177,17 +183,18 @@ namespace ObjC {
 				var unavailableCtors = GetUnavailableParentCtors (t, constructors);
 				if (unavailableCtors.Count () > 0) {
 					// TODO: Print a #pragma mark once we have a well defined header structure http://nshipster.com/pragma/
-					headers.WriteLine ("// List of unavailable initializers. See Constructors v.s. Initializers in our docs");
-					headers.WriteLine ("// https://github.com/mono/Embeddinator-4000/blob/master/docs/ObjC.md");
 					foreach (var uctor in unavailableCtors) {
 						var ctorparams = uctor.GetParameters ();
 						string name = "init";
 						string signature = ".ctor()";
 						if (ctorparams.Length > 0)
 							GetSignatures ("initWith", uctor.Name, uctor, ctorparams, out name, out signature);
-						headers.WriteLine ($"- (instancetype){name} NS_UNAVAILABLE;");
+						headers.WriteLine ("/** This initializer is not available as it was not re-exposed from the base type");
+						headers.WriteLine (" *  For more details consult https://github.com/mono/Embeddinator-4000/blob/master/docs/ObjC.md#constructors-vs-initializers");
+						headers.WriteLine (" */");
+						headers.WriteLine ($"- (nullable instancetype){name} NS_UNAVAILABLE;");
+						headers.WriteLine ();
 					}
-					headers.WriteLine ();
 				}
 
 				foreach (var ctor in constructors) {
@@ -237,21 +244,31 @@ namespace ObjC {
 					else
 						implementation.WriteLine ("\treturn self = [super init];");
 					builder.EndImplementation ();
+
+					headers.WriteLine ();
 				}
 			}
 
 			if (!default_init || static_type) {
-				if (static_type)
-					headers.WriteLine ("// a .net static type cannot be initialized");
-				headers.WriteLine ("- (instancetype)init NS_UNAVAILABLE;");
-				headers.WriteLine ("+ (instancetype)new NS_UNAVAILABLE;");
+				if (static_type) {
+					headers.WriteLine ("/** This is a static type and no instance can be initialized");
+				} else {
+					headers.WriteLine ("/** This type is not meant to be created using only default values");
+				}
+				headers.WriteLine (" *  Both the `-init` and `+new` selectors cannot be used to create instances of this type.");
+				headers.WriteLine (" */");
+				headers.WriteLine ("- (nullable instancetype)init NS_UNAVAILABLE;");
+				headers.WriteLine ("+ (nullable instancetype)new NS_UNAVAILABLE;");
+				headers.WriteLine ();
 			}
 
 			// TODO we should re-use the base `init` when it exists
 			if (!static_type) {
-				headers.WriteLine ("- (instancetype)initForSuper;");
+				headers.WriteLine ("/** This selector is not meant to be called from user code");
+				headers.WriteLine (" *  This exists solely to allow the correct subclassing of managed (.net) types");
+				headers.WriteLine (" */");
+				headers.WriteLine ("- (nullable instancetype)initForSuper;");
 
-				implementation.WriteLine ("// only when `init` is not generated and we have subclasses");
 				implementation.WriteLine ("- (instancetype) initForSuper {");
 				// calls super's initForSuper until we reach a non-generated type
 				if (types.Contains (t.BaseType))
