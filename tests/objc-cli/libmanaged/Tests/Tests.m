@@ -1,6 +1,9 @@
 #import <XCTest/XCTest.h>
+#if defined (TEST_FRAMEWORK)
+#include "managed/managed.h"
+#else
 #include "bindings.h"
-#include "mono_embeddinator.h"
+#endif
 
 @interface Tests : XCTestCase
 
@@ -10,9 +13,11 @@
 
 + (void)setUp {
 	[super setUp];
+#if !defined (TEST_FRAMEWORK)
 	NSBundle *bundle = [NSBundle bundleForClass:[self class]];
 	NSString *path = [bundle pathForResource:@"managed" ofType:@"dll"];
 	mono_embeddinator_set_assembly_path ([path UTF8String]);
+#endif
 }
 
 - (void)setUp {

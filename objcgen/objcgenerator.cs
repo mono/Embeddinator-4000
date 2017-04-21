@@ -38,11 +38,7 @@ namespace ObjC {
 			implementation.WriteLine ("#include \"glib.h\"");
 			implementation.WriteLine ("#include \"objc-support.h\"");
 			implementation.WriteLine ("#include \"mono_embeddinator.h\"");
-			implementation.WriteLine ("#include <mono/jit/jit.h>");
-			implementation.WriteLine ("#include <mono/metadata/assembly.h>");
-			implementation.WriteLine ("#include <mono/metadata/object.h>");
-			implementation.WriteLine ("#include <mono/metadata/mono-config.h>");
-			implementation.WriteLine ("#include <mono/metadata/debug-helpers.h>");
+			implementation.WriteLine ("#include \"mono-support.h\"");
 			implementation.WriteLine ();
 
 			implementation.WriteLine ("mono_embeddinator_context_t __mono_context;");

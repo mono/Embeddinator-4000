@@ -27,7 +27,7 @@
 
 #include "mono_embeddinator.h"
 #include "glib.h"
-#include <mono/metadata/object.h>
+#include "mono-support.h"
 
 #import <Foundation/Foundation.h>
 
