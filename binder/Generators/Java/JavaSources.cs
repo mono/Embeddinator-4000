@@ -303,7 +303,7 @@ namespace MonoEmbeddinator4000.Generators
                 contexts.Add(ctx);
 
                 var marshal = new JavaMarshalManagedToNative(ctx);
-                param.QualifiedType.Visit(marshal);
+                param.Visit(marshal);
 
                 if (!string.IsNullOrWhiteSpace(marshal.Context.SupportBefore))
                         Write(marshal.Context.SupportBefore);

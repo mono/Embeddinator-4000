@@ -42,6 +42,14 @@ namespace MonoEmbeddinator4000.Generators
             Context.Return.Write(Context.ArgName);
             return true;
         }
+
+        public override bool VisitParameterDecl(Parameter parameter)
+        {
+            var ret = base.VisitParameterDecl(parameter);
+            if (parameter.IsInOut || parameter.IsOut)
+                Context.Return.Write(".get()");
+            return ret;
+        }
     }
 
     public class JavaMarshalNativeToManaged : JavaMarshalPrinter

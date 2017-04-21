@@ -40,6 +40,21 @@ namespace MonoEmbeddinator4000.Generators
             return GetName(decl);
         }
 
+        public override TypePrinterResult VisitParameter(Parameter arg, bool hasName)
+        {
+            if ((arg.IsInOut || arg.IsOut) && ContextKind != TypePrinterContextKind.Native)
+            {
+                PushContext(TypePrinterContextKind.Template);
+                var paramType = base.VisitParameter(arg, false);
+                PushContext(TypePrinterContextKind.Template);
+
+                var type = arg.IsInOut ? "Ref" : "Out";
+                return $"mono.embeddinator.{type}<{paramType}> {arg.Name}";
+            }
+
+            return base.VisitParameter(arg, hasName);
+        }
+
         public override TypePrinterResult VisitPointerType(PointerType pointer,
             TypeQualifiers quals)
         {
