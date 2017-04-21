@@ -28,36 +28,6 @@
 
 #pragma once
 
-#ifdef  __cplusplus
-#include <cstdbool>
-#include <cstdint> 
-#else
-#include <stdbool.h>
-#include <stdint.h>
-#endif
-
-#ifdef  __cplusplus
-    #define MONO_EMBEDDINATOR_BEGIN_DECLS  extern "C" {
-    #define MONO_EMBEDDINATOR_END_DECLS    }
-#else
-    #define MONO_EMBEDDINATOR_BEGIN_DECLS
-    #define MONO_EMBEDDINATOR_END_DECLS
-#endif
-
-#if defined(_MSC_VER)
-    #define MONO_EMBEDDINATOR_API_EXPORT __declspec(dllexport)
-    #define MONO_EMBEDDINATOR_API_IMPORT __declspec(dllimport)
-#else
-    #define MONO_EMBEDDINATOR_API_EXPORT __attribute__ ((visibility ("default")))
-    #define MONO_EMBEDDINATOR_API_IMPORT
-#endif
-
-#if defined(MONO_EMBEDDINATOR_DLL_EXPORT)
-    #define MONO_EMBEDDINATOR_API MONO_EMBEDDINATOR_API_EXPORT
-#else
-    #define MONO_EMBEDDINATOR_API MONO_EMBEDDINATOR_API_IMPORT
-#endif
-
 #include "embeddinator.h"
 #include "mono-support.h"
 
