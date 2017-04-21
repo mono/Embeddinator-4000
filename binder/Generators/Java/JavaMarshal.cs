@@ -60,7 +60,10 @@ namespace MonoEmbeddinator4000.Generators
 
         public override bool VisitClassDecl(Class @class)
         {
-            Context.Return.Write("null");
+            var typePrinter = new JavaTypePrinter(Context.Context);
+            var typeName = @class.Visit(typePrinter);
+
+            Context.Return.Write($"new {typeName}({Context.ReturnVarName})");
             return true;
         }
 
