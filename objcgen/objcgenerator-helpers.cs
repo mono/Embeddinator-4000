@@ -53,21 +53,21 @@ namespace ObjC {
 			monoSignature = mono.ToString ();
 		}
 
-		public IEnumerable<ConstructorInfo> GetUnavailableParentCtors (Type type, List<ConstructorInfo> typeCtors)
+		public IEnumerable<ProcessedConstructor> GetUnavailableParentCtors (Type type, List<ProcessedConstructor> typeCtors)
 		{
 			var baseType = type.BaseType;
 			if (baseType.Namespace == "System" && baseType.Name == "Object")
-				return Enumerable.Empty<ConstructorInfo> ();
+				return Enumerable.Empty<ProcessedConstructor> ();
 
-			List<ConstructorInfo> parentCtors;
+			List<ProcessedConstructor> parentCtors;
 			if (!ctors.TryGetValue (baseType, out parentCtors))
-				return Enumerable.Empty<ConstructorInfo> ();
+				return Enumerable.Empty<ProcessedConstructor> ();
 
-			var finalList = new List<ConstructorInfo> ();
+			var finalList = new List<ProcessedConstructor> ();
 			foreach (var pctor in parentCtors) {
-				var pctorParams = pctor.GetParameters ();
+				var pctorParams = pctor.Constructor.GetParameters ();
 				foreach (var ctor in typeCtors) {
-					var ctorParams = ctor.GetParameters ();
+					var ctorParams = ctor.Constructor.GetParameters ();
 					if (pctorParams.Any (pc => !ctorParams.Any (p => p.Position == pc.Position && pc.ParameterType == p.ParameterType))) {
 						finalList.Add (pctor);
 						break;

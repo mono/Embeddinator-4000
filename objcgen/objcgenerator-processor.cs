@@ -153,11 +153,11 @@ namespace ObjC {
 
 		List<Type> enums = new List<Type> ();
 		List<Type> types = new List<Type> ();
-		Dictionary<Type, List<ConstructorInfo>> ctors = new Dictionary<Type, List<ConstructorInfo>> ();
+		Dictionary<Type, List<ProcessedConstructor>> ctors = new Dictionary<Type, List<ProcessedConstructor>> ();
 		Dictionary<Type, List<ProcessedMethod>> methods = new Dictionary<Type, List<ProcessedMethod>> ();
 		Dictionary<Type, List<ProcessedProperty>> properties = new Dictionary<Type, List<ProcessedProperty>> ();
-		Dictionary<Type, List<FieldInfo>> fields = new Dictionary<Type, List<FieldInfo>> ();
-		Dictionary<Type, List<PropertyInfo>> subscriptProperties = new Dictionary<Type, List<PropertyInfo>> ();
+		Dictionary<Type, List<ProcessedFieldInfo>> fields = new Dictionary<Type, List<ProcessedFieldInfo>> ();
+		Dictionary<Type, List<ProcessedProperty>> subscriptProperties = new Dictionary<Type, List<ProcessedProperty>> ();
 
 		public override void Process (IEnumerable<Assembly> assemblies)
 		{
@@ -171,8 +171,9 @@ namespace ObjC {
 					types.Add (t);
 
 					var constructors = GetConstructors (t).OrderBy ((arg) => arg.ParameterCount).ToList ();
-					if (constructors.Count > 0)
-						ctors.Add (t, constructors);
+					var processedConstructors = PostProcessConstructors (constructors).ToList ();
+					if (processedConstructors.Count > 0)
+						ctors.Add (t, processedConstructors);
 
 					var meths = GetMethods (t).OrderBy ((arg) => arg.Name).ToList ();
 					var processedMethods = PostProcessMethods (meths).ToList ();
@@ -208,13 +209,14 @@ namespace ObjC {
 						if (subscriptProps.Count > 1)
 							delayed.Add (ErrorHelper.CreateWarning (1041, $"Indexed properties on {t.Name} is not generated because multiple indexed properties not supported."));
 						else
-							subscriptProperties.Add (t, subscriptProps);
+							subscriptProperties.Add (t, PostProcessSubscriptProperties (subscriptProps).ToList ());
 					}
 
 					// fields will need to be wrapped within properties
 					var f = GetFields (t).OrderBy ((arg) => arg.Name).ToList ();
-					if (f.Count > 0)
-						fields.Add (t, f);
+					var processedFields = PostProcessFields (f).ToList ();
+					if (processedFields.Count > 0)
+						fields.Add (t, processedFields);
 				}
 			}
 			types = types.OrderBy ((arg) => arg.FullName).OrderBy ((arg) => types.Contains (arg.BaseType)).ToList ();

@@ -87,4 +87,10 @@ namespace Methods {
 			set { c [index] = value; }
 		}
 	}
+
+	public class DuplicateMethods {
+		public int DoIt () { return 42; }
+		public int DoIt (int i) { return 42; }
+		public int DoIt (string s) { return 42; }	
+	}
 }

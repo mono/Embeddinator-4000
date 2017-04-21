@@ -170,7 +170,7 @@ namespace ObjC {
 			}
 
 			var default_init = false;
-			List<ConstructorInfo> constructors;
+			List<ProcessedConstructor> constructors;
 			if (ctors.TryGetValue (t, out constructors)) {
 				// First get the unavailable init ctor selectors in parent class
 				var unavailableCtors = GetUnavailableParentCtors (t, constructors);
@@ -179,31 +179,31 @@ namespace ObjC {
 					headers.WriteLine ("// List of unavailable initializers. See Constructors v.s. Initializers in our docs");
 					headers.WriteLine ("// https://github.com/mono/Embeddinator-4000/blob/master/docs/ObjC.md");
 					foreach (var uctor in unavailableCtors) {
-						var ctorparams = uctor.GetParameters ();
+						var ctorparams = uctor.Constructor.GetParameters ();
 						string name = "init";
 						string signature = ".ctor()";
 						if (ctorparams.Length > 0)
-							GetSignatures ("initWith", uctor.Name, uctor, ctorparams, false, out name, out signature);
+							GetSignatures ("initWith", uctor.Constructor.Name, uctor.Constructor, ctorparams, uctor.FallBackToTypeName, out name, out signature);
 						headers.WriteLine ($"- (instancetype){name} NS_UNAVAILABLE;");
 					}
 					headers.WriteLine ();
 				}
 
 				foreach (var ctor in constructors) {
-					var pcount = ctor.ParameterCount;
+					var pcount = ctor.Constructor.ParameterCount;
 					default_init |= pcount == 0;
 
-					var parameters = ctor.GetParameters ();
+					var parameters = ctor.Constructor.GetParameters ();
 					string name = "init";
 					string signature = ".ctor()";
 					if (parameters.Length > 0)
-						GetSignatures ("initWith", ctor.Name, ctor, parameters, false, out name, out signature);
+						GetSignatures ("initWith", ctor.Constructor.Name, ctor.Constructor, parameters, ctor.FallBackToTypeName, out name, out signature);
 
 					var builder = new MethodHelper (headers, implementation) {
 						AssemblyName = aname,
 						ReturnType = "instancetype",
 						ManagedTypeName = t.FullName,
-						MetadataToken = ctor.MetadataToken,
+						MetadataToken = ctor.Constructor.MetadataToken,
 						MonoSignature = signature,
 						ObjCSignature = name,
 						ObjCTypeName = managed_name,
@@ -268,14 +268,14 @@ namespace ObjC {
 					Generate (pi);
 			}
 
-			List<FieldInfo> f;
+			List<ProcessedFieldInfo> f;
 			if (fields.TryGetValue (t, out f)) {
 				headers.WriteLine ();
 				foreach (var fi in f)
 					Generate (fi);
 			}
 
-			List<PropertyInfo> s;
+			List<ProcessedProperty> s;
 			if (subscriptProperties.TryGetValue (t, out s)) {
 				headers.WriteLine ();
 				foreach (var si in s)
@@ -381,8 +381,9 @@ namespace ObjC {
 			ImplementMethod (setter, "set" + pi.Name, pi);
 		}
 
-		protected void Generate (FieldInfo fi)
+		protected void Generate (ProcessedFieldInfo field)
 		{
+			FieldInfo fi = field.Field;
 			bool read_only = fi.IsInitOnly || fi.IsLiteral;
 
 			headers.Write ("@property (nonatomic");

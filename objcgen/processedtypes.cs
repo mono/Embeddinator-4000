@@ -15,7 +15,6 @@ namespace ObjC {
 	}
 
 	public class ProcessedMethod : ProcessedBase {
-		
 		public MethodInfo Method { get; private set; }
 
 		public ProcessedMethod (MethodInfo method)
@@ -30,6 +29,24 @@ namespace ObjC {
 		public ProcessedProperty (PropertyInfo property)
 		{
 			Property = property;
+		}
+	}
+
+	public class ProcessedConstructor : ProcessedBase {
+		public ConstructorInfo Constructor { get; private set; }
+
+		public ProcessedConstructor (ConstructorInfo constructor)
+		{
+			Constructor = constructor;
+		}
+	}
+
+	public class ProcessedFieldInfo : ProcessedBase {
+		public FieldInfo Field { get; private set; }
+
+		public ProcessedFieldInfo (FieldInfo field)
+		{
+			Field = field;
 		}
 	}
 }
