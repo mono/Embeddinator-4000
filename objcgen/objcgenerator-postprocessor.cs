@@ -19,7 +19,7 @@ namespace ObjC {
 			foreach (MethodInfo method in methods) {
 				ProcessedMethod processedMethod = new ProcessedMethod (method);
 
-				if (duplicateNames.Contains (method.Name))
+				if (duplicateNames.Contains (method.Name) && method.Name != "CompareTo") // HACK
 					processedMethod.FallBackToTypeName = true;
 
 				yield return processedMethod;
