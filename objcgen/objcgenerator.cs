@@ -13,8 +13,8 @@ namespace ObjC {
 	
 	public partial class ObjCGenerator : Generator {
 
-		static TextWriter headers = new StringWriter ();
-		static TextWriter implementation = new StringWriter ();
+		TextWriter headers = new StringWriter ();
+		TextWriter implementation = new StringWriter ();
 
 		public override void Generate (IEnumerable<Assembly> assemblies)
 		{
@@ -31,23 +31,21 @@ namespace ObjC {
 			foreach (var t in types)
 				headers.WriteLine ($"@class {GetTypeName (t)};");
 			headers.WriteLine ();
+			headers.WriteLine ("NS_ASSUME_NONNULL_BEGIN");
+			headers.WriteLine ();
 
 			implementation.WriteLine ("#include \"bindings.h\"");
 			implementation.WriteLine ("#include \"glib.h\"");
 			implementation.WriteLine ("#include \"objc-support.h\"");
 			implementation.WriteLine ("#include \"mono_embeddinator.h\"");
-			implementation.WriteLine ("#include <mono/jit/jit.h>");
-			implementation.WriteLine ("#include <mono/metadata/assembly.h>");
-			implementation.WriteLine ("#include <mono/metadata/object.h>");
-			implementation.WriteLine ("#include <mono/metadata/mono-config.h>");
-			implementation.WriteLine ("#include <mono/metadata/debug-helpers.h>");
+			implementation.WriteLine ("#include \"mono-support.h\"");
 			implementation.WriteLine ();
 
 			implementation.WriteLine ("mono_embeddinator_context_t __mono_context;");
 			implementation.WriteLine ();
 
 			foreach (var a in assemblies)
-				implementation.WriteLine ($"MonoImage* __{a.GetName ().Name}_image;");
+				implementation.WriteLine ($"MonoImage* __{SanitizeName (a.GetName ().Name)}_image;");
 			implementation.WriteLine ();
 
 			foreach (var t in types)
@@ -63,18 +61,36 @@ namespace ObjC {
 			implementation.WriteLine ();
 
 			base.Generate (assemblies);
+
+			headers.WriteLine ("NS_ASSUME_NONNULL_END");
+			headers.WriteLine ();
 		}
 
 		protected override void Generate (Assembly a)
 		{
-			var name = a.GetName ().Name;
+			var originalName = a.GetName ().Name;
+			var name = SanitizeName (originalName);
 			implementation.WriteLine ($"static void __lookup_assembly_{name} ()");
 			implementation.WriteLine ("{");
 			implementation.WriteLine ($"\tif (__{name}_image)");
 			implementation.WriteLine ("\t\treturn;");
 			implementation.WriteLine ("\t__initialize_mono ();");
-			implementation.WriteLine ($"\t__{name}_image = mono_embeddinator_load_assembly (&__mono_context, \"{name}.dll\");");
-			implementation.WriteLine ($"\tassert (__{name}_image && \"Could not load the assembly '{name}.dll'.\");");
+			implementation.WriteLine ($"\t__{name}_image = mono_embeddinator_load_assembly (&__mono_context, \"{originalName}.dll\");");
+			implementation.WriteLine ($"\tassert (__{name}_image && \"Could not load the assembly '{originalName}.dll'.\");");
+			var categories = extensions_methods.Keys;
+			if (categories.Count > 0) {
+				implementation.WriteLine ("\t// we cannot use `+initialize` inside categories as they would replace the original type code");
+				implementation.WriteLine ("\t// since there should not be tons of them we're pre-loading them when loading the assembly");
+				foreach (var definedType in extensions_methods.Keys) {
+					var managed_name = GetObjCName (definedType);
+					implementation.WriteLine ("#if TOKENLOOKUP");
+					implementation.WriteLine ($"\t{managed_name}_class = mono_class_get (__{name}_image, 0x{definedType.MetadataToken:X8});");
+					implementation.WriteLine ("#else");
+					implementation.WriteLine ($"\t{managed_name}_class = mono_class_from_name (__{name}_image, \"{definedType.Namespace}\", \"{definedType.Name}\");");
+					implementation.WriteLine ("#endif");
+				}
+			}
+
 			implementation.WriteLine ("}");
 			implementation.WriteLine ();
 
@@ -85,6 +101,36 @@ namespace ObjC {
 			foreach (var t in types) {
 				Generate (t);
 			}
+
+			foreach (var extension in extensions_methods) {
+				var defining_type = extension.Key;
+				foreach (var category in extension.Value)
+					GenerateCategory (defining_type, category.Key, category.Value);
+			}
+		}
+
+		void GenerateCategory (Type definedType, Type extendedType, List<MethodInfo> methods)
+		{
+			var etn = GetTypeName (extendedType).Replace (" *", String.Empty);
+			var name = $"{etn} ({GetTypeName (definedType)})";
+			headers.WriteLine ($"/** Category {name}");
+			headers.WriteLine ($" *  Corresponding .NET Qualified Name: `{definedType.AssemblyQualifiedName}`");
+			headers.WriteLine (" */");
+			headers.WriteLine ($"@interface {name}");
+			headers.WriteLine ();
+
+			implementation.WriteLine ($"@implementation {name}");
+			implementation.WriteLine ();
+
+			foreach (var mi in methods) {
+				ImplementMethod (mi, CamelCase (mi.Name), true);
+			}
+
+			headers.WriteLine ("@end");
+			headers.WriteLine ();
+
+			implementation.WriteLine ("@end");
+			implementation.WriteLine ();
 		}
 
 		void GenerateEnum (Type t)
@@ -107,6 +153,9 @@ namespace ObjC {
 			}
 
 			var macro = flags ? "NS_OPTIONS" : "NS_ENUM";
+			headers.WriteLine ($"/** Enumeration {managed_name}");
+			headers.WriteLine ($" *  Corresponding .NET Qualified Name: `{t.AssemblyQualifiedName}`");
+			headers.WriteLine (" */");
 			headers.WriteLine ($"typedef {macro}({base_type}, {managed_name}) {{");
 			foreach (var name in t.GetEnumNames ()) {
 				var value = t.GetField (name).GetRawConstantValue ();
@@ -130,7 +179,9 @@ namespace ObjC {
 
 			var native_name = GetTypeName (t);
 			headers.WriteLine ();
-			headers.WriteLine ($"// {t.AssemblyQualifiedName}");
+			headers.WriteLine ($"/** Class {native_name}");
+			headers.WriteLine ($" *  Corresponding .NET Qualified Name: `{t.AssemblyQualifiedName}`");
+			headers.WriteLine (" */");
 			headers.WriteLine ($"@interface {native_name} : {GetTypeName (t.BaseType)} {{");
 			if (!static_type && !has_bound_base_class) {
 				headers.WriteLine ("\t@public MonoEmbedObject* _object;");
@@ -139,9 +190,10 @@ namespace ObjC {
 			headers.WriteLine ();
 
 			implementation.WriteLine ();
-			implementation.WriteLine ($"// {t.AssemblyQualifiedName}");
+			implementation.WriteLine ($"/** Class {native_name}");
+			implementation.WriteLine ($" *  Corresponding .NET Qualified Name: `{t.AssemblyQualifiedName}`");
+			implementation.WriteLine (" */");
 			implementation.WriteLine ($"@implementation {native_name} {{");
-			// our internal field is only needed once in the type hierarchy
 			implementation.WriteLine ("}");
 			implementation.WriteLine ();
 
@@ -149,7 +201,7 @@ namespace ObjC {
 			implementation.WriteLine ("{");
 			implementation.WriteLine ($"\tif (self != [{managed_name} class])");
 			implementation.WriteLine ("\t\treturn;");
-			var aname = t.Assembly.GetName ().Name;
+			var aname = SanitizeName (t.Assembly.GetName ().Name);
 			implementation.WriteLine ($"\t__lookup_assembly_{aname} ();");
 
 			implementation.WriteLine ("#if TOKENLOOKUP");
@@ -176,17 +228,18 @@ namespace ObjC {
 				var unavailableCtors = GetUnavailableParentCtors (t, constructors);
 				if (unavailableCtors.Count () > 0) {
 					// TODO: Print a #pragma mark once we have a well defined header structure http://nshipster.com/pragma/
-					headers.WriteLine ("// List of unavailable initializers. See Constructors v.s. Initializers in our docs");
-					headers.WriteLine ("// https://github.com/mono/Embeddinator-4000/blob/master/docs/ObjC.md");
 					foreach (var uctor in unavailableCtors) {
 						var ctorparams = uctor.Constructor.GetParameters ();
 						string name = "init";
 						string signature = ".ctor()";
 						if (ctorparams.Length > 0)
-							GetSignatures ("initWith", uctor.Constructor.Name, uctor.Constructor, ctorparams, uctor.FallBackToTypeName, out name, out signature);
-						headers.WriteLine ($"- (instancetype){name} NS_UNAVAILABLE;");
+							GetSignatures ("initWith", uctor.Name, uctor, ctorparams, uctor.FallBackToTypeName, false, out name, out signature);
+						headers.WriteLine ("/** This initializer is not available as it was not re-exposed from the base type");
+						headers.WriteLine (" *  For more details consult https://github.com/mono/Embeddinator-4000/blob/master/docs/ObjC.md#constructors-vs-initializers");
+						headers.WriteLine (" */");
+						headers.WriteLine ($"- (nullable instancetype){name} NS_UNAVAILABLE;");
+						headers.WriteLine ();
 					}
-					headers.WriteLine ();
 				}
 
 				foreach (var ctor in constructors) {
@@ -197,11 +250,11 @@ namespace ObjC {
 					string name = "init";
 					string signature = ".ctor()";
 					if (parameters.Length > 0)
-						GetSignatures ("initWith", ctor.Constructor.Name, ctor.Constructor, parameters, ctor.FallBackToTypeName, out name, out signature);
+						GetSignatures ("initWith", ctor.Name, ctor, parameters, ctor.FallBackToTypeName, false, out name, out signature);
 
 					var builder = new MethodHelper (headers, implementation) {
 						AssemblyName = aname,
-						ReturnType = "instancetype",
+						ReturnType = "nullable instancetype",
 						ManagedTypeName = t.FullName,
 						MetadataToken = ctor.Constructor.MetadataToken,
 						MonoSignature = signature,
@@ -224,7 +277,7 @@ namespace ObjC {
 					string postInvoke = String.Empty;
 					var args = "nil";
 					if (pcount > 0) {
-						Generate (parameters, out postInvoke);
+						Generate (parameters, false, out postInvoke);
 						args = "__args";
 					}
 					builder.WriteInvoke (args);
@@ -236,22 +289,32 @@ namespace ObjC {
 					else
 						implementation.WriteLine ("\treturn self = [super init];");
 					builder.EndImplementation ();
+
+					headers.WriteLine ();
 				}
 			}
 
 			if (!default_init || static_type) {
-				if (static_type)
-					headers.WriteLine ("// a .net static type cannot be initialized");
-				headers.WriteLine ("- (instancetype)init NS_UNAVAILABLE;");
-				headers.WriteLine ("+ (instancetype)new NS_UNAVAILABLE;");
+				if (static_type) {
+					headers.WriteLine ("/** This is a static type and no instance can be initialized");
+				} else {
+					headers.WriteLine ("/** This type is not meant to be created using only default values");
+				}
+				headers.WriteLine (" *  Both the `-init` and `+new` selectors cannot be used to create instances of this type.");
+				headers.WriteLine (" */");
+				headers.WriteLine ("- (nullable instancetype)init NS_UNAVAILABLE;");
+				headers.WriteLine ("+ (nullable instancetype)new NS_UNAVAILABLE;");
+				headers.WriteLine ();
 			}
 
 			// TODO we should re-use the base `init` when it exists
 			if (!static_type) {
-				headers.WriteLine ("- (instancetype)initForSuper;");
+				headers.WriteLine ("/** This selector is not meant to be called from user code");
+				headers.WriteLine (" *  This exists solely to allow the correct subclassing of managed (.net) types");
+				headers.WriteLine (" */");
+				headers.WriteLine ("- (nullable instancetype)initForSuper;");
 
-				implementation.WriteLine ("// only when `init` is not generated and we have subclasses");
-				implementation.WriteLine ("- (instancetype) initForSuper {");
+				implementation.WriteLine ("- (nullable instancetype) initForSuper {");
 				// calls super's initForSuper until we reach a non-generated type
 				if (types.Contains (t.BaseType))
 					implementation.WriteLine ("\treturn self = [super initForSuper];");
@@ -289,6 +352,21 @@ namespace ObjC {
 					Generate (mi);
 			}
 
+			MethodInfo m;
+			if (icomparable.TryGetValue (t, out m)) {
+				var pt = m.GetParameters () [0].ParameterType;
+				var builder = new ComparableHelper (headers, implementation) {
+					ObjCSignature = $"compare:({managed_name} * _Nullable)other",
+					AssemblyName = aname,
+					MetadataToken = m.MetadataToken,
+					ObjCTypeName = managed_name,
+					ManagedTypeName = t.FullName,
+					MonoSignature = $"CompareTo({GetMonoName (pt)})",
+				};
+				builder.WriteHeaders ();
+				builder.WriteImplementation ();
+			}
+
 			headers.WriteLine ("@end");
 			headers.WriteLine ();
 
@@ -296,14 +374,15 @@ namespace ObjC {
 			implementation.WriteLine ();
 		}
 
-		void Generate (ParameterInfo [] parameters, out string postInvoke)
+		void Generate (ParameterInfo [] parameters, bool isExtension, out string postInvoke)
 		{
 			StringBuilder post = new StringBuilder ();
 			var pcount = parameters.Length;
 			implementation.WriteLine ($"\t\tvoid* __args [{pcount}];");
 			for (int i = 0; i < pcount; i++) {
 				var p = parameters [i];
-				GenerateArgument (p.Name, $"__args[{i}]", p.ParameterType, ref post);
+				var name = (isExtension && (i == 0)) ? "self" : p.Name;
+				GenerateArgument (name, $"__args[{i}]", p.ParameterType, ref post);
 			}
 			postInvoke = post.ToString ();
 		}
@@ -374,11 +453,11 @@ namespace ObjC {
 				property_type += " *";
 			headers.WriteLine ($") {property_type} {name};");
 
-			ImplementMethod (getter, name, pi);
+			ImplementMethod (getter, name, false, pi);
 			if (setter == null)
 				return;
 
-			ImplementMethod (setter, "set" + pi.Name, pi);
+			ImplementMethod (setter, "set" + pi.Name, false, pi);
 		}
 
 		protected void Generate (ProcessedFieldInfo field)
@@ -477,7 +556,11 @@ namespace ObjC {
 		}
 
 		// TODO override with attribute ? e.g. [ObjC.Selector ("foo")]
+<<<<<<< HEAD
 		void ImplementMethod (MethodInfo info, string name, PropertyInfo pi = null, bool useTypeNames = false)
+=======
+		void ImplementMethod (MethodInfo info, string name, bool isExtension = false, PropertyInfo pi = null)
+>>>>>>> objc
 		{
 			var type = info.DeclaringType;
 			var managed_type_name = GetObjCName (type);
@@ -486,11 +569,16 @@ namespace ObjC {
 			string monosig;
 			var managed_name = info.Name;
 			var parametersInfo = info.GetParameters ();
+<<<<<<< HEAD
 			GetSignatures (name, managed_name, (MemberInfo)pi ?? info, parametersInfo, useTypeNames, out objcsig, out monosig);
+=======
+			GetSignatures (name, managed_name, (MemberInfo)pi ?? info, parametersInfo, isExtension, out objcsig, out monosig);
+>>>>>>> objc
 
 			var builder = new MethodHelper (headers, implementation) {
 				AssemblyName = type.Assembly.GetName ().Name,
 				IsStatic = info.IsStatic,
+				IsExtension = isExtension,
 				ReturnType = GetReturnType (type, info.ReturnType),
 				ManagedTypeName = type.FullName,
 				MetadataToken = info.MetadataToken,
@@ -509,7 +597,7 @@ namespace ObjC {
 			string postInvoke = String.Empty;
 			var args = "nil";
 			if (parametersInfo.Length > 0) {
-				Generate (parametersInfo, out postInvoke);
+				Generate (parametersInfo, isExtension, out postInvoke);
 				args = "__args";
 			}
 
@@ -594,8 +682,10 @@ namespace ObjC {
 		// TODO override with attribute ? e.g. [Obj.Name ("XAMType")]
 		public static string GetTypeName (Type t)
 		{
-			if (t.IsByRef)
-				return GetTypeName (t.GetElementType ()) + "*";
+			if (t.IsByRef) {
+				var et = t.GetElementType ();
+				return GetTypeName (et) + (et.IsValueType ? " " : " _Nonnull ") + "* _Nullable";
+			}
 
 			if (t.IsEnum)
 				return GetObjCName (t);
@@ -715,6 +805,39 @@ namespace ObjC {
 			if (s.Length == 0)
 				return String.Empty;
 			return Char.ToUpperInvariant (s [0]) + s.Substring (1, s.Length - 1);
+		}
+
+		public static string SanitizeName (string name)
+		{
+			StringBuilder sb = null;
+
+			for (int i = 0; i < name.Length; i++) {
+				var ch = name [i];
+				switch (ch) {
+				case '.':
+				case '+':
+				case '/':
+				case '`':
+				case '@':
+				case '<':
+				case '>':
+				case '$':
+				case '-':
+				case ' ':
+					if (sb == null)
+						sb = new StringBuilder (name, 0, i, name.Length);
+					sb.Append ('_');
+					break;
+				default:
+					if (sb != null)
+						sb.Append (ch);
+					break;
+				}
+			}
+
+			if (sb != null)
+				return sb.ToString ();
+			return name;
 		}
 	}
 }

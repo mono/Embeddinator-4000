@@ -5,8 +5,8 @@ namespace ObjC {
 
 	public class MethodHelper {
 
-		TextWriter headers;
-		TextWriter implementation;
+		protected TextWriter headers;
+		protected TextWriter implementation;
 
 		public MethodHelper (TextWriter headers, TextWriter implementation)
 		{
@@ -17,6 +17,7 @@ namespace ObjC {
 		public string AssemblyName { get; set; }
 
 		public bool IsConstructor { get; set; }
+		public bool IsExtension { get; set; }
 		public bool IsStatic { get; set; }
 		public bool IsValueType { get; set; }
 
@@ -35,7 +36,7 @@ namespace ObjC {
 
 		void WriteSignature (TextWriter writer)
 		{
-			writer.Write (IsStatic ? '+' : '-');
+			writer.Write (IsStatic && !IsExtension ? '+' : '-');
 			writer.Write ($" ({ReturnType}){ObjCSignature}");
 		}
 
@@ -57,7 +58,7 @@ namespace ObjC {
 			implementation.WriteLine ("\tstatic MonoMethod* __method = nil;");
 			implementation.WriteLine ("\tif (!__method) {");
 			implementation.WriteLine ("#if TOKENLOOKUP");
-			implementation.WriteLine ($"\t\t__method = mono_get_method (__{AssemblyName}_image, 0x{MetadataToken:X8}, {ObjCTypeName}_class);");
+			implementation.WriteLine ($"\t\t__method = mono_get_method (__{ObjCGenerator.SanitizeName (AssemblyName)}_image, 0x{MetadataToken:X8}, {ObjCTypeName}_class);");
 			implementation.WriteLine ("#else");
 			implementation.WriteLine ($"\t\tconst char __method_name [] = \"{ManagedTypeName}:{MonoSignature}\";");
 			implementation.WriteLine ($"\t\t__method = mono_embeddinator_lookup_method (__method_name, {ObjCTypeName}_class);");

@@ -13,3 +13,8 @@ It is not possible to have two mono runtimes co-exists inside the same applicati
 
 ## ObjC generated code
 
+### Nullability
+
+There is no metadata, in .NET, that tell us if a null reference is acceptable or not for an API. Most API will throw `ArgumentNullException` if they cannot cope with a `null` argument. This is problematic as ObjC handling of exceptions is something better avoided.
+
+Since we cannot generate accurate nullability annotations in the header files and wish to minimize  managed exceptions we default to non-null arguments (`NS_ASSUME_NONNULL_BEGIN`) and add some specific, when precision is possible, nullability annotations.

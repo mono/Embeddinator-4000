@@ -1,5 +1,4 @@
 #import <Foundation/Foundation.h>
-#include "mono_embeddinator.h"
 #include "bindings.h"
 
 int main (int argc, const char * argv[])

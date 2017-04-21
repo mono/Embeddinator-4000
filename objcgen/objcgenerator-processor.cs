@@ -96,11 +96,48 @@ namespace ObjC {
 			}
 		}
 
+		Dictionary<Type,MethodInfo> icomparable = new Dictionary<Type, MethodInfo> ();
+
+		// defining type / extended type / methods
+		Dictionary<Type, Dictionary<Type, List<MethodInfo>>> extensions_methods = new Dictionary<Type, Dictionary<Type, List<MethodInfo>>> ();
+
 		protected IEnumerable<MethodInfo> GetMethods (Type t)
 		{
 			foreach (var mi in t.GetMethods (BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly)) {
 				if (!mi.IsPublic)
 					continue;
+
+				// handle special cases where we can implement something better, e.g. a better match
+				if (implement_system_icomparable_t) {
+					// for X we prefer `IComparable<X>` to `IComparable` - since it will be exposed identically to ObjC
+					if (mi.Match ("System.Int32", "CompareTo", t.FullName)) {
+						icomparable [t] = mi;
+						continue;
+					}
+				}
+				if (implement_system_icomparable && mi.Match ("System.Int32", "CompareTo", "System.Object")) {
+					// don't replace CompareTo(T) with CompareTo(Object)
+					if (!icomparable.ContainsKey (t))
+						icomparable.Add (t, mi);
+					continue;
+				}
+
+				// handle extension methods
+				if (extension_type && mi.HasCustomAttribute ("System.Runtime.CompilerServices", "ExtensionAttribute")) {
+					Dictionary<Type, List<MethodInfo>> extensions;
+					if (!extensions_methods.TryGetValue (t, out extensions)) {
+						extensions = new Dictionary<Type, List<MethodInfo>> ();
+						extensions_methods.Add (t, extensions);
+					}
+					var extended_type = mi.GetParameters () [0].ParameterType;
+					List<MethodInfo> methods;
+					if (!extensions.TryGetValue (extended_type, out methods)) {
+						methods = new List<MethodInfo> ();
+						extensions.Add (extended_type, methods);
+					}
+					methods.Add (mi);
+					continue;
+				}
 
 				var rt = mi.ReturnType;
 				if (!IsSupported (rt)) {
@@ -159,6 +196,11 @@ namespace ObjC {
 		Dictionary<Type, List<ProcessedFieldInfo>> fields = new Dictionary<Type, List<ProcessedFieldInfo>> ();
 		Dictionary<Type, List<ProcessedProperty>> subscriptProperties = new Dictionary<Type, List<ProcessedProperty>> ();
 
+		// special cases
+		bool implement_system_icomparable;
+		bool implement_system_icomparable_t;
+		bool extension_type;
+
 		public override void Process (IEnumerable<Assembly> assemblies)
 		{
 			foreach (var a in assemblies) {
@@ -169,6 +211,11 @@ namespace ObjC {
 					}
 
 					types.Add (t);
+
+					extension_type = t.HasCustomAttribute ("System.Runtime.CompilerServices", "ExtensionAttribute");
+
+					implement_system_icomparable = t.Implements ("System", "IComparable");
+					implement_system_icomparable_t = t.Implements("System", "IComparable`1");
 
 					var constructors = GetConstructors (t).OrderBy ((arg) => arg.ParameterCount).ToList ();
 					var processedConstructors = PostProcessConstructors (constructors).ToList ();
