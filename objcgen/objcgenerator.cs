@@ -233,7 +233,7 @@ namespace ObjC {
 						string name = "init";
 						string signature = ".ctor()";
 						if (ctorparams.Length > 0)
-							GetSignatures ("initWith", uctor.Name, uctor, ctorparams, uctor.FallBackToTypeName, false, out name, out signature);
+							GetSignatures ("initWith", uctor.Constructor.Name, uctor.Constructor, ctorparams, uctor.FallBackToTypeName, false, out name, out signature);
 						headers.WriteLine ("/** This initializer is not available as it was not re-exposed from the base type");
 						headers.WriteLine (" *  For more details consult https://github.com/mono/Embeddinator-4000/blob/master/docs/ObjC.md#constructors-vs-initializers");
 						headers.WriteLine (" */");
@@ -250,7 +250,7 @@ namespace ObjC {
 					string name = "init";
 					string signature = ".ctor()";
 					if (parameters.Length > 0)
-						GetSignatures ("initWith", ctor.Name, ctor, parameters, ctor.FallBackToTypeName, false, out name, out signature);
+						GetSignatures ("initWith", ctor.Constructor.Name, ctor.Constructor, parameters, ctor.FallBackToTypeName, false, out name, out signature);
 
 					var builder = new MethodHelper (headers, implementation) {
 						AssemblyName = aname,
@@ -556,11 +556,7 @@ namespace ObjC {
 		}
 
 		// TODO override with attribute ? e.g. [ObjC.Selector ("foo")]
-<<<<<<< HEAD
-		void ImplementMethod (MethodInfo info, string name, PropertyInfo pi = null, bool useTypeNames = false)
-=======
-		void ImplementMethod (MethodInfo info, string name, bool isExtension = false, PropertyInfo pi = null)
->>>>>>> objc
+		void ImplementMethod (MethodInfo info, string name, bool isExtension = false, PropertyInfo pi = null, bool useTypeNames = false)
 		{
 			var type = info.DeclaringType;
 			var managed_type_name = GetObjCName (type);
@@ -569,11 +565,8 @@ namespace ObjC {
 			string monosig;
 			var managed_name = info.Name;
 			var parametersInfo = info.GetParameters ();
-<<<<<<< HEAD
-			GetSignatures (name, managed_name, (MemberInfo)pi ?? info, parametersInfo, useTypeNames, out objcsig, out monosig);
-=======
-			GetSignatures (name, managed_name, (MemberInfo)pi ?? info, parametersInfo, isExtension, out objcsig, out monosig);
->>>>>>> objc
+
+			GetSignatures (name, managed_name, (MemberInfo)pi ?? info, parametersInfo, useTypeNames, isExtension, out objcsig, out monosig);
 
 			var builder = new MethodHelper (headers, implementation) {
 				AssemblyName = type.Assembly.GetName ().Name,
