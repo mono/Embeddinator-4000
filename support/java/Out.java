@@ -49,4 +49,12 @@ public class Out<T> {
     public Ref<T> Ref() {
         return(Obj.Ref());
     }
+
+    public T get() {
+        return Obj.get();
+    }
+
+    public void set(T value) {
+        Obj.set(value);
+    }
 };

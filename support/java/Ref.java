@@ -49,4 +49,12 @@ public class Ref<T> {
     public Ref<T> Ref() {
         return(this);
     }
+
+    public T get() {
+        return Obj.get();
+    }
+
+    public void set(T value) {
+        Obj.set(value);
+    }
 };
