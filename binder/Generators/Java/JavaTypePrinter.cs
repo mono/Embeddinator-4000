@@ -70,30 +70,32 @@ namespace MonoEmbeddinator4000.Generators
         public override TypePrinterResult VisitPrimitiveType(PrimitiveType primitive,
             TypeQualifiers quals)
         {
+            bool useReferencePrimitiveTypes = ContextKind == TypePrinterContextKind.Template;
+
             // This uses JNA conventions, https://jna.java.net/javadoc/overview-summary.html#marshalling.
             switch (primitive)
             {
-                case PrimitiveType.Bool:return "boolean";
+                case PrimitiveType.Bool:return useReferencePrimitiveTypes ? "Boolean" : "boolean";
                 case PrimitiveType.Void: return "void";
                 case PrimitiveType.Char16:
                 case PrimitiveType.Char32:
                 case PrimitiveType.WideChar: return "com.sun.jna.WString";
                 case PrimitiveType.Char: return "char";
-                case PrimitiveType.SChar: return "byte";
+                case PrimitiveType.SChar: return useReferencePrimitiveTypes ? "Byte" : "byte";
                 case PrimitiveType.UChar: return "UnsignedByte";
-                case PrimitiveType.Short: return "short";
+                case PrimitiveType.Short: return useReferencePrimitiveTypes ? "Short" : "short";
                 case PrimitiveType.UShort: return "UnsignedShort";
-                case PrimitiveType.Int: return "int";
+                case PrimitiveType.Int: return useReferencePrimitiveTypes ? "Integer" : "int";
                 case PrimitiveType.UInt: return "UnsignedInt";
-                case PrimitiveType.Long: return "long";
+                case PrimitiveType.Long: return useReferencePrimitiveTypes ? "Long" : "long";
                 case PrimitiveType.ULong: return "UnsignedLong";
                 case PrimitiveType.LongLong: return "LongLong";
                 case PrimitiveType.ULongLong: return "UnsignedLongLong";
                 case PrimitiveType.Int128: return "__int128";
                 case PrimitiveType.UInt128: return "__uint128_t";
                 case PrimitiveType.Half: return "__fp16";
-                case PrimitiveType.Float: return "float";
-                case PrimitiveType.Double: return "double";
+                case PrimitiveType.Float: return useReferencePrimitiveTypes ? "Float" : "float";
+                case PrimitiveType.Double: return useReferencePrimitiveTypes ? "Double" : "double";
                 case PrimitiveType.LongDouble: return "decimal";
                 case PrimitiveType.IntPtr:
                 case PrimitiveType.UIntPtr:
