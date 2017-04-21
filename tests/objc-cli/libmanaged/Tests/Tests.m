@@ -114,6 +114,24 @@
 
 	Constructors_AllTypeCode* all4 = [[Constructors_AllTypeCode alloc] initWithF32:FLT_MAX f64:DBL_MAX];
 	XCTAssertTrue ([all4 testResult], "all4");
+
+	Constructors_DefaultValues* dv0 = [[Constructors_DefaultValues alloc] init];
+	XCTAssertTrue ([dv0 isDefault], "default value 0");
+
+	Constructors_DefaultValues* dv1 = [[Constructors_DefaultValues alloc] initB:0];
+	XCTAssertTrue ([dv1 isDefault], "default value 1");
+
+	Constructors_DefaultValues* dv2 = [[Constructors_DefaultValues alloc] initB:0 s:1];
+	XCTAssertTrue ([dv2 isDefault], "default value 2");
+
+	Constructors_DefaultValues* dv3 = [[Constructors_DefaultValues alloc] initB:0 s:1 i:2];
+	XCTAssertTrue ([dv3 isDefault], "default value 3");
+
+	Constructors_DefaultValues* dv4 = [[Constructors_DefaultValues alloc] initWithB:0 s:1 i:2 l:3];
+	XCTAssertTrue ([dv4 isDefault], "default value 4");
+
+	Constructors_DefaultValues* dvx = [[Constructors_DefaultValues alloc] initWithB:3 s:2 i:1 l:0];
+	XCTAssertFalse ([dvx isDefault], "default value X");
 }
 
 - (void)testMethods {
@@ -166,6 +184,9 @@
 
 	[collection removeItem:item2];
 	XCTAssert ([collection count] == 0, "count 4");
+
+	id default_item = [Methods_Factory createItem];
+	XCTAssert ([default_item integer] == 0, "default creation 0");
 
 	XCTAssertEqualObjects (@"", [Methods_SomeExtensions notAnExtensionMethod], "empty string");
 }

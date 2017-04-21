@@ -291,6 +291,9 @@ namespace ObjC {
 					builder.EndImplementation ();
 
 					headers.WriteLine ();
+
+					if (members_with_default_values.Contains (ctor))
+						default_init |= GenerateDefaultValuesWrappers ("init", ctor);
 				}
 			}
 
@@ -599,6 +602,69 @@ namespace ObjC {
 			builder.EndImplementation ();
 		}
 
+		bool GenerateDefaultValuesWrappers (string name, MethodBase mb)
+		{
+			// parameters with default values must be at the end and there can be many of them
+			var parameters = mb.GetParameters ();
+			for (int i = parameters.Length - 1; i >= 0; i--) {
+				if (!parameters [i].HasDefaultValue)
+					return false;
+				GenerateDefaultValuesWrapper (name, mb, parameters, i);
+			}
+			return true;
+		}
+
+		void GenerateDefaultValuesWrapper (string name, MethodBase mb, ParameterInfo[] parameters, int start)
+		{
+			MethodInfo mi = mb as MethodInfo;
+			string objcsig;
+			string monosig;
+			var parametersInfo = parameters;
+			var plist = new List<ParameterInfo> ();
+			StringBuilder arguments = new StringBuilder ();
+			headers.WriteLine ("/** This is an helper method that inlines some default values:");
+			foreach (var p in parameters) {
+				if (arguments.Length == 0) {
+					if (mi == null)
+						arguments.Append ("With");
+					arguments.Append (PascalCase (p.Name)).Append (':');
+				} else
+					arguments.Append (' ').Append (CamelCase (p.Name)).Append (':');
+				if (p.Position >= start && p.HasDefaultValue) {
+					headers.WriteLine ($" *     {p.Name} = `{p.RawDefaultValue}`");
+					arguments.Append (p.RawDefaultValue);
+				} else {
+					arguments.Append (p.Name);
+					plist.Add (p);
+				}
+			}
+			headers.WriteLine ($" *  @see {name}");
+			headers.WriteLine (" */");
+
+			GetSignatures (name, mb.Name, mb, plist.ToArray (), false, out objcsig, out monosig);
+			var type = mb.DeclaringType;
+			var builder = new MethodHelper (headers, implementation) {
+				IsStatic = mb.IsStatic,
+				ReturnType = mi == null ? "nullable instancetype" : GetReturnType (type, mi.ReturnType),
+				ObjCSignature = objcsig,
+			};
+			builder.WriteHeaders ();
+			headers.WriteLine ();
+
+			builder.BeginImplementation ();
+			implementation.Write ('\t');
+			if (mi == null || !mi.ReturnType.Is ("System", "Void"))
+				implementation.Write ("return [");
+			if (mb.IsStatic) {
+				implementation.Write (GetObjCName (mi.DeclaringType));
+				implementation.Write (' ');
+			} else {
+				implementation.Write ("self ");
+			}
+			implementation.WriteLine ($"{name}{arguments}];");
+			builder.EndImplementation ();
+		}
+
 		protected override void Generate (MethodInfo mi)
 		{
 			string name;
@@ -607,6 +673,9 @@ namespace ObjC {
 			else
 				name = CamelCase (mi.Name);
 			ImplementMethod (mi, name);
+
+			if (members_with_default_values.Contains (mi))
+				GenerateDefaultValuesWrappers (name, mi);
 		}
 
 		void ReturnValue (Type t)
