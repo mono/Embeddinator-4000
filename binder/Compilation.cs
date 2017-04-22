@@ -460,7 +460,7 @@ namespace MonoEmbeddinator4000
                 "/nologo",
                 $"-D{DLLExportDefine}",
                 $"-I\"{monoPath}\\include\\mono-2.0\"",
-                string.Join(" ", files.Select(file => Path.GetFullPath(file))),
+                string.Join(" ", files.Select(file => "\""+ Path.GetFullPath(file) + "\"")),
                 $"\"{monoPath}\\lib\\monosgen-2.0.lib\"",
                 Options.CompileSharedLibrary ? "/LD" : string.Empty,
                 $"/Fe{output}"
