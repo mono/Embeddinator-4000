@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -97,6 +97,8 @@ namespace ObjC {
 		}
 
 		Dictionary<Type,MethodInfo> icomparable = new Dictionary<Type, MethodInfo> ();
+		Dictionary<Type, MethodInfo> equals = new Dictionary<Type, MethodInfo> ();
+		Dictionary<Type, MethodInfo> hashes = new Dictionary<Type, MethodInfo> ();
 
 		// defining type / extended type / methods
 		Dictionary<Type, Dictionary<Type, List<MethodInfo>>> extensions_methods = new Dictionary<Type, Dictionary<Type, List<MethodInfo>>> ();
@@ -119,6 +121,16 @@ namespace ObjC {
 					// don't replace CompareTo(T) with CompareTo(Object)
 					if (!icomparable.ContainsKey (t))
 						icomparable.Add (t, mi);
+					continue;
+				}
+
+				if (mi.Match ("System.Boolean", "Equals", "System.Object")) {
+					equals.Add (t, mi);
+					continue;
+				}
+
+				if (mi.Match ("System.Int32", "GetHashCode")) {
+					hashes.Add (t, mi);
 					continue;
 				}
 

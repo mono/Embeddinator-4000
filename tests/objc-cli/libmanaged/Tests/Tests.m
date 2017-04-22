@@ -585,6 +585,30 @@
     XCTAssert ([StringCollection [@"asdf"] isEqual:@"two"], "get 25");
 }
 
+- (void) testIsEqual {
+    EqualsHashOverrides_Class *c1 = [[EqualsHashOverrides_Class alloc] initWithX:1];
+    XCTAssertFalse ([c1 isEqual:nil], "equals nil");
+    XCTAssertFalse ([c1 isEqual:@"String"], "equals non-mono NSObject");
+    XCTAssertTrue ([c1 isEqual:c1], "equals self");
+
+    EqualsHashOverrides_Class *c2 = [[EqualsHashOverrides_Class alloc] initWithX:1];
+    XCTAssertTrue ([c1 isEqual:c2], "compare equal objects");
+    XCTAssertTrue ([c2 isEqual:c1], "compare equal objects");
+
+    EqualsHashOverrides_Class *c3 = [[EqualsHashOverrides_Class alloc] initWithX:2];
+    XCTAssertFalse ([c1 isEqual:c3], "compare unequal objects");
+    XCTAssertFalse ([c3 isEqual:c1], "compare unequal objects");
+}
+
+- (void) testHash {
+    EqualsHashOverrides_Class *c1 = [[EqualsHashOverrides_Class alloc] initWithX:1];
+    EqualsHashOverrides_Class *c2 = [[EqualsHashOverrides_Class alloc] initWithX:1];
+    EqualsHashOverrides_Class *c3 = [[EqualsHashOverrides_Class alloc] initWithX:2];
+
+    XCTAssertTrue ([c1 hash] == [c2 hash], "Equal objects have matching hash");
+    XCTAssertFalse ([c1 hash] == [c3 hash], "Non-equal objects have different hashes");
+}
+
 #pragma clang diagnostic pop
 
 @end

@@ -313,6 +313,8 @@
     <Compile Include="methodhelper.cs" />
     <Compile Include="objcgenerator-subscripts.cs" />
     <Compile Include="comparablehelper.cs" />
+    <Compile Include="EqualsHelper.cs" />
+    <Compile Include="HashHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="support\" />
