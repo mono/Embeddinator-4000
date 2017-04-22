@@ -33,7 +33,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
 
 #if defined(__APPLE__)
 #include <mach-o/dyld.h>
@@ -45,6 +44,9 @@
 
 #ifdef _WIN32
 #include <Windows.h>
+#define PATH_MAX MAX_PATH
+#else
+#include <unistd.h>
 #endif
 
 #include <mono/jit/jit.h>
