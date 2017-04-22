@@ -49,12 +49,17 @@ If you do not pass any arguments, you will get a list of the tool options:
 MonoEmbeddinator4000.exe [options]+ ManagedAssembly.dll
 Generates target language bindings for interop with managed code.
 
-      --gen=VALUE            target language: c, c++, obj-c (defaults to c)
-      --platform=VALUE       target platform: android, windows, macos, ios, watchos, tvos
-  -o, --out=VALUE            output directory
+      --gen=VALUE            target generator (C, C++, Obj-C, Java)
+  -p, --platform=VALUE       target platform (iOS, macOS, Android, Windows)
+  -o, --out, --outdir=VALUE  output directory
   -c, --compile              compiles the generated output
-      --dll, --shared        compiles as a shared library / DLL
-      --vs=VALUE             Visual Studio version for compilation: 2012, 2013, 2015, Latest (defaults to Latest)
+  -d, --debug                enables debug mode for generated native and
+                               managed code
+  -t, --target=VALUE         compilation target (static, shared, app)
+      --dll, --shared        compiles as a shared library
+      --static               compiles as a static library
+      --vs=VALUE             Visual Studio version for compilation: 2012, 2013,
+                               2015, Latest (defaults to Latest)
   -v, --verbose              generates diagnostic verbose output
   -h, --help                 show this message and exit
 ```
