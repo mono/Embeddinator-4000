@@ -41,6 +41,9 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="Microsoft.VisualStudio.Setup.Configuration.Interop">
+      <HintPath>../../external/CppSharp/deps/vs2017/Microsoft.VisualStudio.Setup.Configuration.Interop.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="../../external/CppSharp/src/Core/Diagnostics.cs">
