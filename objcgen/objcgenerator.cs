@@ -293,7 +293,7 @@ namespace ObjC {
 					headers.WriteLine ();
 
 					if (members_with_default_values.Contains (ctor))
-						default_init |= GenerateDefaultValuesWrappers ("init", ctor);
+						default_init |= GenerateDefaultValuesWrappers (name, ctor);
 				}
 			}
 
@@ -557,7 +557,7 @@ namespace ObjC {
 		}
 
 		// TODO override with attribute ? e.g. [ObjC.Selector ("foo")]
-		void ImplementMethod (MethodInfo info, string name, bool isExtension = false, PropertyInfo pi = null)
+		string ImplementMethod (MethodInfo info, string name, bool isExtension = false, PropertyInfo pi = null)
 		{
 			var type = info.DeclaringType;
 			var managed_type_name = GetObjCName (type);
@@ -600,6 +600,7 @@ namespace ObjC {
 			implementation.Write (postInvoke);
 			ReturnValue (info.ReturnType);
 			builder.EndImplementation ();
+			return objcsig;
 		}
 
 		bool GenerateDefaultValuesWrappers (string name, MethodBase mb)
@@ -622,25 +623,32 @@ namespace ObjC {
 			var parametersInfo = parameters;
 			var plist = new List<ParameterInfo> ();
 			StringBuilder arguments = new StringBuilder ();
-			headers.WriteLine ("/** This is an helper method that inlines some default values:");
+			headers.WriteLine ("/** This is an helper method that inlines the following default values:");
 			foreach (var p in parameters) {
 				if (arguments.Length == 0) {
-					if (mi == null)
-						arguments.Append ("With");
+					//if (mi == null)
+						//arguments.Append ("With");
 					arguments.Append (PascalCase (p.Name)).Append (':');
 				} else
 					arguments.Append (' ').Append (CamelCase (p.Name)).Append (':');
 				if (p.Position >= start && p.HasDefaultValue) {
-					headers.WriteLine ($" *     {p.Name} = `{p.RawDefaultValue}`");
-					arguments.Append (p.RawDefaultValue);
+					var raw = FormatRawValue (p.ParameterType, p.RawDefaultValue);
+					headers.WriteLine ($" *     ({GetTypeName (p.ParameterType)}) {p.Name} = {raw};");
+					arguments.Append (raw);
 				} else {
 					arguments.Append (p.Name);
 					plist.Add (p);
 				}
 			}
+			headers.WriteLine (" *");
 			headers.WriteLine ($" *  @see {name}");
 			headers.WriteLine (" */");
 
+			if (mi == null)
+				name = start == 0 ? "init" : "initWith";
+			else
+				name = CamelCase (mb.Name);
+			
 			GetSignatures (name, mb.Name, mb, plist.ToArray (), false, out objcsig, out monosig);
 			var type = mb.DeclaringType;
 			var builder = new MethodHelper (headers, implementation) {
@@ -661,6 +669,8 @@ namespace ObjC {
 			} else {
 				implementation.Write ("self ");
 			}
+			if (mi == null)
+				name = "initWith";
 			implementation.WriteLine ($"{name}{arguments}];");
 			builder.EndImplementation ();
 		}
@@ -672,10 +682,10 @@ namespace ObjC {
 				name = CamelCase (mi.Name.Substring (3));
 			else
 				name = CamelCase (mi.Name);
-			ImplementMethod (mi, name);
+			var objcsig = ImplementMethod (mi, name);
 
 			if (members_with_default_values.Contains (mi))
-				GenerateDefaultValuesWrappers (name, mi);
+				GenerateDefaultValuesWrappers (objcsig, mi);
 		}
 
 		void ReturnValue (Type t)
@@ -890,6 +900,44 @@ namespace ObjC {
 			if (sb != null)
 				return sb.ToString ();
 			return name;
+		}
+
+		public static string FormatRawValue (Type t, object o)
+		{
+			if (o == null)
+				return "nil";
+
+			switch (t.Namespace) {
+			case "System":
+				switch (t.Name) {
+				case "String":
+					return $"@\"{o}\"";
+				case "Single":
+					float f = (float)o;
+					if (Single.IsNaN (f))
+						return "NAN";
+					if (Single.IsInfinity (f))
+						return "INFINITY";
+					return o + "f";
+				case "Double":
+					double d = (double)o;
+					if (Double.IsNaN (d))
+						return "NAN";
+					if (Double.IsInfinity (d))
+						return "INFINITY";
+					return o + "d";
+				case "UInt32":
+					return o + "ul";
+				case "Int64":
+					return o + "ll";
+				case "UInt64":
+					return o + "ull";
+				}
+				break;
+			}
+			if (t.IsEnum)
+				return GetTypeName (t) + t.GetEnumName (o);
+			return o.ToString ();
 		}
 	}
 }

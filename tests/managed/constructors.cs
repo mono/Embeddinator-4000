@@ -86,6 +86,11 @@ namespace Constructors {
 			IsDefault = (b == 0) && (s == 1) && (i == 2) && (l == 3);
 		}
 
+		public DefaultValues (int nonDefault, string s = "", float f = Single.NaN, double d = Double.PositiveInfinity, Enums.ByteEnum e = Enums.ByteEnum.Max)
+		{
+			IsDefault = (s != null) && (s.Length == 0) && Single.IsNaN (f) && Double.IsInfinity (d) && (e == Enums.ByteEnum.Max);
+		}
+
 		public bool IsDefault { get; private set; }
 	}
 
