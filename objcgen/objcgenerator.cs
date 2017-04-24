@@ -369,7 +369,7 @@ namespace ObjC {
 
 			if (equals.TryGetValue (t, out m)) {
 				var builder = new EqualsHelper (headers, implementation) {
-					ObjCSignature = $"isEqual:(id)other",
+					ObjCSignature = "isEqual:(id)other",
 					AssemblyName = aname,
 					MetadataToken = m.MetadataToken,
 					ObjCTypeName = managed_name,
@@ -385,7 +385,7 @@ namespace ObjC {
 
 			if (hashes.TryGetValue (t, out m)) {
 				var builder = new HashHelper (headers, implementation) {
-					ObjCSignature = $"hash",
+					ObjCSignature = "hash",
 					AssemblyName = aname,
 					MetadataToken = m.MetadataToken,
 					ObjCTypeName = managed_name,

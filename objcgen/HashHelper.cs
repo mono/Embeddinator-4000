@@ -17,7 +17,6 @@ namespace ObjC {
 
 			implementation.WriteLine ("\tvoid* __unbox = mono_object_unbox (__result);");
 			implementation.WriteLine ("\treturn (NSUInteger)(*((int*)__unbox));");
-			//implementation.WriteLine ("\treturn (NSUInteger)result;");
 			EndImplementation ();
 		}
 	}
