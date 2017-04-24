@@ -34,7 +34,8 @@ namespace ObjC {
 				string paramName = useTypeNames ? p.ParameterType.Name : p.Name;
 				if ((method != null) && (n > 0 || !isExtension)) {
 					if (n == 0) {
-						if (method.IsConstructor || !method.IsSpecialName)
+						bool isPropertyMethod = method.IsSpecialName && (method.Name.StartsWith ("get") || method.Name.StartsWith ("set"));
+						if (method.IsConstructor || !method.IsSpecialName || (useTypeNames && isPropertyMethod))
 							objc.Append (PascalCase (paramName));
 					} else
 						objc.Append (paramName.ToLowerInvariant ());

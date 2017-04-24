@@ -612,10 +612,6 @@ namespace ObjC {
 			else
 				name = CamelCase (mi.Name);
 
-			if (method.FallBackToTypeName && method.Method.ParameterCount == 1) {
-				name += method.Method.GetParameters ()[0].ParameterType.Name.Replace ('.', '_');
-			}
-
 			ImplementMethod (mi, name, useTypeNames: method.FallBackToTypeName);
 		}
 
