@@ -1,9 +1,11 @@
 ﻿using System;
 using System.IO;
 
+using Embeddinator;
+
 namespace ObjC {
 	public class HashHelper : MethodHelper {
-		public HashHelper (TextWriter headers, TextWriter implementation) : base (headers, implementation)
+		public HashHelper (SourceWriter headers, SourceWriter implementation) : base (headers, implementation)
 		{
 			MonoSignature = "GetHashCode ()";
 			ReturnType = "NSUInteger";
@@ -15,8 +17,8 @@ namespace ObjC {
 			WriteMethodLookup ();
 			WriteInvoke ("nil");
 
-			implementation.WriteLine ("\tvoid* __unbox = mono_object_unbox (__result);");
-			implementation.WriteLine ("\treturn (NSUInteger)(*((int*)__unbox));");
+			implementation.WriteLine ("void* __unbox = mono_object_unbox (__result);");
+			implementation.WriteLine ("return (NSUInteger)(*((int*)__unbox));");
 			EndImplementation ();
 		}
 	}

@@ -1,14 +1,16 @@
 ﻿using System;
 using System.IO;
 
+using Embeddinator;
+
 namespace ObjC {
 
 	public class MethodHelper {
 
-		protected TextWriter headers;
-		protected TextWriter implementation;
+		protected SourceWriter headers;
+		protected SourceWriter implementation;
 
-		public MethodHelper (TextWriter headers, TextWriter implementation)
+		public MethodHelper (SourceWriter headers, SourceWriter implementation)
 		{
 			this.headers = headers;
 			this.implementation = implementation;
@@ -34,7 +36,7 @@ namespace ObjC {
 
 		public bool IgnoreException { get; set; }
 
-		void WriteSignature (TextWriter writer)
+		void WriteSignature (SourceWriter writer)
 		{
 			writer.Write (IsStatic && !IsExtension ? '+' : '-');
 			writer.Write ($" ({ReturnType}){ObjCSignature}");
@@ -51,52 +53,57 @@ namespace ObjC {
 			WriteSignature (implementation);
 			implementation.WriteLine ();
 			implementation.WriteLine ("{");
+			implementation.Indent++;
 		}
 
 		public void WriteMethodLookup ()
 		{
-			implementation.WriteLine ("\tstatic MonoMethod* __method = nil;");
-			implementation.WriteLine ("\tif (!__method) {");
-			implementation.WriteLine ("#if TOKENLOOKUP");
-			implementation.WriteLine ($"\t\t__method = mono_get_method (__{ObjCGenerator.SanitizeName (AssemblyName)}_image, 0x{MetadataToken:X8}, {ObjCTypeName}_class);");
-			implementation.WriteLine ("#else");
-			implementation.WriteLine ($"\t\tconst char __method_name [] = \"{ManagedTypeName}:{MonoSignature}\";");
-			implementation.WriteLine ($"\t\t__method = mono_embeddinator_lookup_method (__method_name, {ObjCTypeName}_class);");
-			implementation.WriteLine ("#endif");
-			implementation.WriteLine ("\t}");
+			implementation.WriteLine ("static MonoMethod* __method = nil;");
+			implementation.WriteLine ("if (!__method) {");
+			implementation.WriteLineUnindented ("#if TOKENLOOKUP");
+			implementation.Indent++;
+			implementation.WriteLine ($"__method = mono_get_method (__{ObjCGenerator.SanitizeName (AssemblyName)}_image, 0x{MetadataToken:X8}, {ObjCTypeName}_class);");
+			implementation.WriteLineUnindented ("#else");
+			implementation.WriteLine ($"const char __method_name [] = \"{ManagedTypeName}:{MonoSignature}\";");
+			implementation.WriteLine ($"__method = mono_embeddinator_lookup_method (__method_name, {ObjCTypeName}_class);");
+			implementation.Indent--;
+			implementation.WriteLineUnindented ("#endif");
+			implementation.WriteLine ("}");
 		}
 
 		public void WriteInvoke (string args)
 		{
-			implementation.WriteLine ("\tMonoObject* __exception = nil;");
+			implementation.WriteLine ("MonoObject* __exception = nil;");
 			var instance = "nil";
 			if (!IsStatic) {
 				if (!IsConstructor)
-					implementation.WriteLine ($"\tMonoObject* __instance = mono_gchandle_get_target (_object->_handle);");
+					implementation.WriteLine ($"MonoObject* __instance = mono_gchandle_get_target (_object->_handle);");
 				if (IsValueType) {
-					implementation.WriteLine ($"\t\tvoid* __unboxed = mono_object_unbox (__instance);");
+					implementation.WriteLine ($"void* __unboxed = mono_object_unbox (__instance);");
 					instance = "__unboxed";
 				} else {
 					instance = "__instance";
 				}
 			}
 
-			implementation.Write ("\t");
 			if (!IsConstructor && (ReturnType != "void"))
 				implementation.Write ("MonoObject* __result = ");
 			implementation.WriteLine ($"mono_runtime_invoke (__method, {instance}, {args}, &__exception);");
 
-			implementation.WriteLine ("\tif (__exception)");
+			implementation.WriteLine ("if (__exception)");
+			implementation.Indent++;
 			if (IgnoreException) {
 				// TODO: Apple often do NSLog (or asserts but they are more brutal) and returning nil is allowed (and common)
-				implementation.WriteLine ("\t\t\treturn nil;");
+				implementation.WriteLine ("return nil;");
 			} else {
-				implementation.WriteLine ("\t\tmono_embeddinator_throw_exception (__exception);");
+				implementation.WriteLine ("mono_embeddinator_throw_exception (__exception);");
 			}
+			implementation.Indent--;
 		}
 
 		public void EndImplementation ()
 		{
+			implementation.Indent--;
 			implementation.WriteLine ("}");
 			implementation.WriteLine ();
 		}
