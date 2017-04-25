@@ -19,7 +19,7 @@ namespace ObjC {
 			foreach (MethodInfo method in methods) {
 				ProcessedMethod processedMethod = new ProcessedMethod (method);
 
-				if (duplicateNames.Contains (method.Name) && method.Name != "CompareTo") // HACK
+				if (duplicateNames.Contains (CreateStringRep (method)) && method.Name != "CompareTo") // HACK
 					processedMethod.FallBackToTypeName = true;
 
 				yield return processedMethod;
@@ -52,19 +52,19 @@ namespace ObjC {
 
 		protected IEnumerable<ProcessedConstructor> PostProcessConstructors (IEnumerable<ConstructorInfo> constructors)
 		{
-			HashSet<string> duplicateNames = FindDuplicateConstructors (constructors);
+			HashSet<string> duplicateNames = FindDuplicateNames (constructors);
 
 			foreach (ConstructorInfo constructor in constructors) {
 				ProcessedConstructor processedConstructor = new ProcessedConstructor (constructor);
 
-				if (duplicateNames.Contains (CreateStringRepOfConstructor(constructor)))
+				if (duplicateNames.Contains (CreateStringRep(constructor)))
 					processedConstructor.FallBackToTypeName = true;
 
 				yield return processedConstructor;
 			}
 		}
 
-		static string CreateStringRepOfConstructor (ConstructorInfo constructor)
+		static string CreateStringRep (ConstructorInfo constructor)
 		{
 			StringBuilder str = new StringBuilder ();
 			foreach (var arg in constructor.GetParameters ())
@@ -72,27 +72,32 @@ namespace ObjC {
 			return str.ToString ();
 		}
 
-		static HashSet<string> FindDuplicateConstructors (IEnumerable<ConstructorInfo> constructors)
+		static string CreateStringRep (MethodInfo method)
 		{
-			Dictionary<string, int> methodNames = new Dictionary<string, int> ();
-			foreach (ConstructorInfo constructor in constructors) {
-				string ctorString = CreateStringRepOfConstructor (constructor);
-				if (methodNames.ContainsKey (ctorString))
-					methodNames[ctorString]++;
-				else
-					methodNames[ctorString] = 1;
-			}
-			return new HashSet<string> (methodNames.Where (x => x.Value > 1).Select (x => x.Key));
+			StringBuilder str = new StringBuilder (method.Name);
+			foreach (var arg in method.GetParameters ())
+				str.Append (":"); // This format is arbitrary
+			return str.ToString ();
+		}
+
+		static string CreateStringRep (MemberInfo i)
+		{
+			if (i is ConstructorInfo)
+				return CreateStringRep ((ConstructorInfo)i);
+			if (i is MethodInfo)
+				return CreateStringRep ((MethodInfo)i);
+			return i.Name;
 		}
 
 		static HashSet<string> FindDuplicateNames (IEnumerable<MemberInfo> members)
 		{
 			Dictionary<string, int> methodNames = new Dictionary<string, int> ();
 			foreach (MemberInfo member in members) {
-				if (methodNames.ContainsKey (member.Name))
-					methodNames[member.Name]++;
+				string stringRep = CreateStringRep (member);
+				if (methodNames.ContainsKey (stringRep))
+					methodNames[stringRep]++;
 				else
-					methodNames[member.Name] = 1;
+					methodNames[stringRep] = 1;
 			}
 			return new HashSet<string> (methodNames.Where (x => x.Value > 1).Select (x => x.Key));
 		}

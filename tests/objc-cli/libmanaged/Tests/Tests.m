@@ -585,6 +585,32 @@
     XCTAssert ([StringCollection [@"asdf"] isEqual:@"two"], "get 25");
 }
 
+
+- (void) testDuplicateNaming {
+    // The DuplicateMethods class has a number of duplicate methods with different arguments
+    // This test verifies we output the best converted names, using argument names instead of types
+    // where possible
+    Methods_DuplicateMethods *m = [[Methods_DuplicateMethods alloc] init];
+    
+    XCTAssert ([m doIt] == 42, "doIt 1");
+    XCTAssert ([m doItInt32:0] == 42, "doIt 2");
+    XCTAssert ([m doItString:@""] == 42, "doIt 3");
+    XCTAssert ([m doItI:0 j:1] == 84, "doIt 4");
+    XCTAssert ([m findName:@"name"] == YES, "doIt 5");
+    XCTAssert ([m findFirstName:@"name" lastname:@"last"] == YES, "doIt 6");
+    
+    Properties_DuplicateIndexedProperties * p = [[Properties_DuplicateIndexedProperties alloc] init];
+    XCTAssert ([p getItemInt32:0] == 42, "getItemInt32");
+    XCTAssert ([p getItemString:@""] == 42, "getItemString");
+    
+    Constructors_Duplicates * c = [[Constructors_Duplicates alloc] initWithByte:1 byte:2 byte:3 byte:4];
+    XCTAssertNotNil (c, "c");
+    Constructors_Duplicates * c2 = [[Constructors_Duplicates alloc] initWithByte:1 int16:2 int32:3 int64:4];
+    XCTAssertNotNil (c2, "c2");
+    Constructors_Duplicates * c3 = [[Constructors_Duplicates alloc] initWithInt32:1 int32:2 int32:3 int32:4];
+    XCTAssertNotNil (c3, "c3");
+}
+
 #pragma clang diagnostic pop
 
 @end
