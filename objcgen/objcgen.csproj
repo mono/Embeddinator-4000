@@ -313,6 +313,7 @@
     <Compile Include="methodhelper.cs" />
     <Compile Include="objcgenerator-subscripts.cs" />
     <Compile Include="comparablehelper.cs" />
+    <Compile Include="sourcewriter.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="support\" />
