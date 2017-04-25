@@ -1,22 +1,18 @@
 ﻿using CppSharp.AST;
+using CppSharp.AST.Extensions;
 using CppSharp.Generators;
-using CppSharp.Generators.CSharp;
-using CppSharp.Parser;
 using System;
 using System.Collections.Generic;
-using CppSharp.AST.Extensions;
 
 namespace MonoEmbeddinator4000.Generators
 {
-    public class JavaTypePrinterContext : CSharpTypePrinterContext
+    public class JavaTypePrinter : TypePrinter
     {
+        BindingContext Context { get; }
 
-    }
-
-    public class JavaTypePrinter : CSharpTypePrinter
-    {
-        public JavaTypePrinter(BindingContext context) : base(context)
+        public JavaTypePrinter(BindingContext context)
         {
+            Context = context;
         }
 
         public override TypePrinterResult VisitArrayType(ArrayType array,

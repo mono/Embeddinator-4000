@@ -5,12 +5,13 @@ using CppSharp;
 using CppSharp.AST;
 using CppSharp.AST.Extensions;
 using CppSharp.Generators;
-using CppSharp.Generators.CSharp;
 
 namespace MonoEmbeddinator4000.Generators
 {
-    public class JavaSources : CSharpSources
+    public class JavaSources : CodeGenerator
     {
+        public JavaTypePrinter TypePrinter;
+
         public JavaSources(BindingContext context, Declaration decl)
             : this(context, decl.TranslationUnit)
         {
@@ -109,8 +110,7 @@ namespace MonoEmbeddinator4000.Generators
 
             NewLine();
 
-            var typeName = TypePrinter.VisitPrimitiveType(@enum.BuiltinType.Type,
-                                                          new TypeQualifiers());
+            var typeName = @enum.BuiltinType.Visit(TypePrinter);
             WriteLine($"private final {typeName} id;");
             WriteLine($"{@enum.Name}({typeName} id) {{ this.id = id; }}");
             WriteLine($"public {typeName} getValue() {{ return id; }}");
@@ -138,8 +138,7 @@ namespace MonoEmbeddinator4000.Generators
             Write(item.Name);
 
             var @enum = item.Namespace as Enumeration;
-            var typeName = TypePrinter.VisitPrimitiveType(@enum.BuiltinType.Type,
-                                                          new TypeQualifiers());
+            var typeName = @enum.BuiltinType.Visit(TypePrinter);
             if (item.ExplicitValue)
             {
                 var value = @enum.GetItemValueAsString(item);
@@ -241,12 +240,10 @@ namespace MonoEmbeddinator4000.Generators
             if (keywords.Count != 0)
                 Write("{0} ", string.Join(" ", keywords));
 
-            var functionName = GetMethodIdentifier(method);
-
             if (method.IsConstructor || method.IsDestructor)
-                Write("{0}(", functionName);
+                Write("{0}(", @class.Name);
             else
-                Write("{0} {1}(", method.ReturnType, functionName);
+                Write("{0} {1}(", method.ReturnType, method.Name);
 
             var @params = method.Parameters.Where(m => !m.IsImplicit);
             Write("{0}", TypePrinter.VisitParameters(@params, hasNames: true));
