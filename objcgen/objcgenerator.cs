@@ -1,4 +1,4 @@
-﻿﻿using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -370,6 +370,35 @@ namespace ObjC {
 				builder.WriteImplementation ();
 			}
 
+			if (equals.TryGetValue (t, out m)) {
+				var builder = new EqualsHelper (headers, implementation) {
+					ObjCSignature = "isEqual:(id)other",
+					AssemblyName = aname,
+					MetadataToken = m.MetadataToken,
+					ObjCTypeName = managed_name,
+					ManagedTypeName = t.FullName,
+				};
+
+				builder.WriteHeaders ();
+				builder.WriteImplementation ();
+
+
+				GenerateGetGCHandle ();
+			}
+
+			if (hashes.TryGetValue (t, out m)) {
+				var builder = new HashHelper (headers, implementation) {
+					ObjCSignature = "hash",
+					AssemblyName = aname,
+					MetadataToken = m.MetadataToken,
+					ObjCTypeName = managed_name,
+					ManagedTypeName = t.FullName,
+				};
+
+				builder.WriteHeaders ();
+				builder.WriteImplementation ();
+			}
+
 			headers.WriteLine ("@end");
 			headers.WriteLine ();
 
@@ -686,6 +715,15 @@ namespace ObjC {
 
 			if (members_with_default_values.Contains (mi))
 				GenerateDefaultValuesWrappers (objcsig, mi);
+		}
+
+		protected void GenerateGetGCHandle ()
+		{
+			headers.WriteLine ("- (int)xamarinGetGCHandle;");
+			implementation.WriteLine ("- (int)xamarinGetGCHandle");
+			implementation.WriteLine ("{");
+			implementation.WriteLine ("\treturn _object->_handle;");
+			implementation.WriteLine ("}");
 		}
 
 		void ReturnValue (Type t)
