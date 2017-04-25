@@ -35,6 +35,9 @@ namespace ObjCGeneratorTest {
 		{
 			Assert.True (mscorlib.GetType ("System.Int32").Implements ("System", "IComparable`1"), "int");
 			Assert.False (mscorlib.GetType ("System.Object").Implements ("System", "IComparable"), "object");
+
+			Assert.True (mscorlib.GetType ("System.IComparable").Implements ("System", "IComparable"), "IComparable");
+			Assert.False (mscorlib.GetType ("System.IComparable").Implements ("System", "IComparable`1"), "IComparable`1");
 		}
 
 		[Test]

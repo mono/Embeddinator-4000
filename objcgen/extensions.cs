@@ -16,11 +16,16 @@ namespace Embeddinator {
 		{
 			if (self.Is ("System", "Object"))
 				return false;
+			if (self.Is (@namespace, name))
+				return true;
 			foreach (var intf in self.GetInterfaces ()) {
 				if (intf.Is (@namespace, name))
 					return true;
 			}
-			return self.BaseType.Implements (@namespace, name);
+			var bt = self.BaseType;
+			if (bt == null)
+				return false;
+			return bt.Implements (@namespace, name);
 		}
 
 		public static bool Match (this MethodInfo self, string returnType, string name, params string[] parameterTypes)
