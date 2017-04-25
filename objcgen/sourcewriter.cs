@@ -40,12 +40,29 @@ namespace Embeddinator {
 			newline = true;
 		}
 
+		public override void WriteLine (string value)
+		{
+			if (!Enabled)
+				return;
+			ApplyTabs ();
+			sb.AppendLine (value);
+			newline = true;
+		}
+
 		public override void Write (string value)
 		{
 			if (!Enabled)
 				return;
 			ApplyTabs ();
 			sb.Append (value);
+		}
+
+		public void WriteLineUnindented (string value)
+		{
+			if (!Enabled)
+				return;
+			sb.AppendLine (value);
+			newline = true;
 		}
 
 		public override string ToString ()
