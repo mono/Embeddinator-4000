@@ -58,7 +58,7 @@ namespace Methods {
 
 	public static class Factory {
 
-		public static Item CreateItem (int id)
+		public static Item CreateItem (int id = 0)
 		{
 			return new Item (id);
 		}

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -86,7 +86,7 @@ namespace ObjC {
 						delayed.Add (ErrorHelper.CreateWarning (1020, $"Constructor `{ctor}` is not generated because of parameter type `{pt}` is not supported."));
 						pcheck = false;
 					} else if (p.HasDefaultValue) {
-						delayed.Add (ErrorHelper.CreateWarning (1021, $"Constructor `{ctor}` parameter `{p.Name}` has a default value that is not supported."));
+						members_with_default_values.Add (ctor);
 					}
 				}
 				if (!pcheck)
@@ -97,6 +97,9 @@ namespace ObjC {
 		}
 
 		Dictionary<Type,MethodInfo> icomparable = new Dictionary<Type, MethodInfo> ();
+		Dictionary<Type, MethodInfo> equals = new Dictionary<Type, MethodInfo> ();
+		Dictionary<Type, MethodInfo> hashes = new Dictionary<Type, MethodInfo> ();
+		HashSet<MemberInfo> members_with_default_values = new HashSet<MemberInfo> ();
 
 		// defining type / extended type / methods
 		Dictionary<Type, Dictionary<Type, List<MethodInfo>>> extensions_methods = new Dictionary<Type, Dictionary<Type, List<MethodInfo>>> ();
@@ -119,6 +122,16 @@ namespace ObjC {
 					// don't replace CompareTo(T) with CompareTo(Object)
 					if (!icomparable.ContainsKey (t))
 						icomparable.Add (t, mi);
+					continue;
+				}
+
+				if (mi.Match ("System.Boolean", "Equals", "System.Object")) {
+					equals.Add (t, mi);
+					continue;
+				}
+
+				if (mi.Match ("System.Int32", "GetHashCode")) {
+					hashes.Add (t, mi);
 					continue;
 				}
 
@@ -152,7 +165,7 @@ namespace ObjC {
 						delayed.Add (ErrorHelper.CreateWarning (1031, $"Method `{mi}` is not generated because of parameter type `{pt}` is not supported."));
 						pcheck = false;
 					} else if (p.HasDefaultValue) {
-						delayed.Add (ErrorHelper.CreateWarning (1032, $"Method `{mi}` parameter `{p.Name}` has a default value that is not supported."));
+						members_with_default_values.Add (mi);
 					}
 				}
 				if (!pcheck)

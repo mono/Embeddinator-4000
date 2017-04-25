@@ -43,6 +43,7 @@
     <Compile Include="subscripts.cs">
       <DependentUpon>subscripts.tt</DependentUpon>
     </Compile>
+    <Compile Include="equalsHashOverrides.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="subscripts.tt">

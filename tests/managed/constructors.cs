@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 
 namespace Constructors {
 
@@ -77,6 +77,21 @@ namespace Constructors {
 
 		// helper to ease testing from native code
 		public bool TestResult { get; private set; }
+	}
+
+	public class DefaultValues {
+
+		public DefaultValues (byte b = 0, short s = 1, int i = 2, long l = 3)
+		{
+			IsDefault = (b == 0) && (s == 1) && (i == 2) && (l == 3);
+		}
+
+		public DefaultValues (int nonDefault, string s = "", float f = Single.NaN, double d = Double.PositiveInfinity, Enums.ByteEnum e = Enums.ByteEnum.Max)
+		{
+			IsDefault = (s != null) && (s.Length == 0) && Single.IsNaN (f) && Double.IsInfinity (d) && (e == Enums.ByteEnum.Max);
+		}
+
+		public bool IsDefault { get; private set; }
 	}
 
 	public class Duplicates {

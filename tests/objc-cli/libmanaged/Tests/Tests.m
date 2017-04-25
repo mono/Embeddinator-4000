@@ -114,6 +114,39 @@
 
 	Constructors_AllTypeCode* all4 = [[Constructors_AllTypeCode alloc] initWithF32:FLT_MAX f64:DBL_MAX];
 	XCTAssertTrue ([all4 testResult], "all4");
+
+	Constructors_DefaultValues* dv0 = [[Constructors_DefaultValues alloc] init];
+	XCTAssertTrue ([dv0 isDefault], "default value 0");
+
+	Constructors_DefaultValues* dv1 = [[Constructors_DefaultValues alloc] initWithB:0];
+	XCTAssertTrue ([dv1 isDefault], "default value 1");
+
+	Constructors_DefaultValues* dv2 = [[Constructors_DefaultValues alloc] initWithB:0 s:1];
+	XCTAssertTrue ([dv2 isDefault], "default value 2");
+
+	Constructors_DefaultValues* dv3 = [[Constructors_DefaultValues alloc] initWithB:0 s:1 i:2];
+	XCTAssertTrue ([dv3 isDefault], "default value 3");
+
+	Constructors_DefaultValues* dv4 = [[Constructors_DefaultValues alloc] initWithB:0 s:1 i:2 l:3];
+	XCTAssertTrue ([dv4 isDefault], "default value 4");
+
+	Constructors_DefaultValues* dvx = [[Constructors_DefaultValues alloc] initWithB:3 s:2 i:1 l:0];
+	XCTAssertFalse ([dvx isDefault], "default value X");
+
+	Constructors_DefaultValues* dvn0 = [[Constructors_DefaultValues alloc] initWithNonDefault:0];
+	XCTAssertTrue ([dvn0 isDefault], "default value 2 / 0");
+
+	Constructors_DefaultValues* dvn1 = [[Constructors_DefaultValues alloc] initWithNonDefault:1 s:@""];
+	XCTAssertTrue ([dvn1 isDefault], "default value 2 / 1");
+
+	Constructors_DefaultValues* dvn2 = [[Constructors_DefaultValues alloc] initWithNonDefault:2 s:@"" f:NAN];
+	XCTAssertTrue ([dvn2 isDefault], "default value 2 / 2");
+
+	Constructors_DefaultValues* dvn3 = [[Constructors_DefaultValues alloc] initWithNonDefault:3 s:@"" f:NAN d:INFINITY];
+	XCTAssertTrue ([dvn3 isDefault], "default value 2 / 3");
+
+	Constructors_DefaultValues* dvn4 = [[Constructors_DefaultValues alloc] initWithNonDefault:4 s:@"" f:NAN d:INFINITY e:Enums_ByteEnumMax];
+	XCTAssertTrue ([dvn4 isDefault], "default value 2 / 4");
 }
 
 - (void)testMethods {
@@ -166,6 +199,9 @@
 
 	[collection removeItem:item2];
 	XCTAssert ([collection count] == 0, "count 4");
+
+	id default_item = [Methods_Factory createItem];
+	XCTAssert ([default_item integer] == 0, "default creation 0");
 
 	XCTAssertEqualObjects (@"", [Methods_SomeExtensions notAnExtensionMethod], "empty string");
 }
@@ -585,7 +621,6 @@
     XCTAssert ([StringCollection [@"asdf"] isEqual:@"two"], "get 25");
 }
 
-
 - (void) testDuplicateNaming {
     // The DuplicateMethods class has a number of duplicate methods with different arguments
     // This test verifies we output the best converted names, using argument names instead of types
@@ -609,6 +644,30 @@
     XCTAssertNotNil (c2, "c2");
     Constructors_Duplicates * c3 = [[Constructors_Duplicates alloc] initWithInt32:1 int32:2 int32:3 int32:4];
     XCTAssertNotNil (c3, "c3");
+}
+
+   - (void) testIsEqual {
+    EqualsHashOverrides_Class *c1 = [[EqualsHashOverrides_Class alloc] initWithX:1];
+    XCTAssertFalse ([c1 isEqual:nil], "equals nil");
+    XCTAssertFalse ([c1 isEqual:@"String"], "equals non-mono NSObject");
+    XCTAssertTrue ([c1 isEqual:c1], "equals self");
+
+    EqualsHashOverrides_Class *c2 = [[EqualsHashOverrides_Class alloc] initWithX:1];
+    XCTAssertTrue ([c1 isEqual:c2], "compare equal objects");
+    XCTAssertTrue ([c2 isEqual:c1], "compare equal objects");
+
+    EqualsHashOverrides_Class *c3 = [[EqualsHashOverrides_Class alloc] initWithX:2];
+    XCTAssertFalse ([c1 isEqual:c3], "compare unequal objects");
+    XCTAssertFalse ([c3 isEqual:c1], "compare unequal objects");
+}
+
+- (void) testHash {
+    EqualsHashOverrides_Class *c1 = [[EqualsHashOverrides_Class alloc] initWithX:1];
+    EqualsHashOverrides_Class *c2 = [[EqualsHashOverrides_Class alloc] initWithX:1];
+    EqualsHashOverrides_Class *c3 = [[EqualsHashOverrides_Class alloc] initWithX:2];
+
+    XCTAssertTrue ([c1 hash] == [c2 hash], "Equal objects have matching hash");
+    XCTAssertFalse ([c1 hash] == [c3 hash], "Non-equal objects have different hashes");
 }
 
 #pragma clang diagnostic pop

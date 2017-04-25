@@ -83,5 +83,32 @@ namespace ObjCGeneratorTest {
 		{
 			Assert.That (ObjCGenerator.GetObjCName (mscorlib.GetType ("System.Collections.ArrayList")), Is.EqualTo ("System_Collections_ArrayList"), "ArrayList");
 		}
+
+		[Test]
+		public void FormatRawValue ()
+		{
+			var ts = mscorlib.GetType ("System.String");
+			Assert.That (ObjCGenerator.FormatRawValue (ts, null), Is.EqualTo ("nil"), "null");
+			Assert.That (ObjCGenerator.FormatRawValue (ts, String.Empty), Is.EqualTo ("@\"\""), "String Empty");
+			var tf = mscorlib.GetType ("System.Single");
+			Assert.That (ObjCGenerator.FormatRawValue (tf, Single.NaN), Is.EqualTo ("NAN"), "Single NaN");
+			Assert.That (ObjCGenerator.FormatRawValue (tf, Single.PositiveInfinity), Is.EqualTo ("INFINITY"), "Single PositiveInfinity");
+			Assert.That (ObjCGenerator.FormatRawValue (tf, Single.NegativeInfinity), Is.EqualTo ("INFINITY"), "Single NegativeInfinity");
+			Assert.That (ObjCGenerator.FormatRawValue (tf, (float)Math.E), Is.EqualTo ("2.718282f"), "Single E");
+			var td = mscorlib.GetType ("System.Double");
+			Assert.That (ObjCGenerator.FormatRawValue (td, Double.NaN), Is.EqualTo ("NAN"), "Double NaN");
+			Assert.That (ObjCGenerator.FormatRawValue (td, Double.PositiveInfinity), Is.EqualTo ("INFINITY"), "Double PositiveInfinity");
+			Assert.That (ObjCGenerator.FormatRawValue (td, Double.NegativeInfinity), Is.EqualTo ("INFINITY"), "Double NegativeInfinity");
+			Assert.That (ObjCGenerator.FormatRawValue (td, Math.PI), Is.EqualTo ("3.14159265358979d"), "Double PI");
+
+			var tint32 = mscorlib.GetType ("System.Int32");
+			Assert.That (ObjCGenerator.FormatRawValue (tint32, 1), Is.EqualTo ("1"), "Int32 1");
+			var tuint32 = mscorlib.GetType ("System.UInt32");
+			Assert.That (ObjCGenerator.FormatRawValue (tuint32, 1), Is.EqualTo ("1ul"), "UInt32 1");
+			var tint64 = mscorlib.GetType ("System.Int64");
+			Assert.That (ObjCGenerator.FormatRawValue (tint64, 1), Is.EqualTo ("1ll"), "Int64 1");
+			var tuint64 = mscorlib.GetType ("System.UInt64");
+			Assert.That (ObjCGenerator.FormatRawValue (tuint64, 1), Is.EqualTo ("1ull"), "UInt64 1");
+		}
 	}
 }
