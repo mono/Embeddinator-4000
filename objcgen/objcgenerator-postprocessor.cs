@@ -22,6 +22,9 @@ namespace ObjC {
 				if (duplicateNames.Contains (CreateStringRep (method)) && method.Name != "CompareTo") // HACK
 					processedMethod.FallBackToTypeName = true;
 
+				if (method.IsSpecialName && method.IsStatic && method.Name.StartsWith ("op_", StringComparison.Ordinal))
+					processedMethod.IsOperator = true;
+
 				yield return processedMethod;
 			}
 		}

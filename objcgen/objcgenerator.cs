@@ -709,18 +709,10 @@ namespace ObjC {
 
 		protected override void Generate (ProcessedMethod method)
 		{
-			MethodInfo mi = method.Method;
-			string name;
+			var objcsig = ImplementMethod (method.Method, method.BaseName, useTypeNames: method.FallBackToTypeName);
 
-			if (mi.IsSpecialName && mi.IsStatic && mi.Name.StartsWith ("op_", StringComparison.Ordinal))
-				name = CamelCase (mi.Name.Substring (3));
-			else
-				name = CamelCase (mi.Name);
-
-			var objcsig = ImplementMethod (mi, name, useTypeNames: method.FallBackToTypeName);
-
-			if (members_with_default_values.Contains (mi))
-				GenerateDefaultValuesWrappers (objcsig, mi);
+			if (members_with_default_values.Contains (method.Method))
+				GenerateDefaultValuesWrappers (objcsig, method.Method);
 		}
 
 		protected void GenerateGetGCHandle ()

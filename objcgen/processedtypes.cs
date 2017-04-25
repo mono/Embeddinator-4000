@@ -16,6 +16,9 @@ namespace ObjC {
 
 	public class ProcessedMethod : ProcessedBase {
 		public MethodInfo Method { get; private set; }
+		public bool IsOperator { get; set; }
+
+		public string BaseName => IsOperator ? ObjCGenerator.CamelCase (Method.Name.Substring (3)) : ObjCGenerator.CamelCase (Method.Name);
 
 		public ProcessedMethod (MethodInfo method)
 		{
