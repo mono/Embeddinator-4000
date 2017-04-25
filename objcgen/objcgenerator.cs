@@ -717,7 +717,7 @@ namespace ObjC {
 			else
 				name = CamelCase (mi.Name);
 
-			var objcsig = ImplementMethod (mi, name);
+			var objcsig = ImplementMethod (mi, name, useTypeNames: method.FallBackToTypeName);
 
 			if (members_with_default_values.Contains (mi))
 				GenerateDefaultValuesWrappers (objcsig, mi);
