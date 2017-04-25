@@ -222,18 +222,18 @@ namespace ObjC {
 			}
 
 			var default_init = false;
-			List<ConstructorInfo> constructors;
+			List<ProcessedConstructor> constructors;
 			if (ctors.TryGetValue (t, out constructors)) {
 				// First get the unavailable init ctor selectors in parent class
 				var unavailableCtors = GetUnavailableParentCtors (t, constructors);
 				if (unavailableCtors.Count () > 0) {
 					// TODO: Print a #pragma mark once we have a well defined header structure http://nshipster.com/pragma/
 					foreach (var uctor in unavailableCtors) {
-						var ctorparams = uctor.GetParameters ();
+						var ctorparams = uctor.Constructor.GetParameters ();
 						string name = "init";
 						string signature = ".ctor()";
 						if (ctorparams.Length > 0)
-							GetSignatures ("initWith", uctor.Name, uctor, ctorparams, false, out name, out signature);
+							GetSignatures ("initWith", uctor.Constructor.Name, uctor.Constructor, ctorparams, uctor.FallBackToTypeName, false, out name, out signature);
 						headers.WriteLine ("/** This initializer is not available as it was not re-exposed from the base type");
 						headers.WriteLine (" *  For more details consult https://github.com/mono/Embeddinator-4000/blob/master/docs/ObjC.md#constructors-vs-initializers");
 						headers.WriteLine (" */");
@@ -243,20 +243,20 @@ namespace ObjC {
 				}
 
 				foreach (var ctor in constructors) {
-					var pcount = ctor.ParameterCount;
+					var pcount = ctor.Constructor.ParameterCount;
 					default_init |= pcount == 0;
 
-					var parameters = ctor.GetParameters ();
+					var parameters = ctor.Constructor.GetParameters ();
 					string name = "init";
 					string signature = ".ctor()";
 					if (parameters.Length > 0)
-						GetSignatures ("initWith", ctor.Name, ctor, parameters, false, out name, out signature);
+						GetSignatures ("initWith", ctor.Constructor.Name, ctor.Constructor, parameters, ctor.FallBackToTypeName, false, out name, out signature);
 
 					var builder = new MethodHelper (headers, implementation) {
 						AssemblyName = aname,
 						ReturnType = "nullable instancetype",
 						ManagedTypeName = t.FullName,
-						MetadataToken = ctor.MetadataToken,
+						MetadataToken = ctor.Constructor.MetadataToken,
 						MonoSignature = signature,
 						ObjCSignature = name,
 						ObjCTypeName = managed_name,
@@ -292,8 +292,8 @@ namespace ObjC {
 
 					headers.WriteLine ();
 
-					if (members_with_default_values.Contains (ctor))
-						default_init |= GenerateDefaultValuesWrappers (name, ctor);
+					if (members_with_default_values.Contains (ctor.Constructor))
+						default_init |= GenerateDefaultValuesWrappers (name, ctor.Constructor);
 				}
 			}
 
@@ -327,28 +327,28 @@ namespace ObjC {
 				implementation.WriteLine ();
 			}
 
-			List<PropertyInfo> props;
+			List<ProcessedProperty> props;
 			if (properties.TryGetValue (t, out props)) {
 				headers.WriteLine ();
 				foreach (var pi in props)
 					Generate (pi);
 			}
 
-			List<FieldInfo> f;
+			List<ProcessedFieldInfo> f;
 			if (fields.TryGetValue (t, out f)) {
 				headers.WriteLine ();
 				foreach (var fi in f)
 					Generate (fi);
 			}
 
-			List<PropertyInfo> s;
+			List<ProcessedProperty> s;
 			if (subscriptProperties.TryGetValue (t, out s)) {
 				headers.WriteLine ();
 				foreach (var si in s)
 					GenerateSubscript (si);
 			}
 
-			List<MethodInfo> meths;
+			List<ProcessedMethod> meths;
 			if (methods.TryGetValue (t, out meths)) {
 				headers.WriteLine ();
 				foreach (var mi in meths)
@@ -463,8 +463,9 @@ namespace ObjC {
 			}
 		}
 
-		protected override void Generate (PropertyInfo pi)
+		protected override void Generate (ProcessedProperty property)
 		{
+			PropertyInfo pi = property.Property;
 			var getter = pi.GetGetMethod ();
 			var setter = pi.GetSetMethod ();
 			// setter-only properties are handled as methods (and should not reach this code)
@@ -491,8 +492,9 @@ namespace ObjC {
 			ImplementMethod (setter, "set" + pi.Name, false, pi);
 		}
 
-		protected void Generate (FieldInfo fi)
+		protected void Generate (ProcessedFieldInfo field)
 		{
+			FieldInfo fi = field.Field;
 			bool read_only = fi.IsInitOnly || fi.IsLiteral;
 
 			headers.Write ("@property (nonatomic");
@@ -586,7 +588,7 @@ namespace ObjC {
 		}
 
 		// TODO override with attribute ? e.g. [ObjC.Selector ("foo")]
-		string ImplementMethod (MethodInfo info, string name, bool isExtension = false, PropertyInfo pi = null)
+		string ImplementMethod (MethodInfo info, string name, bool isExtension = false, PropertyInfo pi = null, bool useTypeNames = false)
 		{
 			var type = info.DeclaringType;
 			var managed_type_name = GetObjCName (type);
@@ -595,7 +597,8 @@ namespace ObjC {
 			string monosig;
 			var managed_name = info.Name;
 			var parametersInfo = info.GetParameters ();
-			GetSignatures (name, managed_name, (MemberInfo)pi ?? info, parametersInfo, isExtension, out objcsig, out monosig);
+
+			GetSignatures (name, managed_name, (MemberInfo)pi ?? info, parametersInfo, useTypeNames, isExtension, out objcsig, out monosig);
 
 			var builder = new MethodHelper (headers, implementation) {
 				AssemblyName = type.Assembly.GetName ().Name,
@@ -678,7 +681,7 @@ namespace ObjC {
 			else
 				name = CamelCase (mb.Name);
 			
-			GetSignatures (name, mb.Name, mb, plist.ToArray (), false, out objcsig, out monosig);
+			GetSignatures (name, mb.Name, mb, plist.ToArray (), false, false, out objcsig, out monosig);
 			var type = mb.DeclaringType;
 			var builder = new MethodHelper (headers, implementation) {
 				IsStatic = mb.IsStatic,
@@ -704,14 +707,17 @@ namespace ObjC {
 			builder.EndImplementation ();
 		}
 
-		protected override void Generate (MethodInfo mi)
+		protected override void Generate (ProcessedMethod method)
 		{
+			MethodInfo mi = method.Method;
 			string name;
+
 			if (mi.IsSpecialName && mi.IsStatic && mi.Name.StartsWith ("op_", StringComparison.Ordinal))
 				name = CamelCase (mi.Name.Substring (3));
 			else
 				name = CamelCase (mi.Name);
-			var objcsig = ImplementMethod (mi, name);
+
+			var objcsig = ImplementMethod (mi, name, useTypeNames: method.FallBackToTypeName);
 
 			if (members_with_default_values.Contains (mi))
 				GenerateDefaultValuesWrappers (objcsig, mi);

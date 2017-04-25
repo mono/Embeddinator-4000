@@ -94,7 +94,6 @@ namespace Constructors {
 		public bool IsDefault { get; private set; }
 	}
 
-	/*
 	public class Duplicates {
 
 		// objc: except that the following three .ctors would have an identical name in ObjC, e.g. `initWithByte:Short:Int:Long:`
@@ -115,5 +114,4 @@ namespace Constructors {
 		{
 		}
 	}
-	*/
 }

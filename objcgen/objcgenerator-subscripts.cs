@@ -9,8 +9,9 @@ namespace ObjC {
 
 	public partial class ObjCGenerator {
 
-		protected void GenerateSubscript (PropertyInfo pi)
+		protected void GenerateSubscript (ProcessedProperty property)
 		{
+			PropertyInfo pi = property.Property;
 			Type indexType = pi.GetSetMethod ().GetParameters ()[0].ParameterType;
 			Type paramType = pi.PropertyType;
 			switch (Type.GetTypeCode (indexType)) {

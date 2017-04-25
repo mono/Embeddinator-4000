@@ -16,7 +16,7 @@ namespace ObjC {
 			return t.FullName.Replace ('.', '_');
 		}
 
-		void GetSignatures (string objName, string monoName, MemberInfo info, ParameterInfo [] parameters, bool isExtension, out string objcSignature, out string monoSignature)
+		void GetSignatures (string objName, string monoName, MemberInfo info, ParameterInfo [] parameters, bool useTypeNames, bool isExtension, out string objcSignature, out string monoSignature)
 		{
 			var method = (info as MethodBase); // else it's a PropertyInfo
 			// special case for setter-only - the underscore looks ugly
@@ -31,12 +31,14 @@ namespace ObjC {
 					objc.Append (' ');
 					mono.Append (',');
 				}
+				string paramName = useTypeNames ? p.ParameterType.Name : p.Name;
 				if ((method != null) && (n > 0 || !isExtension)) {
 					if (n == 0) {
-						if (method.IsConstructor || !method.IsSpecialName)
-							objc.Append (PascalCase (p.Name));
+						bool isPropertyMethod = method.IsSpecialName && (method.Name.StartsWith ("get") || method.Name.StartsWith ("set"));
+						if (method.IsConstructor || !method.IsSpecialName || (useTypeNames && isPropertyMethod))
+							objc.Append (PascalCase (paramName));
 					} else
-						objc.Append (p.Name.ToLowerInvariant ());
+						objc.Append (paramName.ToLowerInvariant ());
 				}
 				var pt = p.ParameterType;
 				var ptname = GetTypeName (p.ParameterType);
@@ -53,21 +55,21 @@ namespace ObjC {
 			monoSignature = mono.ToString ();
 		}
 
-		public IEnumerable<ConstructorInfo> GetUnavailableParentCtors (Type type, List<ConstructorInfo> typeCtors)
+		public IEnumerable<ProcessedConstructor> GetUnavailableParentCtors (Type type, List<ProcessedConstructor> typeCtors)
 		{
 			var baseType = type.BaseType;
 			if (baseType.Namespace == "System" && baseType.Name == "Object")
-				return Enumerable.Empty<ConstructorInfo> ();
+				return Enumerable.Empty<ProcessedConstructor> ();
 
-			List<ConstructorInfo> parentCtors;
+			List<ProcessedConstructor> parentCtors;
 			if (!ctors.TryGetValue (baseType, out parentCtors))
-				return Enumerable.Empty<ConstructorInfo> ();
+				return Enumerable.Empty<ProcessedConstructor> ();
 
-			var finalList = new List<ConstructorInfo> ();
+			var finalList = new List<ProcessedConstructor> ();
 			foreach (var pctor in parentCtors) {
-				var pctorParams = pctor.GetParameters ();
+				var pctorParams = pctor.Constructor.GetParameters ();
 				foreach (var ctor in typeCtors) {
-					var ctorParams = ctor.GetParameters ();
+					var ctorParams = ctor.Constructor.GetParameters ();
 					if (pctorParams.Any (pc => !ctorParams.Any (p => p.Position == pc.Position && pc.ParameterType == p.ParameterType))) {
 						finalList.Add (pctor);
 						break;
