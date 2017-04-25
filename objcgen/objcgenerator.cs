@@ -292,8 +292,8 @@ namespace ObjC {
 
 					headers.WriteLine ();
 
-					if (members_with_default_values.Contains (ctor))
-						default_init |= GenerateDefaultValuesWrappers (name, ctor);
+					if (members_with_default_values.Contains (ctor.Constructor))
+						default_init |= GenerateDefaultValuesWrappers (name, ctor.Constructor);
 				}
 			}
 
@@ -681,7 +681,7 @@ namespace ObjC {
 			else
 				name = CamelCase (mb.Name);
 			
-			GetSignatures (name, mb.Name, mb, plist.ToArray (), false, out objcsig, out monosig);
+			GetSignatures (name, mb.Name, mb, plist.ToArray (), false, false, out objcsig, out monosig);
 			var type = mb.DeclaringType;
 			var builder = new MethodHelper (headers, implementation) {
 				IsStatic = mb.IsStatic,
