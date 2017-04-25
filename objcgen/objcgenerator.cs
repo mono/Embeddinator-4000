@@ -13,8 +13,8 @@ namespace ObjC {
 	
 	public partial class ObjCGenerator : Generator {
 
-		TextWriter headers = new StringWriter ();
-		TextWriter implementation = new StringWriter ();
+		SourceWriter headers = new SourceWriter ();
+		SourceWriter implementation = new SourceWriter ();
 
 		public override void Generate (IEnumerable<Assembly> assemblies)
 		{
