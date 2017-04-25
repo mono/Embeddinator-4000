@@ -1,4 +1,4 @@
-﻿id:{932C3F0C-D968-42D1-BB14-D97C73361983}
+id:{932C3F0C-D968-42D1-BB14-D97C73361983}
 title:Embeddinator-4000 errors
 
 [//]: # (The original file resides under https://github.com/mono/Embeddinator-4000/tree/master/docs/error.md)
@@ -61,6 +61,10 @@ This is a known issue that we intend to fix in a future release of the generator
 The tool could not merge the frameworks mentioned in the error message, because there's a common file between them.
 
 This might indicate a bug in the Embeddinator-4000; please file a bug report at [https://github.com/mono/Embeddinator-4000/issues](https://github.com/mono/Embeddinator-4000/issues) with a test case.
+
+<h3><a name="EM0011"/>EM0011: The assembly `X` does not exist.</h3>
+
+The tool could not find the assembly `X` specified in the arguments.
 
 <h3><a name="EM0099"/>EM0099: Internal error *. Please file a bug report with a test case (https://github.com/mono/Embeddinator-4000/issues).</h3>
 
