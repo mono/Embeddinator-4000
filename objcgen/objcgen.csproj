@@ -318,6 +318,7 @@
     <Compile Include="EqualsHelper.cs" />
     <Compile Include="HashHelper.cs" />
     <Compile Include="sourcewriter.cs" />
+    <Compile Include="classhelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="support\" />
