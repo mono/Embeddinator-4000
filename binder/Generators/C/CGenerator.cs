@@ -87,6 +87,8 @@ namespace MonoEmbeddinator4000.Generators
     {
         public TranslationUnit Unit;
 
+        Options EmbedOptions => Context.Options as Options; 
+
         public CCodeGenerator(BindingContext context,
             TranslationUnit unit) : base(context, unit)
         {
@@ -113,7 +115,7 @@ namespace MonoEmbeddinator4000.Generators
 
         public void WriteInclude(string include)
         {
-            if (Options.GenerateSupportFiles)
+            if (EmbedOptions.GenerateSupportFiles)
                 WriteLine("#include \"{0}\"", include);
             else
                 WriteLine("#include <{0}>", include);

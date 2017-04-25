@@ -179,11 +179,8 @@
     <Compile Include="../../external/CppSharp/src/Generator/Passes/GenerateAnonymousDelegatesPass.cs">
       <Link>Passes/GenerateAnonymousDelegatesPass.cs</Link>
     </Compile>
-    <Compile Include="../../external/CppSharp/src/Generator/Passes/GenerateInlinesPass.cs">
-      <Link>Passes/GenerateInlinesPass.cs</Link>
-    </Compile>
-    <Compile Include="../../external/CppSharp/src/Generator/Passes/GenerateTemplatesCodePass.cs">
-      <Link>Passes/GenerateTemplatesCodePass.cs</Link>
+    <Compile Include="../../external/CppSharp/src/Generator/Passes/GenerateSymbolsPass.cs">
+      <Link>Passes/GenerateSymbolsPass.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Passes/GetterSetterToPropertyPass.cs">
       <Link>Passes/GetterSetterToPropertyPass.cs</Link>
@@ -193,9 +190,6 @@
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Passes/IgnoreSystemDeclarationsPass.cs">
       <Link>Passes/IgnoreSystemDeclarationsPass.cs</Link>
-    </Compile>
-    <Compile Include="../../external/CppSharp/src/Generator/Passes/InlinesCodeGenerator.cs">
-      <Link>Passes/InlinesCodeGenerator.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Passes/MarkSupportedClassTemplateSpecializationsPass.cs">
       <Link>Passes/MarkSupportedClassTemplateSpecializationsPass.cs</Link>
@@ -236,6 +230,9 @@
     <Compile Include="../../external/CppSharp/src/Generator/Passes/StripUnusedSystemTypesPass.cs">
       <Link>Passes/StripUnusedSystemTypesPass.cs</Link>
     </Compile>
+    <Compile Include="../../external/CppSharp/src/Generator/Passes/SymbolsCodeGenerator.cs">
+      <Link>Passes/SymbolsCodeGenerator.cs</Link>
+    </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Passes/TrimSpecializationsPass.cs">
       <Link>Passes/TrimSpecializationsPass.cs</Link>
     </Compile>
@@ -245,11 +242,14 @@
     <Compile Include="../../external/CppSharp/src/Generator/Types/Std/Stdlib.cs">
       <Link>Types/Std/Stdlib.cs</Link>
     </Compile>
+    <Compile Include="../../external/CppSharp/src/Generator/Types/TypeIgnoreChecker.cs">
+      <Link>Types/TypeIgnoreChecker.cs</Link>
+    </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Types/TypeMap.cs">
       <Link>Types/TypeMap.cs</Link>
     </Compile>
-    <Compile Include="../../external/CppSharp/src/Generator/Types/Types.cs">
-      <Link>Types/Types.cs</Link>
+    <Compile Include="../../external/CppSharp/src/Generator/Types/TypeMapDatabase.cs">
+      <Link>Types/TypeMapDatabase.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Utils/BlockGenerator.cs">
       <Link>Utils/BlockGenerator.cs</Link>

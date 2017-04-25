@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -149,8 +149,8 @@ namespace MonoEmbeddinator4000
             options.Verbose = Verbose;
             options.OutputDir = OutputDir;
             options.CompileCode = CompileCode;
-            options.Target = Target;
-            options.DebugMode = DebugMode;
+            options.Compilation.Target = Target;
+            options.Compilation.DebugMode = DebugMode;
 
             if (options.OutputDir == null)
                 options.OutputDir = Directory.GetCurrentDirectory();
@@ -171,10 +171,10 @@ namespace MonoEmbeddinator4000
             }
 
             var targetPlatform = ConvertToTargetPlatform(Platform);
-            options.Platform = targetPlatform;
+            options.Compilation.Platform = targetPlatform;
 
             var vsVersion = ConvertToVsVersion(VsVersion);
-            options.VsVersion = vsVersion;
+            options.Compilation.VsVersion = vsVersion;
 
             return true;
         }

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -231,13 +231,13 @@ namespace MonoEmbeddinator4000
 
         void AotAssemblies()
         {
-            switch (Options.Platform)
+            switch (Options.Compilation.Platform)
             {
             case TargetPlatform.iOS:
             case TargetPlatform.TVOS:
             case TargetPlatform.WatchOS:
             {
-                string aotCompiler = GetAppleAotCompiler(Options.Platform,
+                string aotCompiler = GetAppleAotCompiler(Options.Compilation.Platform,
                     XamarinSdkRoot, is64bits: false);
 
                 // Call the Mono AOT cross compiler for all input assemblies.
@@ -255,7 +255,7 @@ namespace MonoEmbeddinator4000
             case TargetPlatform.Android:
                 throw new NotSupportedException(string.Format(
                     "AOT cross compilation to target platform '{0}' is not supported.",
-                    Options.Platform));
+                    Options.Compilation.Platform));
             case TargetPlatform.MacOS:
                 break;
             }
@@ -266,7 +266,7 @@ namespace MonoEmbeddinator4000
             get
             {
                 var detectAppleSdks = new Xamarin.iOS.Tasks.DetectIPhoneSdks {
-                    TargetFrameworkIdentifier = GetXamarinTargetFrameworkName(Options.Platform)
+                    TargetFrameworkIdentifier = GetXamarinTargetFrameworkName(Options.Compilation.Platform)
                 };
                 
                 if (!detectAppleSdks.Execute())
@@ -300,13 +300,13 @@ namespace MonoEmbeddinator4000
         {
             var appName = $"{OutputName}.app";
 
-            switch (Options.Platform)
+            switch (Options.Compilation.Platform)
             {
             case TargetPlatform.iOS:
             case TargetPlatform.TVOS:
             case TargetPlatform.WatchOS:
                 var sdkName = App.Abi.IsSimulator() ? "Simulator" : string.Empty;
-                return Path.Combine(Options.OutputDir, $"{Options.Platform}{sdkName}",
+                return Path.Combine(Options.OutputDir, $"{Options.Compilation.Platform}{sdkName}",
                     appName);
             case TargetPlatform.Windows:
             case TargetPlatform.Android:
@@ -314,7 +314,7 @@ namespace MonoEmbeddinator4000
                 break;
             }
 
-            return Path.Combine(Options.OutputDir, Options.Platform.ToString(),
+            return Path.Combine(Options.OutputDir, Options.Compilation.Platform.ToString(),
                 App.Abi.ToString(), appName);
         }
 
@@ -332,13 +332,13 @@ namespace MonoEmbeddinator4000
                 $"--assembly-build-target=@all=framework={OutputName}.framework"
             };
 
-            if (Options.DebugMode)
+            if (Options.Compilation.DebugMode)
                 args.Add("--debug");
 
             var targetArg = App.Abi.IsSimulator() ? "--sim" : "--dev";
             args.Add($"{targetArg} {GetOutputFolder()}");
 
-            var xamarinAppleFramework = GetXamarinTargetFrameworkName(Options.Platform);
+            var xamarinAppleFramework = GetXamarinTargetFrameworkName(Options.Compilation.Platform);
             var references = new List<string> {
                 Path.Combine(MonoTouchSdk.LibDir, "mono", xamarinAppleFramework, $"{xamarinAppleFramework}.dll"),
                 Path.Combine(MonoTouchSdk.LibDir, "mono", xamarinAppleFramework, "mscorlib.dll")
@@ -408,7 +408,7 @@ namespace MonoEmbeddinator4000
                 string.Join(" ", files.Select(file => Path.GetFullPath(file)))
             };
 
-            if (Options.DebugMode)
+            if (Options.Compilation.DebugMode)
                 args.Add("-g");
 
             var invocation = string.Join(" ", args);
@@ -437,14 +437,14 @@ namespace MonoEmbeddinator4000
                 throw new Exception("Visual Studio SDK was not found on your system.");
 
             ToolchainVersion vsSdk;
-            if (Options.VsVersion == VisualStudioVersion.Latest)
+            if (Options.Compilation.VsVersion == VisualStudioVersion.Latest)
                 vsSdk = vsSdks.LastOrDefault();
             else
             {
-                var exactVersion = vsSdks.Where(vs => (int)vs.Version == (int)Options.VsVersion)
+                var exactVersion = vsSdks.Where(vs => (int)vs.Version == (int)Options.Compilation.VsVersion)
                     .Cast<ToolchainVersion?>().SingleOrDefault();
                 if (!exactVersion.HasValue)
-                    throw new Exception($"Visual Studio SDK version {Options.VsVersion} was not found on your system.");
+                    throw new Exception($"Visual Studio SDK version {Options.Compilation.VsVersion} was not found on your system.");
 
                 vsSdk = exactVersion.Value;
             }
@@ -462,7 +462,7 @@ namespace MonoEmbeddinator4000
                 $"-I\"{monoPath}\\include\\mono-2.0\"",
                 string.Join(" ", files.Select(file => "\""+ Path.GetFullPath(file) + "\"")),
                 $"\"{monoPath}\\lib\\monosgen-2.0.lib\"",
-                Options.CompileSharedLibrary ? "/LD" : string.Empty,
+                Options.Compilation.CompileSharedLibrary ? "/LD" : string.Empty,
                 $"/Fe{output}"
             };
 
@@ -502,7 +502,7 @@ namespace MonoEmbeddinator4000
             var sysroot = Path.Combine (XcodeToolchain.GetXcodeIncludesFolder (), "../..");
             args.Add ($"-isysroot {sysroot}");
 
-            if (Options.Target == CompilationTarget.SharedLibrary)
+            if (Options.Compilation.Target == CompilationTarget.SharedLibrary)
             {
                 var name = Path.GetFileNameWithoutExtension(Project.Assemblies[0]);
                 var libName = $"lib{name}.dylib";
@@ -535,7 +535,7 @@ namespace MonoEmbeddinator4000
             }
             else if (Platform.IsMacOS)
             {
-                switch (Options.Platform)
+                switch (Options.Compilation.Platform)
                 {
                 case TargetPlatform.iOS:
                 case TargetPlatform.TVOS:
@@ -545,7 +545,7 @@ namespace MonoEmbeddinator4000
                 case TargetPlatform.Windows:
                 case TargetPlatform.Android:
                     throw new NotSupportedException(
-                        $"Cross compilation to target platform '{Options.Platform}' is not supported.");
+                        $"Cross compilation to target platform '{Options.Compilation.Platform}' is not supported.");
                 case TargetPlatform.MacOS:
                     CompileClang(files);
                     break;
