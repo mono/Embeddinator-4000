@@ -461,7 +461,7 @@ namespace MonoEmbeddinator4000
                 $"-D{DLLExportDefine}",
                 $"-I\"{monoPath}\\include\\mono-2.0\"",
                 string.Join(" ", files.Select(file => "\""+ Path.GetFullPath(file) + "\"")),
-                $"\"{monoPath}\\lib\\monosgen-2.0.lib\"",
+                $"\"{GetSgenLibPath(monoPath)}\"",
                 Options.Compilation.CompileSharedLibrary ? "/LD" : string.Empty,
                 $"/Fe{output}"
             };
@@ -471,6 +471,12 @@ namespace MonoEmbeddinator4000
             var vsVersion = (VisualStudioVersion)(int)vsSdk.Version;
             var includes = MSVCToolchain.GetSystemIncludes(vsVersion);
 
+            var winSdks = new List<ToolchainVersion>();
+            MSVCToolchain.GetWindowsKitsSdks(out winSdks);
+
+            var libParentPath = Directory.GetParent(Directory.EnumerateDirectories(Path.Combine(winSdks.Last().Directory, "lib"), "um", SearchOption.AllDirectories).First());
+            var libPaths = libParentPath.EnumerateDirectories();
+
             Dictionary<string, string> envVars = null;
             if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("INCLUDE")))
             {
@@ -479,10 +485,17 @@ namespace MonoEmbeddinator4000
 
                 var clLib = Path.GetFullPath(
                     Path.Combine(vsSdk.Directory, "..", "..", "VC", "lib"));
-                envVars["LIB"] = clLib;
+                envVars["LIB"] = clLib + ";" + string.Join(";", libPaths.Select(path => Path.Combine(path.FullName, "x86")));
             }
 
             Invoke(clBin, invocation, envVars);
+        }
+
+        string GetSgenLibPath(string monoPath)
+        {
+            var libPath = Path.Combine(monoPath, "lib");
+            var sgenPath = Path.Combine(libPath, "mono-2.0-sgen.lib");
+            return File.Exists(sgenPath) ? sgenPath : Path.Combine(libPath, "monosgen-2.0.lib");
         }
 
         void CompileClang(IEnumerable<string> files)
