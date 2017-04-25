@@ -315,6 +315,7 @@
     <Compile Include="comparablehelper.cs" />
     <Compile Include="EqualsHelper.cs" />
     <Compile Include="HashHelper.cs" />
+    <Compile Include="sourcewriter.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="support\" />

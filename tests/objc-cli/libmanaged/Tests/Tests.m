@@ -114,6 +114,39 @@
 
 	Constructors_AllTypeCode* all4 = [[Constructors_AllTypeCode alloc] initWithF32:FLT_MAX f64:DBL_MAX];
 	XCTAssertTrue ([all4 testResult], "all4");
+
+	Constructors_DefaultValues* dv0 = [[Constructors_DefaultValues alloc] init];
+	XCTAssertTrue ([dv0 isDefault], "default value 0");
+
+	Constructors_DefaultValues* dv1 = [[Constructors_DefaultValues alloc] initWithB:0];
+	XCTAssertTrue ([dv1 isDefault], "default value 1");
+
+	Constructors_DefaultValues* dv2 = [[Constructors_DefaultValues alloc] initWithB:0 s:1];
+	XCTAssertTrue ([dv2 isDefault], "default value 2");
+
+	Constructors_DefaultValues* dv3 = [[Constructors_DefaultValues alloc] initWithB:0 s:1 i:2];
+	XCTAssertTrue ([dv3 isDefault], "default value 3");
+
+	Constructors_DefaultValues* dv4 = [[Constructors_DefaultValues alloc] initWithB:0 s:1 i:2 l:3];
+	XCTAssertTrue ([dv4 isDefault], "default value 4");
+
+	Constructors_DefaultValues* dvx = [[Constructors_DefaultValues alloc] initWithB:3 s:2 i:1 l:0];
+	XCTAssertFalse ([dvx isDefault], "default value X");
+
+	Constructors_DefaultValues* dvn0 = [[Constructors_DefaultValues alloc] initWithNonDefault:0];
+	XCTAssertTrue ([dvn0 isDefault], "default value 2 / 0");
+
+	Constructors_DefaultValues* dvn1 = [[Constructors_DefaultValues alloc] initWithNonDefault:1 s:@""];
+	XCTAssertTrue ([dvn1 isDefault], "default value 2 / 1");
+
+	Constructors_DefaultValues* dvn2 = [[Constructors_DefaultValues alloc] initWithNonDefault:2 s:@"" f:NAN];
+	XCTAssertTrue ([dvn2 isDefault], "default value 2 / 2");
+
+	Constructors_DefaultValues* dvn3 = [[Constructors_DefaultValues alloc] initWithNonDefault:3 s:@"" f:NAN d:INFINITY];
+	XCTAssertTrue ([dvn3 isDefault], "default value 2 / 3");
+
+	Constructors_DefaultValues* dvn4 = [[Constructors_DefaultValues alloc] initWithNonDefault:4 s:@"" f:NAN d:INFINITY e:Enums_ByteEnumMax];
+	XCTAssertTrue ([dvn4 isDefault], "default value 2 / 4");
 }
 
 - (void)testMethods {
@@ -166,6 +199,9 @@
 
 	[collection removeItem:item2];
 	XCTAssert ([collection count] == 0, "count 4");
+
+	id default_item = [Methods_Factory createItem];
+	XCTAssert ([default_item integer] == 0, "default creation 0");
 
 	XCTAssertEqualObjects (@"", [Methods_SomeExtensions notAnExtensionMethod], "empty string");
 }
