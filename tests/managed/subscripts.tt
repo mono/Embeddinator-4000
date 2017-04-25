@@ -1,0 +1,57 @@
+﻿﻿<#@ template language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+using System.Collections.Generic;
+
+namespace Subscripts
+{
+<# foreach (var t in new string [] {"bool", "sbyte", "byte", "short", "ushort", "int", "uint", "long", "ulong", "float", "double", "char", "string"}) { #>
+	public class <#=Char.ToUpperInvariant (t[0]) + t.Substring(1).ToLowerInvariant()  #>Collection
+	{
+		List<<#=t#>> c = new List<<#=t#>> ();
+
+		public void Add (<#=t#> item)
+		{
+			c.Add (item);
+		}
+
+		public void Remove (<#=t#> item)
+		{
+			c.Remove (item);
+		}
+
+		public int Count => c.Count;
+
+		public <#=t#> this[int index] {
+			get { return c[index]; }
+			set { c[index] = value; }
+		}
+	}
+
+	public class <#=Char.ToUpperInvariant (t[0]) + t.Substring(1).ToLowerInvariant()  #>DictionaryCollection
+	{
+		Dictionary <string, <#=t#>> c = new Dictionary <string, <#=t#>> ();
+
+		public void Add (string key, <#=t#> item)
+		{
+			c.Add (key, item);
+		}
+
+		public void Remove (string key)
+		{
+			c.Remove (key);
+		}
+
+		public int Count => c.Count;
+
+		public <#=t#> this[string key] {
+			get { return c[key]; }
+			set { c[key] = value; }
+		}
+	}
+
+<# } #>
+}

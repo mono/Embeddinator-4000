@@ -157,6 +157,7 @@ namespace ObjC {
 		Dictionary<Type, List<MethodInfo>> methods = new Dictionary<Type, List<MethodInfo>> ();
 		Dictionary<Type, List<PropertyInfo>> properties = new Dictionary<Type, List<PropertyInfo>> ();
 		Dictionary<Type, List<FieldInfo>> fields = new Dictionary<Type, List<FieldInfo>> ();
+		Dictionary<Type, List<PropertyInfo>> subscriptProperties = new Dictionary<Type, List<PropertyInfo>> ();
 
 		public override void Process (IEnumerable<Assembly> assemblies)
 		{
@@ -176,15 +177,20 @@ namespace ObjC {
 						methods.Add (t, meths);
 
 					var props = new List<PropertyInfo> ();
+					var subscriptProps = new List<PropertyInfo> ();
 					foreach (var pi in GetProperties (t)) {
 						var getter = pi.GetGetMethod ();
 						var setter = pi.GetSetMethod ();
 						// setter only property are valid in .NET and we need to generate a method in ObjC (there's no writeonly properties)
 						if (getter == null)
 							continue;
-						// indexers are implemented as methods
-						if ((getter.ParameterCount > 0) || ((setter != null) && setter.ParameterCount > 1))
+
+						// indexers are implemented as methods and object subscripting
+						if ((getter.ParameterCount > 0) || ((setter != null) && setter.ParameterCount > 1)) {
+							subscriptProps.Add (pi);
 							continue;
+						}
+
 						// we can do better than methods for the more common cases (readonly and readwrite)
 						meths.Remove (getter);
 						meths.Remove (setter);
@@ -193,6 +199,13 @@ namespace ObjC {
 					props = props.OrderBy ((arg) => arg.Name).ToList ();
 					if (props.Count > 0)
 						properties.Add (t, props);
+
+					if (subscriptProps.Count > 0) {
+						if (subscriptProps.Count > 1)
+							delayed.Add (ErrorHelper.CreateWarning (1041, $"Indexed properties on {t.Name} is not generated because multiple indexed properties not supported."));
+
+						subscriptProperties.Add (t, subscriptProps);
+					}
 
 					// fields will need to be wrapped within properties - except for enums
 					if (!t.IsEnum) {

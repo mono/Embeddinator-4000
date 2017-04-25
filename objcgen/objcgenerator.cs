@@ -280,6 +280,13 @@ namespace ObjC {
 					Generate (fi);
 			}
 
+			List<PropertyInfo> s;
+			if (subscriptProperties.TryGetValue (t, out s)) {
+				headers.WriteLine ();
+				foreach (var si in s)
+					GenerateSubscript (si);
+			}
+
 			List<MethodInfo> meths;
 			if (methods.TryGetValue (t, out meths)) {
 				headers.WriteLine ();
