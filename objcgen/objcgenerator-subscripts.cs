@@ -40,7 +40,9 @@ namespace ObjC {
 
 			implementation.WriteLine ($"- (id)objectForKeyedSubscript:(id)key;");
 			implementation.WriteLine ("{");
-			implementation.WriteLine ($"\treturn {ToNSObject (propertyType, "[self getItem:key]")};");
+			implementation.Indent++;
+			implementation.WriteLine ($"return {ToNSObject (propertyType, "[self getItem:key]")};");
+			implementation.Indent--;
 			implementation.WriteLine ("}");
 			implementation.WriteLine ();
 
@@ -49,7 +51,9 @@ namespace ObjC {
 
 			implementation.WriteLine ($"- (void)setObject:(id)obj forKeyedSubscript:(id)key;");
 			implementation.WriteLine ("{");
-			implementation.WriteLine ($"\t[self setItem:key value:{FromNSObject (propertyType, "obj")}];");
+			implementation.Indent++;
+			implementation.WriteLine ($"[self setItem:key value:{FromNSObject (propertyType, "obj")}];");
+			implementation.Indent--;
 			implementation.WriteLine ("}");
 			implementation.WriteLine ();
 		}
@@ -62,7 +66,9 @@ namespace ObjC {
 
 			implementation.WriteLine ($"- (id)objectAtIndexedSubscript:({indexTypeString})idx");
 			implementation.WriteLine ("{");
-			implementation.WriteLine ($"\treturn {ToNSObject (propertyType, "[self getItem:idx]")};");
+			implementation.Indent++;
+			implementation.WriteLine ($"return {ToNSObject (propertyType, "[self getItem:idx]")};");
+			implementation.Indent--;
 			implementation.WriteLine ("}");
 			implementation.WriteLine ();
 
@@ -70,7 +76,9 @@ namespace ObjC {
 
 			implementation.WriteLine ($"- (void)setObject:(id)obj atIndexedSubscript: ({indexTypeString})idx");
 			implementation.WriteLine ("{");
-			implementation.WriteLine ($"\t[self setItem:idx value:{FromNSObject (propertyType, "obj")}];");
+			implementation.Indent++;
+			implementation.WriteLine ($"[self setItem:idx value:{FromNSObject (propertyType, "obj")}];");
+			implementation.Indent--;
 			implementation.WriteLine ("}");
 			implementation.WriteLine ();
 		}
