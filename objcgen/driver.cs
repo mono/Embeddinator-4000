@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -213,6 +213,9 @@ namespace Embeddinator {
 
 			var universe = new Universe (UniverseOptions.MetadataOnly);
 			foreach (var arg in args) {
+				if (!File.Exists (arg))
+					throw ErrorHelper.CreateError (11, $"The assembly {arg} does not exist.");
+
 				Assemblies.Add (universe.LoadFile (arg));
 				Console.WriteLine ($"\tParsed '{arg}'");
 			}
