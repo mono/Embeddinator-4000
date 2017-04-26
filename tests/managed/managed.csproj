@@ -44,6 +44,7 @@
       <DependentUpon>subscripts.tt</DependentUpon>
     </Compile>
     <Compile Include="equalsHashOverrides.cs" />
+    <Compile Include="interfaces.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="subscripts.tt">

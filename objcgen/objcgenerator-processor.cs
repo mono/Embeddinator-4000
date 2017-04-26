@@ -22,13 +22,6 @@ namespace ObjC {
 			if (unsupported.Contains (t))
 				return false;
 
-			// FIXME protocols
-			if (t.IsInterface) {
-				delayed.Add (ErrorHelper.CreateWarning (1010, $"Type `{t}` is not generated because `interfaces` are not supported."));
-				unsupported.Add (t);
-				return false;
-			}
-
 			if (t.IsGenericParameter || t.IsGenericType) {
 				delayed.Add (ErrorHelper.CreateWarning (1010, $"Type `{t}` is not generated because `generics` are not supported."));
 				unsupported.Add (t);
@@ -203,6 +196,7 @@ namespace ObjC {
 
 		List<Type> enums = new List<Type> ();
 		List<Type> types = new List<Type> ();
+		List<Type> protocols = new List<Type> ();
 
 		Dictionary<Type, List<ProcessedConstructor>> ctors = new Dictionary<Type, List<ProcessedConstructor>> ();
 		Dictionary<Type, List<ProcessedMethod>> methods = new Dictionary<Type, List<ProcessedMethod>> ();
@@ -229,7 +223,11 @@ namespace ObjC {
 						continue;
 					}
 
-					types.Add (t);
+					if (t.IsInterface) {
+						protocols.Add (t);
+					} else {
+						types.Add (t);
+					}
 
 					extension_type = t.HasCustomAttribute ("System.Runtime.CompilerServices", "ExtensionAttribute");
 
