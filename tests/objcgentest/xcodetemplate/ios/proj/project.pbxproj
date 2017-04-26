@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		7E015F2E1EA6845D0039309A /* managed-ios.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7E577A671E9E5AEA003FA392 /* managed-ios.framework */; };
+		7E015F2E1EA6845D0039309A /* %FRAMEWORK_REFERENCE_NAME%.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7E577A671E9E5AEA003FA392 /* %FRAMEWORK_REFERENCE_NAME%.framework */; };
 		7E577A421E9E5A4B003FA392 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 7E577A411E9E5A4B003FA392 /* main.m */; };
 		7E577A451E9E5A4B003FA392 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 7E577A441E9E5A4B003FA392 /* AppDelegate.m */; };
 		7E577A481E9E5A4B003FA392 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7E577A471E9E5A4B003FA392 /* ViewController.m */; };
@@ -16,9 +16,9 @@
 		7E577A501E9E5A4B003FA392 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7E577A4E1E9E5A4B003FA392 /* LaunchScreen.storyboard */; };
 		7E577A5B1E9E5A4C003FA392 /* iosTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 7E577A5A1E9E5A4C003FA392 /* iosTests.m */; };
 		7E577A661E9E5A5E003FA392 /* Tests.m in Sources */ = {isa = PBXBuildFile; fileRef = 7E577A651E9E5A5E003FA392 /* Tests.m */; };
-		7E577A681E9E5AEA003FA392 /* managed-ios.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7E577A671E9E5AEA003FA392 /* managed-ios.framework */; };
-		7E577A6B1E9E5D9C003FA392 /* managed-ios.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 7E577A671E9E5AEA003FA392 /* managed-ios.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		7E577A6D1E9E6D9D003FA392 /* managed-ios.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 7E577A671E9E5AEA003FA392 /* managed-ios.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		7E577A681E9E5AEA003FA392 /* %FRAMEWORK_REFERENCE_NAME%.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7E577A671E9E5AEA003FA392 /* %FRAMEWORK_REFERENCE_NAME%.framework */; };
+		7E577A6B1E9E5D9C003FA392 /* %FRAMEWORK_REFERENCE_NAME%.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 7E577A671E9E5AEA003FA392 /* %FRAMEWORK_REFERENCE_NAME%.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		7E577A6D1E9E6D9D003FA392 /* %FRAMEWORK_REFERENCE_NAME%.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 7E577A671E9E5AEA003FA392 /* %FRAMEWORK_REFERENCE_NAME%.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -27,7 +27,7 @@
 			containerPortal = 7E577A351E9E5A4B003FA392 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 7E577A3C1E9E5A4B003FA392;
-			remoteInfo = "libmanaged-ios";
+			remoteInfo = "%PROJECT_NAME%";
 		};
 /* End PBXContainerItemProxy section */
 
@@ -38,7 +38,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				7E577A6B1E9E5D9C003FA392 /* managed-ios.framework in CopyFiles */,
+				7E577A6B1E9E5D9C003FA392 /* %FRAMEWORK_REFERENCE_NAME%.framework in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -48,14 +48,14 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				7E577A6D1E9E6D9D003FA392 /* managed-ios.framework in CopyFiles */,
+				7E577A6D1E9E6D9D003FA392 /* %FRAMEWORK_REFERENCE_NAME%.framework in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		7E577A3D1E9E5A4B003FA392 /* libmanaged-ios.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "libmanaged-ios.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		7E577A3D1E9E5A4B003FA392 /* %PROJECT_NAME%.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "%PROJECT_NAME%.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		7E577A411E9E5A4B003FA392 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		7E577A431E9E5A4B003FA392 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		7E577A441E9E5A4B003FA392 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -65,11 +65,11 @@
 		7E577A4C1E9E5A4B003FA392 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		7E577A4F1E9E5A4B003FA392 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		7E577A511E9E5A4B003FA392 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		7E577A561E9E5A4C003FA392 /* libmanaged-iosTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "libmanaged-iosTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		7E577A561E9E5A4C003FA392 /* Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		7E577A5A1E9E5A4C003FA392 /* iosTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = iosTests.m; sourceTree = "<group>"; };
 		7E577A5C1E9E5A4C003FA392 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		7E577A651E9E5A5E003FA392 /* Tests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Tests.m; path = ../../libmanaged/Tests/Tests.m; sourceTree = "<group>"; };
-		7E577A671E9E5AEA003FA392 /* managed-ios.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = "managed-ios.framework"; path = "../debug/libmanaged-ios-framework/managed-ios.framework"; sourceTree = "<group>"; };
+		7E577A651E9E5A5E003FA392 /* Tests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Tests.m; path = %TESTS_ROOT_DIR%/objc-cli/libmanaged/Tests/Tests.m; sourceTree = "<group>"; };
+		7E577A671E9E5AEA003FA392 /* %FRAMEWORK_REFERENCE_NAME%.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = "%FRAMEWORK_REFERENCE_NAME%.framework"; path = "%FRAMEWORK_REFERENCE_DIR%/%FRAMEWORK_REFERENCE_NAME%.framework"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -77,7 +77,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7E015F2E1EA6845D0039309A /* managed-ios.framework in Frameworks */,
+				7E015F2E1EA6845D0039309A /* %FRAMEWORK_REFERENCE_NAME%.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -85,7 +85,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7E577A681E9E5AEA003FA392 /* managed-ios.framework in Frameworks */,
+				7E577A681E9E5AEA003FA392 /* %FRAMEWORK_REFERENCE_NAME%.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -95,9 +95,9 @@
 		7E577A341E9E5A4B003FA392 = {
 			isa = PBXGroup;
 			children = (
-				7E577A671E9E5AEA003FA392 /* managed-ios.framework */,
-				7E577A3F1E9E5A4B003FA392 /* libmanaged-ios */,
-				7E577A591E9E5A4C003FA392 /* libmanaged-iosTests */,
+				7E577A671E9E5AEA003FA392 /* %FRAMEWORK_REFERENCE_NAME%.framework */,
+				7E577A3F1E9E5A4B003FA392 /* %PROJECT_NAME% */,
+				7E577A591E9E5A4C003FA392 /* Tests */,
 				7E577A3E1E9E5A4B003FA392 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -105,13 +105,13 @@
 		7E577A3E1E9E5A4B003FA392 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				7E577A3D1E9E5A4B003FA392 /* libmanaged-ios.app */,
-				7E577A561E9E5A4C003FA392 /* libmanaged-iosTests.xctest */,
+				7E577A3D1E9E5A4B003FA392 /* %PROJECT_NAME%.app */,
+				7E577A561E9E5A4C003FA392 /* Tests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		7E577A3F1E9E5A4B003FA392 /* libmanaged-ios */ = {
+		7E577A3F1E9E5A4B003FA392 /* %PROJECT_NAME% */ = {
 			isa = PBXGroup;
 			children = (
 				7E577A431E9E5A4B003FA392 /* AppDelegate.h */,
@@ -124,7 +124,7 @@
 				7E577A511E9E5A4B003FA392 /* Info.plist */,
 				7E577A401E9E5A4B003FA392 /* Supporting Files */,
 			);
-			path = "libmanaged-ios";
+			path = "%PROJECT_NAME%";
 			sourceTree = "<group>";
 		};
 		7E577A401E9E5A4B003FA392 /* Supporting Files */ = {
@@ -135,22 +135,22 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		7E577A591E9E5A4C003FA392 /* libmanaged-iosTests */ = {
+		7E577A591E9E5A4C003FA392 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
 				7E577A651E9E5A5E003FA392 /* Tests.m */,
 				7E577A5A1E9E5A4C003FA392 /* iosTests.m */,
 				7E577A5C1E9E5A4C003FA392 /* Info.plist */,
 			);
-			path = "libmanaged-iosTests";
+			path = "Tests";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		7E577A3C1E9E5A4B003FA392 /* libmanaged-ios */ = {
+		7E577A3C1E9E5A4B003FA392 /* %PROJECT_NAME% */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 7E577A5F1E9E5A4C003FA392 /* Build configuration list for PBXNativeTarget "libmanaged-ios" */;
+			buildConfigurationList = 7E577A5F1E9E5A4C003FA392 /* Build configuration list for PBXNativeTarget "%PROJECT_NAME%" */;
 			buildPhases = (
 				7E577A391E9E5A4B003FA392 /* Sources */,
 				7E577A3A1E9E5A4B003FA392 /* Frameworks */,
@@ -161,14 +161,14 @@
 			);
 			dependencies = (
 			);
-			name = "libmanaged-ios";
-			productName = "libmanaged-ios";
-			productReference = 7E577A3D1E9E5A4B003FA392 /* libmanaged-ios.app */;
+			name = "%PROJECT_NAME%";
+			productName = "%PROJECT_NAME%";
+			productReference = 7E577A3D1E9E5A4B003FA392 /* %PROJECT_NAME%.app */;
 			productType = "com.apple.product-type.application";
 		};
-		7E577A551E9E5A4C003FA392 /* libmanaged-iosTests */ = {
+		7E577A551E9E5A4C003FA392 /* Tests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 7E577A621E9E5A4C003FA392 /* Build configuration list for PBXNativeTarget "libmanaged-iosTests" */;
+			buildConfigurationList = 7E577A621E9E5A4C003FA392 /* Build configuration list for PBXNativeTarget "Tests" */;
 			buildPhases = (
 				7E577A521E9E5A4C003FA392 /* Sources */,
 				7E577A531E9E5A4C003FA392 /* Frameworks */,
@@ -180,9 +180,9 @@
 			dependencies = (
 				7E577A581E9E5A4C003FA392 /* PBXTargetDependency */,
 			);
-			name = "libmanaged-iosTests";
-			productName = "libmanaged-iosTests";
-			productReference = 7E577A561E9E5A4C003FA392 /* libmanaged-iosTests.xctest */;
+			name = "Tests";
+			productName = "Tests";
+			productReference = 7E577A561E9E5A4C003FA392 /* Tests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
@@ -192,7 +192,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastUpgradeCheck = 0830;
-				ORGANIZATIONNAME = "Rolf Bjarne Kvinge";
+				ORGANIZATIONNAME = "Microsoft";
 				TargetAttributes = {
 					7E577A3C1E9E5A4B003FA392 = {
 						CreatedOnToolsVersion = 8.3;
@@ -207,7 +207,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 7E577A381E9E5A4B003FA392 /* Build configuration list for PBXProject "libmanaged-ios" */;
+			buildConfigurationList = 7E577A381E9E5A4B003FA392 /* Build configuration list for PBXProject "%PROJECT_NAME%" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -220,8 +220,8 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				7E577A3C1E9E5A4B003FA392 /* libmanaged-ios */,
-				7E577A551E9E5A4C003FA392 /* libmanaged-iosTests */,
+				7E577A3C1E9E5A4B003FA392 /* %PROJECT_NAME% */,
+				7E577A551E9E5A4C003FA392 /* Tests */,
 			);
 		};
 /* End PBXProject section */
@@ -271,7 +271,7 @@
 /* Begin PBXTargetDependency section */
 		7E577A581E9E5A4C003FA392 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 7E577A3C1E9E5A4B003FA392 /* libmanaged-ios */;
+			target = 7E577A3C1E9E5A4B003FA392 /* %PROJECT_NAME% */;
 			targetProxy = 7E577A571E9E5A4C003FA392 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -394,11 +394,11 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = TGFVQHFHZF;
 				ENABLE_BITCODE = NO;
-				FRAMEWORK_SEARCH_PATHS = "../debug/libmanaged-ios-framework";
-				INFOPLIST_FILE = "libmanaged-ios/Info.plist";
+				FRAMEWORK_SEARCH_PATHS = "%FRAMEWORK_REFERENCE_DIR%";
+				INFOPLIST_FILE = "%PROJECT_NAME%/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.rolfkvinge.libmanaged-ios";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.xamarin.%PROJECT_NAME%";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -409,11 +409,11 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = TGFVQHFHZF;
 				ENABLE_BITCODE = NO;
-				FRAMEWORK_SEARCH_PATHS = "../debug/libmanaged-ios-framework";
-				INFOPLIST_FILE = "libmanaged-ios/Info.plist";
+				FRAMEWORK_SEARCH_PATHS = "%FRAMEWORK_REFERENCE_DIR%";
+				INFOPLIST_FILE = "%PROJECT_NAME%/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.rolfkvinge.libmanaged-ios";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.xamarin.%PROJECT_NAME%";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
@@ -423,18 +423,18 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				DEVELOPMENT_TEAM = TGFVQHFHZF;
-				"FRAMEWORK_SEARCH_PATHS[sdk=iphoneos*]" = "../debug/libmanaged-ios-framework";
-				"FRAMEWORK_SEARCH_PATHS[sdk=iphonesimulator*]" = "../debug/libmanaged-ios-framework";
+				FRAMEWORK_SEARCH_PATHS = "%FRAMEWORK_REFERENCE_DIR%";
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
 					"TEST_FRAMEWORK=1",
+					"XAMARIN_IOS=1",
 				);
-				INFOPLIST_FILE = "libmanaged-iosTests/Info.plist";
+				INFOPLIST_FILE = "Tests/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.rolfkvinge.libmanaged-iosTests";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.xamarin.%PROJECT_NAME%Tests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/libmanaged-ios.app/libmanaged-ios";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/%PROJECT_NAME%.app/%PROJECT_NAME%";
 			};
 			name = Debug;
 		};
@@ -443,19 +443,23 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				DEVELOPMENT_TEAM = TGFVQHFHZF;
-				GCC_PREPROCESSOR_DEFINITIONS = "TEST_FRAMEWORK=1";
-				INFOPLIST_FILE = "libmanaged-iosTests/Info.plist";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"TEST_FRAMEWORK=1",
+					"XAMARIN_IOS=1",
+				);
+				INFOPLIST_FILE = "Tests/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.rolfkvinge.libmanaged-iosTests";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.xamarin.%PROJECT_NAME%Tests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/libmanaged-ios.app/libmanaged-ios";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/%PROJECT_NAME%.app/%PROJECT_NAME%";
 			};
 			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		7E577A381E9E5A4B003FA392 /* Build configuration list for PBXProject "libmanaged-ios" */ = {
+		7E577A381E9E5A4B003FA392 /* Build configuration list for PBXProject "%PROJECT_NAME%" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				7E577A5D1E9E5A4C003FA392 /* Debug */,
@@ -464,7 +468,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		7E577A5F1E9E5A4C003FA392 /* Build configuration list for PBXNativeTarget "libmanaged-ios" */ = {
+		7E577A5F1E9E5A4C003FA392 /* Build configuration list for PBXNativeTarget "%PROJECT_NAME%" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				7E577A601E9E5A4C003FA392 /* Debug */,
@@ -473,7 +477,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		7E577A621E9E5A4C003FA392 /* Build configuration list for PBXNativeTarget "libmanaged-iosTests" */ = {
+		7E577A621E9E5A4C003FA392 /* Build configuration list for PBXNativeTarget "Tests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				7E577A631E9E5A4C003FA392 /* Debug */,

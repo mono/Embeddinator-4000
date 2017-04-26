@@ -5,6 +5,7 @@ using System.Linq;
 using System.IO;
 using IKVM.Reflection;
 using Type = IKVM.Reflection.Type;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Xml;
 
@@ -24,7 +25,10 @@ namespace Embeddinator {
 
 	public enum Platform
 	{
-		macOS,
+		macOS, // Does not use Xamarin.Mac
+		macOSFull,
+		macOSModern,
+		macOSSystem,
 		iOS,
 		watchOS,
 		tvOS,
@@ -133,6 +137,12 @@ namespace Embeddinator {
 			}
 		}
 
+		string bundleIdentifier;
+		public string BundleIdentifier {
+			get { return bundleIdentifier ?? LibraryName; }
+			set { bundleIdentifier = value; }
+		}
+
 		public bool CompileCode { get; set; }
 
 		public bool Debug { get; set; }
@@ -151,6 +161,18 @@ namespace Embeddinator {
 			case "macos":
 			case "mac":
 				Platform = Platform.macOS;
+				break;
+			case "macosmodern":
+			case "macos-modern":
+				Platform = Platform.macOSModern;
+				break;
+			case "macosfull":
+			case "macos-full":
+				Platform = Platform.macOSFull;
+				break;
+			case "macossystem":
+			case "macos-system":
+				Platform = Platform.macOSSystem;
 				break;
 			case "ios":
 				Platform = Platform.iOS;
@@ -215,8 +237,12 @@ namespace Embeddinator {
 				case Platform.watchOS:
 					return "/Library/Frameworks/Xamarin.iOS.framework/Versions/Current/lib/mono/Xamarin.WatchOS";
 				case Platform.macOS:
-					// FIXME: this is not right when embedding XM.
+				case Platform.macOSSystem:
 					return "/Library/Frameworks/Mono.framework/Versions/Current/lib/mono/4.5";
+				case Platform.macOSFull:
+					return "/Library/Frameworks/Xamarin.Mac.framework/Versions/Current/lib/mono/4.5";
+				case Platform.macOSModern:
+					return "/Library/Frameworks/Xamarin.Mac.framework/Versions/Current/lib/mono/Xamarin.Mac";
 				default:
 					throw ErrorHelper.CreateError (99, "Internal error: invalid platform {0}. Please file a bug report with a test case (https://github.com/mono/Embeddinator-4000/issues).", Platform);
 				}
@@ -320,6 +346,9 @@ namespace Embeddinator {
 				SystemCheck.VerifyXamariniOS ();
 				break;
 			case Platform.macOS:
+			case Platform.macOSFull:
+			case Platform.macOSModern:
+			case Platform.macOSSystem:
 				SystemCheck.VerifyXamarinMac ();
 				break;
 			default:
@@ -337,6 +366,9 @@ namespace Embeddinator {
 
 			switch (Platform) {
 			case Platform.macOS:
+			case Platform.macOSFull:
+			case Platform.macOSModern:
+			case Platform.macOSSystem:
 				build_infos = new BuildInfo [] {
 					new BuildInfo { Sdk = "MacOSX", Architectures = new string [] { "i386", "x86_64" }, SdkName = "macosx", MinVersion = "10.7" },
 				};
@@ -450,10 +482,13 @@ namespace Embeddinator {
 
 					switch (Platform) {
 					case Platform.macOS:
-						// FIXME: Pending XM support to switch include directory.
-						//common_options.Append ("-I/Library/Frameworks/Xamarin.Mac.framework/Versions/Current/include ");
-						//common_options.Append ("-DXAMARIN_MAC ");
 						common_options.Append ("-I/Library/Frameworks/Mono.framework/Versions/Current/include/mono-2.0 ");
+						break;
+					case Platform.macOSSystem:
+					case Platform.macOSModern:
+					case Platform.macOSFull:
+						common_options.Append ("-I/Library/Frameworks/Xamarin.Mac.framework/Versions/Current/include ");
+						common_options.Append ("-DXAMARIN_MAC ");
 						break;
 					case Platform.iOS:
 					case Platform.tvOS:
@@ -530,17 +565,174 @@ namespace Embeddinator {
 				if (!Lipo (lipo_files, sdk_output_file, out exitCode))
 					return exitCode;
 
-				// Call mtouch if we're building a framework
 				if (CompilationTarget == CompilationTarget.Framework) {
+					var appdir = Path.GetFullPath (Path.Combine (OutputDirectory, build_info.Sdk, LibraryName));
+					var cachedir = Path.GetFullPath (Path.Combine (outputDirectory, build_info.Sdk, "build-cache"));
+
+					string fwdir;
+					string headers;
+
 					switch (Platform) {
 					case Platform.macOS:
-						throw new NotImplementedException ("frameworks for macOS");
+					case Platform.macOSFull:
+					case Platform.macOSModern:
+					case Platform.macOSSystem:
+						fwdir = Path.Combine (appdir, $"{LibraryName}.framework");
+						headers = Path.Combine (fwdir, "Headers");
+						Directory.CreateDirectory (Path.Combine (fwdir, "Versions", "A", "Headers"));
+						CreateSymlink (Path.Combine (fwdir, "Versions", "Current"), "A");
+						CreateSymlink (Path.Combine (fwdir, "Headers"), "Versions/Current/Headers");
+						CreateSymlink (Path.Combine (fwdir, "Resources"), "Versions/Current/Resources");
+						break;
+					case Platform.iOS:
+					case Platform.tvOS:
+					case Platform.watchOS:
+						fwdir = Path.Combine (appdir, "Frameworks", $"{LibraryName}.framework");
+						headers = Path.Combine (fwdir, "Headers");
+						Directory.CreateDirectory (headers);
+						break;
+					default:
+						throw ErrorHelper.CreateError (99, "Internal error: invalid platform {0}. Please file a bug report with a test case (https://github.com/mono/Embeddinator-4000/issues).", Platform);
+					}
+
+					switch (Platform) {
+					case Platform.macOS:
+						var resources_dir = Path.Combine (fwdir, "Versions", "A", "Resources");
+						Directory.CreateDirectory (resources_dir);
+
+						// Link the .a files into a framework
+						var options = new StringBuilder ("clang ");
+						options.Append ($"-dynamiclib ");
+						options.Append (build_info.LinkerFlags).Append (" ");
+						options.Append ("-lobjc ");
+						options.Append ("-framework CoreFoundation ");
+						options.Append ("-framework Foundation ");
+						options.Append ($"-install_name {Quote ($"@loader_path/../Frameworks/{LibraryName}.framework/Versions/A/{LibraryName}")} ");
+						options.Append ("-force_load ").Append (Quote (sdk_output_file)).Append (" ");
+						options.Append ($"-o ").Append (Quote (Path.Combine (fwdir, "Versions", "A", LibraryName))).Append (" ");
+						options.Append ("-L/Library/Frameworks/Mono.framework/Versions/Current/lib/ ");
+						options.Append ("-lmonosgen-2.0 ");
+						if (!Xcrun (options, out exitCode))
+							return exitCode;
+						// Create framework structure
+						CreateSymlink (Path.Combine (fwdir, LibraryName), $"Versions/Current/{LibraryName}");
+
+						File.WriteAllText (Path.Combine (fwdir, "Versions", "A", "Resources", "Info.plist"), $@"<?xml version=""1.0"" encoding=""UTF-8""?>
+<!DOCTYPE plist PUBLIC ""-//Apple//DTD PLIST 1.0//EN"" ""http://www.apple.com/DTDs/PropertyList-1.0.dtd"">
+<plist version=""1.0"">
+<dict>
+        <key>CFBundleDevelopmentRegion</key>
+        <string>English</string>
+        <key>CFBundleExecutable</key>
+        <string>{LibraryName}</string>
+        <key>CFBundleIdentifier</key>
+        <string>{BundleIdentifier}</string>
+        <key>CFBundleInfoDictionaryVersion</key>
+        <string>6.0</string>
+        <key>CFBundleName</key>
+        <string>{LibraryName}</string>
+        <key>CFBundlePackageType</key>
+        <string>FMWK</string>
+        <key>CFBundleShortVersionString</key>
+        <string>1.0</string>
+        <key>CFBundleSignature</key>
+        <string>????</string>
+        <key>CFBundleSupportedPlatforms</key>
+        <array>
+                <string>MacOSX</string>
+        </array>
+        <key>CFBundleVersion</key>
+        <string>1</string>
+        <key>DTCompiler</key>
+        <string>com.apple.compilers.llvm.clang.1_0</string>
+        <key>DTPlatformBuild</key>
+        <string>8C38</string>
+        <key>DTPlatformVersion</key>
+        <string>GM</string>
+        <key>DTSDKBuild</key>
+        <string>16C58</string>
+        <key>DTSDKName</key>
+        <string>macosx10.12</string>
+        <key>DTXcode</key>
+        <string>0620</string>
+        <key>DTXcodeBuild</key>
+        <string>6C131e</string>
+        <key>BuildMachineOSBuild</key>
+        <string>13F34</string>
+</dict>
+</plist>
+");
+
+						// Copy any assemblies to the framework
+						var bundleDir = Path.Combine (resources_dir, "MonoBundle");
+						Directory.CreateDirectory (bundleDir);
+						foreach (var asm in Assemblies) {
+							var src = asm.Location;
+							var tgt = Path.Combine (bundleDir, Path.GetFileName (asm.Location));
+							File.Copy (src, tgt, true);
+							FileCopyIfExists (Path.ChangeExtension (src, "pdb"), Path.ChangeExtension (tgt, "pdb"));
+							FileCopyIfExists (src + ".config", tgt + ".config");
+							// FIXME: Satellite assemblies?
+						}
+						// Add the headers to the framework
+						File.Copy (Path.Combine (OutputDirectory, "embeddinator.h"), Path.Combine (headers, "embeddinator.h"), true);
+						File.Copy (Path.Combine (OutputDirectory, "bindings.h"), Path.Combine (headers, $"bindings.h"), true);
+						// Create an umbrella header for the everything in the framework.
+						File.WriteAllText (Path.Combine (headers, LibraryName + ".h"),
+@"
+#include ""bindings.h""
+");
+						break;
+					case Platform.macOSFull:
+					case Platform.macOSModern:
+					case Platform.macOSSystem:
+						var mmp = new StringBuilder ();
+						mmp.Append ($"--output={Quote (appdir)} ");
+						mmp.Append ($"--arch={string.Join (",", build_info.Architectures)} ");
+						if (build_info.Architectures.Length > 1)
+							throw new NotImplementedException ("fat Xamarin.Mac apps");
+						mmp.Append ($"--sdkroot {XcodeApp} ");
+						mmp.Append ($"--minos {build_info.MinVersion} ");
+						mmp.Append ($"--embeddinator ");
+						foreach (var asm in Assemblies)
+							mmp.Append (Quote (Path.GetFullPath (asm.Location))).Append (" ");
+						mmp.Append ($"-a:{GetPlatformAssembly ()} ");
+						mmp.Append ($"--sdk {GetSdkVersion (build_info.Sdk.ToLower ())} ");
+						mmp.Append ("--linksdkonly ");
+						mmp.Append ("--registrar:static ");
+						mmp.Append ($"--cache {Quote (cachedir)} ");
+						if (Debug)
+							mmp.Append ("--debug ");
+						mmp.Append ("-p "); // generate a plist
+						mmp.Append ($"--target-framework {GetTargetFramework ()} ");
+						mmp.Append ($"\"--link_flags=-force_load {Path.GetFullPath (sdk_output_file)}\" ");
+						if (!RunProcess ("/Library/Frameworks/Xamarin.Mac.framework/Versions/Current/bin/mmp", mmp.ToString (), out exitCode))
+							return exitCode;
+
+						// Add the headers to the framework
+						File.Copy (Path.Combine (OutputDirectory, "embeddinator.h"), Path.Combine (headers, "embeddinator.h"), true);
+						File.Copy (Path.Combine (OutputDirectory, "bindings.h"), Path.Combine (headers, $"bindings.h"), true);
+						// Create an umbrella header for the everything in the framework.
+						File.WriteAllText (Path.Combine (headers, LibraryName + ".h"),
+@"
+#include ""bindings.h""
+#if defined(__i386__)
+#include ""registrar-i386.h""
+#elif defined(__x86_64__)
+#include ""registrar-x86_64.h""
+#else
+#error Unknown architecture
+#endif
+");
+						if (build_info.Architectures.Contains ("i386"))
+							FileCopyIfExists (Path.Combine (cachedir, "registrar.h"), Path.Combine (headers, "registrar-i386.h"));
+						if (build_info.Architectures.Contains ("x86_64"))
+							FileCopyIfExists (Path.Combine (cachedir, "registrar.h"), Path.Combine (headers, "registrar-x86_64.h"));
+						break;
 					case Platform.iOS:
 					case Platform.tvOS:
 					case Platform.watchOS:
 						var mtouch = new StringBuilder ();
-						var appdir = Path.GetFullPath (Path.Combine (OutputDirectory, build_info.Sdk, LibraryName));
-						var cachedir = Path.GetFullPath (Path.Combine (outputDirectory, build_info.Sdk, "mtouch-cache"));
 						mtouch.Append (build_info.IsSimulator ? "--sim " : "--dev ");
 						mtouch.Append ($"{Quote (appdir)} ");
 						mtouch.Append ($"--abi={string.Join (",", build_info.Architectures)} ");
@@ -565,9 +757,6 @@ namespace Embeddinator {
 							return exitCode;
 
 						// Add the headers to the framework
-						var fwdir = Path.Combine (appdir, "Frameworks", $"{LibraryName}.framework");
-						var headers = Path.Combine (fwdir, "Headers");
-						Directory.CreateDirectory (headers);
 						File.Copy (Path.Combine (OutputDirectory, "embeddinator.h"), Path.Combine (headers, "embeddinator.h"), true);
 						File.Copy (Path.Combine (OutputDirectory, "bindings.h"), Path.Combine (headers, $"bindings.h"), true);
 						// Create an umbrella header for the everything in the framework.
@@ -593,16 +782,17 @@ namespace Embeddinator {
 							FileCopyIfExists (Path.Combine (cachedir, "32", "registrar.h"), Path.Combine (headers, "registrar-arm32.h"));
 							FileCopyIfExists (Path.Combine (cachedir, "64", "registrar.h"), Path.Combine (headers, "registrar-arm64.h"));
 						}
-						// Move the framework to the output directory
-						var fwpath = Path.Combine (OutputDirectory, build_info.Sdk, $"{LibraryName}.framework");
-						if (Directory.Exists (fwpath))
-							Directory.Delete (fwpath, true);
-						Directory.Move (fwdir, fwpath);
-						Directory.Delete (appdir, true); // We don't need this anymore.
 						break;
 					default:
 						throw ErrorHelper.CreateError (99, "Internal error: invalid platform {0}. Please file a bug report with a test case (https://github.com/mono/Embeddinator-4000/issues).", Platform);
 					}
+
+					// Move the framework to the output directory
+					var fwpath = Path.Combine (OutputDirectory, build_info.Sdk, $"{LibraryName}.framework");
+					if (Directory.Exists (fwpath))
+						Directory.Delete (fwpath, true);
+					Directory.Move (fwdir, fwpath);
+					Directory.Delete (appdir, true); // We don't need this anymore.
 				}
 			}
 
@@ -613,14 +803,38 @@ namespace Embeddinator {
 			if (!DSymUtil (output_path, out exitCode))
 				return exitCode;
 
-			if (build_infos.Length == 2 && CompilationTarget == CompilationTarget.Framework) {
-				var dev_fwpath = Path.Combine (OutputDirectory, build_infos [0].Sdk, $"{LibraryName}.framework");
-				var sim_fwpath = Path.Combine (OutputDirectory, build_infos [1].Sdk, $"{LibraryName}.framework");
-				if (!MergeFrameworks (Path.Combine (OutputDirectory, LibraryName + ".framework"), dev_fwpath, sim_fwpath, out exitCode))
-					return exitCode;
+			if (CompilationTarget == CompilationTarget.Framework) {
+				var fwpath = Path.Combine (OutputDirectory, $"{LibraryName}.framework");
+				if (build_infos.Length == 2) {
+					var dev_fwpath = Path.Combine (OutputDirectory, build_infos [0].Sdk, $"{LibraryName}.framework");
+					var sim_fwpath = Path.Combine (OutputDirectory, build_infos [1].Sdk, $"{LibraryName}.framework");
+					if (!MergeFrameworks (fwpath, dev_fwpath, sim_fwpath, out exitCode))
+						return exitCode;
+				} else {
+					var fwsdkpath = Path.Combine (OutputDirectory, build_infos [0].Sdk, $"{LibraryName}.framework");
+					Directory.Move (fwsdkpath, fwpath);
+				}
+				Console.WriteLine ($"Successfully created framework: {fwpath}");
+			} else {
+				Console.WriteLine ($"Successfully created library: {output_path}");
 			}
 
 			return 0;
+		}
+
+		// Mono.Unix can't create symlinks to relative paths, it insists on making the target a full path before creating the symlink.
+		[DllImport ("libc", SetLastError = true)]
+		static extern int symlink (string path1, string path2);
+
+		[DllImport ("libc")]
+		static extern int unlink (string pathname);
+
+		static void CreateSymlink (string file, string target)
+		{
+			unlink (file);
+			var rv = symlink (target, file);
+			if (rv != 0)
+				throw ErrorHelper.CreateError (16, $"Could not create symlink '{file}' -> '{target}': error {Marshal.GetLastWin32Error ()}");
 		}
 
 		static void FileCopyIfExists (string source, string target)
@@ -738,6 +952,11 @@ namespace Embeddinator {
 			switch (Platform) {
 			case Platform.macOS:
 				throw new NotImplementedException ("platform assembly for macOS"); // We need to know full/mobile
+			case Platform.macOSFull:
+				return "/Library/Frameworks/Xamarin.Mac.framework/Versions/Current/lib/mono/4.5/Xamarin.Mac.dll";
+			case Platform.macOSModern:
+			case Platform.macOSSystem:
+				return "/Library/Frameworks/Xamarin.Mac.framework/Versions/Current/lib/mono/Xamarin.Mac/Xamarin.Mac.dll";
 			case Platform.iOS:
 				return "/Library/Frameworks/Xamarin.iOS.framework/Versions/Current/lib/mono/Xamarin.iOS/Xamarin.iOS.dll";
 			case Platform.tvOS:
@@ -752,8 +971,12 @@ namespace Embeddinator {
 		string GetTargetFramework ()
 		{
 			switch (Platform) {
-			case Platform.macOS:
-				throw new NotImplementedException ("target framework for macOS");
+			case Platform.macOSSystem:
+				return "Xamarin.Mac,Version=v4.5,Profile=System";
+			case Platform.macOSFull:
+				return "Xamarin.Mac,Version=v4.5,Profile=Full";
+			case Platform.macOSModern:
+				return "Xamarin.Mac,Version=v2.0,Profile=Mobile";
 			case Platform.iOS:
 				return "Xamarin.iOS,v1.0";
 			case Platform.tvOS:
@@ -811,11 +1034,12 @@ namespace Embeddinator {
 
 		public static int RunProcess (string filename, string arguments)
 		{
-			Console.WriteLine ($"\t{filename} {arguments}");
-			using (var p = Process.Start (filename, arguments)) {
-				p.WaitForExit ();
-				return p.ExitCode;
-			}
+			int exitCode;
+			string output;
+			RunProcess (filename, arguments, out exitCode, out output, capture_stderr: true);
+			if (exitCode != 0)
+				Console.WriteLine (output);
+			return exitCode;
 		}
 
 		public static bool RunProcess (string filename, string arguments, out int exitCode)

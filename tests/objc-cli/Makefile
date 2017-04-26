@@ -1,6 +1,6 @@
 TOP=../..
 
-all: run-test perf xctest test-leaks test-static test-dynamic test-framework-ios xctest-ios-simulator
+all: run-test perf xctest test-leaks test-static test-dynamic
 
 include $(TOP)/tests/managed/Makefile.include
 
@@ -18,11 +18,7 @@ MANAGED_DLL=$(GENERIC_MANAGED_DLL)
 	mkdir -p $(dir $@)
 	cp $< $@
 
-debug/libmanaged-ios-framework/managed-ios.framework: $(IOS_MANAGED_DLL) $(OBJC_GEN)
-	$(MONO) --debug $(abspath $(OBJC_GEN)) --debug $(abspath $<) -c --outdir=$(abspath $(dir $@)) --target=framework --platform=ios
-
-release/libmanaged-ios-framework/managed-ios.framework: $(IOS_MANAGED_DLL) $(OBJC_GEN)
-	$(MONO) --debug $(abspath $(OBJC_GEN)) $(abspath $<) -c --outdir=$(abspath $(dir $@)) --target=framework --platform=ios
+# ADD RELEASE FRAMEWORK TESTS
 
 debug/libmanaged.dylib: debug/managed.dll $(OBJC_GEN)
 	$(MONO) --debug $(OBJC_GEN) --debug debug/managed.dll -c -o debug
@@ -93,17 +89,3 @@ test-framework: test-framework-macos test-framework-ios test-framework-tvos test
 
 test-framework-%: debug/managed.dll $(OBJC_GEN)
 	/Library/Frameworks/Mono.framework/Versions/Current/Commands/mono --debug $(abspath $(OBJC_GEN)) --debug $(abspath debug/managed.dll) -c --outdir=$(abspath build/$@-temp-dir) --target=framework --platform=$*
-
-xctest-ios-simulator: debug/libmanaged-ios-framework/managed-ios.framework release/libmanaged-ios-framework/managed-ios.framework
-	xcodebuild -quiet test -project libmanaged-ios/libmanaged-ios.xcodeproj -scheme libmanaged-ios -destination 'platform=iOS Simulator,name=iPhone 6,OS=latest'
-
-xctest-ios-device: build/ios-device-id debug/libmanaged-ios-framework/managed-ios.framework
-	xcodebuild test -project libmanaged-ios/libmanaged-ios.xcodeproj -scheme libmanaged-ios -destination 'platform=iOS,id=$(shell cat build/ios-device-id)'
-
-build/device-list.xml:
-	@mkdir -p build
-	/Library/Frameworks/Xamarin.iOS.framework/Versions/Current/bin/mlaunch --listdev=$@ --output-format=xml
-
-build/ios-device-id: build/device-list.xml
-	csharp -e 'var doc = new System.Xml.XmlDocument (); doc.Load ("$<"); Console.WriteLine (doc.SelectSingleNode ("/MTouch/Device[DeviceClass = \"iPhone\"]/DeviceIdentifier").InnerText);' > $@.tmp
-	mv $@.tmp $@

@@ -1,6 +1,16 @@
 #import <XCTest/XCTest.h>
 #if defined (TEST_FRAMEWORK)
+#if defined (XAMARIN_MAC_MODERN)
+#include "managed-macos-modern/managed-macos-modern.h"
+#elif defined (XAMARIN_MAC_FULL)
+#include "managed-macos-full/managed-macos-full.h"
+#elif defined (XAMARIN_MAC_SYSTEM)
+#include "managed-macos-system/managed-macos-system.h"
+#elif defined (XAMARIN_IOS)
 #include "managed-ios/managed-ios.h"
+#else
+#include "managed/managed.h"
+#endif
 #else
 #include "bindings.h"
 #endif

@@ -4,7 +4,4 @@ all:
 
 include Makefile.include
 
-all: $(GENERIC_MANAGED_DLL) $(IOS_MANAGED_DLL)
-
-clean:
-	@rm -rf bin/ obj/ */bin */obj
+all: $(ALL_MANAGED_DLLS)
