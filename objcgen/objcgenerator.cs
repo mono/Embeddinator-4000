@@ -16,7 +16,7 @@ namespace ObjC {
 		SourceWriter headers = new SourceWriter ();
 		SourceWriter implementation = new SourceWriter ();
 
-		public override void Generate (IEnumerable<Assembly> assemblies)
+		public override void Generate ()
 		{
 			headers.WriteLine ("#include \"embeddinator.h\"");
 			headers.WriteLine ("#import <Foundation/Foundation.h>");
@@ -45,7 +45,7 @@ namespace ObjC {
 			implementation.WriteLine ();
 
 			foreach (var a in assemblies)
-				implementation.WriteLine ($"MonoImage* __{SanitizeName (a.GetName ().Name)}_image;");
+				implementation.WriteLine ($"MonoImage* __{a.SafeName}_image;");
 			implementation.WriteLine ();
 
 			foreach (var t in types)
@@ -64,16 +64,16 @@ namespace ObjC {
 			implementation.WriteLine ("}");
 			implementation.WriteLine ();
 
-			base.Generate (assemblies);
+			base.Generate ();
 
 			headers.WriteLine ("NS_ASSUME_NONNULL_END");
 			headers.WriteLine ();
 		}
 
-		protected override void Generate (Assembly a)
+		protected override void Generate (ProcessedAssembly a)
 		{
-			var originalName = a.GetName ().Name;
-			var name = SanitizeName (originalName);
+			var originalName = a.Name;
+			var name = a.SafeName;
 			implementation.WriteLine ($"static void __lookup_assembly_{name} ()");
 			implementation.WriteLine ("{");
 			implementation.Indent++;
@@ -130,7 +130,7 @@ namespace ObjC {
 			implementation.WriteLine ();
 
 			foreach (var mi in methods) {
-				ImplementMethod (mi, CamelCase (mi.Name), true);
+				ImplementMethod (mi, mi.Name.CamelCase (), true);
 			}
 
 			headers.WriteLine ("@end");
@@ -181,7 +181,7 @@ namespace ObjC {
 
 		protected override void Generate (Type t)
 		{
-			var aname = SanitizeName (t.Assembly.GetName ().Name);
+			var aname = t.Assembly.GetName ().Name.Sanitize ();
 			var static_type = t.IsSealed && t.IsAbstract;
 
 			var managed_name = GetObjCName (t);
@@ -233,7 +233,7 @@ namespace ObjC {
 						GetSignatures ("initWith", ctor.Constructor.Name, ctor.Constructor, parameters, ctor.FallBackToTypeName, false, out name, out signature);
 
 					var builder = new MethodHelper (headers, implementation) {
-						AssemblyName = aname,
+						AssemblySafeName = aname,
 						ReturnType = "nullable instancetype",
 						ManagedTypeName = t.FullName,
 						MetadataToken = ctor.Constructor.MetadataToken,
@@ -315,7 +315,7 @@ namespace ObjC {
 				var pt = m.GetParameters () [0].ParameterType;
 				var builder = new ComparableHelper (headers, implementation) {
 					ObjCSignature = $"compare:({managed_name} * _Nullable)other",
-					AssemblyName = aname,
+					AssemblySafeName = aname,
 					MetadataToken = m.MetadataToken,
 					ObjCTypeName = managed_name,
 					ManagedTypeName = t.FullName,
@@ -328,7 +328,7 @@ namespace ObjC {
 			if (equals.TryGetValue (t, out m)) {
 				var builder = new EqualsHelper (headers, implementation) {
 					ObjCSignature = "isEqual:(id)other",
-					AssemblyName = aname,
+					AssemblySafeName = aname,
 					MetadataToken = m.MetadataToken,
 					ObjCTypeName = managed_name,
 					ManagedTypeName = t.FullName,
@@ -344,7 +344,7 @@ namespace ObjC {
 			if (hashes.TryGetValue (t, out m)) {
 				var builder = new HashHelper (headers, implementation) {
 					ObjCSignature = "hash",
-					AssemblyName = aname,
+					AssemblySafeName = aname,
 					MetadataToken = m.MetadataToken,
 					ObjCTypeName = managed_name,
 					ManagedTypeName = t.FullName,
@@ -424,7 +424,7 @@ namespace ObjC {
 			if (getter == null && setter != null)
 				throw new EmbeddinatorException (99, "Internal error `setter only`. Please file a bug report with a test case (https://github.com/mono/Embeddinator-4000/issues");
 
-			var name = CamelCase (pi.Name);
+			var name = pi.Name.CamelCase ();
 
 			headers.Write ("@property (nonatomic");
 			if (getter.IsStatic)
@@ -463,7 +463,7 @@ namespace ObjC {
 			if (bound)
 				field_type += " *";
 
-			var name = CamelCase (fi.Name);
+			var name = fi.Name.CamelCase ();
 			headers.WriteLine ($") {field_type} {name};");
 
 			// it's similar, but different from implementing a method
@@ -473,14 +473,13 @@ namespace ObjC {
 			var return_type = GetReturnType (type, fi.FieldType);
 
 			implementation.Write (fi.IsStatic ? '+' : '-');
-			implementation.WriteLine ($" ({return_type}) {CamelCase (fi.Name)}");
+			implementation.WriteLine ($" ({return_type}) {name}");
 			implementation.WriteLine ("{");
 			implementation.Indent++;
 			implementation.WriteLine ("static MonoClassField* __field = nil;");
 			implementation.WriteLine ("if (!__field) {");
 			implementation.Indent++;
 			implementation.WriteLineUnindented ("#if TOKENLOOKUP");
-			var aname = type.Assembly.GetName ().Name;
 			implementation.WriteLine ($"__field = mono_class_get_field ({managed_type_name}_class, 0x{fi.MetadataToken:X8});");
 			implementation.WriteLineUnindented ("#else");
 			implementation.WriteLine ($"const char __field_name [] = \"{fi.Name}\";");
@@ -514,7 +513,6 @@ namespace ObjC {
 			implementation.WriteLine ("if (!__field) {");
 			implementation.Indent++;
 			implementation.WriteLineUnindented ("#if TOKENLOOKUP");
-			aname = type.Assembly.GetName ().Name;
 			implementation.WriteLine ($"__field = mono_class_get_field ({managed_type_name}_class, 0x{fi.MetadataToken:X8});");
 			implementation.WriteLineUnindented ("#else");
 			implementation.WriteLine ($"const char __field_name [] = \"{fi.Name}\";");
@@ -562,7 +560,7 @@ namespace ObjC {
 			GetSignatures (name, managed_name, (MemberInfo)pi ?? info, parametersInfo, useTypeNames, isExtension, out objcsig, out monosig);
 
 			var builder = new MethodHelper (headers, implementation) {
-				AssemblyName = type.Assembly.GetName ().Name,
+				AssemblySafeName = type.Assembly.GetName ().Name.Sanitize (),
 				IsStatic = info.IsStatic,
 				IsExtension = isExtension,
 				ReturnType = GetReturnType (type, info.ReturnType),
@@ -619,11 +617,9 @@ namespace ObjC {
 			headers.WriteLine ("/** This is an helper method that inlines the following default values:");
 			foreach (var p in parameters) {
 				if (arguments.Length == 0) {
-					//if (mi == null)
-						//arguments.Append ("With");
-					arguments.Append (PascalCase (p.Name)).Append (':');
+					arguments.Append (p.Name.PascalCase ()).Append (':');
 				} else
-					arguments.Append (' ').Append (CamelCase (p.Name)).Append (':');
+					arguments.Append (' ').Append (p.Name.CamelCase ()).Append (':');
 				if (p.Position >= start && p.HasDefaultValue) {
 					var raw = FormatRawValue (p.ParameterType, p.RawDefaultValue);
 					headers.WriteLine ($" *     ({GetTypeName (p.ParameterType)}) {p.Name} = {raw};");
@@ -640,7 +636,7 @@ namespace ObjC {
 			if (mi == null)
 				name = start == 0 ? "init" : "initWith";
 			else
-				name = CamelCase (mb.Name);
+				name = mb.Name.CamelCase ();
 			
 			GetSignatures (name, mb.Name, mb, plist.ToArray (), false, false, out objcsig, out monosig);
 			var type = mb.DeclaringType;
@@ -849,57 +845,6 @@ namespace ObjC {
 			default:
 				throw new NotImplementedException ($"Converting type {t.Name} to a mono type name");
 			}
-		}
-
-		public static string CamelCase (string s)
-		{
-			if (s == null)
-				return null;
-			if (s.Length == 0)
-				return String.Empty;
-			return Char.ToLowerInvariant (s [0]) + s.Substring (1, s.Length - 1);
-		}
-
-		public static string PascalCase (string s)
-		{
-			if (s == null)
-				return null;
-			if (s.Length == 0)
-				return String.Empty;
-			return Char.ToUpperInvariant (s [0]) + s.Substring (1, s.Length - 1);
-		}
-
-		public static string SanitizeName (string name)
-		{
-			StringBuilder sb = null;
-
-			for (int i = 0; i < name.Length; i++) {
-				var ch = name [i];
-				switch (ch) {
-				case '.':
-				case '+':
-				case '/':
-				case '`':
-				case '@':
-				case '<':
-				case '>':
-				case '$':
-				case '-':
-				case ' ':
-					if (sb == null)
-						sb = new StringBuilder (name, 0, i, name.Length);
-					sb.Append ('_');
-					break;
-				default:
-					if (sb != null)
-						sb.Append (ch);
-					break;
-				}
-			}
-
-			if (sb != null)
-				return sb.ToString ();
-			return name;
 		}
 
 		public static string FormatRawValue (Type t, object o)

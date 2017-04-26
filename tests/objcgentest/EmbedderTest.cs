@@ -62,6 +62,21 @@ namespace DriverTest
 			Assert.AreEqual (0, Driver.Main2 ("--platform", platform.ToString (), "--abi", "x86_64", "-c", dll, "-o", tmpdir), "build");
 		}
 
+		[Test]
+		public void DuplicateAssemblyName ()
+		{
+			var platform = Platform.macOS;
+			var dll = CompileLibrary (platform, libraryName: "dupe");
+			var tmpdir = Xamarin.Cache.CreateTemporaryDirectory ();
+			try {
+				Driver.Main2 ("--platform", platform.ToString (), "--abi", "x86_64", dll, dll, "-o", tmpdir);
+			}
+			catch (EmbeddinatorException ee) {
+				Assert.True (ee.Error, "Error");
+				Assert.That (ee.Code, Is.EqualTo (12), "Code");
+			}
+		}
+
 		string CompileLibrary (Platform platform, string code = null, string libraryName = null)
 		{
 			int exitCode;

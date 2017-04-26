@@ -16,7 +16,7 @@ namespace ObjC {
 			this.implementation = implementation;
 		}
 
-		public string AssemblyName { get; set; }
+		public string AssemblySafeName { get; set; }
 
 		public bool IsConstructor { get; set; }
 		public bool IsExtension { get; set; }
@@ -62,7 +62,7 @@ namespace ObjC {
 			implementation.WriteLine ("if (!__method) {");
 			implementation.WriteLineUnindented ("#if TOKENLOOKUP");
 			implementation.Indent++;
-			implementation.WriteLine ($"__method = mono_get_method (__{ObjCGenerator.SanitizeName (AssemblyName)}_image, 0x{MetadataToken:X8}, {ObjCTypeName}_class);");
+			implementation.WriteLine ($"__method = mono_get_method (__{AssemblySafeName}_image, 0x{MetadataToken:X8}, {ObjCTypeName}_class);");
 			implementation.WriteLineUnindented ("#else");
 			implementation.WriteLine ($"const char __method_name [] = \"{ManagedTypeName}:{MonoSignature}\";");
 			implementation.WriteLine ($"__method = mono_embeddinator_lookup_method (__method_name, {ObjCTypeName}_class);");

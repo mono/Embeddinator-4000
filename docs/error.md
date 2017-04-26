@@ -66,6 +66,12 @@ This might indicate a bug in the Embeddinator-4000; please file a bug report at 
 
 The tool could not find the assembly `X` specified in the arguments.
 
+<h3><a name="EM0012"/>EM0012: The assembly name `X` is not unique</h3>
+
+More than one assembly supplied have the same, internal name and it would not be possible to distinguish between them at runtime.
+
+The most likely cause is that an assembly is specified more than once on the command-line arguments. However a renamed assembly still keeps it's original name and multiple copies cannot coexists.
+
 <h3><a name="EM0099"/>EM0099: Internal error *. Please file a bug report with a test case (https://github.com/mono/Embeddinator-4000/issues).</h3>
 
 This error message is reported when an internal consistency check in the Embeddinator-4000 fails.

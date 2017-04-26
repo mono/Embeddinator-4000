@@ -15,24 +15,6 @@ namespace ObjCGeneratorTest {
 		public static Assembly mscorlib { get; } = Universe.Load ("mscorlib.dll");
 
 		[Test]
-		public void CamelCase ()
-		{
-			Assert.Null (ObjCGenerator.CamelCase (null), "null");
-			Assert.That (ObjCGenerator.CamelCase (String.Empty), Is.EqualTo (""), "length == 0");
-			Assert.That (ObjCGenerator.CamelCase ("S"), Is.EqualTo ("s"), "length == 1");
-			Assert.That (ObjCGenerator.CamelCase ("TU"), Is.EqualTo ("tU"), "length == 2");
-		}
-
-		[Test]
-		public void PascalCase ()
-		{
-			Assert.Null (ObjCGenerator.PascalCase (null), "null");
-			Assert.That (ObjCGenerator.PascalCase (String.Empty), Is.EqualTo (""), "length == 0");
-			Assert.That (ObjCGenerator.PascalCase ("s"), Is.EqualTo ("S"), "length == 1");
-			Assert.That (ObjCGenerator.PascalCase ("tu"), Is.EqualTo ("Tu"), "length == 2");
-		}
-
-		[Test]
 		public void TypeMatch ()
 		{
 			Assert.That (ObjCGenerator.GetTypeName (mscorlib.GetType ("System.Boolean")), Is.EqualTo ("bool"), "bool");

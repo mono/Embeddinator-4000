@@ -36,7 +36,7 @@ namespace ObjC {
 					if (n == 0) {
 						bool isPropertyMethod = method.IsSpecialName && (method.Name.StartsWith ("get") || method.Name.StartsWith ("set"));
 						if (method.IsConstructor || !method.IsSpecialName || (useTypeNames && isPropertyMethod))
-							objc.Append (PascalCase (paramName));
+							objc.Append (paramName.PascalCase ());
 					} else
 						objc.Append (paramName.ToLowerInvariant ());
 				}

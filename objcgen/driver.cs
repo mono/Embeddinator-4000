@@ -229,7 +229,7 @@ namespace Embeddinator {
 			g.Process (Assemblies);
 
 			Console.WriteLine ("Generating binding code...");
-			g.Generate (Assemblies);
+			g.Generate ();
 			g.Write (OutputDirectory);
 
 			var exe = typeof (Driver).Assembly;
