@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using System.Collections.Generic;
 
 using IKVM.Reflection;
 using Type = IKVM.Reflection.Type;
@@ -113,6 +114,22 @@ namespace Embeddinator {
 					return true;
 			}
 			return false;
+		}
+
+		public static void IncrementValue<TKey> (this Dictionary<TKey, int> dictionary, TKey key)
+		{
+			if (dictionary.ContainsKey (key))
+				dictionary[key] += 1;
+			else
+				dictionary[key] = 1;
+		}
+
+		public static void AddValue<TKey, TListValue> (this Dictionary<TKey, List<TListValue>> dictionary, TKey key, TListValue val)
+		{
+			if (dictionary.ContainsKey (key))
+				dictionary[key].Add (val);
+			else
+				dictionary[key] = new List<TListValue> () { val };
 		}
 	}
 }

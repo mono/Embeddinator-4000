@@ -15,6 +15,7 @@ namespace ObjC {
 		protected IEnumerable<ProcessedMethod> PostProcessMethods (IEnumerable<MethodInfo> methods)
 		{
 			HashSet<string> duplicateNames = FindDuplicateNames (methods);
+			HashSet<MethodInfo> operatorToIgnore = new HashSet<MethodInfo> (OperatorOverloads.FindOperatorPairToIgnore (methods));
 
 			foreach (MethodInfo method in methods) {
 				ProcessedMethod processedMethod = new ProcessedMethod (method);
@@ -24,6 +25,11 @@ namespace ObjC {
 
 				if (method.IsSpecialName && method.IsStatic && method.Name.StartsWith ("op_", StringComparison.Ordinal))
 					processedMethod.IsOperator = true;
+				
+				if (operatorToIgnore.Contains (method)) {
+					processedMethod.Ignore = true;
+					delayed.Add (ErrorHelper.CreateWarning (1033, $"Method {processedMethod.Method.Name} is not generated because another method exposes the operator with a friendly name"));
+				}
 
 				yield return processedMethod;
 			}
@@ -95,13 +101,8 @@ namespace ObjC {
 		static HashSet<string> FindDuplicateNames (IEnumerable<MemberInfo> members)
 		{
 			Dictionary<string, int> methodNames = new Dictionary<string, int> ();
-			foreach (MemberInfo member in members) {
-				string stringRep = CreateStringRep (member);
-				if (methodNames.ContainsKey (stringRep))
-					methodNames[stringRep]++;
-				else
-					methodNames[stringRep] = 1;
-			}
+			foreach (MemberInfo member in members)
+				methodNames.IncrementValue (CreateStringRep (member));
 			return new HashSet<string> (methodNames.Where (x => x.Value > 1).Select (x => x.Key));
 		}
 	}

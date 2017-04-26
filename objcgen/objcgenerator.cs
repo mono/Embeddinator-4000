@@ -285,28 +285,28 @@ namespace ObjC {
 			List<ProcessedProperty> props;
 			if (properties.TryGetValue (t, out props)) {
 				headers.WriteLine ();
-				foreach (var pi in props)
+				foreach (var pi in props.Where (x => !x.Ignore))
 					Generate (pi);
 			}
 
 			List<ProcessedFieldInfo> f;
 			if (fields.TryGetValue (t, out f)) {
 				headers.WriteLine ();
-				foreach (var fi in f)
+				foreach (var fi in f.Where (x => !x.Ignore))
 					Generate (fi);
 			}
 
 			List<ProcessedProperty> s;
 			if (subscriptProperties.TryGetValue (t, out s)) {
 				headers.WriteLine ();
-				foreach (var si in s)
+				foreach (var si in s.Where (x => !x.Ignore))
 					GenerateSubscript (si);
 			}
 
 			List<ProcessedMethod> meths;
 			if (methods.TryGetValue (t, out meths)) {
 				headers.WriteLine ();
-				foreach (var mi in meths)
+				foreach (var mi in meths.Where (x => !x.Ignore))
 					Generate (mi);
 			}
 

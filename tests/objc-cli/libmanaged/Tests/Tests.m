@@ -670,6 +670,14 @@
     XCTAssertFalse ([c1 hash] == [c3 hash], "Non-equal objects have different hashes");
 }
 
+- (void) testOperatorOverloading {
+    Methods_OperatorCollision * one = [[Methods_OperatorCollision alloc] initWithVal:1];
+    Methods_OperatorCollision * two = [[Methods_OperatorCollision alloc] initWithVal:2];
+    XCTAssertTrue ([[Methods_OperatorCollision addC1:one c2:two] value] == 3, "1 + 1");
+    XCTAssertTrue ([[Methods_OperatorCollision subtraction:two c2:one] value] == 1, "2 - 1");
+    XCTAssertTrue ([[Methods_OperatorCollision multiplyC1:two c2:two] value] == 4, "2 * 2");
+}
+
 #pragma clang diagnostic pop
 
 @end

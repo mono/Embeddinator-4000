@@ -142,6 +142,11 @@ This is a **warning** that the default parameters of method `M` are not generati
 
 Note: Supported features will evolve with new versions of the tool.
 
+<h3><a name="EM1033"/>Method `M` is not generated because another method exposes the operator with a friendly name.</h3>
+
+This is a **warning** that the method `M` is not generated because another method exposes the operator with a friendly name. (https://msdn.microsoft.com/en-us/library/ms229032(v=vs.110).aspx)
+
+
 
 <h3><a name="EM1040"/>Property `P` is not generated because of parameter type `T` is not supported.</h3>
 
@@ -154,7 +159,6 @@ Note: Supported features will evolve with new versions of the tool.
 <h3><a name="EM1041"/>Indexed properties on `T` is not generated because multiple indexed properties are not supported.</h3>
 
 This is a **warning** that the indexed properties on `T` will be ignored (i.e. nothing will be generated) because multiple indexed properties are not supported.
-
 
 
 <h3><a name="EM1050"/>Field `F` is not generated because of field type `T` is not supported.</h3>

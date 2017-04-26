@@ -129,4 +129,33 @@ namespace Methods {
 			return String.Empty;
 		}
 	}
+
+	public class OperatorCollision {
+		public int Value { get; private set; }
+
+		public OperatorCollision (int val)
+		{
+			Value = val;
+		}
+
+		public static OperatorCollision operator + (OperatorCollision c1, OperatorCollision c2)
+		{
+			return new OperatorCollision (c1.Value + c2.Value);
+		}
+
+		public static OperatorCollision Add (OperatorCollision c1, OperatorCollision c2)
+		{
+			return new OperatorCollision (c1.Value + c2.Value);
+		}
+
+		public static OperatorCollision operator - (OperatorCollision c1, OperatorCollision c2)
+		{
+			return new OperatorCollision (c1.Value - c2.Value);
+		}
+
+		public static OperatorCollision Multiply (OperatorCollision c1, OperatorCollision c2)
+		{
+			return new OperatorCollision (c1.Value * c2.Value);
+		}
+	}
 }
