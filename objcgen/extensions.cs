@@ -1,9 +1,67 @@
 ﻿using System;
+using System.Text;
 
 using IKVM.Reflection;
 using Type = IKVM.Reflection.Type;
 
 namespace Embeddinator {
+
+	public static class StringExtensions {
+
+		public static string CamelCase (this string self)
+		{
+			if (self == null)
+				return null;
+			if (self.Length == 0)
+				return String.Empty;
+			return Char.ToLowerInvariant (self [0]) + self.Substring (1, self.Length - 1);
+		}
+
+		public static string PascalCase (this string self)
+		{
+			if (self == null)
+				return null;
+			if (self.Length == 0)
+				return String.Empty;
+			return Char.ToUpperInvariant (self [0]) + self.Substring (1, self.Length - 1);
+		}
+
+		public static string Sanitize (this string self)
+		{
+			if (self == null)
+				return null;
+
+			StringBuilder sb = null;
+
+			for (int i = 0; i < self.Length; i++) {
+				var ch = self [i];
+				switch (ch) {
+				case '.':
+				case '+':
+				case '/':
+				case '`':
+				case '@':
+				case '<':
+				case '>':
+				case '$':
+				case '-':
+				case ' ':
+					if (sb == null)
+						sb = new StringBuilder (self, 0, i, self.Length);
+					sb.Append ('_');
+					break;
+				default:
+					if (sb != null)
+						sb.Append (ch);
+					break;
+				}
+			}
+
+			if (sb != null)
+				return sb.ToString ();
+			return self;
+		}
+	}
 
 	public static class TypeExtensions {
 		

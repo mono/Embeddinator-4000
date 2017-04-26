@@ -9,7 +9,7 @@ using Type = IKVM.Reflection.Type;
 namespace ObjCGeneratorTest {
 
 	[TestFixture]
-	public class ExtensionsTest {
+	public class TypeExtensionsTest {
 
 		public static Universe Universe { get; } = new Universe (UniverseOptions.None);
 

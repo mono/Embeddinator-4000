@@ -8,20 +8,39 @@ namespace Embeddinator {
 
 	public class Generator {
 
-		public virtual void Process (IEnumerable<Assembly> assemblies)
+		protected List<ProcessedAssembly> assemblies = new List<ProcessedAssembly> ();
+
+		// uniqueness checks
+		HashSet<string> assembly_name = new HashSet<string> ();
+		HashSet<string> assembly_safename = new HashSet<string> ();
+
+		public virtual void Process (IEnumerable<Assembly> input)
 		{
 		}
 
-		public virtual void Generate (IEnumerable<Assembly> assemblies)
+		public bool AddIfUnique (ProcessedAssembly assembly)
+		{
+			if (assembly_name.Contains (assembly.Name))
+				return false;
+			if (assembly_safename.Contains (assembly.SafeName))
+				return false;
+
+			assemblies.Add (assembly);
+			assembly_name.Add (assembly.Name);
+			assembly_safename.Add (assembly.SafeName);
+			return true;
+		}
+
+		public virtual void Generate ()
 		{
 			foreach (var a in assemblies) {
 				Generate (a);
 			}
 		}
 
-		protected virtual void Generate (Assembly a)
+		protected virtual void Generate (ProcessedAssembly a)
 		{
-			foreach (var t in a.GetTypes ()) {
+			foreach (var t in a.Assembly.GetTypes ()) {
 				if (!t.IsPublic)
 					continue;
 				Generate (t);

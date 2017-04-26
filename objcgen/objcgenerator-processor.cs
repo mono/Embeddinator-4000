@@ -203,6 +203,7 @@ namespace ObjC {
 
 		List<Type> enums = new List<Type> ();
 		List<Type> types = new List<Type> ();
+
 		Dictionary<Type, List<ProcessedConstructor>> ctors = new Dictionary<Type, List<ProcessedConstructor>> ();
 		Dictionary<Type, List<ProcessedMethod>> methods = new Dictionary<Type, List<ProcessedMethod>> ();
 		Dictionary<Type, List<ProcessedProperty>> properties = new Dictionary<Type, List<ProcessedProperty>> ();
@@ -214,9 +215,14 @@ namespace ObjC {
 		bool implement_system_icomparable_t;
 		bool extension_type;
 
-		public override void Process (IEnumerable<Assembly> assemblies)
+		public override void Process (IEnumerable<Assembly> input)
 		{
-			foreach (var a in assemblies) {
+			foreach (var a in input) {
+				var pa = new ProcessedAssembly (a);
+				// ignoring/warning one is not an option as they could be different (e.g. different builds/versions)
+				if (!AddIfUnique (pa))
+					throw ErrorHelper.CreateError (12, $"The assembly name `{pa.Name}` is not unique");
+
 				foreach (var t in GetTypes (a)) {
 					if (t.IsEnum) {
 						enums.Add (t);
