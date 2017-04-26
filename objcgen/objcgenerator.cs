@@ -327,7 +327,6 @@ namespace ObjC {
 
 			if (equals.TryGetValue (t, out m)) {
 				var builder = new EqualsHelper (headers, implementation) {
-					ObjCSignature = "isEqual:(id)other",
 					AssemblySafeName = aname,
 					MetadataToken = m.MetadataToken,
 					ObjCTypeName = managed_name,
@@ -343,7 +342,6 @@ namespace ObjC {
 
 			if (hashes.TryGetValue (t, out m)) {
 				var builder = new HashHelper (headers, implementation) {
-					ObjCSignature = "hash",
 					AssemblySafeName = aname,
 					MetadataToken = m.MetadataToken,
 					ObjCTypeName = managed_name,

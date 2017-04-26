@@ -7,7 +7,8 @@ namespace ObjC {
 	public class HashHelper : MethodHelper {
 		public HashHelper (SourceWriter headers, SourceWriter implementation) : base (headers, implementation)
 		{
-			MonoSignature = "GetHashCode ()";
+			MonoSignature = "GetHashCode()";
+			ObjCSignature = "hash";
 			ReturnType = "NSUInteger";
 		}
 
