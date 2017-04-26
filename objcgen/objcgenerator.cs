@@ -500,6 +500,7 @@ namespace ObjC {
 				implementation.Indent--;
 			}
 			ReturnValue (fi.FieldType);
+			implementation.Indent--;
 			implementation.WriteLine ("}");
 			implementation.WriteLine ();
 
