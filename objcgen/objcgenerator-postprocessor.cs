@@ -27,8 +27,8 @@ namespace ObjC {
 					processedMethod.IsOperator = true;
 				
 				if (operatorToIgnore.Contains (method)) {
-					processedMethod.Ignore = true;
 					delayed.Add (ErrorHelper.CreateWarning (1033, $"Method {processedMethod.Method.Name} is not generated because another method exposes the operator with a friendly name"));
+					continue;
 				}
 
 				yield return processedMethod;

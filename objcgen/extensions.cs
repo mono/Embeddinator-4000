@@ -115,7 +115,9 @@ namespace Embeddinator {
 			}
 			return false;
 		}
+	}
 
+	public static class DictionaryExtensions {
 		public static void IncrementValue<TKey> (this Dictionary<TKey, int> dictionary, TKey key)
 		{
 			if (dictionary.ContainsKey (key))

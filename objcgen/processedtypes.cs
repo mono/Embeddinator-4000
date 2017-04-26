@@ -12,7 +12,6 @@ namespace Embeddinator {
 
 	public abstract class ProcessedMemberBase {
 		public bool FallBackToTypeName { get; set; }
-		public bool Ignore { get; set; }
 	}
 
 	public class ProcessedAssembly {
