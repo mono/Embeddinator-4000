@@ -29,7 +29,7 @@ namespace ObjC {
 
 			headers.WriteLine ("// forward declarations");
 			foreach (var t in types)
-				headers.WriteLine ($"@class {GetTypeName (t)};");
+				headers.WriteLine ($"@class {t.TypeName};");
 			headers.WriteLine ();
 			headers.WriteLine ("NS_ASSUME_NONNULL_BEGIN");
 			headers.WriteLine ();
@@ -49,9 +49,9 @@ namespace ObjC {
 			implementation.WriteLine ();
 
 			foreach (var t in types)
-				implementation.WriteLine ($"static MonoClass* {GetObjCName (t)}_class = nil;");
+				implementation.WriteLine ($"static MonoClass* {t.ObjCName}_class = nil;");
 			foreach (var t in protocols) {
-				var pname = GetTypeName (t);
+				var pname = t.TypeName;
 				headers.WriteLine ($"@protocol {pname};");
 				implementation.WriteLine ($"@class __{pname}Wrapper;");
 			}
@@ -159,7 +159,7 @@ namespace ObjC {
 		void GenerateEnum (ProcessedType type)
 		{
 			Type t = type.Type;
-			var managed_name = GetObjCName (t);
+			var managed_name = type.ObjCName;
 			var underlying_type = t.GetEnumUnderlyingType ();
 			var base_type = GetTypeName (underlying_type);
 
@@ -257,7 +257,7 @@ namespace ObjC {
 			var aname = t.Assembly.GetName ().Name.Sanitize ();
 			var static_type = t.IsSealed && t.IsAbstract;
 
-			var managed_name = GetObjCName (t);
+			var managed_name = type.ObjCName;
 
 			var tbuilder = new ClassHelper (headers, implementation) {
 				AssemblyQualifiedName = t.AssemblyQualifiedName,
@@ -540,7 +540,7 @@ namespace ObjC {
 			// it's similar, but different from implementing a method
 
 			var type = fi.DeclaringType;
-			var managed_type_name = GetObjCName (type);
+			var managed_type_name = field.ObjCName;
 			var return_type = GetReturnType (type, fi.FieldType);
 
 			implementation.Write (fi.IsStatic ? '+' : '-');
@@ -816,11 +816,6 @@ namespace ObjC {
 
 		// TODO complete mapping (only with corresponding tests)
 		// TODO override with attribute ? e.g. [Obj.Name ("XAMType")]
-
-		public static string GetTypeName (ProcessedType type)
-		{
-			return GetTypeName (type.Type);
-		}
 
 		public static string GetTypeName (Type t)
 		{

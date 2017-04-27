@@ -11,10 +11,6 @@ namespace ObjC {
 	public partial class ObjCGenerator {
 
 		// get a name that is safe to use from ObjC code
-		public static string GetObjCName (ProcessedType t)
-		{
-			return GetObjCName (t.Type);
-		}
 
 		public static string GetObjCName (Type t)
 		{

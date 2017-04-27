@@ -28,10 +28,14 @@ namespace Embeddinator {
 	public class ProcessedType
 	{
 		public Type Type { get; private set; }
+		public string TypeName { get; private set; }
+		public string ObjCName { get; private set; }
 
 		public ProcessedType (Type type)
 		{
 			Type = type;
+			TypeName = ObjC.ObjCGenerator.GetTypeName (Type);
+			ObjCName = ObjC.ObjCGenerator.GetObjCName (Type);
 		}
 	}
 
@@ -72,10 +76,14 @@ namespace Embeddinator {
 
 	public class ProcessedFieldInfo : ProcessedMemberBase {
 		public FieldInfo Field { get; private set; }
+		public string TypeName { get; private set; }
+		public string ObjCName { get; private set; }
 
 		public ProcessedFieldInfo (FieldInfo field)
 		{
 			Field = field;
+			TypeName = ObjC.ObjCGenerator.GetTypeName (Field.DeclaringType);
+			ObjCName = ObjC.ObjCGenerator.GetObjCName (Field.DeclaringType);
 		}
 	}
 }
