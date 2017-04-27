@@ -16,9 +16,9 @@ namespace ObjCGenErrWarnTests {
 	[TestFixture]
 	public class GenErrWarnTests {
 		[Test]
-        [TestCase (arg: new[] {
-            "warning EM1011: Type `System.Type` is not generated because it lacks a native counterpart."
-        })]
+		[TestCase (arg: new[] {
+			"warning EM1011: Type `System.Type` is not generated because it lacks a native counterpart."
+		})]
 		public void GenWarningTest (string [] warnToSearch)
 		{
 			string valid = Xamarin.Cache.CreateTemporaryDirectory ();
