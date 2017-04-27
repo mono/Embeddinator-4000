@@ -80,6 +80,8 @@ public final class Runtime {
     }
 
     public static void initialize(String library) {
+        System.setProperty("jna.encoding", "utf8");
+
         runtimeLibrary = Native.loadLibrary(library, RuntimeLibrary.class);
 
         String assemblyPath = System.getProperty("user.dir") + "/" + library;
