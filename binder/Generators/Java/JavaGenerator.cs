@@ -17,8 +17,11 @@ namespace MonoEmbeddinator4000.Generators
         public static string GetNativeLibPackageName(TranslationUnit unit) =>
             unit.FileName.Replace('.', '_').ToLowerInvariant();
 
+        public JavaTypePrinter TypePrinter;
+
         public JavaGenerator(BindingContext context) : base(context)
         {
+            TypePrinter = new JavaTypePrinter(Context);
         }
 
         List<CodeGenerator> Generators = new List<CodeGenerator>();
@@ -86,8 +89,6 @@ namespace MonoEmbeddinator4000.Generators
                 RenameTargets.Function | RenameTargets.Method | RenameTargets.Property);
             return true;
         }
-
-        public JavaTypePrinter TypePrinter => new JavaTypePrinter(Context);
 
         protected override string TypePrinterDelegate(CppSharp.AST.Type type)
         {

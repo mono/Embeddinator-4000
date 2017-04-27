@@ -1,5 +1,4 @@
 ﻿using CppSharp.AST;
-using CppSharp.AST.Extensions;
 using CppSharp.Generators;
 using System;
 using System.Collections.Generic;
@@ -9,6 +8,8 @@ namespace MonoEmbeddinator4000.Generators
     public class JavaTypePrinter : TypePrinter
     {
         BindingContext Context { get; }
+
+        bool IsByRefParameter => (Parameter != null) && (Parameter.IsOut || Parameter.IsInOut);
 
         public JavaTypePrinter(BindingContext context)
         {
@@ -51,21 +52,67 @@ namespace MonoEmbeddinator4000.Generators
             return base.VisitParameter(param, hasName);
         }
 
+        public TypePrinterResult HandleNativeRefOutPrimitiveType(PrimitiveType type)
+        {
+            switch (type)
+            {
+                case PrimitiveType.Bool:
+                case PrimitiveType.Char:
+                case PrimitiveType.SChar:
+                case PrimitiveType.UChar:
+                    return "com.sun.jna.ptr.ByteByReference";
+                case PrimitiveType.Short:
+                case PrimitiveType.UShort:
+                    return "com.sun.jna.ptr.ShortByReference";
+                case PrimitiveType.Int:
+                case PrimitiveType.UInt:
+                    return "com.sun.jna.ptr.IntByReference";
+                case PrimitiveType.Long:
+                case PrimitiveType.ULong:
+                    return "com.sun.jna.ptr.LongByReference";
+                case PrimitiveType.Float:
+                    return "com.sun.jna.ptr.FloatByReference";
+                case PrimitiveType.Double:
+                    return "com.sun.jna.ptr.DoubleByReference";
+                case PrimitiveType.IntPtr:
+                case PrimitiveType.UIntPtr:
+                    return "com.sun.jna.ptr.PointerByReference";
+                case PrimitiveType.String:
+                    return "mono.embeddinator.GString";
+                default:
+                    return JavaGenerator.IntPtrType;
+            }
+        }
+
+        public override TypePrinterResult VisitEnumDecl(Enumeration @enum)
+        {
+            if (ContextKind == TypePrinterContextKind.Native && IsByRefParameter)
+                return HandleNativeRefOutPrimitiveType(@enum.BuiltinType.Type);
+
+            return base.VisitEnumDecl(@enum);
+        }
+
+        public override TypePrinterResult VisitClassDecl(Class @class)
+        {
+            if (ContextKind == TypePrinterContextKind.Native)
+                return JavaGenerator.IntPtrType;
+
+            return VisitDeclaration(@class);
+        }
+
         public override TypePrinterResult VisitPointerType(PointerType pointer,
             TypeQualifiers quals)
         {
             var pointee = pointer.Pointee;
-
-            Class @class;
-            if (pointee.TryGetClass(out @class) && ContextKind == TypePrinterContextKind.Native)
-                return JavaGenerator.IntPtrType;
-
             return pointer.QualifiedPointee.Visit(this);
         }
 
         public override TypePrinterResult VisitPrimitiveType(PrimitiveType primitive,
             TypeQualifiers quals)
         {
+            if (ContextKind == TypePrinterContextKind.Native && IsByRefParameter)
+                return HandleNativeRefOutPrimitiveType(primitive);
+
             bool useReferencePrimitiveTypes = ContextKind == TypePrinterContextKind.Template;
 
             // This uses JNA conventions, https://jna.java.net/javadoc/overview-summary.html#marshalling.
