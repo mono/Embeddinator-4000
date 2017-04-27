@@ -68,6 +68,9 @@ namespace MonoEmbeddinator4000.Generators
             if (isEnum)
                 marshal = $"{@enum.Name}.fromOrdinal({value})";
 
+            if (type == PrimitiveType.Bool)
+                marshal = $"{value} != 0";
+
             Context.SupportAfter.WriteLine($"{Context.ArgName}.set({marshal});");
         }
 
