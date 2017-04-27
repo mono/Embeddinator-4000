@@ -1,5 +1,7 @@
 ﻿using System;
 
+#pragma warning disable 660 // 'Point' defines operator == or operator != but does not override Object.Equals(object o)
+#pragma warning disable 661 // 'Point' defines operator == or operator != but does not override Object.GetHashCode()
 namespace Structs {
 
 	public struct Point {
