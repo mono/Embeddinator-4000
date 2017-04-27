@@ -26,7 +26,7 @@ namespace ObjC {
 
 		public int MetadataToken { get; set; }
 
-		public void BeginHeaders ()
+		public virtual void BeginHeaders ()
 		{
 			headers.WriteLine ();
 			headers.WriteLine ($"/** Class {Name}");
@@ -62,9 +62,10 @@ namespace ObjC {
 			headers.WriteLine (" *  It exists solely to allow the correct subclassing of managed (.net) types");
 			headers.WriteLine (" */");
 			headers.WriteLine ("- (nullable instancetype)initForSuper;");
+			headers.WriteLine ();
 		}
 
-		public void EndHeaders ()
+		public virtual void EndHeaders ()
 		{
 			if (!IsStatic)
 				DefineInitForSuper ();
@@ -72,22 +73,23 @@ namespace ObjC {
 			headers.WriteLine ();
 		}
 
-		public void BeginImplementation ()
+		public virtual void BeginImplementation (string implementationName = null)
 		{
+			var name = implementationName ?? Name;
 			implementation.WriteLine ();
-			implementation.WriteLine ($"@implementation {Name} {{");
+			implementation.WriteLine ($"@implementation {name} {{");
 			implementation.WriteLine ("}");
 			implementation.WriteLine ();
-			WriteInitialize ();
+			WriteInitialize (name);
 			WriteDealloc ();
 		}
 
-		void WriteInitialize ()
+		void WriteInitialize (string name)
 		{
 			implementation.WriteLine ("+ (void) initialize");
 			implementation.WriteLine ("{");
 			implementation.Indent++;
-			implementation.WriteLine ($"if (self != [{Name} class])");
+			implementation.WriteLine ($"if (self != [{name} class])");
 			implementation.Indent++;
 			implementation.WriteLine ("return;");
 			implementation.Indent--;
