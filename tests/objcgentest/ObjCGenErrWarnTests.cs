@@ -42,9 +42,9 @@ namespace ObjCGenErrWarnTests {
 
 					Console.SetOut (stdout);
 					Console.SetError (stderr);
-                    foreach (var term in warnToSearch) {
-                        Assert.That (output, Does.Contain (term));   
-                    }
+					foreach (var term in warnToSearch) {
+						Assert.That (output, Does.Contain (term));
+					}
 				}
 			} finally {
 				Directory.Delete (valid, true);
