@@ -16,14 +16,22 @@ namespace ObjCGenErrWarnTests {
 	[TestFixture]
 	public class GenErrWarnTests {
 		[Test]
-		[TestCase (arg: new[] {
-			"warning EM1011: Type `System.Type` is not generated because it lacks a native counterpart."
-		})]
-		public void GenWarningTest (string [] warnToSearch)
+		[TestCase (
+			// Warning message to [not] look for.
+			arg1: new [] {
+				"warning EM1011: Type `System.Type` is not generated because it lacks a native counterpart.",
+			},
+			// true: Does.Contain | false: Does.Not.Contain
+			arg2: new [] {
+				true,
+			}
+		)]
+		public void GenWarningTest (string [] warnsToSearch, bool [] shouldFindWarn)
 		{
+			Assert.That (warnsToSearch.Length, Is.EqualTo (shouldFindWarn.Length), $"{nameof (warnsToSearch)} array length must match {nameof (shouldFindWarn)}'s");
 			string valid = Xamarin.Cache.CreateTemporaryDirectory ();
 			var warnerrAssembly = ObjCGeneratorTest.Helpers.Universe.Load ("managedwarn");
-			Assert.NotNull (warnerrAssembly);
+			Assert.NotNull (warnerrAssembly, "warnerrAssembly");
 
 			try {
 				using (var ms = new MemoryStream ()) {
@@ -42,8 +50,13 @@ namespace ObjCGenErrWarnTests {
 
 					Console.SetOut (stdout);
 					Console.SetError (stderr);
-					foreach (var term in warnToSearch) {
-						Assert.That (output, Does.Contain (term));
+
+					var arrCount = warnsToSearch.Length;
+					for (int i = 0; i < arrCount; i++) {
+						if (shouldFindWarn [i])
+							Assert.That (output, Does.Contain (warnsToSearch [i]), $"Did not find: {warnsToSearch [i]}");
+						else
+							Assert.That (output, Does.Not.Contain (warnsToSearch [i]), $"Did find: {warnsToSearch [i]}");
 					}
 				}
 			} finally {
