@@ -28,6 +28,8 @@
 
 package mono.embeddinator;
 
-public class RuntimeException extends java.lang.RuntimeException {
-
+public class NullRefParameterException extends java.lang.RuntimeException {
+	public NullRefParameterException(String parameter) {
+		super(parameter);
+	}
 }
