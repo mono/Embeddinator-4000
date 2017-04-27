@@ -35,4 +35,12 @@ public final class GString extends Runtime.RuntimeLibrary.GString {
 	public GString (String string) {
 		
 	}
+
+	/**
+	* Gets the native string as a Java string.
+	* This is named getValue() for uniformity with com.sun.jna.ptr.*ByReference set of types.
+	*/
+	public String getValue() {
+		return "";
+	}
 }
