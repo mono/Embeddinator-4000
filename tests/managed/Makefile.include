@@ -1,0 +1,16 @@
+GENERIC_MANAGED_DLL=$(TOP)/tests/managed/generic/bin/Debug/managed.dll
+IOS_MANAGED_DLL=$(TOP)/tests/managed/ios/bin/Debug/managed-ios.dll
+
+MANAGED_DEPENDENCIES = \
+	$(wildcard $(TOP)/tests/managed/*.projitems) \
+	$(wildcard $(TOP)/tests/managed/*.shproj) \
+	$(wildcard $(TOP)/tests/managed/*.targets) \
+	$(wildcard $(TOP)/tests/managed/*/*.csproj) \
+	$(wildcard $(TOP)/tests/managed/*.cs) \
+	$(wildcard $(TOP)/tests/managed/*.tt) \
+
+$(GENERIC_MANAGED_DLL): $(MANAGED_DEPENDENCIES)
+	/Library/Frameworks/Mono.framework/Versions/Current/Commands/msbuild $(TOP)/tests/managed/generic/managed-generic.csproj
+
+$(IOS_MANAGED_DLL): $(MANAGED_DEPENDENCIES)
+	/Library/Frameworks/Mono.framework/Versions/Current/Commands/msbuild $(TOP)/tests/managed/ios/managed-ios.csproj

@@ -33,11 +33,8 @@
     <Reference Include="Xamarin.iOS" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="MyObject.cs" />
-    <Compile Include="..\managed\*.cs" />
-    <!-- subscripts.cs must be listed manually, because it's generated, and the glob above won't include it unless it's already generated when the glob is evaluated, which happens before the file is generated -->
-    <Compile Include="..\managed\subscripts.cs" />
   </ItemGroup>
+  <Import Project="..\managed-shared.projitems" Label="Shared" Condition="Exists('..\managed-shared.projitems')" />
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
-  <Import Project="..\managed\CustomBuildActions.targets" />
+  <Import Project="..\CustomBuildActions.targets" />
 </Project>

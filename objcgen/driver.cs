@@ -217,7 +217,8 @@ namespace Embeddinator {
 				case Platform.watchOS:
 					return "/Library/Frameworks/Xamarin.iOS.framework/Versions/Current/lib/mono/Xamarin.WatchOS";
 				case Platform.macOS:
-					throw new NotImplementedException ("mac platform sdk"); // need to know full/mobile
+					// FIXME: this is not right when embedding XM.
+					return "/Library/Frameworks/Mono.framework/Versions/Current/lib/mono/4.5";
 				default:
 					throw ErrorHelper.CreateError (99, "Internal error: invalid platform {0}. Please file a bug report with a test case (https://github.com/mono/Embeddinator-4000/issues).", Platform);
 				}

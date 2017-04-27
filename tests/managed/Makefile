@@ -1,7 +1,10 @@
-bin/Debug/managed.dll: $(wildcard *.cs) managed.csproj
-	/Library/Frameworks/Mono.framework/Versions/Current/Commands/msbuild managed.csproj
-	
-all: managed.dll
+TOP=../..
+
+all:
+
+include Makefile.include
+
+all: $(GENERIC_MANAGED_DLL) $(IOS_MANAGED_DLL)
 
 clean:
-	@rm -rf bin/ obj/
+	@rm -rf bin/ obj/ */bin */obj

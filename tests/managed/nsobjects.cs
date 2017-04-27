@@ -1,9 +1,10 @@
-﻿using Foundation;
+#if __IOS__ || __TVOS__ || __WATCHOS__ || __MACOS__
+using Foundation;
 
 namespace CustomUI
 {
-    public class MyObject : NSObject
-    {
+	public class MyObject : NSObject
+	{
 		[Export ("addStatic:to:")]
 		public static int AddStatic (int a, int b)
 		{
@@ -17,3 +18,4 @@ namespace CustomUI
 		}
 	}
 }
+#endif

@@ -1,26 +1,24 @@
 TOP=../..
 
-include $(TOP)/tests/managed-ios/Makefile.include
-
 all: run-test perf xctest test-leaks test-static test-dynamic test-framework-ios xctest-ios-simulator
+
+include $(TOP)/tests/managed/Makefile.include
+
 
 MONO=/Library/Frameworks/Mono.framework/Versions/Current/Commands/mono
 
-OBJC_GEN_DIR=../../objcgen
+OBJC_GEN_DIR=$(TOP)/objcgen
 OBJC_GEN=$(OBJC_GEN_DIR)/bin/Debug/objcgen.exe
 $(OBJC_GEN): $(wildcard $(OBJC_GEN_DIR)/*.cs) $(wildcard ../../support/*)
 	$(MAKE) -C $(OBJC_GEN_DIR)
 
-MANAGED_DLL_DIR=../managed
-MANAGED_DLL=$(MANAGED_DLL_DIR)/bin/Debug/managed.dll
-$(MANAGED_DLL): $(wildcard $(MANAGED_DLL_DIR)/*.cs)
-	make -C $(MANAGED_DLL_DIR)
+MANAGED_DLL=$(GENERIC_MANAGED_DLL)
 
 %/managed.dll: $(MANAGED_DLL)
 	mkdir -p $(dir $@)
 	cp $< $@
 
-debug/libmanaged-ios-framework/managed-ios.framework: $(TESTS_MANAGED_IOS_DLL) $(OBJC_GEN)
+debug/libmanaged-ios-framework/managed-ios.framework: $(IOS_MANAGED_DLL) $(OBJC_GEN)
 	$(MONO) --debug $(abspath $(OBJC_GEN)) --debug $(abspath $<) -c --outdir=$(abspath $(dir $@)) --target=framework --platform=ios
 
 debug/libmanaged.dylib: debug/managed.dll $(OBJC_GEN)
