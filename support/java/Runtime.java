@@ -59,6 +59,20 @@ public final class Runtime {
             }
         }
 
+        public class GString extends Structure {
+            public static class ByValue extends GString implements Structure.ByValue { }
+            public static class ByReference  extends GString implements Structure.ByReference { }
+
+            public Pointer str;
+            public NativeLong len;
+            public NativeLong allocated_len;
+
+            @Override
+            protected List getFieldOrder() {
+                return Arrays.asList("str", "len", "allocated_len");
+            }
+        }
+
         public static interface ErrorCallback extends Callback {
             void invoke(RuntimeLibrary.Error.ByValue error) throws RuntimeException;
         }
