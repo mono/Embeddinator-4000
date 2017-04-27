@@ -102,8 +102,7 @@ namespace MonoEmbeddinator4000.Generators
             PushBlock(BlockKind.Enum);
             GenerateDeclarationCommon(@enum);
 
-            Write("{0} enum {1} ", AccessIdentifier(@enum.Access),
-                SafeIdentifier(@enum.Name));
+            Write("{0} enum {1} ", AccessIdentifier(@enum.Access), @enum.Name);
 
             WriteStartBraceIndent();
             GenerateEnumItems(@enum);
@@ -168,7 +167,7 @@ namespace MonoEmbeddinator4000.Generators
                 keywords.Add("static");
 
             keywords.Add(@class.IsInterface ? "interface" : "class");
-            keywords.Add(SafeIdentifier(@class.Name));
+            keywords.Add(@class.Name);
 
             keywords = keywords.Where(s => !string.IsNullOrWhiteSpace(s)).ToList();
             if (keywords.Count != 0)
