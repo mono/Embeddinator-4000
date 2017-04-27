@@ -12,6 +12,7 @@ namespace DriverTest
 		{
 			try {
 				action ();
+				Assert.Fail ($"Expected EM{code} exception, but no exception was thrown.");
 			} catch (EmbeddinatorException ee) {
 				Assert.That (ee.Error, "Error");
 				Assert.That (ee.Code, Is.EqualTo (code), "Code");
@@ -21,6 +22,7 @@ namespace DriverTest
 		{
 			try {
 				action ();
+				Assert.Fail ($"Expected EM{code} exception, but no exception was thrown.", message);
 			} catch (EmbeddinatorException ee) {
 				Assert.That (ee.Error, "Error");
 				Assert.That (ee.Code, Is.EqualTo (code), "Code");
