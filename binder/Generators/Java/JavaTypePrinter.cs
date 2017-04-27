@@ -147,7 +147,7 @@ namespace MonoEmbeddinator4000.Generators
                 case PrimitiveType.LongDouble: return "decimal";
                 case PrimitiveType.IntPtr:
                 case PrimitiveType.UIntPtr:
-                case PrimitiveType.Null: return "Pointer";
+                case PrimitiveType.Null: return JavaGenerator.IntPtrType;
                 case PrimitiveType.String: return "String";
             }
 

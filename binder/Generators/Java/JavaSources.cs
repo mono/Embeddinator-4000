@@ -226,10 +226,11 @@ namespace MonoEmbeddinator4000.Generators
 
             if (!@class.IsStatic && !@class.HasBase)
             {
-                WriteLine("public {0} __object;", JavaGenerator.IntPtrType);
+                var objectIdent = JavaGenerator.GeneratedIdentifier("object");
+                WriteLine($"public {JavaGenerator.IntPtrType} {objectIdent};");
                 NewLine();
                 
-                WriteLine($"{@class.Name}(com.sun.jna.Pointer object) {{ this.__object = object; }}");
+                WriteLine($"{@class.Name}({JavaGenerator.IntPtrType} object) {{ this.{objectIdent} = object; }}");
                 NewLine();
             }
 
