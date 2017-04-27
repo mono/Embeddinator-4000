@@ -44,11 +44,10 @@ namespace MonoEmbeddinator4000.Generators
             TypePrinter.PopContext();
 
             // Perform null checking for all primitive value types.
-            if (type != PrimitiveType.String)
-            {
-                Context.SupportBefore.WriteLine($"if ({Context.ArgName}.get() == null)");
-                Context.SupportBefore.WriteLineIndent($"throw new NullRefParameterException(\"{Context.Parameter.Name}\");");
-            }
+            string extraCheck = type != PrimitiveType.String ?
+                $" || {Context.ArgName}.get() == null" : string.Empty;
+            Context.SupportBefore.WriteLine($"if ({Context.ArgName} == null{extraCheck})");
+            Context.SupportBefore.WriteLineIndent($"throw new NullRefParameterException(\"{Context.Parameter.Name}\");");
 
             string marshal = $"{Context.ArgName}.get()";
 
