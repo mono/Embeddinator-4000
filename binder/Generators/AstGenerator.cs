@@ -166,7 +166,11 @@ namespace MonoEmbeddinator4000.Generators
             HandleNamespace(type, @enum);
 
             if (Options.GeneratorKind == GeneratorKind.CPlusPlus)
-                @enum.Modifiers = Enumeration.EnumModifiers.Scoped;
+                @enum.Modifiers |= Enumeration.EnumModifiers.Scoped;
+
+            bool flags = type.HasCustomAttribute("System", "FlagsAttribute");
+            if (flags)
+                @enum.Modifiers |= Enumeration.EnumModifiers.Flags;
 
             foreach (var item in type.DeclaredFields)
             {
@@ -610,4 +614,22 @@ namespace MonoEmbeddinator4000.Generators
             return property;
         }
     }
+
+    public static class TypeExtensions {
+        
+        public static bool Is (this IKVM.Reflection.Type self, string @namespace, string name)
+        {
+            return (self.Namespace == @namespace) && (self.Name == name);
+        }
+
+        public static bool HasCustomAttribute (this IKVM.Reflection.Type self, string @namespace, string name)
+        {
+            foreach (var ca in self.CustomAttributes) {
+                if (ca.AttributeType.Is (@namespace, name))
+                    return true;
+            }
+            return false;
+        }
+    }
 }
+
