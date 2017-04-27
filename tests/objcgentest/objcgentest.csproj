@@ -38,6 +38,7 @@
     <Compile Include="Cache.cs" />
     <Compile Include="TypeExtensionsTest.cs" />
     <Compile Include="StringExtensionsTest.cs" />
+    <Compile Include="ObjCGenErrWarnTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -46,6 +47,10 @@
     <ProjectReference Include="..\..\objcgen\objcgen.csproj">
       <Project>{C166803B-011F-4EAF-B8C2-D7DBBA3CF1EC}</Project>
       <Name>objcgen</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\managedwarn\managedwarn.csproj">
+      <Project>{73C4FAF0-C37A-4CEE-A3F3-B1F80748D5B2}</Project>
+      <Name>managedwarn</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
