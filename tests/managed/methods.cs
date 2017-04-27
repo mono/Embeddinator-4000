@@ -202,7 +202,7 @@ namespace Methods {
 
 		public static AllOperators operator & (AllOperators c1, AllOperators c2)
 		{
-			return new AllOperators (c1.Value | c2.Value);
+			return new AllOperators (c1.Value & c2.Value);
 		}
 
 		public static AllOperators operator ++ (AllOperators c1)
