@@ -179,5 +179,22 @@ namespace DriverTest {
 			Driver.Main2 (new string [] { "--abi=any" });
 			CollectionAssert.AreEquivalent (new string [] { "any" }, Driver.CurrentEmbedder.ABIs, "any");
 		}
+
+		[Test]
+		public void EM0011 ()
+		{
+			Asserts.ThrowsEmbeddinatorException (11, "The assembly foo.dll does not exist.", () => Driver.Main2 ("foo.dll"));
+		}
+
+		[Test]
+		public void EM0013 ()
+		{
+			var tmpdir = Xamarin.Cache.CreateTemporaryDirectory ();
+			var csfile = Path.Combine (tmpdir, "foo.cs");
+			var dllfile = Path.Combine (tmpdir, "foo.dll");
+			File.WriteAllText (csfile, @"public class C { public Foundation.NSObject F () {  throw new System.NotImplementedException (); } }");
+			Asserts.RunProcess ("/Library/Frameworks/Mono.framework/Commands/csc", $"/target:library /out:{Embedder.Quote (dllfile)} {Embedder.Quote (csfile)} -r:/Library/Frameworks/Xamarin.iOS.framework/Versions/Current/lib/mono/Xamarin.iOS/Xamarin.iOS.dll", "compile dll");
+			Asserts.ThrowsEmbeddinatorException (13, "Can't find the assembly 'Xamarin.iOS, Version=0.0.0.0, Culture=neutral, PublicKeyToken=84e04ff9cfb79065', referenced by 'foo, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null'.", () => Driver.Main2 (dllfile, "--platform=tvOS", "--outdir=" + tmpdir));
+		}
 	}
 }

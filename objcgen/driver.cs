@@ -207,11 +207,45 @@ namespace Embeddinator {
 		public TargetLanguage TargetLanguage { get; private set; } = TargetLanguage.ObjectiveC;
 		public CompilationTarget CompilationTarget { get; set; } = CompilationTarget.SharedLibrary;
 
+		public string PlatformSdkDirectory {
+			get {
+				switch (Platform) {
+				case Platform.iOS:
+					return "/Library/Frameworks/Xamarin.iOS.framework/Versions/Current/lib/mono/Xamarin.iOS";
+				case Platform.tvOS:
+					return "/Library/Frameworks/Xamarin.iOS.framework/Versions/Current/lib/mono/Xamarin.TVOS";
+				case Platform.watchOS:
+					return "/Library/Frameworks/Xamarin.iOS.framework/Versions/Current/lib/mono/Xamarin.WatchOS";
+				case Platform.macOS:
+					// FIXME: this is not right when embedding XM.
+					return "/Library/Frameworks/Mono.framework/Versions/Current/lib/mono/4.5";
+				default:
+					throw ErrorHelper.CreateError (99, "Internal error: invalid platform {0}. Please file a bug report with a test case (https://github.com/mono/Embeddinator-4000/issues).", Platform);
+				}
+			}
+		}
+
 		public int Generate (List<string> args)
 		{
 			Console.WriteLine ("Parsing assemblies...");
 
 			var universe = new Universe (UniverseOptions.MetadataOnly);
+
+			universe.AssemblyResolve += (object sender, IKVM.Reflection.ResolveEventArgs resolve_args) => {
+				var directories = new List<string> ();
+				directories.Add (PlatformSdkDirectory);
+				foreach (var asm in Assemblies)
+					directories.Add (Path.GetDirectoryName (asm.Location));
+
+				AssemblyName an = new AssemblyName (resolve_args.Name);
+				foreach (var dir in directories) {
+					var filename = Path.Combine (dir, an.Name + ".dll");
+					if (File.Exists (filename))
+						return universe.LoadFile (filename);
+				}
+				throw ErrorHelper.CreateError (13, $"Can't find the assembly '{resolve_args.Name}', referenced by '{resolve_args.RequestingAssembly.FullName}'.");
+			};
+
 			foreach (var arg in args) {
 				if (!File.Exists (arg))
 					throw ErrorHelper.CreateError (11, $"The assembly {arg} does not exist.");
@@ -477,6 +511,7 @@ namespace Embeddinator {
 					case Platform.watchOS:
 						var mtouch = new StringBuilder ();
 						var appdir = Path.GetFullPath (Path.Combine (OutputDirectory, build_info.Sdk, "appdir"));
+						var cachedir = Path.GetFullPath (Path.Combine (outputDirectory, build_info.Sdk, "mtouch-cache"));
 						mtouch.Append (build_info.IsSimulator ? "--sim " : "--dev ");
 						mtouch.Append ($"{Quote (appdir)} ");
 						mtouch.Append ($"--abi={string.Join (",", build_info.Architectures)} ");
@@ -490,7 +525,7 @@ namespace Embeddinator {
 						mtouch.Append ($"--sdk {GetSdkVersion (build_info.Sdk.ToLower ())} ");
 						mtouch.Append ("--linksdkonly ");
 						mtouch.Append ("--registrar:static ");
-						mtouch.Append ($"--cache {Quote (Path.GetFullPath (Path.Combine (outputDirectory, build_info.Sdk, "mtouch-cache")))} ");
+						mtouch.Append ($"--cache {Quote (cachedir)} ");
 						if (Debug)
 							mtouch.Append ("--debug ");
 						mtouch.Append ($"--assembly-build-target=@all=framework={LibraryName}.framework ");
@@ -509,7 +544,25 @@ namespace Embeddinator {
 						File.WriteAllText (Path.Combine (headers, LibraryName + ".h"),
 @"
 #include ""bindings.h""
+#if defined(__i386__)
+#include ""registrar-i386.h""
+#elif defined(__x86_64__)
+#include ""registrar-x86_64.h""
+#elif defined(__arm__)
+#include ""registrar-arm32.h"" // this includes all 32-bit arm architectures.
+#elif defined(__aarch64__)
+#include ""registrar-arm64.h""
+#else
+#error Unknown architecture
+#endif
 ");
+						if (build_info.IsSimulator) {
+							FileCopyIfExists (Path.Combine (cachedir, "32", "registrar.h"), Path.Combine (headers, "registrar-i386.h"));
+							FileCopyIfExists (Path.Combine (cachedir, "64", "registrar.h"), Path.Combine (headers, "registrar-x86_64.h"));
+						} else {
+							FileCopyIfExists (Path.Combine (cachedir, "32", "registrar.h"), Path.Combine (headers, "registrar-arm32.h"));
+							FileCopyIfExists (Path.Combine (cachedir, "64", "registrar.h"), Path.Combine (headers, "registrar-arm64.h"));
+						}
 						// Move the framework to the output directory
 						var fwpath = Path.Combine (OutputDirectory, build_info.Sdk, $"{LibraryName}.framework");
 						if (Directory.Exists (fwpath))
@@ -538,6 +591,13 @@ namespace Embeddinator {
 			}
 
 			return 0;
+		}
+
+		static void FileCopyIfExists (string source, string target)
+		{
+			if (!File.Exists (source))
+				return;
+			File.Copy (source, target, true);
 		}
 
 		// All files from both frameworks will be included.
@@ -675,17 +735,45 @@ namespace Embeddinator {
 			}
 		}
 		
-		public static bool RunProcess (string filename, string arguments, out int exitCode, out string stdout)
+		public static bool RunProcess (string filename, string arguments, out int exitCode, out string stdout, bool capture_stderr = false)
 		{
 			Console.WriteLine($"\t{filename} {arguments}");
+			var sb = new StringBuilder ();
+			var stdout_done = new System.Threading.ManualResetEvent (false);
+			var stderr_done = new System.Threading.ManualResetEvent (false);
 			using (var p = new Process ()) {
 				p.StartInfo.FileName = filename;
 				p.StartInfo.Arguments = arguments;
 				p.StartInfo.UseShellExecute = false;
 				p.StartInfo.RedirectStandardOutput = true;
-				p.Start();
-				stdout = p.StandardOutput.ReadToEnd();
+				p.StartInfo.RedirectStandardError = capture_stderr;
+				p.OutputDataReceived += (sender, e) => {
+					if (e.Data == null) {
+						stdout_done.Set ();
+					} else {
+						lock (sb)
+							sb.AppendLine (e.Data);
+					}
+				};
+				if (capture_stderr) {
+					p.ErrorDataReceived += (sender, e) => {
+						if (e.Data == null) {
+							stderr_done.Set ();
+						} else {
+							lock (sb)
+								sb.AppendLine (e.Data);
+						}
+					};
+				}
+				p.Start ();
+				p.BeginOutputReadLine ();
+				if (capture_stderr)
+					p.BeginErrorReadLine ();
 				p.WaitForExit ();
+				stdout_done.WaitOne (TimeSpan.FromSeconds (1));
+				if (capture_stderr)
+					stderr_done.WaitOne (TimeSpan.FromSeconds (1));
+				stdout = sb.ToString ();
 				exitCode = p.ExitCode;
 				return exitCode == 0;
 			}

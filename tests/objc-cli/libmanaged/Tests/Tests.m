@@ -1,6 +1,6 @@
 #import <XCTest/XCTest.h>
 #if defined (TEST_FRAMEWORK)
-#include "managed/managed.h"
+#include "managed-ios/managed-ios.h"
 #else
 #include "bindings.h"
 #endif

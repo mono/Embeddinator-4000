@@ -7,17 +7,18 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7E015F2E1EA6845D0039309A /* managed-ios.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7E577A671E9E5AEA003FA392 /* managed-ios.framework */; };
 		7E577A421E9E5A4B003FA392 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 7E577A411E9E5A4B003FA392 /* main.m */; };
 		7E577A451E9E5A4B003FA392 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 7E577A441E9E5A4B003FA392 /* AppDelegate.m */; };
 		7E577A481E9E5A4B003FA392 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7E577A471E9E5A4B003FA392 /* ViewController.m */; };
 		7E577A4B1E9E5A4B003FA392 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7E577A491E9E5A4B003FA392 /* Main.storyboard */; };
 		7E577A4D1E9E5A4B003FA392 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7E577A4C1E9E5A4B003FA392 /* Assets.xcassets */; };
 		7E577A501E9E5A4B003FA392 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7E577A4E1E9E5A4B003FA392 /* LaunchScreen.storyboard */; };
-		7E577A5B1E9E5A4C003FA392 /* libmanaged_iosTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 7E577A5A1E9E5A4C003FA392 /* libmanaged_iosTests.m */; };
+		7E577A5B1E9E5A4C003FA392 /* iosTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 7E577A5A1E9E5A4C003FA392 /* iosTests.m */; };
 		7E577A661E9E5A5E003FA392 /* Tests.m in Sources */ = {isa = PBXBuildFile; fileRef = 7E577A651E9E5A5E003FA392 /* Tests.m */; };
-		7E577A681E9E5AEA003FA392 /* managed.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7E577A671E9E5AEA003FA392 /* managed.framework */; };
-		7E577A6B1E9E5D9C003FA392 /* managed.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 7E577A671E9E5AEA003FA392 /* managed.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		7E577A6D1E9E6D9D003FA392 /* managed.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 7E577A671E9E5AEA003FA392 /* managed.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		7E577A681E9E5AEA003FA392 /* managed-ios.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7E577A671E9E5AEA003FA392 /* managed-ios.framework */; };
+		7E577A6B1E9E5D9C003FA392 /* managed-ios.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 7E577A671E9E5AEA003FA392 /* managed-ios.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		7E577A6D1E9E6D9D003FA392 /* managed-ios.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 7E577A671E9E5AEA003FA392 /* managed-ios.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -37,7 +38,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				7E577A6B1E9E5D9C003FA392 /* managed.framework in CopyFiles */,
+				7E577A6B1E9E5D9C003FA392 /* managed-ios.framework in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -47,7 +48,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				7E577A6D1E9E6D9D003FA392 /* managed.framework in CopyFiles */,
+				7E577A6D1E9E6D9D003FA392 /* managed-ios.framework in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -65,10 +66,10 @@
 		7E577A4F1E9E5A4B003FA392 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		7E577A511E9E5A4B003FA392 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7E577A561E9E5A4C003FA392 /* libmanaged-iosTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "libmanaged-iosTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		7E577A5A1E9E5A4C003FA392 /* libmanaged_iosTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = libmanaged_iosTests.m; sourceTree = "<group>"; };
+		7E577A5A1E9E5A4C003FA392 /* iosTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = iosTests.m; sourceTree = "<group>"; };
 		7E577A5C1E9E5A4C003FA392 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7E577A651E9E5A5E003FA392 /* Tests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Tests.m; path = ../../libmanaged/Tests/Tests.m; sourceTree = "<group>"; };
-		7E577A671E9E5AEA003FA392 /* managed.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = managed.framework; path = "../build/test-framework-ios-temp-dir/managed.framework"; sourceTree = "<group>"; };
+		7E577A671E9E5AEA003FA392 /* managed-ios.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = "managed-ios.framework"; path = "../debug/libmanaged-ios-framework/managed-ios.framework"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -76,6 +77,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7E015F2E1EA6845D0039309A /* managed-ios.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -83,7 +85,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7E577A681E9E5AEA003FA392 /* managed.framework in Frameworks */,
+				7E577A681E9E5AEA003FA392 /* managed-ios.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -93,7 +95,7 @@
 		7E577A341E9E5A4B003FA392 = {
 			isa = PBXGroup;
 			children = (
-				7E577A671E9E5AEA003FA392 /* managed.framework */,
+				7E577A671E9E5AEA003FA392 /* managed-ios.framework */,
 				7E577A3F1E9E5A4B003FA392 /* libmanaged-ios */,
 				7E577A591E9E5A4C003FA392 /* libmanaged-iosTests */,
 				7E577A3E1E9E5A4B003FA392 /* Products */,
@@ -137,7 +139,7 @@
 			isa = PBXGroup;
 			children = (
 				7E577A651E9E5A5E003FA392 /* Tests.m */,
-				7E577A5A1E9E5A4C003FA392 /* libmanaged_iosTests.m */,
+				7E577A5A1E9E5A4C003FA392 /* iosTests.m */,
 				7E577A5C1E9E5A4C003FA392 /* Info.plist */,
 			);
 			path = "libmanaged-iosTests";
@@ -259,7 +261,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7E577A5B1E9E5A4C003FA392 /* libmanaged_iosTests.m in Sources */,
+				7E577A5B1E9E5A4C003FA392 /* iosTests.m in Sources */,
 				7E577A661E9E5A5E003FA392 /* Tests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -391,6 +393,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = TGFVQHFHZF;
+				ENABLE_BITCODE = NO;
+				FRAMEWORK_SEARCH_PATHS = "../debug/libmanaged-ios-framework";
 				INFOPLIST_FILE = "libmanaged-ios/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -404,6 +408,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = TGFVQHFHZF;
+				ENABLE_BITCODE = NO;
+				FRAMEWORK_SEARCH_PATHS = "../debug/libmanaged-ios-framework";
 				INFOPLIST_FILE = "libmanaged-ios/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -417,8 +423,8 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				DEVELOPMENT_TEAM = TGFVQHFHZF;
-				"FRAMEWORK_SEARCH_PATHS[sdk=iphoneos*]" = "../build/test-framework-ios-temp-dir/iPhoneOS";
-				"FRAMEWORK_SEARCH_PATHS[sdk=iphonesimulator*]" = "../build/test-framework-ios-temp-dir/iPhoneSimulator";
+				"FRAMEWORK_SEARCH_PATHS[sdk=iphoneos*]" = "../debug/libmanaged-ios-framework";
+				"FRAMEWORK_SEARCH_PATHS[sdk=iphonesimulator*]" = "../debug/libmanaged-ios-framework";
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",

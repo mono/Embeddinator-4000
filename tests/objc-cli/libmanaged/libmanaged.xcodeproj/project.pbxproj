@@ -31,8 +31,8 @@
 /* Begin PBXFileReference section */
 		7E3455791E92B06100FCAD74 /* libmanaged.dylib.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = libmanaged.dylib.dSYM; path = ../debug/libmanaged.dylib.dSYM; sourceTree = "<group>"; };
 		7E5081F01E928C24008125B5 /* libmanaged.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libmanaged.dylib; path = ../debug/libmanaged.dylib; sourceTree = "<group>"; };
-		D1B0CD801E904EA6008FF17D /* managed.dll */ = {isa = PBXFileReference; lastKnownFileType = file; name = managed.dll; path = ../../../managed/bin/Debug/managed.dll; sourceTree = "<group>"; };
-		D1B0CD811E904EA6008FF17D /* managed.pdb */ = {isa = PBXFileReference; lastKnownFileType = file; name = managed.pdb; path = ../../../managed/bin/Debug/managed.pdb; sourceTree = "<group>"; };
+		D1B0CD801E904EA6008FF17D /* managed.dll */ = {isa = PBXFileReference; lastKnownFileType = file; name = managed.dll; path = ../../../managed/generic/bin/Debug/managed.dll; sourceTree = "<group>"; };
+		D1B0CD811E904EA6008FF17D /* managed.pdb */ = {isa = PBXFileReference; lastKnownFileType = file; name = managed.pdb; path = ../../../managed/generic/bin/Debug/managed.pdb; sourceTree = "<group>"; };
 		D1E2B21F1E8F4FBB00846AF8 /* Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D1E2B2211E8F4FBB00846AF8 /* Tests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Tests.m; sourceTree = "<group>"; };
 		D1E2B2231E8F4FBB00846AF8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };

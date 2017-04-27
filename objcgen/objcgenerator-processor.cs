@@ -14,6 +14,20 @@ namespace ObjC {
 		List<Exception> delayed = new List<Exception> ();
 		HashSet<Type> unsupported = new HashSet<Type> ();
 
+		bool IsNSObjectSubclass (Type t)
+		{
+			if (t.Name == "Object" && t.Namespace == "System")
+				return false;
+			
+			if (t.Name == "NSObject" && t.Namespace == "Foundation")
+				return true;
+
+			if (t.BaseType == null)
+				return false;
+
+			return IsNSObjectSubclass (t.BaseType);
+		}
+
 		bool IsSupported (Type t)
 		{
 			if (t.IsByRef)
@@ -58,6 +72,9 @@ namespace ObjC {
 
 				if (!IsSupported (t))
 					continue;
+
+				if (IsNSObjectSubclass (t))
+					continue; // The static registrar generates the code for these types.
 
 				yield return t;
 			}
