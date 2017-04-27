@@ -86,8 +86,13 @@ namespace MonoEmbeddinator4000.Generators
 
         public override TypePrinterResult VisitEnumDecl(Enumeration @enum)
         {
-            if (ContextKind == TypePrinterContextKind.Native && IsByRefParameter)
-                return HandleNativeRefOutPrimitiveType(@enum.BuiltinType.Type);
+            if (ContextKind == TypePrinterContextKind.Native)
+            {
+                if (IsByRefParameter)
+                    return HandleNativeRefOutPrimitiveType(@enum.BuiltinType.Type);
+
+                return @enum.BuiltinType.Visit(this);
+            }
 
             return base.VisitEnumDecl(@enum);
         }

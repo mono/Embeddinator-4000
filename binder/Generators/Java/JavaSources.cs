@@ -114,6 +114,31 @@ namespace MonoEmbeddinator4000.Generators
             WriteLine($"{@enum.Name}({typeName} id) {{ this.id = id; }}");
             WriteLine($"public {typeName} getValue() {{ return id; }}");
 
+            NewLine();
+            var index = @enum.BuiltinType.IsUnsigned ? "n.intValue()" : "n";
+            WriteLine($"public static {@enum.Name} fromOrdinal({typeName} n) {{");
+            WriteLineIndent($"return valuesMap.get({index});");
+            WriteLine("}");
+
+            TypePrinter.PushContext(TypePrinterContextKind.Template);
+            var refTypeName = @enum.BuiltinType.Visit(TypePrinter);
+            TypePrinter.PopContext();
+
+            NewLine();
+            WriteLine($"private static final java.util.Map<{refTypeName}, {@enum.Name}> valuesMap = ");
+            WriteLineIndent($"new java.util.HashMap<{refTypeName}, {@enum.Name}>();");
+
+            NewLine();
+            WriteLine("static {");
+            PushIndent();
+
+            WriteLine($"for (final {@enum.Name} type : {@enum.Name}.values()) {{");
+            WriteLineIndent($"valuesMap.put(type.getValue(), type);");
+            WriteLine("}");
+
+            PopIndent();
+            WriteLine("}");
+
             WriteCloseBraceIndent();
             PopBlock(NewLineKind.BeforeNextBlock);
 

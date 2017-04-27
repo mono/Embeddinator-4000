@@ -37,7 +37,7 @@ namespace MonoEmbeddinator4000.Generators
             return true;
         }
 
-        public void HandleRefOutPrimitiveType(PrimitiveType type, bool isEnum = false)
+        public void HandleRefOutPrimitiveType(PrimitiveType type, Enumeration @enum = null)
         {
             TypePrinter.PushContext(TypePrinterContextKind.Native);
             var typeName = Context.Parameter.Visit(TypePrinter);
@@ -51,7 +51,7 @@ namespace MonoEmbeddinator4000.Generators
 
             string marshal = $"{Context.ArgName}.get()";
 
-            // Special cases for enumerations and booleans.
+            var isEnum = @enum != null;
             if (isEnum)
                 marshal = $"{marshal}.getValue()";
 
@@ -61,17 +61,29 @@ namespace MonoEmbeddinator4000.Generators
             var varName = JavaGenerator.GeneratedIdentifier(Context.ArgName);
             Context.SupportBefore.WriteLine($"{typeName} {varName} = new {typeName}({marshal});");
             Context.Return.Write(varName);
+
+            var value = $"{varName}.getValue()";
+            marshal = value;
+
+            if (isEnum)
+                marshal = $"{@enum.Name}.fromOrdinal({value})";
+
+            Context.SupportAfter.WriteLine($"{Context.ArgName}.set({marshal});");
         }
 
         public override bool VisitEnumDecl(Enumeration @enum)
         {
             if (IsByRefParameter)
             {
-                HandleRefOutPrimitiveType(@enum.BuiltinType.Type, isEnum: true);
+                HandleRefOutPrimitiveType(@enum.BuiltinType.Type, @enum);
                 return true;
             }
 
-            Context.Return.Write(Context.ArgName);
+            var typeName = @enum.BuiltinType.Visit(TypePrinter);
+            var varName = JavaGenerator.GeneratedIdentifier(Context.ArgName);
+            Context.SupportBefore.WriteLine($"{typeName} {varName} = {Context.ArgName}.getValue();");
+
+            Context.Return.Write(varName);
             return true;
         }
 
@@ -120,7 +132,7 @@ namespace MonoEmbeddinator4000.Generators
 
         public override bool VisitEnumDecl(Enumeration @enum)
         {
-            Context.Return.Write(Context.ReturnVarName);
+            Context.Return.Write($"{@enum.Name}.fromOrdinal({Context.ReturnVarName})");
             return true;
         }
 
