@@ -50,6 +50,11 @@ namespace ObjC {
 
 			foreach (var t in types)
 				implementation.WriteLine ($"static MonoClass* {GetObjCName (t)}_class = nil;");
+			foreach (var t in protocols) {
+				var pname = GetTypeName (t);
+				headers.WriteLine ($"@protocol {pname};");
+				implementation.WriteLine ($"@class __{pname}Wrapper;");
+			}
 			implementation.WriteLine ();
 
 			implementation.WriteLine ("static void __initialize_mono ()");
@@ -103,6 +108,10 @@ namespace ObjC {
 
 			foreach (var t in enums) {
 				GenerateEnum (t);
+			}
+
+			foreach (var t in protocols) {
+				GenerateProtocol (t);
 			}
 
 			foreach (var t in types) {
@@ -177,6 +186,60 @@ namespace ObjC {
 			headers.Indent--;
 			headers.WriteLine ("};");
 			headers.WriteLine ();
+		}
+
+		void GenerateProtocol (Type t)
+		{
+			var pbuilder = new ProtocolHelper (headers, implementation) {
+				AssemblyQualifiedName = t.AssemblyQualifiedName,
+				AssemblyName = t.Assembly.GetName ().Name.Sanitize (),
+				ProtocolName = GetTypeName (t),
+				Namespace = t.Namespace,
+				ManagedName = t.Name,
+				MetadataToken = t.MetadataToken,
+			};
+			pbuilder.BeginHeaders ();
+
+			// no need to iterate constructors or fields as they cannot be part of net interfaces
+			// do not generate implementations for protocols
+			implementation.Enabled = false;
+
+			List<ProcessedProperty> props;
+			if (properties.TryGetValue (t, out props)) {
+				headers.WriteLine ();
+				foreach (var pi in props)
+					Generate (pi);
+			}
+
+			List<ProcessedMethod> meths;
+			if (methods.TryGetValue (t, out meths)) {
+				headers.WriteLine ();
+				foreach (var mi in meths)
+					Generate (mi);
+			}
+
+			pbuilder.EndHeaders ();
+
+			// wrappers are internal so not part of the headers
+			headers.Enabled = false;
+			implementation.Enabled = true;
+
+			pbuilder.BeginImplementation ();
+
+			if (properties.TryGetValue (t, out props)) {
+				implementation.WriteLine ();
+				foreach (var pi in props)
+					Generate (pi);
+			}
+
+			if (methods.TryGetValue (t, out meths)) {
+				implementation.WriteLine ();
+				foreach (var mi in meths)
+					Generate (mi);
+			}
+
+			pbuilder.EndImplementation ();
+			headers.Enabled = true;
 		}
 
 		protected override void Generate (Type t)
@@ -536,6 +599,8 @@ namespace ObjC {
 
 		public string GetReturnType (Type declaringType, Type returnType)
 		{
+			if (protocols.Contains (returnType))
+				return "id<" + GetTypeName (returnType) + ">";
 			if (declaringType == returnType)
 				return "instancetype";
 
@@ -569,6 +634,7 @@ namespace ObjC {
 				ObjCSignature = objcsig,
 				ObjCTypeName = managed_type_name,
 				IsValueType = type.IsValueType,
+				IsVirtual = info.IsVirtual,
 			};
 
 			if (pi == null)
@@ -706,7 +772,7 @@ namespace ObjC {
 			case TypeCode.Object:
 				if (t.Namespace == "System" && t.Name == "Void")
 					return;
-				if (!types.Contains (t))
+				if (!types.Contains (t) && !protocols.Contains (t))
 					goto default;
 
 				implementation.WriteLine ("if (!__result)");
@@ -714,7 +780,10 @@ namespace ObjC {
 				implementation.WriteLine ("return nil;");
 				implementation.Indent--;
 				// TODO: cheating by reusing `initForSuper` - maybe a better name is needed
-				implementation.WriteLine ($"{GetTypeName (t)}* __peer = [[{GetTypeName (t)} alloc] initForSuper];");
+				var tname = GetTypeName (t);
+				if (protocols.Contains (t))
+					tname = "__" + tname + "Wrapper";
+				implementation.WriteLine ($"\t{tname}* __peer = [[{tname} alloc] initForSuper];");
 				implementation.WriteLine ("__peer->_object = mono_embeddinator_create_object (__result);");
 				implementation.WriteLine ("return __peer;");
 				break;

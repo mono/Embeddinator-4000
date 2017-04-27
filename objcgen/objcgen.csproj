@@ -319,6 +319,7 @@
     <Compile Include="HashHelper.cs" />
     <Compile Include="sourcewriter.cs" />
     <Compile Include="classhelper.cs" />
+    <Compile Include="protocolhelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="support\" />

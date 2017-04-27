@@ -670,6 +670,15 @@
     XCTAssertFalse ([c1 hash] == [c3 hash], "Non-equal objects have different hashes");
 }
 
+- (void)testProtocols {
+	id<Interfaces_IMakeItUp> m = [Interfaces_Supplier create];
+	XCTAssertTrue ([m boolean], "true");
+	XCTAssertFalse ([m boolean], "false");
+
+	XCTAssertEqualObjects (@"0", [m convertInt32:0], "0");
+	XCTAssertEqualObjects (@"1", [m convertInt64:1ll], "1");
+}
+
 #pragma clang diagnostic pop
 
 @end
