@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text;
 
 using IKVM.Reflection;
@@ -110,6 +111,18 @@ namespace Embeddinator {
 		{
 			foreach (var ca in CustomAttributeData.GetCustomAttributes (self)) {
 				if (ca.AttributeType.Is (@namespace, name))
+					return true;
+			}
+			return false;
+		}
+	}
+
+	public static class ListExtensions
+	{
+		public static bool ContainsType (this List<ProcessedType> list, Type type)
+		{
+			foreach (ProcessedType t in list) {
+				if (t.Type == type)
 					return true;
 			}
 			return false;

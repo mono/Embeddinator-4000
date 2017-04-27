@@ -156,8 +156,9 @@ namespace ObjC {
 			implementation.WriteLine ();
 		}
 
-		void GenerateEnum (Type t)
+		void GenerateEnum (ProcessedType type)
 		{
+			Type t = type.Type;
 			var managed_name = GetObjCName (t);
 			var underlying_type = t.GetEnumUnderlyingType ();
 			var base_type = GetTypeName (underlying_type);
@@ -195,8 +196,9 @@ namespace ObjC {
 			headers.WriteLine ();
 		}
 
-		void GenerateProtocol (Type t)
+		void GenerateProtocol (ProcessedType type)
 		{
+			Type t = type.Type;
 			var pbuilder = new ProtocolHelper (headers, implementation) {
 				AssemblyQualifiedName = t.AssemblyQualifiedName,
 				AssemblyName = t.Assembly.GetName ().Name.Sanitize (),
@@ -249,8 +251,9 @@ namespace ObjC {
 			headers.Enabled = true;
 		}
 
-		protected override void Generate (Type t)
+		protected override void Generate (ProcessedType type)
 		{
+			Type t = type.Type;
 			var aname = t.Assembly.GetName ().Name.Sanitize ();
 			var static_type = t.IsSealed && t.IsAbstract;
 
@@ -263,7 +266,7 @@ namespace ObjC {
 				Name = GetTypeName (t),
 				Namespace = t.Namespace,
 				ManagedName = t.Name,
-				IsBaseTypeBound = types.Contains (t.BaseType),
+				IsBaseTypeBound = types.ContainsType (t.BaseType),
 				IsStatic = t.IsSealed && t.IsAbstract,
 				MetadataToken = t.MetadataToken,
 			};
@@ -336,7 +339,7 @@ namespace ObjC {
 					implementation.WriteLine ("_object = mono_embeddinator_create_object (__instance);");
 					implementation.Indent--;
 					implementation.WriteLine ("}");
-					if (types.Contains (t.BaseType))
+					if (types.ContainsType (t.BaseType))
 						implementation.WriteLine ("return self = [super initForSuper];");
 					else
 						implementation.WriteLine ("return self = [super init];");
@@ -475,7 +478,7 @@ namespace ObjC {
 				if (t.IsValueType)
 					implementation.WriteLine ($"{argumentName} = mono_object_unbox (mono_gchandle_get_target ({paramaterName}->_object->_handle));");
 				else 
-				if (types.Contains (t))
+				if (types.ContainsType (t))
 					implementation.WriteLine ($"{argumentName} = {paramaterName} ? mono_gchandle_get_target ({paramaterName}->_object->_handle): nil;");
 				else
 					throw new NotImplementedException ($"Converting type {t.FullName} to mono code");
@@ -501,7 +504,7 @@ namespace ObjC {
 				headers.Write (", readonly");
 			var pt = pi.PropertyType;
 			var property_type = GetTypeName (pt);
-			if (types.Contains (pt))
+			if (types.ContainsType (pt))
 				property_type += " *";
 			headers.WriteLine ($") {property_type} {name};");
 
@@ -523,7 +526,7 @@ namespace ObjC {
 			if (read_only)
 				headers.Write (", readonly");
 			var ft = fi.FieldType;
-			var bound = types.Contains (ft);
+			var bound = types.ContainsType (ft);
 			if (bound && ft.IsValueType)
 				headers.Write (", nonnull");
 
@@ -561,7 +564,7 @@ namespace ObjC {
 				instance = "__instance";
 			}
 			implementation.WriteLine ($"MonoObject* __result = mono_field_get_value_object (__mono_context.domain, __field, {instance});");
-			if (types.Contains (ft)) {
+			if (types.ContainsType (ft)) {
 				implementation.WriteLine ("if (!__result)");
 				implementation.Indent++;
 				implementation.WriteLine ("return nil;");
@@ -606,13 +609,13 @@ namespace ObjC {
 
 		public string GetReturnType (Type declaringType, Type returnType)
 		{
-			if (protocols.Contains (returnType))
+			if (protocols.ContainsType (returnType))
 				return "id<" + GetTypeName (returnType) + ">";
 			if (declaringType == returnType)
 				return "instancetype";
 
 			var return_type = GetTypeName (returnType);
-			if (types.Contains (returnType))
+			if (types.ContainsType (returnType))
 				return_type += "*";
 			return return_type;
 		}
@@ -779,7 +782,7 @@ namespace ObjC {
 			case TypeCode.Object:
 				if (t.Namespace == "System" && t.Name == "Void")
 					return;
-				if (!types.Contains (t) && !protocols.Contains (t))
+				if (!types.ContainsType (t) && !protocols.ContainsType (t))
 					goto default;
 
 				implementation.WriteLine ("if (!__result)");
@@ -788,7 +791,7 @@ namespace ObjC {
 				implementation.Indent--;
 				// TODO: cheating by reusing `initForSuper` - maybe a better name is needed
 				var tname = GetTypeName (t);
-				if (protocols.Contains (t))
+				if (protocols.ContainsType (t))
 					tname = "__" + tname + "Wrapper";
 				implementation.WriteLine ($"\t{tname}* __peer = [[{tname} alloc] initForSuper];");
 				implementation.WriteLine ("__peer->_object = mono_embeddinator_create_object (__result);");
@@ -813,6 +816,12 @@ namespace ObjC {
 
 		// TODO complete mapping (only with corresponding tests)
 		// TODO override with attribute ? e.g. [Obj.Name ("XAMType")]
+
+		public static string GetTypeName (ProcessedType type)
+		{
+			return GetTypeName (type.Type);
+		}
+
 		public static string GetTypeName (Type t)
 		{
 			if (t.IsByRef) {

@@ -11,6 +11,11 @@ namespace ObjC {
 	public partial class ObjCGenerator {
 
 		// get a name that is safe to use from ObjC code
+		public static string GetObjCName (ProcessedType t)
+		{
+			return GetObjCName (t.Type);
+		}
+
 		public static string GetObjCName (Type t)
 		{
 			return t.FullName.Replace ('.', '_');
@@ -42,7 +47,7 @@ namespace ObjC {
 				}
 				var pt = p.ParameterType;
 				var ptname = GetTypeName (p.ParameterType);
-				if (types.Contains (pt))
+				if (types.ContainsType (pt))
 					ptname += " *";
 				if (n > 0 || !isExtension)
 					objc.Append (":(").Append (ptname).Append (") ").Append (p.Name);

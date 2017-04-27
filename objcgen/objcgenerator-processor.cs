@@ -211,9 +211,9 @@ namespace ObjC {
 			}
 		}
 
-		List<Type> enums = new List<Type> ();
-		List<Type> types = new List<Type> ();
-		List<Type> protocols = new List<Type> ();
+		List<ProcessedType> enums = new List<ProcessedType> ();
+		List<ProcessedType> types = new List<ProcessedType> ();
+		List<ProcessedType> protocols = new List<ProcessedType> ();
 
 		Dictionary<Type, List<ProcessedConstructor>> ctors = new Dictionary<Type, List<ProcessedConstructor>> ();
 		Dictionary<Type, List<ProcessedMethod>> methods = new Dictionary<Type, List<ProcessedMethod>> ();
@@ -236,14 +236,14 @@ namespace ObjC {
 
 				foreach (var t in GetTypes (a)) {
 					if (t.IsEnum) {
-						enums.Add (t);
+						enums.Add (new ProcessedType (t));
 						continue;
 					}
 
 					if (t.IsInterface) {
-						protocols.Add (t);
+						protocols.Add (new ProcessedType (t));
 					} else {
-						types.Add (t);
+						types.Add (new ProcessedType (t));
 					}
 
 					extension_type = t.HasCustomAttribute ("System.Runtime.CompilerServices", "ExtensionAttribute");
@@ -300,7 +300,7 @@ namespace ObjC {
 						fields.Add (t, processedFields);
 				}
 			}
-			types = types.OrderBy ((arg) => arg.FullName).OrderBy ((arg) => types.Contains (arg.BaseType)).ToList ();
+			types = types.OrderBy ((arg) => arg.Type.FullName).OrderBy ((arg) => types.ContainsType (arg.Type.BaseType)).ToList ();
 			Console.WriteLine ($"\t{types.Count} types found");
 
 			ErrorHelper.Show (delayed);

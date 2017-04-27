@@ -33,21 +33,13 @@ namespace Embeddinator {
 
 		public virtual void Generate ()
 		{
-			foreach (var a in assemblies) {
-				Generate (a);
-			}
 		}
 
 		protected virtual void Generate (ProcessedAssembly a)
 		{
-			foreach (var t in a.Assembly.GetTypes ()) {
-				if (!t.IsPublic)
-					continue;
-				Generate (t);
-			}
 		}
 
-		protected virtual void Generate (Type t)
+		protected virtual void Generate (ProcessedType t)
 		{
 		}
 

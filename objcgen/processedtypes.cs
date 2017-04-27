@@ -10,10 +10,6 @@ namespace Embeddinator {
 	// While processing user assemblies, we may come across conditions that will affect
 	// final code generation that we need to pass to the generation pass
 
-	public abstract class ProcessedMemberBase {
-		public bool FallBackToTypeName { get; set; }
-	}
-
 	public class ProcessedAssembly {
 
 		public Assembly Assembly { get; private set; }
@@ -27,6 +23,21 @@ namespace Embeddinator {
 			Name = assembly.GetName ().Name;
 			SafeName = Name.Sanitize ();
 		}
+	}
+
+	public class ProcessedType
+	{
+		public Type Type { get; private set; }
+
+		public ProcessedType (Type type)
+		{
+			Type = type;
+		}
+	}
+
+	public abstract class ProcessedMemberBase
+	{
+		public bool FallBackToTypeName { get; set; }
 	}
 
 	public class ProcessedMethod : ProcessedMemberBase {
