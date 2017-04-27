@@ -320,6 +320,7 @@
     <Compile Include="sourcewriter.cs" />
     <Compile Include="classhelper.cs" />
     <Compile Include="OperatorOverloads.cs" />
+    <Compile Include="protocolhelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="support\" />
