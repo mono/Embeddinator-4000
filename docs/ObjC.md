@@ -23,6 +23,22 @@ API that expose `System.String` types are converted into `NSString`. This makes 
 
 Managed interfaces are converted into ObjC protocols where all members are `@required`.
 
+### NSObject Protocol support
+
+By default we assume the default hashing and equality of both .net and the ObjC runtime are fine and interchangeable as they share very similar semantics.
+
+When a managed type overrides `Equals(Object)` or `GetHashCode` then it generally means the defaut (.net) behaviour was not the best one. We can assume the default ObjC behaviour would not be either.
+
+In such case the generator overrides the [`isEqual:`](https://developer.apple.com/reference/objectivec/1418956-nsobject/1418795-isequal?language=objc) method and [`hash`](https://developer.apple.com/reference/objectivec/1418956-nsobject/1418859-hash?language=objc) property defined in the [`NSObject` protocol](https://developer.apple.com/reference/objectivec/1418956-nsobject?language=objc). This allows the custom managed implementation to be used from ObjC code transparently.
+
+### Comparison
+
+Managed types that implement `IComparable` or it's generic version `IComparable<T>` will produce ObjC friendly methods that returns a `NSComparisonResult` and accept a `nil` argument. This makes the generated API more friendly to ObjC developers, e.g.
+
+```
+- (NSComparisonResult)compare:(XAMComparableType * _Nullable)other;
+```
+
 
 ## Main differences with .NET
 
