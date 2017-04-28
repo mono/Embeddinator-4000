@@ -223,6 +223,10 @@
 }
 
 - (void) testStructs {
+	Structs_Point* def = [[Structs_Point alloc] init];
+	XCTAssert ([def x] == .0f, "x 0");
+	XCTAssert ([def y] == .0f, "y 0");
+
 	Structs_Point* p1 = [[Structs_Point alloc] initWithX:1.0f y:-1.0f];
 	XCTAssert ([p1 x] == 1.0f, "x 1");
 	XCTAssert ([p1 y] == -1.0f, "y 1");
