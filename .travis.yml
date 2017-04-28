@@ -15,12 +15,7 @@ addons:
     - g++-4.8
 
 install:
-  - external/CppSharp/build/InstallMono.sh
-  - if [ "$TRAVIS_OS_NAME" = "linux" ] && [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
+  - source external/CppSharp/build/InstallMono.sh
 
 script: |
-  if [ "$TRAVIS_OS_NAME" = "linux" ]; then PREMAKE=premake5-linux-64; else PREMAKE=premake5-osx; fi &&
-  external/CppSharp/build/$PREMAKE --file=build/premake5.lua --dev=true gmake &&
-  if [ "$TRAVIS_OS_NAME" = "osx" ]; then export PATH=$PATH:/Library/Frameworks/Mono.framework/Versions/Current/bin/; fi &&
-  config=release make -C build/gmake/ &&
-  tests/RunTestsuite.sh
+  build/Compile.sh && tests/RunTestsuite.sh
