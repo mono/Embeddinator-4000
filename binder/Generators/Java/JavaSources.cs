@@ -58,7 +58,7 @@ namespace MonoEmbeddinator4000.Generators
 
         public override void Process()
         {
-            GenerateFilePreamble(CommentKind.JavaDoc);
+            GenerateFilePreamble(CommentKind.JavaDoc, "Embeddinator-4000");
 
             GenerateJavaPackage(Declaration);
             GenerateJavaImports();
