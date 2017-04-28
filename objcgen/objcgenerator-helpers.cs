@@ -82,9 +82,8 @@ namespace ObjC {
 						pName = ObjCTypeToArgument [ptname];
 					else pName = "anObject";
 
-                    if (parameters.Count (p2 => p2.ParameterType == p.ParameterType && p2.Name.Length < 3) > 1) {
-                        pName += p.Name.PascalCase();
-                    }
+					if (parameters.Count (p2 => p2.ParameterType == p.ParameterType && p2.Name.Length < 3) > 1)
+						pName += p.Name.PascalCase();
 				}
 				if (n > 0 || !isExtension)
 					objc.Append (":(").Append (ptname).Append (")").Append (pName);

@@ -474,9 +474,8 @@ namespace ObjC {
 						name = CsharpTypeToArgument [p.ParameterType.ToString ()];
 					else name = "anObject";
 
-                    if (parameters.Count (p2 => p2.ParameterType == p.ParameterType && p2.Name.Length< 3) > 1) {
-                        name += p.Name.PascalCase();
-                    }
+					if (parameters.Count (p2 => p2.ParameterType == p.ParameterType && p2.Name.Length< 3) > 1)
+						name += p.Name.PascalCase();
 				}
 				GenerateArgument (name, $"__args[{i}]", p.ParameterType, ref post);
 			}
