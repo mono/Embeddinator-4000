@@ -72,9 +72,9 @@ namespace ObjC {
 			implementation.WriteLine ("}");
 			implementation.WriteLine ();
 
-			headers.WriteLine ($"- (void)setObject:(id)obj atIndexedSubscript: ({indexTypeString})idx;");
+			headers.WriteLine ($"- (void)setObject:(id)obj atIndexedSubscript:({indexTypeString})idx;");
 
-			implementation.WriteLine ($"- (void)setObject:(id)obj atIndexedSubscript: ({indexTypeString})idx");
+			implementation.WriteLine ($"- (void)setObject:(id)obj atIndexedSubscript:({indexTypeString})idx");
 			implementation.WriteLine ("{");
 			implementation.Indent++;
 			implementation.WriteLine ($"[self setItem:idx value:{FromNSObject (propertyType, "obj")}];");
