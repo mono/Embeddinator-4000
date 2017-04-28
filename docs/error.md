@@ -1,7 +1,7 @@
-﻿id:{932C3F0C-D968-42D1-BB14-D97C73361983}
+id:{932C3F0C-D968-42D1-BB14-D97C73361983}
 title:Embeddinator-4000 errors
 
-[//]: # (The original file resides under https://github.com/mono/Embeddinator-4000/tree/master/docs/error.md)
+[//]: # (The original file resides under https://github.com/mono/Embeddinator-4000/tree/objc/docs/error.md)
 [//]: # (This allows all contributors (including external) to submit, using a PR, updates to the documentation that match the tools changes)
 [//]: # (Modifications outside of mono/Embeddinator-4000 will be lost on future updates)
 
@@ -44,6 +44,10 @@ The tool does not support the compilation target `X`. It is possible that anothe
 
 The tool could not find the currently selected Xcode location using the `xcode-select -p` command. Please verify that this command succeeds, and returns the correct Xcode location.
 
+<h3><a name="EM0007"/>EM0007: Could not get the sdk version for '{sdk}'.</h3>
+
+The tool could not get the SDK version using the `xcrun --show-sdk-version --sdk {sdk}` command. Please verify that this command succeeds, and returns the SDK version.
+
 <h3><a name="EM0008"/>EM0008: The architecture '{arch}' is not valid for {platform}. Valid architectures for {platform} are: '{architectures}'.</h3>
 
 The architecture in the error message is not valid for the targeted platform. Please verify that the --abi option is passed a valid architecture.
@@ -51,6 +55,26 @@ The architecture in the error message is not valid for the targeted platform. Pl
 <h3><a name="EM0009"/>EM0009: The feature `X` is not currently implemented by the generator</h3>
 
 This is a known issue that we intend to fix in a future release of the generator. Contributions are welcome.
+
+<h3><a name="EM0010"/>EM0010: Can't merge the frameworks '{simulatorFramework}' and '{deviceFramework}' because the file '{file}' exists in both.</h3>
+
+The tool could not merge the frameworks mentioned in the error message, because there's a common file between them.
+
+This might indicate a bug in the Embeddinator-4000; please file a bug report at [https://github.com/mono/Embeddinator-4000/issues](https://github.com/mono/Embeddinator-4000/issues) with a test case.
+
+<h3><a name="EM0011"/>EM0011: The assembly `X` does not exist.</h3>
+
+The tool could not find the assembly `X` specified in the arguments.
+
+<h3><a name="EM0012"/>EM0012: The assembly name `X` is not unique</h3>
+
+More than one assembly supplied have the same, internal name and it would not be possible to distinguish between them at runtime.
+
+The most likely cause is that an assembly is specified more than once on the command-line arguments. However a renamed assembly still keeps it's original name and multiple copies cannot coexists.
+
+<h3><a name="EM0013"/>EM0013: Can't find the assembly 'X', referenced by 'Y'.</h3>
+
+The tool could not find the assembly 'X', referenced by the assembly 'Y'. Please make sure all referenced assemblies are in the same directory as the assembly to be bound.
 
 <h3><a name="EM0099"/>EM0099: Internal error *. Please file a bug report with a test case (https://github.com/mono/Embeddinator-4000/issues).</h3>
 
@@ -122,10 +146,28 @@ This is a **warning** that the default parameters of method `M` are not generati
 
 Note: Supported features will evolve with new versions of the tool.
 
+<h3><a name="EM1033"/>Method `M` is not generated because another method exposes the operator with a friendly name.</h3>
+
+This is a **warning** that the method `M` is not generated because another method exposes the operator with a friendly name. (https://msdn.microsoft.com/en-us/library/ms229032(v=vs.110).aspx)
+
+
 
 <h3><a name="EM1040"/>Property `P` is not generated because of parameter type `T` is not supported.</h3>
 
 This is a **warning** that the property `P` will be ignored (i.e. nothing will be generated) because the exposed type `T` is not supported.
+
+There should be an earlier warning giving more information why type `T` is not supported.
+
+Note: Supported features will evolve with new versions of the tool.
+
+<h3><a name="EM1041"/>Indexed properties on `T` is not generated because multiple indexed properties are not supported.</h3>
+
+This is a **warning** that the indexed properties on `T` will be ignored (i.e. nothing will be generated) because multiple indexed properties are not supported.
+
+
+<h3><a name="EM1050"/>Field `F` is not generated because of field type `T` is not supported.</h3>
+
+This is a **warning** that the field `F` will be ignored (i.e. nothing will be generated) because the exposed type `T` is not supported.
 
 There should be an earlier warning giving more information why type `T` is not supported.
 
