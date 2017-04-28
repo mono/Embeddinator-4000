@@ -12,11 +12,12 @@ namespace ObjC {
 
 		// get a name that is safe to use from ObjC code
 
-		public static Dictionary<string, string> TypeToArgument = new Dictionary<string, string> {
+		public static Dictionary<string, string> ObjCTypeToArgument = new Dictionary<string, string> {
 			{ "int", "anInt" },
 			{ "uint", "aUint" },
 			{ "double", "aDouble" },
 			{ "float", "aFloat" },
+			{ "NSString", "aString" },
 			{ "NSString *", "aString" },
 			{ "id", "anObject" },
 			{ "NSObject", "anObject" },
@@ -30,6 +31,21 @@ namespace ObjC {
 			{ "ulong", "aUlong" },
 			{ "bool", "aBool" },
 			{ "char", "aChar" },
+		};
+
+		public static Dictionary<string, string> CsharpTypeToArgument = new Dictionary<string, string> {
+			{ "System.Int32", "anInt" },
+			{ "System.UInt32", "aUint" },
+			{ "System.Double", "aDouble" },
+			{ "System.Single", "aFloat" },
+			{ "System.String", "aString" },
+			{ "System.Object", "anObject" },
+			{ "System.Int16", "aShort" },
+			{ "System.Uint16", "aUshort" },
+			{ "System.Int64", "aLong" },
+			{ "System.UInt64", "aUlong" },
+			{ "System.Boolean", "aBool" },
+			{ "System.Char", "aChar" },
 		};
 
 		void GetSignatures (string objName, string monoName, MemberInfo info, ParameterInfo [] parameters, bool useTypeNames, bool isExtension, out string objcSignature, out string monoSignature)
@@ -62,8 +78,8 @@ namespace ObjC {
 					ptname += " *";
 				string pName = p.Name;
 				if (p.Name.Length < 3) {
-					if (TypeToArgument.ContainsKey (ptname))
-						pName = TypeToArgument [ptname];
+					if (ObjCTypeToArgument.ContainsKey (ptname))
+						pName = ObjCTypeToArgument [ptname];
 					else pName = "anObject";
 
                     if (parameters.Count (p2 => p2.ParameterType == p.ParameterType && p2.Name.Length < 3) > 1) {

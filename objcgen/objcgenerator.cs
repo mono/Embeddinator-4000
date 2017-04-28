@@ -469,6 +469,15 @@ namespace ObjC {
 			for (int i = 0; i < pcount; i++) {
 				var p = parameters [i];
 				var name = (isExtension && (i == 0)) ? "self" : p.Name;
+				if (name.Length< 3) {
+					if (CsharpTypeToArgument.ContainsKey (p.ParameterType.ToString ()))
+						name = CsharpTypeToArgument [p.ParameterType.ToString ()];
+					else name = "anObject";
+
+                    if (parameters.Count (p2 => p2.ParameterType == p.ParameterType && p2.Name.Length< 3) > 1) {
+                        name += p.Name.PascalCase();
+                    }
+				}
 				GenerateArgument (name, $"__args[{i}]", p.ParameterType, ref post);
 			}
 			postInvoke = post.ToString ();
