@@ -3,10 +3,8 @@ using System.Collections.Generic;
 
 using Type = IKVM.Reflection.Type;
 
-namespace ObjC
-{
-	public static class NameGenerator
-	{
+namespace ObjC {
+	public static class NameGenerator {
 		public static string GetObjCName (Type t)
 		{
 			return t.FullName.Replace ('.', '_');
