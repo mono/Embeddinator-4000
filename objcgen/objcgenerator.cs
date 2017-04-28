@@ -349,6 +349,41 @@ namespace ObjC {
 				}
 			}
 
+			// generate an `init` for a value type (even if none was defined, the default one is usable)
+			if (!default_init && t.IsValueType) {
+				var builder = new MethodHelper (headers, implementation) {
+					AssemblySafeName = aname,
+					ReturnType = "nullable instancetype",
+					ManagedTypeName = t.FullName,
+					MonoSignature = ".ctor()",
+					ObjCSignature = "init",
+					ObjCTypeName = managed_name,
+					IsConstructor = true,
+					IsValueType = t.IsValueType,
+					IgnoreException = true,
+				};
+
+				builder.WriteHeaders ();
+				builder.BeginImplementation ();
+				// no call to `WriteMethodLookup` since there is not such method if we reached this case
+
+				implementation.WriteLine ("if (!_object) {");
+				implementation.Indent++;
+				implementation.WriteLine ($"MonoObject* __instance = mono_object_new (__mono_context.domain, {managed_name}_class);");
+				// no call to `WriteInvoke` since there is not such method if we reached this case
+				implementation.WriteLine ("_object = mono_embeddinator_create_object (__instance);");
+				implementation.Indent--;
+				implementation.WriteLine ("}");
+				if (types.Contains (t.BaseType))
+					implementation.WriteLine ("return self = [super initForSuper];");
+				else
+					implementation.WriteLine ("return self = [super init];");
+				builder.EndImplementation ();
+
+				headers.WriteLine ();
+				default_init = true;
+			}
+
 			if (!default_init || static_type)
 				tbuilder.DefineNoDefaultInit ();
 	
