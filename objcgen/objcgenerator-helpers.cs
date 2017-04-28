@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,6 +11,26 @@ namespace ObjC {
 	public partial class ObjCGenerator {
 
 		// get a name that is safe to use from ObjC code
+
+		public static Dictionary<string, string> TypeToArgument = new Dictionary<string, string> {
+			{ "int", "anInt" },
+			{ "uint", "aUint" },
+			{ "double", "aDouble" },
+			{ "float", "aFloat" },
+			{ "NSString *", "aString" },
+			{ "id", "anObject" },
+			{ "NSObject", "anObject" },
+			{ "NSPoint", "aPoint" },
+			{ "NSRect", "aRect" },
+			{ "NSFont", "fontObj" },
+			{ "SEL", "aSelector" },
+			{ "short", "aShort" },
+			{ "ushort", "aUshort" },
+			{ "long", "aLong" },
+			{ "ulong", "aUlong" },
+			{ "bool", "aBool" },
+			{ "char", "aChar" },
+		};
 
 		void GetSignatures (string objName, string monoName, MemberInfo info, ParameterInfo [] parameters, bool useTypeNames, bool isExtension, out string objcSignature, out string monoSignature)
 		{
@@ -40,8 +60,14 @@ namespace ObjC {
 				var ptname = NameGenerator.GetTypeName (p.ParameterType);
 				if (types.Contains (pt))
 					ptname += " *";
+				string pName = p.Name;
+				if (p.Name.Length < 3) {
+					if (TypeToArgument.ContainsKey (ptname))
+						pName = TypeToArgument [ptname] + p.Name.PascalCase ();
+					else pName = "anObject" + p.Name.PascalCase ();
+				}
 				if (n > 0 || !isExtension)
-					objc.Append (":(").Append (ptname).Append (")").Append (p.Name);
+					objc.Append (":(").Append (ptname).Append (")").Append (pName);
 				mono.Append (NameGenerator.GetMonoName (p.ParameterType));
 				n++;
 			}
