@@ -1,10 +1,11 @@
 ﻿using System;
 using System.IO;
-using System.Diagnostics;
+using System.Text;
 using System.Collections.Generic;
 
 using NUnit.Framework;
 using Embeddinator;
+using DriverTest;
 
 namespace ObjCGenErrWarnTests {
 
@@ -29,27 +30,24 @@ namespace ObjCGenErrWarnTests {
 		public void GenWarningTest (string [] warnsToSearch, bool [] shouldFindWarn)
 		{
 			Assert.That (warnsToSearch.Length, Is.EqualTo (shouldFindWarn.Length), $"{nameof (warnsToSearch)} array length must match {nameof (shouldFindWarn)}'s");
-			string valid = Xamarin.Cache.CreateTemporaryDirectory ();
+			string tmpDir = Xamarin.Cache.CreateTemporaryDirectory ();
 			var warnerrAssembly = ObjCGeneratorTest.Helpers.Universe.Load ("managedwarn");
 			Assert.NotNull (warnerrAssembly, "warnerrAssembly");
+			var stdout = Console.Out;
+			var stderr = Console.Error;
 
 			try {
 				using (var ms = new MemoryStream ()) {
-					var stdout = Console.Out;
-					var stderr = Console.Error;
 					var sw = new StreamWriter (ms);
 
 					Console.SetOut (sw);
 					Console.SetError (sw);
 
-					Driver.Main2 (new string [] { $"-o={valid}", "-c", warnerrAssembly.Location });
+					Driver.Main2 (new string [] { $"-o={tmpDir}", "-c", warnerrAssembly.Location });
 					sw.Flush ();
 					ms.Position = 0;
 					var sr = new StreamReader (ms);
 					var output = sr.ReadToEnd ();
-
-					Console.SetOut (stdout);
-					Console.SetError (stderr);
 
 					var arrCount = warnsToSearch.Length;
 					for (int i = 0; i < arrCount; i++) {
@@ -60,7 +58,8 @@ namespace ObjCGenErrWarnTests {
 					}
 				}
 			} finally {
-				Directory.Delete (valid, true);
+				Console.SetOut (stdout);
+				Console.SetError (stderr);
 			}
 		}
 
@@ -68,71 +67,69 @@ namespace ObjCGenErrWarnTests {
 		static readonly string XcodeFolderPath = $"{AppDomain.CurrentDomain.BaseDirectory}../../xcode";
 		static readonly string MonoMsBuildPath = "/Library/Frameworks/Mono.framework/Versions/Current/Commands/msbuild";
 		static readonly string MonoPath = "/Library/Frameworks/Mono.framework/Versions/Current/Commands/mono";
-		static readonly string XcodebuildPath = "/usr/bin/xcodebuild";
+		static readonly string ClangPath = "/usr/bin/clang";
 
 		[Test]
-		[TestCase ("NoInitInSubclassTest", "ConstructorsLib", "NoInitInSubclassTest", "NoInitInSubclassTest", Configuration.Debug, "error: 'initWithId:' is unavailable", true)]
-		public void XcodeBuildErrorTest (string directoryTest, string csprojName, string xcodeprojName, string xcodeprojTarget, Configuration config, string errorToSearch, bool cleanOutputDirs)
+		[TestCase ("NoInitInSubclassTest", "ConstructorsLib", "main.m", Platform.macOS, Configuration.Debug, "error: 'initWithId:' is unavailable")]
+		public void XcodeBuildErrorTest (string directoryTest, string csprojName, string objcmFileName, Platform platform, Configuration config, string errorToSearch)
 		{
 			Assert.IsTrue (Directory.Exists (XcodeFolderPath), "XcodeFolderPath");
 			Assert.IsTrue (File.Exists (MonoMsBuildPath), "MonoMsBuildPath");
 			Assert.IsTrue (File.Exists (MonoPath), "MonoPath");
-			Assert.IsTrue (File.Exists (XcodebuildPath), "XcodebuildPath");
+			Assert.IsTrue (File.Exists (ClangPath), "ClangPath");
 
-			try {
-				var testcaseBaseDir = Path.Combine (XcodeFolderPath, directoryTest);
-				var msbuildInfo = new ProcessStartInfo {
-					FileName = MonoMsBuildPath,
-					Arguments = $"/p:Configuration={config} /p:OutputPath=DllOutput {Path.Combine (testcaseBaseDir, csprojName)}.csproj"
-				};
+			var testcaseBaseDir = Path.Combine (XcodeFolderPath, directoryTest);
+			var tempWorkingDir = Xamarin.Cache.CreateTemporaryDirectory ();
+			var e4kOutputDir = Path.Combine (tempWorkingDir, "E4KOutput");
 
-				using (var msbuildProc = Process.Start (msbuildInfo)) {
-					msbuildProc.WaitForExit ();
-					Assert.That (msbuildProc.ExitCode, Is.Zero, "msbuildProc");
-				}
+			Asserts.RunProcess (MonoMsBuildPath, $"/p:Configuration={config} /p:IntermediateOutputPath={Path.Combine (tempWorkingDir, "obj")}/ /p:OutputPath={Path.Combine (tempWorkingDir, "DllOutput")} {Path.Combine (testcaseBaseDir, csprojName)}.csproj", "msbuildProc");
 
-				var eargs = new List<string> {
+			var eargs = new List<string> {
 					"-c",
-					$"{Path.Combine (testcaseBaseDir, "DllOutput", csprojName)}.dll",
-					$"-o={Path.Combine (testcaseBaseDir, "E4KOutput")}"
+					$"{Path.Combine (tempWorkingDir, "DllOutput", csprojName)}.dll",
+					$"-o={e4kOutputDir}"
 				};
-				if (config == Configuration.Debug)
-					eargs.Add ("--debug");
+			if (config == Configuration.Debug)
+				eargs.Add ("--debug");
 
-				Driver.Main2 (eargs.ToArray ());
+			Driver.Main2 (eargs.ToArray ());
 
-				var xbuildInfo = new ProcessStartInfo {
-					FileName = XcodebuildPath,
-					Arguments = $"-project {Path.Combine (testcaseBaseDir, xcodeprojName)}.xcodeproj -target {xcodeprojTarget} -configuration {config}",
-					UseShellExecute = false,
-					CreateNoWindow = true,
-					RedirectStandardError = true,
-					RedirectStandardOutput = true
-				};
+			// Sadly no C# 7 yet
+			// (string sdk, string arch, string sdkName, string minVersion) build_info;
+			Tuple<string, string, string, string> build_info = null;
 
-				using (var xcodebuildProc = Process.Start (xbuildInfo)) {
-					xcodebuildProc.WaitForExit ();
-					Assert.That (xcodebuildProc.ExitCode, Is.GreaterThanOrEqualTo (1), "xcodebuildProc");
-					var stdout = xcodebuildProc.StandardOutput.ReadToEnd ();
-					Assert.That (stdout, Does.Contain (errorToSearch), $"Not Found: {errorToSearch}");
-				}
-
-			} finally {
-				if (cleanOutputDirs) {
-					var dllOutputDir = Path.Combine (XcodeFolderPath, directoryTest, "DllOutput");
-					var objDir = Path.Combine (XcodeFolderPath, directoryTest, "obj");
-					var ek4OutputDir = Path.Combine (XcodeFolderPath, directoryTest, "E4KOutput");
-					var buildDir = Path.Combine (XcodeFolderPath, directoryTest, "build");
-					if (Directory.Exists (dllOutputDir))
-						Directory.Delete (dllOutputDir, true);
-					if (Directory.Exists (objDir))
-						Directory.Delete (objDir, true);
-					if (Directory.Exists (ek4OutputDir))
-						Directory.Delete (ek4OutputDir, true);
-					if (Directory.Exists (buildDir))
-						Directory.Delete (buildDir, true);
-				}
+			switch (platform) {
+			case Platform.macOS:
+				build_info = new Tuple<string, string, string, string> ("MacOSX", "x86_64", "macosx", "10.7");
+				break;
+			case Platform.iOS:
+				build_info = new Tuple<string, string, string, string> ("iPhoneSimulator", "x86_64", "ios-simulator", "8.0");
+				break;
+			case Platform.tvOS:
+				build_info = new Tuple<string, string, string, string> ("AppleTVSimulator", "x86_64", "tvos-simulator", "9.0");
+				break;
+			case Platform.watchOS:
+				build_info = new Tuple<string, string, string, string> ("WatchSimulator", "i386", "watchos-simulator", "2.0");
+				break;
 			}
+
+			var clangArgs = new StringBuilder ();
+			if (config == Configuration.Debug)
+				clangArgs.Append ("-g -O0 ");
+			else
+				clangArgs.Append ("-O2 ");
+			clangArgs.Append ("-fobjc-arc ");
+			clangArgs.Append ("-ObjC ");
+			clangArgs.Append ($"-arch {build_info.Item2} ");
+			clangArgs.Append ($"-isysroot {Embedder.XcodeApp}/Contents/Developer/Platforms/{build_info.Item1}.platform/Developer/SDKs/{build_info.Item1}.sdk ");
+			clangArgs.Append ($"-m{build_info.Item3}-version-min={build_info.Item4} ");
+			clangArgs.Append ($"-I{e4kOutputDir} ");
+			clangArgs.Append ($"-c {Path.Combine (testcaseBaseDir, objcmFileName)} ");
+			clangArgs.Append ($"-o {Path.Combine (tempWorkingDir, "foo.o")} ");
+
+			// Embedder.RunProcess returns false if exitcode != 0
+			Assert.IsFalse (Embedder.RunProcess (ClangPath, clangArgs.ToString (), out int exitCode, out string output, capture_stderr: true), "clangbuild");
+			Assert.That (output, Does.Contain (errorToSearch), $"Not found: {errorToSearch}");
 		}
 	}
 }
