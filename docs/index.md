@@ -8,6 +8,8 @@ your existing iOS app, you can do that.   Or if you want to link it
 with a native C++ library, you can also do that.   Or consume .NET
 code from Java.
 
+# Environments and Languages
+
 The tool is both aware of the environment it will use, as well as the
 language that will consume it.   For example, the iOS platform does
 not allow just-in-time (JIT) compilation, so the embeddinator will
@@ -25,11 +27,13 @@ support that we have been working on:
 
 More languages will come later.
 
+# Getting Started
+
 To get started, check one of our guides for each of the currently
 supported languages:
 
-* [Objective-C](getting-started-objective-c.md): covers macOS, iOS, tvOS.
-* [Java](getting-started-java.md): covers Android and Java desktop.
-* [C/C++](getting-started-c.md): for C targets
+* [Objective-C](getting-started-objective-c): covers macOS, iOS, tvOS.
+* [Java](getting-started-java): covers Android and Java desktop.
+* [C/C++](getting-started-c): for C targets
 
 
