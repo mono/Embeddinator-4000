@@ -1,18 +1,18 @@
 id:{932C3F0C-D968-42D1-BB14-D97C73361983}
 title:Embeddinator-4000 Best Practices for ObjC
 
-[//]: # (The original file resides under https://github.com/mono/Embeddinator-4000/tree/master/docs/BestPracticesObjC.md)
+[//]: # (The original file resides under https://github.com/mono/Embeddinator-4000/tree/objc/docs/BestPracticesObjC.md)
 [//]: # (This allows all contributors (including external) to submit, using a PR, updates to the documentation that match the tools changes)
 [//]: # (Modifications outside of mono/Embeddinator-4000 will be lost on future updates)
 
-This is a draft and might not be in-sync with the features presently supported by the tool. We hope that this document will evolve separately and eventually match the final tool, i.e. we'll suggest the long term best approaches - not immediate workarounds.
+This is a draft and might not be in-sync with the features presently supported by the tool. We hope that this document will evolve separately and eventually match the final tool, i.e. we'll suggest long term best approaches - not immediate workarounds.
 
-A large part of this document also applies to any other supported languages. However all provided examples are in C# and ObjC.
+A large part of this document also applies to other supported languages. However all provided examples are in C# and ObjC.
 
 
 # Exposing a subset of the managed code
 
-The generated native library/framework contains ObjC code to call each of the managed API that is exposed. The more API you surface (public) then larger the native library will become.
+The generated native library/framework contains ObjC code to call each of the managed API that is exposed. The more API you surface (make public) then larger the native _glue_ library will become.
 
 It might be a good idea to create a different, smaller assembly, to expose only the required API to the native developer. That facade will also allow you more control over the visibility, naming, error checking... of the generated code.
 
@@ -117,3 +117,11 @@ public bool TryParse (string number, out int value)
 	return Int32.TryParse (number, out value);
 }
 ```
+
+## Exceptions inside `init*`
+
+In .NET a constructor must either succeed and return a, _hopefully_ valid instance or throw an exception.
+
+In contrast ObjC allows `init*` to return `nil` when an instance cannot be created. This is a common, but not general, pattern used in many of Apple's frameworks. In some other cases an `assert` can happen (and kill the current process).
+
+The generator follow the same `return nil` pattern for generated `init*` methods. If a managed exception is thrown then it will be printed (using `NSLog`) and `nil` will be returned to the caller.
