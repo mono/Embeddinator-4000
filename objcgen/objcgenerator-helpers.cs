@@ -11,10 +11,6 @@ namespace ObjC {
 	public partial class ObjCGenerator {
 
 		// get a name that is safe to use from ObjC code
-		public static string GetObjCName (Type t)
-		{
-			return t.FullName.Replace ('.', '_');
-		}
 
 		void GetSignatures (string objName, string monoName, MemberInfo info, ParameterInfo [] parameters, bool useTypeNames, bool isExtension, out string objcSignature, out string monoSignature)
 		{
@@ -41,12 +37,12 @@ namespace ObjC {
 						objc.Append (paramName.ToLowerInvariant ());
 				}
 				var pt = p.ParameterType;
-				var ptname = GetTypeName (p.ParameterType);
+				var ptname = NameGenerator.GetTypeName (p.ParameterType);
 				if (types.Contains (pt))
 					ptname += " *";
 				if (n > 0 || !isExtension)
 					objc.Append (":(").Append (ptname).Append (")").Append (p.Name);
-				mono.Append (GetMonoName (p.ParameterType));
+				mono.Append (NameGenerator.GetMonoName (p.ParameterType));
 				n++;
 			}
 			mono.Append (')');
