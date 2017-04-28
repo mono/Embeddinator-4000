@@ -1,7 +1,7 @@
 id:{932C3F0C-D968-42D1-BB14-D97C73361983}
 title:Embeddinator-4000 errors
 
-[//]: # (The original file resides under https://github.com/mono/Embeddinator-4000/tree/master/docs/error.md)
+[//]: # (The original file resides under https://github.com/mono/Embeddinator-4000/tree/objc/docs/error.md)
 [//]: # (This allows all contributors (including external) to submit, using a PR, updates to the documentation that match the tools changes)
 [//]: # (Modifications outside of mono/Embeddinator-4000 will be lost on future updates)
 

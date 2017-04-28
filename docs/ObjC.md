@@ -1,3 +1,10 @@
+id:{8e48fb46-9a13-4a1b-a8af-9fe87458a293}
+title:ObjC Support
+
+[//]: # (The original file resides under https://github.com/mono/Embeddinator-4000/tree/objc/docs/ObjC.md)
+[//]: # (This allows all contributors (including external) to submit, using a PR, updates to the documentation that match the tools changes)
+[//]: # (Modifications outside of mono/Embeddinator-4000 will be lost on future updates)
+
 # ObjC
 
 ## Specific features
@@ -11,6 +18,11 @@ The use of Automatic Reference Counting (ARC) is **required** to call the genera
 ### NSString support
 
 API that expose `System.String` types are converted into `NSString`. This makes memory management easier than dealing with `char*`.
+
+### Protocols support
+
+Managed interfaces are converted into ObjC protocols where all members are `@required`.
+
 
 ## Main differences with .NET
 
