@@ -27,6 +27,7 @@
       <DependentUpon>subscripts.tt</DependentUpon>
     </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)types.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)shortParameters.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="$(MSBuildThisFileDirectory)subscripts.tt">

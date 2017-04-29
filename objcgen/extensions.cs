@@ -4,6 +4,8 @@ using System.Collections.Generic;
 
 using IKVM.Reflection;
 using Type = IKVM.Reflection.Type;
+using ObjC;
+using System.Linq;
 
 namespace Embeddinator {
 
@@ -114,6 +116,24 @@ namespace Embeddinator {
 					return true;
 			}
 			return false;
+		}
+	}
+
+	public static class ParameterInfoExtensions {
+		public static string ExtendedName (this ParameterInfo p, ParameterInfo[] parameters)
+		{
+			string pName = p.Name;
+			string ptname = NameGenerator.GetTypeName (p.ParameterType);
+			if (p.Name.Length< 3) {
+				if (!ObjCGenerator.ObjCTypeToArgument.TryGetValue(ptname, out pName))
+                    pName = "anObject";
+
+				if (parameters.Count (p2 => NameGenerator.GetTypeName (p2.ParameterType) == ptname && p2.Name.Length< 3) > 1 ||
+				    pName == "anObject" && parameters.Count (p2 => !ObjCGenerator.ObjCTypeToArgument.ContainsKey (NameGenerator.GetTypeName (p2.ParameterType))) > 1)
+					pName += p.Name.PascalCase ();
+			}
+
+			return pName;
 		}
 	}
 

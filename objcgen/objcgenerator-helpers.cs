@@ -14,7 +14,7 @@ namespace ObjC {
 
 		public static Dictionary<string, string> ObjCTypeToArgument = new Dictionary<string, string> {
 			{ "int", "anInt" },
-			{ "uint", "aUint" },
+			{ "unsigned int", "aUint" },
 			{ "double", "aDouble" },
 			{ "float", "aFloat" },
 			{ "NSString", "aString" },
@@ -26,26 +26,13 @@ namespace ObjC {
 			{ "NSFont", "fontObj" },
 			{ "SEL", "aSelector" },
 			{ "short", "aShort" },
-			{ "ushort", "aUshort" },
-			{ "long", "aLong" },
-			{ "ulong", "aUlong" },
+			{ "unsigned short", "aUshort" },
+			{ "long long", "aLong" },
+			{ "unsigned long long", "aUlong" },
 			{ "bool", "aBool" },
 			{ "char", "aChar" },
-		};
-
-		public static Dictionary<string, string> CsharpTypeToArgument = new Dictionary<string, string> {
-			{ "System.Int32", "anInt" },
-			{ "System.UInt32", "aUint" },
-			{ "System.Double", "aDouble" },
-			{ "System.Single", "aFloat" },
-			{ "System.String", "aString" },
-			{ "System.Object", "anObject" },
-			{ "System.Int16", "aShort" },
-			{ "System.Uint16", "aUshort" },
-			{ "System.Int64", "aLong" },
-			{ "System.UInt64", "aUlong" },
-			{ "System.Boolean", "aBool" },
-			{ "System.Char", "aChar" },
+			{ "unsigned char", "aChar" },
+			{ "signed char", "aChar" }
 		};
 
 		void GetSignatures (string objName, string monoName, MemberInfo info, ParameterInfo [] parameters, bool useTypeNames, bool isExtension, out string objcSignature, out string monoSignature)
@@ -76,17 +63,9 @@ namespace ObjC {
 				var ptname = NameGenerator.GetTypeName (p.ParameterType);
 				if (types.Contains (pt))
 					ptname += " *";
-				string pName = p.Name;
-				if (p.Name.Length < 3) {
-					if (ObjCTypeToArgument.ContainsKey (ptname))
-						pName = ObjCTypeToArgument [ptname];
-					else pName = "anObject";
 
-					if (parameters.Count (p2 => p2.ParameterType == p.ParameterType && p2.Name.Length < 3) > 1)
-						pName += p.Name.PascalCase();
-				}
 				if (n > 0 || !isExtension)
-					objc.Append (":(").Append (ptname).Append (")").Append (pName);
+					objc.Append (":(").Append (ptname).Append (")").Append (p.ExtendedName (parameters));
 				mono.Append (NameGenerator.GetMonoName (p.ParameterType));
 				n++;
 			}
