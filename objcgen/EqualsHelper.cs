@@ -14,15 +14,15 @@ namespace ObjC {
 		public void WriteImplementation ()
 		{
 			BeginImplementation ();
-			implementation.WriteLine ("if (![other respondsToSelector: @selector (xamarinGetGCHandle)])");
+			implementation.WriteLine ("MonoObject* __other = mono_embeddinator_get_object (other, false);");
+			implementation.WriteLine ("if (!__other)");
 			implementation.Indent++;
 			implementation.WriteLine ("return false;");
 			implementation.Indent--;
 			WriteMethodLookup ();
 
 			implementation.WriteLine ("void* __args [1];");
-			implementation.WriteLine ("int gchandle = [other xamarinGetGCHandle];");
-			implementation.WriteLine ("__args[0] = mono_gchandle_get_target (gchandle);");
+			implementation.WriteLine ("__args [0] = __other;");
 
 			WriteInvoke ("__args");
 

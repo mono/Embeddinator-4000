@@ -676,11 +676,20 @@
 
 - (void)testProtocols {
 	id<Interfaces_IMakeItUp> m = [Interfaces_Supplier create];
+	XCTAssertTrue ([m conformsToProtocol:@protocol(Interfaces_IMakeItUp)], "conformsToProtocol 1");
 	XCTAssertTrue ([m boolean], "true");
 	XCTAssertFalse ([m boolean], "false");
 
 	XCTAssertEqualObjects (@"0", [m convertInt32:0], "0");
 	XCTAssertEqualObjects (@"1", [m convertInt64:1ll], "1");
+
+	Interfaces_ManagedAdder *adder = [[Interfaces_ManagedAdder alloc] init];
+	XCTAssertTrue ([adder conformsToProtocol:@protocol(Interfaces_IOperations)], "conformsToProtocol 2");
+	XCTAssertTrue ([Interfaces_OpConsumer doAdditionOps:adder a:40 b:2] == 42, "doAdditionOps");
+	XCTAssertTrue ([Interfaces_OpConsumer testManagedAdderA:1 b:-1], "testManagedAdder");
+
+	// FIXME: today it is not possible to define a native type that conforms
+	// to `Interfaces_IOperations` and pass it on the managed side (abort)
 }
 
 - (void) testOperatorOverloading {
