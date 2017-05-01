@@ -115,15 +115,15 @@ namespace ObjC {
 
 			var assembly = a.Assembly;
 
-			foreach (var t in enums.Where ((Type arg) => arg.Assembly == assembly)) {
+			foreach (var t in enums.Where ((ProcessedType arg) => arg.Type.Assembly == assembly)) {
 				GenerateEnum (t);
 			}
 
-			foreach (var t in protocols.Where ((Type arg) => arg.Assembly == assembly)) {
+			foreach (var t in protocols.Where ((ProcessedType arg) => arg.Type.Assembly == assembly)) {
 				GenerateProtocol (t);
 			}
 
-			foreach (var t in types.Where ((Type arg) => arg.Assembly == assembly)) {
+			foreach (var t in types.Where ((ProcessedType arg) => arg.Type.Assembly == assembly)) {
 				Generate (t);
 			}
 
