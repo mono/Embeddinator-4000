@@ -545,9 +545,7 @@ namespace ObjC {
 			if (types.Contains (pt))
 				property_type += " *";
 
-			var spacing = " ";
-			if (property_type.EndsWith ("*", StringComparison.Ordinal))
-				spacing = string.Empty;
+			var spacing = property_type [property_type.Length - 1] == '*' ? string.Empty : " ";
 			headers.WriteLine ($") {property_type}{spacing}{name};");
 
 			ImplementMethod (getter, name, false, pi);
@@ -578,9 +576,7 @@ namespace ObjC {
 
 			var name = fi.Name.CamelCase ();
 
-			var spacing = " ";
-			if (field_type.EndsWith ("*", StringComparison.Ordinal))
-				spacing = string.Empty;
+			var spacing = field_type [field_type.Length - 1] == '*' ? string.Empty : " ";
 			headers.WriteLine ($") {field_type}{spacing}{name};");
 
 			// it's similar, but different from implementing a method
