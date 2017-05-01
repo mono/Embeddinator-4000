@@ -29,7 +29,7 @@ namespace ObjC {
 
 			headers.WriteLine ("// forward declarations");
 			foreach (var t in types)
-				headers.WriteLine ($"@class {NameGenerator.GetTypeName (t)};");
+				headers.WriteLine ($"@class {t.TypeName};");
 			headers.WriteLine ();
 			headers.WriteLine ("NS_ASSUME_NONNULL_BEGIN");
 			headers.WriteLine ();
@@ -49,9 +49,9 @@ namespace ObjC {
 			implementation.WriteLine ();
 
 			foreach (var t in types)
-				implementation.WriteLine ($"static MonoClass* {NameGenerator.GetObjCName (t)}_class = nil;");
+				implementation.WriteLine ($"static MonoClass* {t.ObjCName}_class = nil;");
 			foreach (var t in protocols) {
-				var pname = NameGenerator.GetTypeName (t);
+				var pname = t.TypeName;
 				headers.WriteLine ($"@protocol {pname};");
 				implementation.WriteLine ($"@class __{pname}Wrapper;");
 			}
@@ -156,9 +156,10 @@ namespace ObjC {
 			implementation.WriteLine ();
 		}
 
-		void GenerateEnum (Type t)
+		void GenerateEnum (ProcessedType type)
 		{
-			var managed_name = NameGenerator.GetObjCName (t);
+			Type t = type.Type;
+			var managed_name = type.ObjCName;
 			var underlying_type = t.GetEnumUnderlyingType ();
 			var base_type = NameGenerator.GetTypeName (underlying_type);
 
@@ -195,8 +196,9 @@ namespace ObjC {
 			headers.WriteLine ();
 		}
 
-		void GenerateProtocol (Type t)
+		void GenerateProtocol (ProcessedType type)
 		{
+			Type t = type.Type;
 			var pbuilder = new ProtocolHelper (headers, implementation) {
 				AssemblyQualifiedName = t.AssemblyQualifiedName,
 				AssemblyName = t.Assembly.GetName ().Name.Sanitize (),
@@ -249,8 +251,9 @@ namespace ObjC {
 			headers.Enabled = true;
 		}
 
-		protected override void Generate (Type t)
+		protected override void Generate (ProcessedType type)
 		{
+			Type t = type.Type;
 			var aname = t.Assembly.GetName ().Name.Sanitize ();
 			var static_type = t.IsSealed && t.IsAbstract;
 
