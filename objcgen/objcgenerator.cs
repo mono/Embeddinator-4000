@@ -29,7 +29,7 @@ namespace ObjC {
 
 			headers.WriteLine ("// forward declarations");
 			foreach (var t in types)
-				headers.WriteLine ($"@class {NameGenerator.GetTypeName (t)};");
+				headers.WriteLine ($"@class {t.TypeName};");
 			headers.WriteLine ();
 			headers.WriteLine ("NS_ASSUME_NONNULL_BEGIN");
 			headers.WriteLine ();
@@ -49,9 +49,9 @@ namespace ObjC {
 			implementation.WriteLine ();
 
 			foreach (var t in types)
-				implementation.WriteLine ($"static MonoClass* {NameGenerator.GetObjCName (t)}_class = nil;");
+				implementation.WriteLine ($"static MonoClass* {t.ObjCName}_class = nil;");
 			foreach (var t in protocols) {
-				var pname = NameGenerator.GetTypeName (t);
+				var pname = t.TypeName;
 				headers.WriteLine ($"@protocol {pname};");
 				implementation.WriteLine ($"@class __{pname}Wrapper;");
 			}
@@ -113,20 +113,24 @@ namespace ObjC {
 			implementation.WriteLine ("}");
 			implementation.WriteLine ();
 
-			foreach (var t in enums) {
+			var assembly = a.Assembly;
+
+			foreach (var t in enums.Where ((Type arg) => arg.Assembly == assembly)) {
 				GenerateEnum (t);
 			}
 
-			foreach (var t in protocols) {
+			foreach (var t in protocols.Where ((Type arg) => arg.Assembly == assembly)) {
 				GenerateProtocol (t);
 			}
 
-			foreach (var t in types) {
+			foreach (var t in types.Where ((Type arg) => arg.Assembly == assembly)) {
 				Generate (t);
 			}
 
 			foreach (var extension in extensions_methods) {
 				var defining_type = extension.Key;
+				if (defining_type.Assembly != assembly)
+					continue;
 				foreach (var category in extension.Value)
 					GenerateCategory (defining_type, category.Key, category.Value);
 			}
@@ -156,9 +160,10 @@ namespace ObjC {
 			implementation.WriteLine ();
 		}
 
-		void GenerateEnum (Type t)
+		void GenerateEnum (ProcessedType type)
 		{
-			var managed_name = NameGenerator.GetObjCName (t);
+			Type t = type.Type;
+			var managed_name = type.ObjCName;
 			var underlying_type = t.GetEnumUnderlyingType ();
 			var base_type = NameGenerator.GetTypeName (underlying_type);
 
@@ -195,8 +200,9 @@ namespace ObjC {
 			headers.WriteLine ();
 		}
 
-		void GenerateProtocol (Type t)
+		void GenerateProtocol (ProcessedType type)
 		{
+			Type t = type.Type;
 			var pbuilder = new ProtocolHelper (headers, implementation) {
 				AssemblyQualifiedName = t.AssemblyQualifiedName,
 				AssemblyName = t.Assembly.GetName ().Name.Sanitize (),
@@ -249,12 +255,19 @@ namespace ObjC {
 			headers.Enabled = true;
 		}
 
-		protected override void Generate (Type t)
+		protected override void Generate (ProcessedType type)
 		{
+			Type t = type.Type;
 			var aname = t.Assembly.GetName ().Name.Sanitize ();
 			var static_type = t.IsSealed && t.IsAbstract;
 
 			var managed_name = NameGenerator.GetObjCName (t);
+
+			List<string> conformed_protocols = new List<string> ();
+			foreach (var i in t.GetInterfaces ()) {
+				if (protocols.Contains (i))
+					conformed_protocols.Add (NameGenerator.GetObjCName (i));
+			}
 
 			var tbuilder = new ClassHelper (headers, implementation) {
 				AssemblyQualifiedName = t.AssemblyQualifiedName,
@@ -263,6 +276,7 @@ namespace ObjC {
 				Name = NameGenerator.GetTypeName (t),
 				Namespace = t.Namespace,
 				ManagedName = t.Name,
+				Protocols = conformed_protocols,
 				IsBaseTypeBound = types.Contains (t.BaseType),
 				IsStatic = t.IsSealed && t.IsAbstract,
 				MetadataToken = t.MetadataToken,
@@ -440,9 +454,6 @@ namespace ObjC {
 
 				builder.WriteHeaders ();
 				builder.WriteImplementation ();
-
-
-				GenerateGetGCHandle ();
 			}
 
 			if (hashes.TryGetValue (t, out m)) {
@@ -512,6 +523,8 @@ namespace ObjC {
 				else 
 				if (types.Contains (t))
 					implementation.WriteLine ($"{argumentName} = {paramaterName} ? mono_gchandle_get_target ({paramaterName}->_object->_handle): nil;");
+				else if (protocols.Contains (t))
+					implementation.WriteLine ($"{argumentName} = {paramaterName} ? mono_embeddinator_get_object ({paramaterName}, true) : nil;");
 				else
 					throw new NotImplementedException ($"Converting type {t.FullName} to mono code");
 				break;
@@ -777,17 +790,6 @@ namespace ObjC {
 
 			if (members_with_default_values.Contains (method.Method))
 				GenerateDefaultValuesWrappers (objcsig, method.Method);
-		}
-
-		protected void GenerateGetGCHandle ()
-		{
-			headers.WriteLine ("- (int)xamarinGetGCHandle;");
-			implementation.WriteLine ("- (int)xamarinGetGCHandle");
-			implementation.WriteLine ("{");
-			implementation.Indent++;
-			implementation.WriteLine ("return _object->_handle;");
-			implementation.Indent--;
-			implementation.WriteLine ("}");
 		}
 
 		void ReturnValue (Type t)

@@ -39,6 +39,31 @@ Managed types that implement `IComparable` or it's generic version `IComparable<
 - (NSComparisonResult)compare:(XAMComparableType * _Nullable)other;
 ```
 
+### Categories
+
+Managed extensions methods are converted into categories. For example the following extension methods on `Collection`
+
+```
+	public static class SomeExtensions {
+
+		public static int CountNonNull (this Collection collection) { ... }
+
+		public static int CountNull (this Collection collection) { ... }
+	}
+```
+
+would create an ObjC category like this one:
+
+```
+@interface Collection (SomeExtensions)
+
+- (int)countNonNull;
+- (int)countNull;
+@end
+```
+
+When a single managed type extends several types then multiple ObjC categories are generated.
+
 
 ## Main differences with .NET
 

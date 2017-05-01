@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Embeddinator;
 
 namespace ObjC {
@@ -25,6 +27,7 @@ namespace ObjC {
 		public string ManagedName { get; set; }
 
 		public int MetadataToken { get; set; }
+		public List<string> Protocols { get; set; }
 
 		public virtual void BeginHeaders ()
 		{
@@ -32,7 +35,18 @@ namespace ObjC {
 			headers.WriteLine ($"/** Class {Name}");
 			headers.WriteLine ($" *  Corresponding .NET Qualified Name: `{AssemblyQualifiedName}`");
 			headers.WriteLine (" */");
-			headers.WriteLine ($"@interface {Name} : {BaseTypeName} {{");
+			headers.Write ($"@interface {Name} : {BaseTypeName}");
+			var pcount = Protocols.Count;
+			if (pcount > 0) {
+				headers.Write (" <");
+				for (int i = 0; i < pcount; i++) {
+					if (i > 0)
+						headers.Write (", ");
+					headers.Write (Protocols [i]);
+				}
+				headers.Write (">");
+			}
+			headers.WriteLine (" {");
 			if (!IsStatic && !IsBaseTypeBound) {
 				headers.Indent++;
 				headers.WriteLine ("@public MonoEmbedObject* _object;");
@@ -121,6 +135,18 @@ namespace ObjC {
 			implementation.WriteLine ();
 		}
 
+		void ImplementGetGCHandle ()
+		{
+			implementation.WriteLine ("// for internal embeddinator use only");
+			implementation.WriteLine ("- (int)xamarinGetGCHandle");
+			implementation.WriteLine ("{");
+			implementation.Indent++;
+			implementation.WriteLine ("return _object->_handle;");
+			implementation.Indent--;
+			implementation.WriteLine ("}");
+			implementation.WriteLine ();
+		}
+
 		protected void ImplementInitForSuper ()
 		{
 			implementation.WriteLine ("// for internal embeddinator use only");
@@ -138,8 +164,10 @@ namespace ObjC {
 
 		public void EndImplementation ()
 		{
-			if (!IsStatic)
+			if (!IsStatic) {
+				ImplementGetGCHandle ();
 				ImplementInitForSuper ();
+			}
 			implementation.WriteLine ("@end");
 			implementation.WriteLine ();
 		}

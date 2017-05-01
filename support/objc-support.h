@@ -39,5 +39,8 @@ NSString* mono_embeddinator_get_nsstring (MonoString* string);
 MONO_EMBEDDINATOR_API
 NSComparisonResult mono_embeddinator_compare_to (MonoEmbedObject *object, MonoMethod *method, MonoEmbedObject *other);
 
+MONO_EMBEDDINATOR_API
+MonoObject* mono_embeddinator_get_object (id native, bool assertOnFailure);
+
 MONO_EMBEDDINATOR_END_DECLS
 	

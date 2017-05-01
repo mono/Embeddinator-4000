@@ -676,68 +676,79 @@
 
 - (void)testProtocols {
 	id<Interfaces_IMakeItUp> m = [Interfaces_Supplier create];
+	XCTAssertTrue ([m conformsToProtocol:@protocol(Interfaces_IMakeItUp)], "conformsToProtocol 1");
 	XCTAssertTrue ([m boolean], "true");
 	XCTAssertFalse ([m boolean], "false");
 
 	XCTAssertEqualObjects (@"0", [m convertInt32:0], "0");
 	XCTAssertEqualObjects (@"1", [m convertInt64:1ll], "1");
+
+	Interfaces_ManagedAdder *adder = [[Interfaces_ManagedAdder alloc] init];
+	XCTAssertTrue ([adder conformsToProtocol:@protocol(Interfaces_IOperations)], "conformsToProtocol 2");
+	XCTAssertTrue ([Interfaces_OpConsumer doAdditionOps:adder a:40 b:2] == 42, "doAdditionOps");
+	XCTAssertTrue ([Interfaces_OpConsumer testManagedAdderA:1 b:-1], "testManagedAdder");
+
+	// FIXME: today it is not possible to define a native type that conforms
+	// to `Interfaces_IOperations` and pass it on the managed side (abort)
 }
 
 - (void) testOperatorOverloading {
-    // Methods_OperatorCollision defines:
-    // - One operator with both a "friendly" and operator version (Addition)
-    // - One with just the "friendly" version
-    // - One with just the operator versions
-    Methods_OperatorCollision * one = [[Methods_OperatorCollision alloc] initWithVal:1];
-    Methods_OperatorCollision * two = [[Methods_OperatorCollision alloc] initWithVal:2];
-    XCTAssertTrue ([[Methods_OperatorCollision addC1:one c2:two] value] == 3, "1 + 2");
-    XCTAssertTrue ([[Methods_OperatorCollision subtraction:two c2:one] value] == 1, "2 - 1");
-    XCTAssertTrue ([[Methods_OperatorCollision multiplyC1:two c2:two] value] == 4, "2 * 2");
-    
-    // Methods_AllOperators defines just operator versions of all
-    Methods_AllOperators * oneAll = [[Methods_AllOperators alloc] initWithVal:1];
-    Methods_AllOperators * twoAll = [[Methods_AllOperators alloc] initWithVal:2];
-    XCTAssertTrue ([[Methods_AllOperators addition:oneAll c2:twoAll] value] == (1 + 2), "1 + 2 All");
-    XCTAssertTrue ([[Methods_AllOperators subtraction:oneAll c2:twoAll] value] == (1 - 2), "1 - 2 All");
-    XCTAssertTrue ([[Methods_AllOperators multiply:oneAll c2:twoAll] value] == (1 * 2), "1 * 2 All");
-    XCTAssertTrue ([[Methods_AllOperators division:twoAll c2:oneAll] value] == (2 / 1), "2 / 1 All");
-    
-    XCTAssertTrue ([[Methods_AllOperators bitwiseAnd:oneAll c2:twoAll] value] == (1 & 2), "1 & 2 All");
-    XCTAssertTrue ([[Methods_AllOperators bitwiseOr:oneAll c2:twoAll] value] == (1 | 2), "1 | 2 All");
-    XCTAssertTrue ([[Methods_AllOperators exclusiveOr:oneAll c2:twoAll] value] == (1 ^ 2), "1 ^ 2 All");
+	// Overloads_OperatorCollision defines:
+	// - One operator with both a "friendly" and operator version (Addition)
+	// - One with just the "friendly" version
+	// - One with just the operator versions
+	Overloads_OperatorCollision * one = [[Overloads_OperatorCollision alloc] initWithVal:1];
+	Overloads_OperatorCollision * two = [[Overloads_OperatorCollision alloc] initWithVal:2];
+	XCTAssertTrue ([[Overloads_OperatorCollision addC1:one c2:two] value] == 3, "1 + 2");
+	XCTAssertTrue ([[Overloads_OperatorCollision subtraction:two c2:one] value] == 1, "2 - 1");
+	XCTAssertTrue ([[Overloads_OperatorCollision multiplyC1:two c2:two] value] == 4, "2 * 2");
 
-    XCTAssertTrue ([[Methods_AllOperators leftShift:oneAll a:2] value] == (1 << 2), "1 << 2 All");
-    XCTAssertTrue ([[Methods_AllOperators rightShift:oneAll a:2] value] == (1 >> 2), "1 >> 2 All");
+	// Overloads_AllOperators defines just operator versions of all
+	Overloads_AllOperators * oneAll = [[Overloads_AllOperators alloc] initWithVal:1];
+	Overloads_AllOperators * twoAll = [[Overloads_AllOperators alloc] initWithVal:2];
+	XCTAssertTrue ([[Overloads_AllOperators addition:oneAll c2:twoAll] value] == (1 + 2), "1 + 2 All");
+	XCTAssertTrue ([[Overloads_AllOperators subtraction:oneAll c2:twoAll] value] == (1 - 2), "1 - 2 All");
+	XCTAssertTrue ([[Overloads_AllOperators multiply:oneAll c2:twoAll] value] == (1 * 2), "1 * 2 All");
+	XCTAssertTrue ([[Overloads_AllOperators division:twoAll alloperators:oneAll] value] == (2 / 1), "2 / 1 All");
+	XCTAssertTrue ([[Overloads_AllOperators division:twoAll int32:1] value] == (2 / 1), "2 / 1 All int");
 
-    XCTAssertTrue ([[Methods_AllOperators onesComplement:oneAll] value] == (~1), "!1 All");
-    XCTAssertTrue ([[Methods_AllOperators unaryNegation:oneAll] value] == (-1), "- 1 All");
-    XCTAssertTrue ([[Methods_AllOperators unaryPlus:oneAll] value] == (+1), "+ 1 All");
-    
-    XCTAssertTrue ([[Methods_AllOperators decrement:oneAll] value] == (1 - 1), "1 - 1 All");
-    XCTAssertTrue ([[Methods_AllOperators increment:oneAll] value] == (1 + 1), "1 + 1 All");
+	XCTAssertTrue ([[Overloads_AllOperators bitwiseAnd:oneAll alloperators:twoAll] value] == (1 & 2), "1 & 2 All");
+	XCTAssertTrue ([[Overloads_AllOperators bitwiseAnd:oneAll int32:2] value] == (1 & 2), "1 & 2 All int");
 
-    
-    // Methods_AllOperatorsWithFriendly defines both the operator and "friendly" version
-    Methods_AllOperatorsWithFriendly * oneFriend = [[Methods_AllOperatorsWithFriendly alloc] initWithVal:1];
-    Methods_AllOperatorsWithFriendly * twoFriend = [[Methods_AllOperatorsWithFriendly alloc] initWithVal:2];
-    XCTAssertTrue ([[Methods_AllOperatorsWithFriendly addC1:oneFriend c2:twoFriend] value] == (1 + 2), "1 + 2 All");
-    XCTAssertTrue ([[Methods_AllOperatorsWithFriendly subtractC1:oneFriend c2:twoFriend] value] == (1 - 2), "1 - 2 All");
-    XCTAssertTrue ([[Methods_AllOperatorsWithFriendly multiplyC1:oneFriend c2:twoFriend] value] == (1 * 2), "1 * 2 All");
-    XCTAssertTrue ([[Methods_AllOperatorsWithFriendly divideC1:twoFriend c2:oneFriend] value] == (2 / 1), "2 / 1 All");
-    
-    XCTAssertTrue ([[Methods_AllOperatorsWithFriendly bitwiseAndC1:oneFriend c2:twoFriend] value] == (1 & 2), "1 & 2 All");
-    XCTAssertTrue ([[Methods_AllOperatorsWithFriendly bitwiseOrC1:oneFriend c2:twoFriend] value] == (1 | 2), "1 | 2 All");
-    XCTAssertTrue ([[Methods_AllOperatorsWithFriendly xorC1:oneFriend c2:twoFriend] value] == (1 ^ 2), "1 ^ 2 All");
-    
-    XCTAssertTrue ([[Methods_AllOperatorsWithFriendly leftShiftC1:oneFriend a:2] value] == (1 << 2), "1 << 2 All");
-    XCTAssertTrue ([[Methods_AllOperatorsWithFriendly rightShiftC1:oneFriend a:2] value] == (1 >> 2), "1 >> 2 All");
-    
-    XCTAssertTrue ([[Methods_AllOperatorsWithFriendly onesComplementC1:oneFriend] value] == (~1), "!1 All");
-    XCTAssertTrue ([[Methods_AllOperatorsWithFriendly negateC1:oneFriend] value] == (-1), "- 1 All");
-    XCTAssertTrue ([[Methods_AllOperatorsWithFriendly plusC1:oneFriend] value] == (+1), "+ 1 All");
-    
-    XCTAssertTrue ([[Methods_AllOperatorsWithFriendly decrementC1:oneFriend] value] == (1 - 1), "1 - 1 All");
-    XCTAssertTrue ([[Methods_AllOperatorsWithFriendly incrementC1:oneFriend] value] == (1 + 1), "1 + 1 All");    
+	XCTAssertTrue ([[Overloads_AllOperators bitwiseOr:oneAll c2:twoAll] value] == (1 | 2), "1 | 2 All");
+	XCTAssertTrue ([[Overloads_AllOperators exclusiveOr:oneAll c2:twoAll] value] == (1 ^ 2), "1 ^ 2 All");
+
+	XCTAssertTrue ([[Overloads_AllOperators leftShift:oneAll a:2] value] == (1 << 2), "1 << 2 All");
+	XCTAssertTrue ([[Overloads_AllOperators rightShift:oneAll a:2] value] == (1 >> 2), "1 >> 2 All");
+
+	XCTAssertTrue ([[Overloads_AllOperators onesComplement:oneAll] value] == (~1), "!1 All");
+	XCTAssertTrue ([[Overloads_AllOperators unaryNegation:oneAll] value] == (-1), "- 1 All");
+	XCTAssertTrue ([[Overloads_AllOperators unaryPlus:oneAll] value] == (+1), "+ 1 All");
+
+	XCTAssertTrue ([[Overloads_AllOperators decrement:oneAll] value] == (1 - 1), "1 - 1 All");
+	XCTAssertTrue ([[Overloads_AllOperators increment:oneAll] value] == (1 + 1), "1 + 1 All");
+
+	// Overloads_AllOperatorsWithFriendly defines both the operator and "friendly" version
+	Overloads_AllOperatorsWithFriendly * oneFriend = [[Overloads_AllOperatorsWithFriendly alloc] initWithVal:1];
+	Overloads_AllOperatorsWithFriendly * twoFriend = [[Overloads_AllOperatorsWithFriendly alloc] initWithVal:2];
+	XCTAssertTrue ([[Overloads_AllOperatorsWithFriendly addC1:oneFriend c2:twoFriend] value] == (1 + 2), "1 + 2 All");
+	XCTAssertTrue ([[Overloads_AllOperatorsWithFriendly subtractC1:oneFriend c2:twoFriend] value] == (1 - 2), "1 - 2 All");
+	XCTAssertTrue ([[Overloads_AllOperatorsWithFriendly multiplyC1:oneFriend c2:twoFriend] value] == (1 * 2), "1 * 2 All");
+	XCTAssertTrue ([[Overloads_AllOperatorsWithFriendly divideC1:twoFriend c2:oneFriend] value] == (2 / 1), "2 / 1 All");
+
+	XCTAssertTrue ([[Overloads_AllOperatorsWithFriendly bitwiseAndC1:oneFriend c2:twoFriend] value] == (1 & 2), "1 & 2 All");
+	XCTAssertTrue ([[Overloads_AllOperatorsWithFriendly bitwiseOrC1:oneFriend c2:twoFriend] value] == (1 | 2), "1 | 2 All");
+	XCTAssertTrue ([[Overloads_AllOperatorsWithFriendly xorC1:oneFriend c2:twoFriend] value] == (1 ^ 2), "1 ^ 2 All");
+
+	XCTAssertTrue ([[Overloads_AllOperatorsWithFriendly leftShiftC1:oneFriend a:2] value] == (1 << 2), "1 << 2 All");
+	XCTAssertTrue ([[Overloads_AllOperatorsWithFriendly rightShiftC1:oneFriend a:2] value] == (1 >> 2), "1 >> 2 All");
+
+	XCTAssertTrue ([[Overloads_AllOperatorsWithFriendly onesComplementC1:oneFriend] value] == (~1), "!1 All");
+	XCTAssertTrue ([[Overloads_AllOperatorsWithFriendly negateC1:oneFriend] value] == (-1), "- 1 All");
+	XCTAssertTrue ([[Overloads_AllOperatorsWithFriendly plusC1:oneFriend] value] == (+1), "+ 1 All");
+
+	XCTAssertTrue ([[Overloads_AllOperatorsWithFriendly decrementC1:oneFriend] value] == (1 - 1), "1 - 1 All");
+	XCTAssertTrue ([[Overloads_AllOperatorsWithFriendly incrementC1:oneFriend] value] == (1 + 1), "1 + 1 All");
 }
 
 - (void)testShortParamters {

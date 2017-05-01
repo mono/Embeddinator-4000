@@ -10,10 +10,6 @@ namespace Embeddinator {
 	// While processing user assemblies, we may come across conditions that will affect
 	// final code generation that we need to pass to the generation pass
 
-	public abstract class ProcessedMemberBase {
-		public bool FallBackToTypeName { get; set; }
-	}
-
 	public class ProcessedAssembly {
 
 		public Assembly Assembly { get; private set; }
@@ -27,6 +23,23 @@ namespace Embeddinator {
 			Name = assembly.GetName ().Name;
 			SafeName = Name.Sanitize ();
 		}
+	}
+
+	public class ProcessedType {
+		public Type Type { get; private set; }
+		public string TypeName { get; private set; }
+		public string ObjCName { get; private set; }
+
+		public ProcessedType (Type type)
+		{
+			Type = type;
+			TypeName = ObjC.NameGenerator.GetTypeName (Type);
+			ObjCName = ObjC.NameGenerator.GetObjCName (Type);
+		}
+	}
+
+	public abstract class ProcessedMemberBase {
+		public bool FallBackToTypeName { get; set; }
 	}
 
 	public class ProcessedMethod : ProcessedMemberBase {
@@ -61,10 +74,14 @@ namespace Embeddinator {
 
 	public class ProcessedFieldInfo : ProcessedMemberBase {
 		public FieldInfo Field { get; private set; }
+		public string TypeName { get; private set; }
+		public string ObjCName { get; private set; }
 
 		public ProcessedFieldInfo (FieldInfo field)
 		{
 			Field = field;
+			TypeName = ObjC.NameGenerator.GetTypeName (Field.DeclaringType);
+			ObjCName = ObjC.NameGenerator.GetObjCName (Field.DeclaringType);
 		}
 	}
 }

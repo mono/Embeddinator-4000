@@ -6,7 +6,7 @@ using Type = IKVM.Reflection.Type;
 
 namespace Embeddinator {
 
-	public class Generator {
+	public abstract class Generator {
 
 		protected List<ProcessedAssembly> assemblies = new List<ProcessedAssembly> ();
 
@@ -38,29 +38,10 @@ namespace Embeddinator {
 			}
 		}
 
-		protected virtual void Generate (ProcessedAssembly a)
-		{
-			foreach (var t in a.Assembly.GetTypes ()) {
-				if (!t.IsPublic)
-					continue;
-				Generate (t);
-			}
-		}
-
-		protected virtual void Generate (Type t)
-		{
-		}
-
-		protected virtual void Generate (ProcessedProperty property)
-		{
-		}
-
-		protected virtual void Generate (ProcessedMethod method)
-		{
-		}
-
-		public virtual void Write (string outputDirectory)
-		{
-		}
+		protected abstract void Generate (ProcessedAssembly a);
+		protected abstract void Generate (ProcessedType t);
+		protected abstract void Generate (ProcessedProperty property);
+		protected abstract void Generate (ProcessedMethod method);
+		public abstract void Write (string outputDirectory);
 	}
 }
