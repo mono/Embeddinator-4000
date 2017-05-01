@@ -136,7 +136,7 @@ namespace Embeddinator {
 	}
 
 	public static class ListExtensions {
-		public static bool ContainsType (this List<ProcessedType> list, Type type)
+		public static bool Contains (this List<ProcessedType> list, Type type)
 		{
 			foreach (ProcessedType t in list) {
 				if (t.Type == type)

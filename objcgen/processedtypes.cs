@@ -25,8 +25,7 @@ namespace Embeddinator {
 		}
 	}
 
-	public class ProcessedType
-	{
+	public class ProcessedType {
 		public Type Type { get; private set; }
 		public string TypeName { get; private set; }
 		public string ObjCName { get; private set; }
@@ -39,8 +38,7 @@ namespace Embeddinator {
 		}
 	}
 
-	public abstract class ProcessedMemberBase
-	{
+	public abstract class ProcessedMemberBase {
 		public bool FallBackToTypeName { get; set; }
 	}
 

@@ -300,7 +300,7 @@ namespace ObjC {
 						fields.Add (t, processedFields);
 				}
 			}
-			types = types.OrderBy ((arg) => arg.Type.FullName).OrderBy ((arg) => types.ContainsType (arg.Type.BaseType)).ToList ();
+			types = types.OrderBy ((arg) => arg.Type.FullName).OrderBy ((arg) => types.Contains (arg.Type.BaseType)).ToList ();
 			Console.WriteLine ($"\t{types.Count} types found");
 
 			ErrorHelper.Show (delayed);

@@ -39,7 +39,7 @@ namespace ObjC {
 				if (pt.IsInterface)
 					ptname = $"id<{ptname}>";
 
-				if (types.ContainsType (pt))
+				if (types.Contains (pt))
 					ptname += " *";
 				if (n > 0 || !isExtension)
 					objc.Append (":(").Append (ptname).Append (")").Append (p.Name);
