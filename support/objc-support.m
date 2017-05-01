@@ -49,3 +49,15 @@ NSComparisonResult mono_embeddinator_compare_to (MonoEmbedObject *object, MonoMe
 	void* __unbox = mono_object_unbox (__result);
 	return (NSComparisonResult) *((int*)__unbox);
 }
+
+MonoObject* mono_embeddinator_get_object (id native, bool assertOnFailure)
+{
+	if (![native respondsToSelector:@selector (xamarinGetGCHandle)]) {
+		if (!assertOnFailure)
+			return nil;
+		NSLog (@"`%@` is not a managed instance and cannot be used like one", [native description]);
+		abort ();
+	}
+	int gchandle = (int) [native performSelector:@selector (xamarinGetGCHandle)];
+	return mono_gchandle_get_target (gchandle);
+}

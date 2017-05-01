@@ -33,7 +33,7 @@ namespace ObjC {
 
 		protected void GenerateKeyedSubscripting (Type indexType, Type propertyType)
 		{
-			string indexTypeString = GetTypeName (indexType);
+			string indexTypeString = NameGenerator.GetTypeName (indexType);
 
 			// TODO - Technically the argument here can be anything, not just id
 			headers.WriteLine ($"- (id)objectForKeyedSubscript:(id)key;");
@@ -60,7 +60,7 @@ namespace ObjC {
 
 		protected void GenerateIndexedSubscripting (Type indexType, Type propertyType)
 		{
-			string indexTypeString = GetTypeName (indexType);
+			string indexTypeString = NameGenerator.GetTypeName (indexType);
 
 			headers.WriteLine ($"- (id)objectAtIndexedSubscript:({indexTypeString})idx;");
 
@@ -72,9 +72,9 @@ namespace ObjC {
 			implementation.WriteLine ("}");
 			implementation.WriteLine ();
 
-			headers.WriteLine ($"- (void)setObject:(id)obj atIndexedSubscript: ({indexTypeString})idx;");
+			headers.WriteLine ($"- (void)setObject:(id)obj atIndexedSubscript:({indexTypeString})idx;");
 
-			implementation.WriteLine ($"- (void)setObject:(id)obj atIndexedSubscript: ({indexTypeString})idx");
+			implementation.WriteLine ($"- (void)setObject:(id)obj atIndexedSubscript:({indexTypeString})idx");
 			implementation.WriteLine ("{");
 			implementation.Indent++;
 			implementation.WriteLine ($"[self setItem:idx value:{FromNSObject (propertyType, "obj")}];");

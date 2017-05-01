@@ -29,7 +29,7 @@ namespace ObjC {
 
 			headers.WriteLine ("// forward declarations");
 			foreach (var t in types)
-				headers.WriteLine ($"@class {t.TypeName};");
+				headers.WriteLine ($"@class {NameGenerator.GetTypeName (t)};");
 			headers.WriteLine ();
 			headers.WriteLine ("NS_ASSUME_NONNULL_BEGIN");
 			headers.WriteLine ();
@@ -49,9 +49,9 @@ namespace ObjC {
 			implementation.WriteLine ();
 
 			foreach (var t in types)
-				implementation.WriteLine ($"static MonoClass* {t.ObjCName}_class = nil;");
+				implementation.WriteLine ($"static MonoClass* {NameGenerator.GetObjCName (t)}_class = nil;");
 			foreach (var t in protocols) {
-				var pname = t.TypeName;
+				var pname = NameGenerator.GetTypeName (t);
 				headers.WriteLine ($"@protocol {pname};");
 				implementation.WriteLine ($"@class __{pname}Wrapper;");
 			}
@@ -101,7 +101,7 @@ namespace ObjC {
 				implementation.WriteLine ("// we cannot use `+initialize` inside categories as they would replace the original type code");
 				implementation.WriteLine ("// since there should not be tons of them we're pre-loading them when loading the assembly");
 				foreach (var definedType in extensions_methods.Keys) {
-					var managed_name = GetObjCName (definedType);
+					var managed_name = NameGenerator.GetObjCName (definedType);
 					implementation.WriteLineUnindented ("#if TOKENLOOKUP");
 					implementation.WriteLine ($"{managed_name}_class = mono_class_get (__{name}_image, 0x{definedType.MetadataToken:X8});");
 					implementation.WriteLineUnindented ("#else");
@@ -134,8 +134,8 @@ namespace ObjC {
 
 		void GenerateCategory (Type definedType, Type extendedType, List<MethodInfo> methods)
 		{
-			var etn = GetTypeName (extendedType).Replace (" *", String.Empty);
-			var name = $"{etn} ({GetTypeName (definedType)})";
+			var etn = NameGenerator.GetTypeName (extendedType).Replace (" *", String.Empty);
+			var name = $"{etn} ({NameGenerator.GetTypeName (definedType)})";
 			headers.WriteLine ($"/** Category {name}");
 			headers.WriteLine ($" *  Corresponding .NET Qualified Name: `{definedType.AssemblyQualifiedName}`");
 			headers.WriteLine (" */");
@@ -158,10 +158,9 @@ namespace ObjC {
 
 		void GenerateEnum (ProcessedType type)
 		{
-			Type t = type.Type;
-			var managed_name = type.ObjCName;
+			var managed_name = NameGenerator.GetObjCName (t);
 			var underlying_type = t.GetEnumUnderlyingType ();
-			var base_type = GetTypeName (underlying_type);
+			var base_type = NameGenerator.GetTypeName (underlying_type);
 
 			// it's nicer to expose flags as unsigned integers - but .NET defaults to `int`
 			bool flags = t.HasCustomAttribute ("System", "FlagsAttribute");
@@ -202,7 +201,7 @@ namespace ObjC {
 			var pbuilder = new ProtocolHelper (headers, implementation) {
 				AssemblyQualifiedName = t.AssemblyQualifiedName,
 				AssemblyName = t.Assembly.GetName ().Name.Sanitize (),
-				ProtocolName = GetTypeName (t),
+				ProtocolName = NameGenerator.GetTypeName (t),
 				Namespace = t.Namespace,
 				ManagedName = t.Name,
 				MetadataToken = t.MetadataToken,
@@ -257,16 +256,23 @@ namespace ObjC {
 			var aname = t.Assembly.GetName ().Name.Sanitize ();
 			var static_type = t.IsSealed && t.IsAbstract;
 
-			var managed_name = type.ObjCName;
+			var managed_name = NameGenerator.GetObjCName (t);
+
+			List<string> conformed_protocols = new List<string> ();
+			foreach (var i in t.GetInterfaces ()) {
+				if (protocols.Contains (i))
+					conformed_protocols.Add (NameGenerator.GetObjCName (i));
+			}
 
 			var tbuilder = new ClassHelper (headers, implementation) {
 				AssemblyQualifiedName = t.AssemblyQualifiedName,
 				AssemblyName = aname,
-				BaseTypeName = GetTypeName (t.BaseType),
-				Name = GetTypeName (t),
+				BaseTypeName = NameGenerator.GetTypeName (t.BaseType),
+				Name = NameGenerator.GetTypeName (t),
 				Namespace = t.Namespace,
 				ManagedName = t.Name,
-				IsBaseTypeBound = types.ContainsType (t.BaseType),
+				Protocols = conformed_protocols,
+				IsBaseTypeBound = types.Contains (t.BaseType),
 				IsStatic = t.IsSealed && t.IsAbstract,
 				MetadataToken = t.MetadataToken,
 			};
@@ -352,6 +358,41 @@ namespace ObjC {
 				}
 			}
 
+			// generate an `init` for a value type (even if none was defined, the default one is usable)
+			if (!default_init && t.IsValueType) {
+				var builder = new MethodHelper (headers, implementation) {
+					AssemblySafeName = aname,
+					ReturnType = "nullable instancetype",
+					ManagedTypeName = t.FullName,
+					MonoSignature = ".ctor()",
+					ObjCSignature = "init",
+					ObjCTypeName = managed_name,
+					IsConstructor = true,
+					IsValueType = t.IsValueType,
+					IgnoreException = true,
+				};
+
+				builder.WriteHeaders ();
+				builder.BeginImplementation ();
+				// no call to `WriteMethodLookup` since there is not such method if we reached this case
+
+				implementation.WriteLine ("if (!_object) {");
+				implementation.Indent++;
+				implementation.WriteLine ($"MonoObject* __instance = mono_object_new (__mono_context.domain, {managed_name}_class);");
+				// no call to `WriteInvoke` since there is not such method if we reached this case
+				implementation.WriteLine ("_object = mono_embeddinator_create_object (__instance);");
+				implementation.Indent--;
+				implementation.WriteLine ("}");
+				if (types.Contains (t.BaseType))
+					implementation.WriteLine ("return self = [super initForSuper];");
+				else
+					implementation.WriteLine ("return self = [super init];");
+				builder.EndImplementation ();
+
+				headers.WriteLine ();
+				default_init = true;
+			}
+
 			if (!default_init || static_type)
 				tbuilder.DefineNoDefaultInit ();
 	
@@ -392,7 +433,7 @@ namespace ObjC {
 					MetadataToken = m.MetadataToken,
 					ObjCTypeName = managed_name,
 					ManagedTypeName = t.FullName,
-					MonoSignature = $"CompareTo({GetMonoName (pt)})",
+					MonoSignature = $"CompareTo({NameGenerator.GetMonoName (pt)})",
 				};
 				builder.WriteHeaders ();
 				builder.WriteImplementation ();
@@ -408,9 +449,6 @@ namespace ObjC {
 
 				builder.WriteHeaders ();
 				builder.WriteImplementation ();
-
-
-				GenerateGetGCHandle ();
 			}
 
 			if (hashes.TryGetValue (t, out m)) {
@@ -480,6 +518,8 @@ namespace ObjC {
 				else 
 				if (types.ContainsType (t))
 					implementation.WriteLine ($"{argumentName} = {paramaterName} ? mono_gchandle_get_target ({paramaterName}->_object->_handle): nil;");
+				else if (protocols.Contains (t))
+					implementation.WriteLine ($"{argumentName} = {paramaterName} ? mono_embeddinator_get_object ({paramaterName}, true) : nil;");
 				else
 					throw new NotImplementedException ($"Converting type {t.FullName} to mono code");
 				break;
@@ -503,8 +543,8 @@ namespace ObjC {
 			if (setter == null)
 				headers.Write (", readonly");
 			var pt = pi.PropertyType;
-			var property_type = GetTypeName (pt);
-			if (types.ContainsType (pt))
+			var property_type = NameGenerator.GetTypeName (pt);
+			if (types.Contains (pt))
 				property_type += " *";
 			headers.WriteLine ($") {property_type} {name};");
 
@@ -530,7 +570,7 @@ namespace ObjC {
 			if (bound && ft.IsValueType)
 				headers.Write (", nonnull");
 
-			var field_type = GetTypeName (ft);
+			var field_type = NameGenerator.GetTypeName (ft);
 			if (bound)
 				field_type += " *";
 
@@ -540,7 +580,7 @@ namespace ObjC {
 			// it's similar, but different from implementing a method
 
 			var type = fi.DeclaringType;
-			var managed_type_name = field.ObjCName;
+			var managed_type_name = NameGenerator.GetObjCName (type);
 			var return_type = GetReturnType (type, fi.FieldType);
 
 			implementation.Write (fi.IsStatic ? '+' : '-');
@@ -609,13 +649,13 @@ namespace ObjC {
 
 		public string GetReturnType (Type declaringType, Type returnType)
 		{
-			if (protocols.ContainsType (returnType))
-				return "id<" + GetTypeName (returnType) + ">";
+			if (protocols.Contains (returnType))
+				return "id<" + NameGenerator.GetTypeName (returnType) + ">";
 			if (declaringType == returnType)
 				return "instancetype";
 
-			var return_type = GetTypeName (returnType);
-			if (types.ContainsType (returnType))
+			var return_type = NameGenerator.GetTypeName (returnType);
+			if (types.Contains (returnType))
 				return_type += "*";
 			return return_type;
 		}
@@ -624,7 +664,7 @@ namespace ObjC {
 		string ImplementMethod (MethodInfo info, string name, bool isExtension = false, PropertyInfo pi = null, bool useTypeNames = false)
 		{
 			var type = info.DeclaringType;
-			var managed_type_name = GetObjCName (type);
+			var managed_type_name = NameGenerator.GetObjCName (type);
 
 			string objcsig;
 			string monosig;
@@ -697,7 +737,7 @@ namespace ObjC {
 					arguments.Append (' ').Append (p.Name.CamelCase ()).Append (':');
 				if (p.Position >= start && p.HasDefaultValue) {
 					var raw = FormatRawValue (p.ParameterType, p.RawDefaultValue);
-					headers.WriteLine ($" *     ({GetTypeName (p.ParameterType)}) {p.Name} = {raw};");
+					headers.WriteLine ($" *     ({NameGenerator.GetTypeName (p.ParameterType)}) {p.Name} = {raw};");
 					arguments.Append (raw);
 				} else {
 					arguments.Append (p.Name);
@@ -727,7 +767,7 @@ namespace ObjC {
 			if (mi == null || !mi.ReturnType.Is ("System", "Void"))
 				implementation.Write ("return [");
 			if (mb.IsStatic) {
-				implementation.Write (GetObjCName (mi.DeclaringType));
+				implementation.Write (NameGenerator.GetObjCName (mi.DeclaringType));
 				implementation.Write (' ');
 			} else {
 				implementation.Write ("self ");
@@ -744,17 +784,6 @@ namespace ObjC {
 
 			if (members_with_default_values.Contains (method.Method))
 				GenerateDefaultValuesWrappers (objcsig, method.Method);
-		}
-
-		protected void GenerateGetGCHandle ()
-		{
-			headers.WriteLine ("- (int)xamarinGetGCHandle;");
-			implementation.WriteLine ("- (int)xamarinGetGCHandle");
-			implementation.WriteLine ("{");
-			implementation.Indent++;
-			implementation.WriteLine ("return _object->_handle;");
-			implementation.Indent--;
-			implementation.WriteLine ("}");
 		}
 
 		void ReturnValue (Type t)
@@ -775,7 +804,7 @@ namespace ObjC {
 			case TypeCode.UInt64:
 			case TypeCode.Single:
 			case TypeCode.Double:
-				var name = GetTypeName (t);
+				var name = NameGenerator.GetTypeName (t);
 				implementation.WriteLine ("void* __unbox = mono_object_unbox (__result);");
 				implementation.WriteLine ($"return *(({name}*)__unbox);");
 				break;
@@ -790,8 +819,8 @@ namespace ObjC {
 				implementation.WriteLine ("return nil;");
 				implementation.Indent--;
 				// TODO: cheating by reusing `initForSuper` - maybe a better name is needed
-				var tname = GetTypeName (t);
-				if (protocols.ContainsType (t))
+				var tname = NameGenerator.GetTypeName (t);
+				if (protocols.Contains (t))
 					tname = "__" + tname + "Wrapper";
 				implementation.WriteLine ($"\t{tname}* __peer = [[{tname} alloc] initForSuper];");
 				implementation.WriteLine ("__peer->_object = mono_embeddinator_create_object (__result);");
@@ -812,117 +841,6 @@ namespace ObjC {
 		{
 			WriteFile (Path.Combine (outputDirectory, "bindings.h"), headers.ToString ());
 			WriteFile (Path.Combine (outputDirectory, "bindings.m"), implementation.ToString ());
-		}
-
-		// TODO complete mapping (only with corresponding tests)
-		// TODO override with attribute ? e.g. [Obj.Name ("XAMType")]
-		public static string GetTypeName (Type t)
-		{
-			if (t.IsByRef) {
-				var et = t.GetElementType ();
-				return GetTypeName (et) + (et.IsValueType ? " " : " _Nonnull ") + "* _Nullable";
-			}
-
-			if (t.IsEnum)
-				return GetObjCName (t);
-
-			switch (Type.GetTypeCode (t)) {
-			case TypeCode.Object:
-				switch (t.Namespace) {
-				case "System":
-					switch (t.Name) {
-					case "Object":
-					case "ValueType":
-						return "NSObject";
-					case "Void":
-						return "void";
-					default:
-						return GetObjCName (t);
-					}
-				default:
-					return GetObjCName (t);
-				}
-			case TypeCode.Boolean:
-				return "bool";
-			case TypeCode.Char:
-				return "unsigned short";
-			case TypeCode.Double:
-				return "double";
-			case TypeCode.Single:
-				return "float";
-			case TypeCode.Byte:
-				return "unsigned char";
-			case TypeCode.SByte:
-				return "signed char";
-			case TypeCode.Int16:
-				return "short";
-			case TypeCode.Int32:
-				return "int";
-			case TypeCode.Int64:
-				return "long long";
-			case TypeCode.UInt16:
-				return "unsigned short";
-			case TypeCode.UInt32:
-				return "unsigned int";
-			case TypeCode.UInt64:
-				return "unsigned long long";
-			case TypeCode.String:
-				return "NSString *";
-			default:
-				throw new NotImplementedException ($"Converting type {t.Name} to a native type name");
-			}
-		}
-
-		public static string GetMonoName (Type t)
-		{
-			if (t.IsByRef)
-				return GetMonoName (t.GetElementType ()) + "&";
-
-			if (t.IsEnum)
-				return t.FullName;
-
-			switch (Type.GetTypeCode (t)) {
-			case TypeCode.Object:
-				switch (t.Namespace) {
-				case "System":
-					switch (t.Name) {
-					case "Void":
-						return "void";
-					default:
-						return "object";
-					}
-				default:
-					return t.FullName;
-				}
-			case TypeCode.Boolean:
-				return "bool";
-			case TypeCode.Char:
-				return "char";
-			case TypeCode.Double:
-				return "double";
-			case TypeCode.Single:
-				return "single";
-			case TypeCode.Byte:
-				return "byte";
-			case TypeCode.SByte:
-				return "sbyte";
-			case TypeCode.Int16:
-				return "int16";
-			case TypeCode.Int32:
-				return "int";
-			case TypeCode.Int64:
-				return "long";
-			case TypeCode.UInt16:
-				return "uint16";
-			case TypeCode.UInt32:
-				return "uint";
-			case TypeCode.UInt64:
-				return "ulong";
-			case TypeCode.String:
-				return "string";
-			default:
-				throw new NotImplementedException ($"Converting type {t.Name} to a mono type name");
-			}
 		}
 
 		public static string FormatRawValue (Type t, object o)
@@ -959,7 +877,7 @@ namespace ObjC {
 				break;
 			}
 			if (t.IsEnum)
-				return GetTypeName (t) + t.GetEnumName (o);
+				return NameGenerator.GetTypeName (t) + t.GetEnumName (o);
 			return o.ToString ();
 		}
 	}

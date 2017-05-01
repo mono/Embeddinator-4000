@@ -43,6 +43,7 @@ MonoObject *    mono_field_get_value_object (MonoDomain *domain, MonoClassField 
 void            mono_field_set_value (MonoObject *obj, MonoClassField *field, void *value);
 MonoVTable *    mono_class_vtable          (MonoDomain *domain, MonoClass *klass);
 void            mono_field_static_set_value (MonoVTable *vt, MonoClassField *field, void *value);
+MonoString *    mono_object_to_string (MonoObject *obj, MonoObject **exc);
 
 MONO_EMBEDDINATOR_END_DECLS
 #else

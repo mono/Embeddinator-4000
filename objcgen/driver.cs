@@ -234,6 +234,7 @@ namespace Embeddinator {
 			universe.AssemblyResolve += (object sender, IKVM.Reflection.ResolveEventArgs resolve_args) => {
 				var directories = new List<string> ();
 				directories.Add (PlatformSdkDirectory);
+				directories.Add (Path.Combine (PlatformSdkDirectory, "Facades"));
 				foreach (var asm in Assemblies)
 					directories.Add (Path.GetDirectoryName (asm.Location));
 

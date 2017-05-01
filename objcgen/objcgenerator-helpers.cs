@@ -9,14 +9,7 @@ using Type = IKVM.Reflection.Type;
 using Embeddinator;
 namespace ObjC {
 	public partial class ObjCGenerator {
-
-		// get a name that is safe to use from ObjC code
-
-		public static string GetObjCName (Type t)
-		{
-			return t.FullName.Replace ('.', '_');
-		}
-
+		
 		void GetSignatures (string objName, string monoName, MemberInfo info, ParameterInfo [] parameters, bool useTypeNames, bool isExtension, out string objcSignature, out string monoSignature)
 		{
 			var method = (info as MethodBase); // else it's a PropertyInfo
@@ -42,12 +35,20 @@ namespace ObjC {
 						objc.Append (paramName.ToLowerInvariant ());
 				}
 				var pt = p.ParameterType;
+<<<<<<< HEAD
 				var ptname = GetTypeName (p.ParameterType);
 				if (types.ContainsType (pt))
+=======
+				var ptname = NameGenerator.GetTypeName (pt);
+				if (pt.IsInterface)
+					ptname = $"id<{ptname}>";
+
+				if (types.Contains (pt))
+>>>>>>> objc
 					ptname += " *";
 				if (n > 0 || !isExtension)
-					objc.Append (":(").Append (ptname).Append (") ").Append (p.Name);
-				mono.Append (GetMonoName (p.ParameterType));
+					objc.Append (":(").Append (ptname).Append (")").Append (p.Name);
+				mono.Append (NameGenerator.GetMonoName (p.ParameterType));
 				n++;
 			}
 			mono.Append (')');

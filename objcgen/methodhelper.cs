@@ -96,15 +96,17 @@ namespace ObjC {
 				implementation.Write ("MonoObject* __result = ");
 			implementation.WriteLine ($"mono_runtime_invoke ({method}, {instance}, {args}, &__exception);");
 
-			implementation.WriteLine ("if (__exception)");
+			implementation.WriteLine ("if (__exception) {");
 			implementation.Indent++;
 			if (IgnoreException) {
 				// TODO: Apple often do NSLog (or asserts but they are more brutal) and returning nil is allowed (and common)
+				implementation.WriteLine ("NSLog (@\"%@\", mono_embeddinator_get_nsstring (mono_object_to_string (__exception, nil)));");
 				implementation.WriteLine ("return nil;");
 			} else {
 				implementation.WriteLine ("mono_embeddinator_throw_exception (__exception);");
 			}
 			implementation.Indent--;
+			implementation.WriteLine ("}");
 		}
 
 		public void EndImplementation ()
