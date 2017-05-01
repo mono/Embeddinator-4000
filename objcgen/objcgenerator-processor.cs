@@ -151,23 +151,6 @@ namespace ObjC {
 					continue;
 				}
 
-				// handle extension methods
-				if (extension_type && mi.HasCustomAttribute ("System.Runtime.CompilerServices", "ExtensionAttribute")) {
-					Dictionary<Type, List<MethodInfo>> extensions;
-					if (!extensions_methods.TryGetValue (t, out extensions)) {
-						extensions = new Dictionary<Type, List<MethodInfo>> ();
-						extensions_methods.Add (t, extensions);
-					}
-					var extended_type = mi.GetParameters () [0].ParameterType;
-					List<MethodInfo> methods;
-					if (!extensions.TryGetValue (extended_type, out methods)) {
-						methods = new List<MethodInfo> ();
-						extensions.Add (extended_type, methods);
-					}
-					methods.Add (mi);
-					continue;
-				}
-
 				var rt = mi.ReturnType;
 				if (!IsSupported (rt)) {
 					delayed.Add (ErrorHelper.CreateWarning (1030, $"Method `{mi}` is not generated because return type `{rt}` is not supported."));
@@ -186,6 +169,23 @@ namespace ObjC {
 				}
 				if (!pcheck)
 					continue;
+
+				// handle extension methods
+				if (extension_type && mi.HasCustomAttribute ("System.Runtime.CompilerServices", "ExtensionAttribute")) {
+					Dictionary<Type, List<MethodInfo>> extensions;
+					if (!extensions_methods.TryGetValue (t, out extensions)) {
+						extensions = new Dictionary<Type, List<MethodInfo>> ();
+						extensions_methods.Add (t, extensions);
+					}
+					var extended_type = mi.GetParameters () [0].ParameterType;
+					List<MethodInfo> extmethods;
+					if (!extensions.TryGetValue (extended_type, out extmethods)) {
+						extmethods = new List<MethodInfo> ();
+						extensions.Add (extended_type, extmethods);
+					}
+					extmethods.Add (mi);
+					continue;
+				}
 
 				yield return mi;
 			}
