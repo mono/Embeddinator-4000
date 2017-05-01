@@ -113,20 +113,24 @@ namespace ObjC {
 			implementation.WriteLine ("}");
 			implementation.WriteLine ();
 
-			foreach (var t in enums) {
+			var assembly = a.Assembly;
+
+			foreach (var t in enums.Where ((Type arg) => arg.Assembly == assembly)) {
 				GenerateEnum (t);
 			}
 
-			foreach (var t in protocols) {
+			foreach (var t in protocols.Where ((Type arg) => arg.Assembly == assembly)) {
 				GenerateProtocol (t);
 			}
 
-			foreach (var t in types) {
+			foreach (var t in types.Where ((Type arg) => arg.Assembly == assembly)) {
 				Generate (t);
 			}
 
 			foreach (var extension in extensions_methods) {
 				var defining_type = extension.Key;
+				if (defining_type.Assembly != assembly)
+					continue;
 				foreach (var category in extension.Value)
 					GenerateCategory (defining_type, category.Key, category.Value);
 			}
