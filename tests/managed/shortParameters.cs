@@ -1,136 +1,135 @@
 ﻿using System;
-namespace ShortParameters
-{
-    public class Class
-    {
-        public int X { get; set; }
-        public int Y { get; set; }
 
-        public string A { get; set; }
-        public string B { get; set; }
+namespace ShortParameters {
+	public class Class {
+		public int X { get; set; }
+		public int Y { get; set; }
 
-        public double C { get; set; }
-        public double D { get; set; }
+		public string A { get; set; }
+		public string B { get; set; }
 
-        public float E { get; set; }
-        public float F { get; set; }
+		public double C { get; set; }
+		public double D { get; set; }
 
-        public uint G { get; set; }
-        public uint H { get; set; }
+		public float E { get; set; }
+		public float F { get; set; }
 
-        public short I { get; set; }
-        public short J { get; set; }
+		public uint G { get; set; }
+		public uint H { get; set; }
 
-        public ushort K { get; set; }
-        public ushort L { get; set; }
+		public short I { get; set; }
+		public short J { get; set; }
 
-        public long M { get; set; }
-        public long N { get; set; }
+		public ushort K { get; set; }
+		public ushort L { get; set; }
 
-        public ulong O { get; set; }
-        public ulong P { get; set; }
+		public long M { get; set; }
+		public long N { get; set; }
 
-        public char Q { get; set; }
-        public char R { get; set; }
+		public ulong O { get; set; }
+		public ulong P { get; set; }
 
-        public bool S { get; set; }
-        public bool T { get; set; }
+		public char Q { get; set; }
+		public char R { get; set; }
 
-        public Class ()
-        {
-        }
+		public bool S { get; set; }
+		public bool T { get; set; }
 
-        public bool NoDuplicateTypes(string a, double c, float e, uint g, short i, ushort k, long m, ulong o, char q, bool s)
-        {
-            A = a;
-            C = c;
-            E = e;
-            G = g;
-            I = i;
-            K = k;
-            M = m;
-            O = o;
-            Q = q;
-            S = s;
+		public Class ()
+		{
+		}
 
-            return true;
-        }
+		public bool NoDuplicateTypes(string a, double c, float e, uint g, short i, ushort k, long m, ulong o, char q, bool s)
+		{
+			A = a;
+			C = c;
+			E = e;
+			G = g;
+			I = i;
+			K = k;
+			M = m;
+			O = o;
+			Q = q;
+			S = s;
 
-        public int TwoInt(int x, int y)
-        {
-            X = x;
-            Y = y;
-            return x + y;
-        }
+			return true;
+		}
 
-        public string TwoString(string a, string b)
-        {
-            A = a;
-            B = b;
-            return a + b;
-        }
+		public int TwoInt(int x, int y)
+		{
+			X = x;
+			Y = y;
+			return x + y;
+		}
 
-        public double TwoDouble(double c, double d)
-        {
-            C = c;
-            D = d;
-            return c + d;
-        }
+		public string TwoString(string a, string b)
+		{
+			A = a;
+			B = b;
+			return a + b;
+		}
 
-        public float TwoFloat(float e, float f)
-        {
-            E = e;
-            F = f;
-            return e + f;
-        }
+		public double TwoDouble(double c, double d)
+		{
+			C = c;
+			D = d;
+			return c + d;
+		}
 
-        public uint TwoUint(uint g, uint h)
-        {
-            G = g;
-            H = h;
-            return g + h;
-        }
+		public float TwoFloat(float e, float f)
+		{
+			E = e;
+			F = f;
+			return e + f;
+		}
 
-        public int TwoShort (short i, short j)
-        {
-            I = i;
-            J = j;
-            return i + j;
-        }
+		public uint TwoUint(uint g, uint h)
+		{
+			G = g;
+			H = h;
+			return g + h;
+		}
 
-        public int TwoUshort (ushort k, ushort l)
-        {
-            K = k;
-            L = l;
-            return k + l;
-        }
+		public int TwoShort (short i, short j)
+		{
+			I = i;
+			J = j;
+			return i + j;
+		}
 
-        public long TwoLong (long m, long n)
-        {
-            M = m;
-            N = n;
-            return m + n;
-        }
+		public int TwoUshort (ushort k, ushort l)
+		{
+			K = k;
+			L = l;
+			return k + l;
+		}
 
-        public ulong TwoUlong (ulong o, ulong p)
-        {
-            O = o;
-            P = p;
-            return o + p;
-        }
+		public long TwoLong (long m, long n)
+		{
+			M = m;
+			N = n;
+			return m + n;
+		}
 
-        public int TwoChar (char q, char r)
-        {
-            Q = q;
-            R = r;
-            return q + r;
-        }
+		public ulong TwoUlong (ulong o, ulong p)
+		{
+			O = o;
+			P = p;
+			return o + p;
+		}
 
-        public bool TwoBool (bool s, bool t)
-        {
-            S = s;
-            T = t;
-            return s || t;
-        }
+		public int TwoChar (char q, char r)
+		{
+			Q = q;
+			R = r;
+			return q + r;
+		}
+
+		public bool TwoBool (bool s, bool t)
+		{
+			S = s;
+			T = t;
+			return s || t;
+		}
 	}
 }

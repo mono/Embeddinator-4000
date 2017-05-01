@@ -126,10 +126,10 @@ namespace Embeddinator {
 			string ptname = NameGenerator.GetTypeName (p.ParameterType);
 			if (p.Name.Length< 3) {
 				if (!ObjCGenerator.ObjCTypeToArgument.TryGetValue(ptname, out pName))
-                    pName = "anObject";
+					pName = "anObject";
 
 				if (parameters.Count (p2 => NameGenerator.GetTypeName (p2.ParameterType) == ptname && p2.Name.Length< 3) > 1 ||
-				    pName == "anObject" && parameters.Count (p2 => !ObjCGenerator.ObjCTypeToArgument.ContainsKey (NameGenerator.GetTypeName (p2.ParameterType))) > 1)
+					pName == "anObject" && parameters.Count (p2 => !ObjCGenerator.ObjCTypeToArgument.ContainsKey (NameGenerator.GetTypeName (p2.ParameterType))) > 1)
 					pName += p.Name.PascalCase ();
 			}
 
