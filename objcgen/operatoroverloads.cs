@@ -65,9 +65,6 @@ namespace ObjC
 			}
 
 			foreach (var match in matches.Where (x => x.Value.Count > 1)) {
-				if (match.Value.Count != 2)
-					throw new EmbeddinatorException (99, $"Internal error `FindOperatorPairs found {match.Value.Count} matches?`. Please file a bug report with a test case (https://github.com/mono/Embeddinator-4000/issues");
-
 				// If we have a friendly method, ignore op variants and vice versa
 				MethodInfo friendlyMethod = match.Value.FirstOrDefault (x => !x.Name.StartsWith ("op_", StringComparison.Ordinal));
 				if (friendlyMethod != null) {
