@@ -37,7 +37,10 @@ namespace ObjC {
 						objc.Append (paramName.ToLowerInvariant ());
 				}
 				var pt = p.ParameterType;
-				var ptname = NameGenerator.GetTypeName (p.ParameterType);
+				var ptname = NameGenerator.GetTypeName (pt);
+				if (pt.IsInterface)
+					ptname = $"id<{ptname}>";
+
 				if (types.Contains (pt))
 					ptname += " *";
 				if (n > 0 || !isExtension)

@@ -42,4 +42,28 @@ namespace Interfaces {
 			return new MakeItUp ();
 		}
 	}
+
+	public interface IOperations {
+		int AddInt (int a, int b);
+	}
+
+	public class ManagedAdder: IOperations {
+
+		public int AddInt (int a, int b)
+		{
+			return a + b;
+		}
+	}
+
+	public class OpConsumer {
+		public static int DoAddition (IOperations ops, int a, int b)
+		{
+			return ops.AddInt (a, b);
+		}
+
+		public static bool TestManagedAdder (int a, int b)
+		{
+			return DoAddition (new ManagedAdder (), a, b) == (a + b);
+		}
+	}
 }

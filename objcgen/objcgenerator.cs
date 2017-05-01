@@ -256,6 +256,12 @@ namespace ObjC {
 
 			var managed_name = NameGenerator.GetObjCName (t);
 
+			List<string> conformed_protocols = new List<string> ();
+			foreach (var i in t.GetInterfaces ()) {
+				if (protocols.Contains (i))
+					conformed_protocols.Add (NameGenerator.GetObjCName (i));
+			}
+
 			var tbuilder = new ClassHelper (headers, implementation) {
 				AssemblyQualifiedName = t.AssemblyQualifiedName,
 				AssemblyName = aname,
@@ -263,6 +269,7 @@ namespace ObjC {
 				Name = NameGenerator.GetTypeName (t),
 				Namespace = t.Namespace,
 				ManagedName = t.Name,
+				Protocols = conformed_protocols,
 				IsBaseTypeBound = types.Contains (t.BaseType),
 				IsStatic = t.IsSealed && t.IsAbstract,
 				MetadataToken = t.MetadataToken,
@@ -440,9 +447,6 @@ namespace ObjC {
 
 				builder.WriteHeaders ();
 				builder.WriteImplementation ();
-
-
-				GenerateGetGCHandle ();
 			}
 
 			if (hashes.TryGetValue (t, out m)) {
@@ -512,6 +516,8 @@ namespace ObjC {
 				else 
 				if (types.Contains (t))
 					implementation.WriteLine ($"{argumentName} = {paramaterName} ? mono_gchandle_get_target ({paramaterName}->_object->_handle): nil;");
+				else if (protocols.Contains (t))
+					implementation.WriteLine ($"{argumentName} = {paramaterName} ? mono_embeddinator_get_object ({paramaterName}, true) : nil;");
 				else
 					throw new NotImplementedException ($"Converting type {t.FullName} to mono code");
 				break;
@@ -776,17 +782,6 @@ namespace ObjC {
 
 			if (members_with_default_values.Contains (method.Method))
 				GenerateDefaultValuesWrappers (objcsig, method.Method);
-		}
-
-		protected void GenerateGetGCHandle ()
-		{
-			headers.WriteLine ("- (int)xamarinGetGCHandle;");
-			implementation.WriteLine ("- (int)xamarinGetGCHandle");
-			implementation.WriteLine ("{");
-			implementation.Indent++;
-			implementation.WriteLine ("return _object->_handle;");
-			implementation.Indent--;
-			implementation.WriteLine ("}");
 		}
 
 		void ReturnValue (Type t)
