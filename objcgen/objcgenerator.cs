@@ -816,7 +816,6 @@ namespace ObjC {
 
 		// TODO complete mapping (only with corresponding tests)
 		// TODO override with attribute ? e.g. [Obj.Name ("XAMType")]
-
 		public static string GetTypeName (Type t)
 		{
 			if (t.IsByRef) {
