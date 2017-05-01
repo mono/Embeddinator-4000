@@ -34,8 +34,8 @@ namespace Embeddinator {
 		public ProcessedType (Type type)
 		{
 			Type = type;
-			TypeName = ObjC.ObjCGenerator.GetTypeName (Type);
-			ObjCName = ObjC.ObjCGenerator.GetObjCName (Type);
+			TypeName = ObjC.NameGenerator.GetTypeName (Type);
+			ObjCName = ObjC.NameGenerator.GetObjCName (Type);
 		}
 	}
 
@@ -82,8 +82,8 @@ namespace Embeddinator {
 		public ProcessedFieldInfo (FieldInfo field)
 		{
 			Field = field;
-			TypeName = ObjC.ObjCGenerator.GetTypeName (Field.DeclaringType);
-			ObjCName = ObjC.ObjCGenerator.GetObjCName (Field.DeclaringType);
+			TypeName = ObjC.NameGenerator.GetTypeName (Field.DeclaringType);
+			ObjCName = ObjC.NameGenerator.GetObjCName (Field.DeclaringType);
 		}
 	}
 }

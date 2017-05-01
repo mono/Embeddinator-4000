@@ -29,7 +29,7 @@ namespace ObjC {
 
 			headers.WriteLine ("// forward declarations");
 			foreach (var t in types)
-				headers.WriteLine ($"@class {NameGenerator.GetTypeName (t)};");
+				headers.WriteLine ($"@class {t.TypeName};");
 			headers.WriteLine ();
 			headers.WriteLine ("NS_ASSUME_NONNULL_BEGIN");
 			headers.WriteLine ();
@@ -49,9 +49,9 @@ namespace ObjC {
 			implementation.WriteLine ();
 
 			foreach (var t in types)
-				implementation.WriteLine ($"static MonoClass* {NameGenerator.GetObjCName (t)}_class = nil;");
+				implementation.WriteLine ($"static MonoClass* {t.ObjCName}_class = nil;");
 			foreach (var t in protocols) {
-				var pname = NameGenerator.GetTypeName (t);
+				var pname = t.TypeName;
 				headers.WriteLine ($"@protocol {pname};");
 				implementation.WriteLine ($"@class __{pname}Wrapper;");
 			}
@@ -158,7 +158,8 @@ namespace ObjC {
 
 		void GenerateEnum (ProcessedType type)
 		{
-			var managed_name = NameGenerator.GetObjCName (t);
+			Type t = type.Type;
+			var managed_name = type.ObjCName;
 			var underlying_type = t.GetEnumUnderlyingType ();
 			var base_type = NameGenerator.GetTypeName (underlying_type);
 
@@ -260,7 +261,7 @@ namespace ObjC {
 
 			List<string> conformed_protocols = new List<string> ();
 			foreach (var i in t.GetInterfaces ()) {
-				if (protocols.Contains (i))
+				if (protocols.ContainsType (i))
 					conformed_protocols.Add (NameGenerator.GetObjCName (i));
 			}
 
@@ -272,7 +273,7 @@ namespace ObjC {
 				Namespace = t.Namespace,
 				ManagedName = t.Name,
 				Protocols = conformed_protocols,
-				IsBaseTypeBound = types.Contains (t.BaseType),
+				IsBaseTypeBound = types.ContainsType (t.BaseType),
 				IsStatic = t.IsSealed && t.IsAbstract,
 				MetadataToken = t.MetadataToken,
 			};
@@ -383,7 +384,7 @@ namespace ObjC {
 				implementation.WriteLine ("_object = mono_embeddinator_create_object (__instance);");
 				implementation.Indent--;
 				implementation.WriteLine ("}");
-				if (types.Contains (t.BaseType))
+				if (types.ContainsType (t.BaseType))
 					implementation.WriteLine ("return self = [super initForSuper];");
 				else
 					implementation.WriteLine ("return self = [super init];");
@@ -518,7 +519,7 @@ namespace ObjC {
 				else 
 				if (types.ContainsType (t))
 					implementation.WriteLine ($"{argumentName} = {paramaterName} ? mono_gchandle_get_target ({paramaterName}->_object->_handle): nil;");
-				else if (protocols.Contains (t))
+				else if (protocols.ContainsType (t))
 					implementation.WriteLine ($"{argumentName} = {paramaterName} ? mono_embeddinator_get_object ({paramaterName}, true) : nil;");
 				else
 					throw new NotImplementedException ($"Converting type {t.FullName} to mono code");
@@ -544,7 +545,7 @@ namespace ObjC {
 				headers.Write (", readonly");
 			var pt = pi.PropertyType;
 			var property_type = NameGenerator.GetTypeName (pt);
-			if (types.Contains (pt))
+			if (types.ContainsType (pt))
 				property_type += " *";
 			headers.WriteLine ($") {property_type} {name};");
 
@@ -649,13 +650,13 @@ namespace ObjC {
 
 		public string GetReturnType (Type declaringType, Type returnType)
 		{
-			if (protocols.Contains (returnType))
+			if (protocols.ContainsType (returnType))
 				return "id<" + NameGenerator.GetTypeName (returnType) + ">";
 			if (declaringType == returnType)
 				return "instancetype";
 
 			var return_type = NameGenerator.GetTypeName (returnType);
-			if (types.Contains (returnType))
+			if (types.ContainsType (returnType))
 				return_type += "*";
 			return return_type;
 		}
@@ -820,7 +821,7 @@ namespace ObjC {
 				implementation.Indent--;
 				// TODO: cheating by reusing `initForSuper` - maybe a better name is needed
 				var tname = NameGenerator.GetTypeName (t);
-				if (protocols.Contains (t))
+				if (protocols.ContainsType (t))
 					tname = "__" + tname + "Wrapper";
 				implementation.WriteLine ($"\t{tname}* __peer = [[{tname} alloc] initForSuper];");
 				implementation.WriteLine ("__peer->_object = mono_embeddinator_create_object (__result);");
