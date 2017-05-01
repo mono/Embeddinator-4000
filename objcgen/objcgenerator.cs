@@ -551,7 +551,9 @@ namespace ObjC {
 			var property_type = NameGenerator.GetTypeName (pt);
 			if (types.Contains (pt))
 				property_type += " *";
-			headers.WriteLine ($") {property_type} {name};");
+
+			var spacing = property_type [property_type.Length - 1] == '*' ? string.Empty : " ";
+			headers.WriteLine ($") {property_type}{spacing}{name};");
 
 			ImplementMethod (getter, name, false, pi);
 			if (setter == null)
@@ -580,7 +582,9 @@ namespace ObjC {
 				field_type += " *";
 
 			var name = fi.Name.CamelCase ();
-			headers.WriteLine ($") {field_type} {name};");
+
+			var spacing = field_type [field_type.Length - 1] == '*' ? string.Empty : " ";
+			headers.WriteLine ($") {field_type}{spacing}{name};");
 
 			// it's similar, but different from implementing a method
 
