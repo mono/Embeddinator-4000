@@ -9,8 +9,9 @@ using Type = IKVM.Reflection.Type;
 using Embeddinator;
 namespace ObjC {
 	public partial class ObjCGenerator {
-		
+
 		// get a name that is safe to use from ObjC code
+
 		void GetSignatures (string objName, string monoName, MemberInfo info, ParameterInfo [] parameters, bool useTypeNames, bool isExtension, out string objcSignature, out string monoSignature)
 		{
 			var method = (info as MethodBase); // else it's a PropertyInfo
