@@ -33,6 +33,9 @@ namespace Embeddinator {
 
 		public virtual void Generate ()
 		{
+			foreach (var a in assemblies) {
+				Generate (a);
+			}
 		}
 
 		protected virtual void Generate (ProcessedAssembly a)
