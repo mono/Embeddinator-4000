@@ -68,13 +68,15 @@ namespace ObjC
 				if (match.Value.Count != 2)
 					throw new EmbeddinatorException (99, $"Internal error `FindOperatorPairs found {match.Value.Count} matches?`. Please file a bug report with a test case (https://github.com/mono/Embeddinator-4000/issues");
 
-				if (match.Value.Count (x => x.Name.StartsWith ("op_", StringComparison.InvariantCulture)) != 1)
-					throw new EmbeddinatorException (99, $"Internal error `FindOperatorPairs did not find expected number of op_ methods`. Please file a bug report with a test case (https://github.com/mono/Embeddinator-4000/issues");
-
-				if (!match.Value[0].Name.StartsWith ("op_", StringComparison.InvariantCulture))
-					yield return match.Value[1];
-				else
-					yield return match.Value[0];
+				// If we have a friendly method, ignore op variants and vice versa
+				MethodInfo friendlyMethod = match.Value.FirstOrDefault (x => !x.Name.StartsWith ("op_", StringComparison.InvariantCulture));
+				if (friendlyMethod != null) {
+					foreach (var opMethod in match.Value.Where (x => x.Name.StartsWith ("op_", StringComparison.InvariantCulture)))
+						yield return opMethod;
+				}
+				else {
+					yield return friendlyMethod;
+				}
 			}
 		}
 	}
