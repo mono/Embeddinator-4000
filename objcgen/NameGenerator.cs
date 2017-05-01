@@ -5,6 +5,29 @@ using Type = IKVM.Reflection.Type;
 
 namespace ObjC {
 	public static class NameGenerator {
+		public static Dictionary<string, string> ObjCTypeToArgument = new Dictionary<string, string> {
+			{ "int", "anInt" },
+			{ "unsigned int", "aUint" },
+			{ "double", "aDouble" },
+			{ "float", "aFloat" },
+			{ "NSString", "aString" },
+			{ "NSString *", "aString" },
+			{ "id", "anObject" },
+			{ "NSObject", "anObject" },
+			{ "NSPoint", "aPoint" },
+			{ "NSRect", "aRect" },
+			{ "NSFont", "fontObj" },
+			{ "SEL", "aSelector" },
+			{ "short", "aShort" },
+			{ "unsigned short", "aUshort" },
+			{ "long long", "aLong" },
+			{ "unsigned long long", "aUlong" },
+			{ "bool", "aBool" },
+			{ "char", "aChar" },
+			{ "unsigned char", "aChar" },
+			{ "signed char", "aChar" }
+		};
+
 		public static string GetObjCName (Type t)
 		{
 			return t.FullName.Replace ('.', '_');

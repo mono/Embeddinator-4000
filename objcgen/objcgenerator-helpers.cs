@@ -12,29 +12,6 @@ namespace ObjC {
 
 		// get a name that is safe to use from ObjC code
 
-		public static Dictionary<string, string> ObjCTypeToArgument = new Dictionary<string, string> {
-			{ "int", "anInt" },
-			{ "unsigned int", "aUint" },
-			{ "double", "aDouble" },
-			{ "float", "aFloat" },
-			{ "NSString", "aString" },
-			{ "NSString *", "aString" },
-			{ "id", "anObject" },
-			{ "NSObject", "anObject" },
-			{ "NSPoint", "aPoint" },
-			{ "NSRect", "aRect" },
-			{ "NSFont", "fontObj" },
-			{ "SEL", "aSelector" },
-			{ "short", "aShort" },
-			{ "unsigned short", "aUshort" },
-			{ "long long", "aLong" },
-			{ "unsigned long long", "aUlong" },
-			{ "bool", "aBool" },
-			{ "char", "aChar" },
-			{ "unsigned char", "aChar" },
-			{ "signed char", "aChar" }
-		};
-
 		void GetSignatures (string objName, string monoName, MemberInfo info, ParameterInfo [] parameters, bool useTypeNames, bool isExtension, out string objcSignature, out string monoSignature)
 		{
 			var method = (info as MethodBase); // else it's a PropertyInfo
