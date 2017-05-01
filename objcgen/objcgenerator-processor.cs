@@ -36,6 +36,12 @@ namespace ObjC {
 			if (unsupported.Contains (t))
 				return false;
 
+			if (t.IsArray) {
+				delayed.Add (ErrorHelper.CreateWarning (1010, $"Type `{t}` is not generated because `arrays` are not supported."));
+				unsupported.Add (t);
+				return false;
+			}
+
 			if (t.IsGenericParameter || t.IsGenericType) {
 				delayed.Add (ErrorHelper.CreateWarning (1010, $"Type `{t}` is not generated because `generics` are not supported."));
 				unsupported.Add (t);
