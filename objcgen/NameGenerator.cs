@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-
+using System.Linq;
+using Embeddinator;
+using IKVM.Reflection;
 using Type = IKVM.Reflection.Type;
 
 namespace ObjC {
@@ -142,6 +144,22 @@ namespace ObjC {
 			default:
 				throw new NotImplementedException ($"Converting type {t.Name} to a mono type name");
 			}
+		}
+
+		public static string GetExtendedParameterName (ParameterInfo p, ParameterInfo [] parameters)
+		{
+			string pName = p.Name;
+			string ptname = GetTypeName (p.ParameterType);
+			if (p.Name.Length < 3) {
+				if (!ObjCTypeToArgument.TryGetValue (ptname, out pName))
+					pName = "anObject";
+
+				if (parameters.Count (p2 => GetTypeName (p2.ParameterType) == ptname && p2.Name.Length < 3) > 1 ||
+					pName == "anObject" && parameters.Count (p2 => !ObjCTypeToArgument.ContainsKey (GetTypeName (p2.ParameterType))) > 1)
+					pName += p.Name.PascalCase ();
+			}
+
+			return pName;
 		}
 	}
 }

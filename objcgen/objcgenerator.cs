@@ -479,7 +479,7 @@ namespace ObjC {
 			implementation.WriteLine ($"void* __args [{pcount}];");
 			for (int i = 0; i < pcount; i++) {
 				var p = parameters [i];
-				var name = (isExtension && (i == 0)) ? "self" : p.ExtendedName (parameters);
+				var name = (isExtension && (i == 0)) ? "self" : NameGenerator.GetExtendedParameterName (p, parameters);
 				GenerateArgument (name, $"__args[{i}]", p.ParameterType, ref post);
 			}
 			postInvoke = post.ToString ();
@@ -740,7 +740,7 @@ namespace ObjC {
 			StringBuilder arguments = new StringBuilder ();
 			headers.WriteLine ("/** This is an helper method that inlines the following default values:");
 			foreach (var p in parameters) {
-				string pName = p.ExtendedName (parameters);
+				string pName = NameGenerator.GetExtendedParameterName (p, parameters);
 				if (arguments.Length == 0) {
 					arguments.Append (p.Name.PascalCase ()).Append (':');
 				} else

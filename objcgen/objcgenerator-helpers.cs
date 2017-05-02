@@ -45,7 +45,7 @@ namespace ObjC {
 					ptname += " *";
 
 				if (n > 0 || !isExtension)
-					objc.Append (":(").Append (ptname).Append (")").Append (p.ExtendedName (parameters));
+					objc.Append (":(").Append (ptname).Append (")").Append (NameGenerator.GetExtendedParameterName (p, parameters));
 				mono.Append (NameGenerator.GetMonoName (p.ParameterType));
 				n++;
 			}
