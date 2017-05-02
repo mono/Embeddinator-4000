@@ -145,6 +145,26 @@ public class Tests {
         Parameters.out("Xamarin", l, os);
         assertEquals(new Integer(7), l.get());
         assertEquals("XAMARIN", os.get());
+
+        Item item = Factory.createItem(1);
+        assertEquals(1, item.getInteger());
+
+        Collection collection = new Collection();
+        assertEquals(0, collection.getCount());
+        collection.add(item);
+        assertEquals(1, collection.getCount());
+        assertEquals(item.getInteger(), collection.getItem(0).getInteger());
+
+        Item item2 = Factory.createItem(2);
+        collection.setItem(0, item2);
+        assertEquals(1, collection.getCount());
+        assertEquals(item2.getInteger(), collection.getItem(0).getInteger());
+
+        collection.remove(item);
+        assertEquals(1, collection.getCount());
+
+        collection.remove(item2);
+        assertEquals(0, collection.getCount());
     }
 
     @Test
