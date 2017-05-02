@@ -42,6 +42,12 @@ namespace ObjC {
 				return false;
 			}
 
+			if (t.IsPointer) {
+				delayed.Add (ErrorHelper.CreateWarning (1010, $"Type `{t}` is not generated because `unsafe pointers` are not supported."));
+				unsupported.Add (t);
+				return false;
+			}
+
 			if (t.IsGenericParameter || t.IsGenericType) {
 				delayed.Add (ErrorHelper.CreateWarning (1010, $"Type `{t}` is not generated because `generics` are not supported."));
 				unsupported.Add (t);
@@ -52,6 +58,7 @@ namespace ObjC {
 			case "System":
 				switch (t.Name) {
 				case "Object": // we cannot accept arbitrary NSObject (which we might not have bound) into mono
+				case "DBNull":
 				case "Exception":
 				case "IFormatProvider":
 				case "Type":
