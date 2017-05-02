@@ -219,6 +219,27 @@ TEST_CASE("Methods.C", "[C][Methods]") {
     REQUIRE(Methods_Collection_get_Count(collection) == 0);
 }
 
+TEST_CASE("Structs.C", "[C][Structs]") {
+    Structs_Point* p1 = Structs_Point_new(1.0f, -1.0f);
+    REQUIRE(Structs_Point_get_X(p1) == 1.0f);
+    REQUIRE(Structs_Point_get_Y(p1) == -1.0f);
+
+    Structs_Point* p2 = Structs_Point_new(2.0f, -2.0f);
+    REQUIRE(Structs_Point_get_X(p2) == 2.0f);
+    REQUIRE(Structs_Point_get_Y(p2) == -2.0f);
+
+    REQUIRE(Structs_Point_op_Equality(p1, p1) == true);
+    REQUIRE(Structs_Point_op_Equality(p2, p2) == true);
+    REQUIRE(Structs_Point_op_Inequality(p1, p2) == true);
+
+    Structs_Point* p3 = Structs_Point_op_Addition(p1, p2);
+    REQUIRE(Structs_Point_get_X(p3) == 3.0f);
+    REQUIRE(Structs_Point_get_Y(p3) == -3.0f);
+
+    Structs_Point* p4 = Structs_Point_op_Subtraction(p3, p2);
+    REQUIRE(Structs_Point_op_Equality(p4, p1) == true);
+}
+
 TEST_CASE("Enums.C", "[C][Enums]") {
     Enums_IntEnum i = Enums_IntEnum_Min;
     Enums_ShortEnum s;
