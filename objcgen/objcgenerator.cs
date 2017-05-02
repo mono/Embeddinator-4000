@@ -115,15 +115,15 @@ namespace ObjC {
 
 			var assembly = a.Assembly;
 
-			foreach (var t in enums.Where ((Type arg) => arg.Assembly == assembly)) {
+			foreach (var t in enums.Where ((ProcessedType arg) => arg.Type.Assembly == assembly)) {
 				GenerateEnum (t);
 			}
 
-			foreach (var t in protocols.Where ((Type arg) => arg.Assembly == assembly)) {
+			foreach (var t in protocols.Where ((ProcessedType arg) => arg.Type.Assembly == assembly)) {
 				GenerateProtocol (t);
 			}
 
-			foreach (var t in types.Where ((Type arg) => arg.Assembly == assembly)) {
+			foreach (var t in types.Where ((ProcessedType arg) => arg.Type.Assembly == assembly)) {
 				Generate (t);
 			}
 
@@ -551,7 +551,9 @@ namespace ObjC {
 			var property_type = NameGenerator.GetTypeName (pt);
 			if (types.Contains (pt))
 				property_type += " *";
-			headers.WriteLine ($") {property_type} {name};");
+
+			var spacing = property_type [property_type.Length - 1] == '*' ? string.Empty : " ";
+			headers.WriteLine ($") {property_type}{spacing}{name};");
 
 			ImplementMethod (getter, name, false, pi);
 			if (setter == null)
@@ -580,7 +582,9 @@ namespace ObjC {
 				field_type += " *";
 
 			var name = fi.Name.CamelCase ();
-			headers.WriteLine ($") {field_type} {name};");
+
+			var spacing = field_type [field_type.Length - 1] == '*' ? string.Empty : " ";
+			headers.WriteLine ($") {field_type}{spacing}{name};");
 
 			// it's similar, but different from implementing a method
 
