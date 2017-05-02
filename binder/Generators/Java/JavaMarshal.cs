@@ -44,7 +44,7 @@ namespace MonoEmbeddinator4000.Generators
             TypePrinter.PopContext();
 
             // Perform null checking for all primitive value types.
-            string extraCheck = type != PrimitiveType.String ?
+            string extraCheck = (type != PrimitiveType.String && Context.Parameter.IsInOut) ?
                 $" || {Context.ArgName}.get() == null" : string.Empty;
             Context.SupportBefore.WriteLine($"if ({Context.ArgName} == null{extraCheck})");
             Context.SupportBefore.WriteLineIndent($"throw new NullRefParameterException(\"{Context.Parameter.Name}\");");
@@ -59,7 +59,14 @@ namespace MonoEmbeddinator4000.Generators
                 marshal = $"((byte) ({marshal} ? 1 : 0))";
 
             var varName = JavaGenerator.GeneratedIdentifier(Context.ArgName);
-            Context.SupportBefore.WriteLine($"{typeName} {varName} = new {typeName}({marshal});");
+
+            Context.SupportBefore.Write($"{typeName} {varName} = ");
+
+            if (isEnum || type == PrimitiveType.Bool)
+                Context.SupportBefore.WriteLine($"new {typeName}({marshal});");
+            else
+                Context.SupportBefore.WriteLine($"({marshal}) != null ? new {typeName}({marshal}) : new {typeName}();");
+
             Context.Return.Write(varName);
 
             var value = $"{varName}.getValue()";

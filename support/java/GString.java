@@ -32,6 +32,9 @@ import com.sun.jna.*;
 import com.sun.jna.ptr.*;
 
 public final class GString extends Runtime.RuntimeLibrary.GString {
+	public GString () {
+	}
+
 	public GString (String string) {
 		if (string == null)
 			return;
