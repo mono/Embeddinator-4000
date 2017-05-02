@@ -12,7 +12,11 @@ namespace ObjC {
 		protected void GenerateSubscript (ProcessedProperty property)
 		{
 			PropertyInfo pi = property.Property;
-			Type indexType = pi.GetSetMethod ().GetParameters ()[0].ParameterType;
+
+			bool hasRead = pi.GetGetMethod () != null;
+			bool hasWrite = pi.GetSetMethod () != null;
+
+			Type indexType = hasWrite ? pi.GetSetMethod ().GetParameters ()[0].ParameterType : pi.GetGetMethod ().ReturnType;
 			Type paramType = pi.PropertyType;
 			switch (Type.GetTypeCode (indexType)) {
 			case TypeCode.Byte:
@@ -23,15 +27,21 @@ namespace ObjC {
 			case TypeCode.Int16:
 			case TypeCode.Int32:
 			case TypeCode.Int64:
-				GenerateIndexedSubscripting (indexType, paramType);
+				if (hasRead)
+					GenerateIndexedSubscriptingRead (indexType, paramType);
+				if (hasWrite)
+					GenerateIndexedSubscriptingWrite (indexType, paramType);
 				return;
 			default:
-				GenerateKeyedSubscripting (indexType, paramType);
+				if (hasRead)
+					GenerateKeyedSubscriptingRead (indexType, paramType);
+				if (hasWrite)
+					GenerateKeyedSubscriptingWrite (indexType, paramType);
 				return;
 			}
 		}
 
-		protected void GenerateKeyedSubscripting (Type indexType, Type propertyType)
+		protected void GenerateKeyedSubscriptingRead (Type indexType, Type propertyType)
 		{
 			string indexTypeString = NameGenerator.GetTypeName (indexType);
 
@@ -45,7 +55,10 @@ namespace ObjC {
 			implementation.Indent--;
 			implementation.WriteLine ("}");
 			implementation.WriteLine ();
+		}
 
+		protected void GenerateKeyedSubscriptingWrite (Type indexType, Type propertyType)
+		{
 			// TODO - Technically the argument here can be anything, not just id
 			headers.WriteLine ($"- (void)setObject:(id)obj forKeyedSubscript:(id)key;");
 
@@ -58,7 +71,7 @@ namespace ObjC {
 			implementation.WriteLine ();
 		}
 
-		protected void GenerateIndexedSubscripting (Type indexType, Type propertyType)
+		protected void GenerateIndexedSubscriptingRead (Type indexType, Type propertyType)
 		{
 			string indexTypeString = NameGenerator.GetTypeName (indexType);
 
@@ -71,6 +84,11 @@ namespace ObjC {
 			implementation.Indent--;
 			implementation.WriteLine ("}");
 			implementation.WriteLine ();
+		}
+
+		protected void GenerateIndexedSubscriptingWrite (Type indexType, Type propertyType)
+		{
+			string indexTypeString = NameGenerator.GetTypeName (indexType);
 
 			headers.WriteLine ($"- (void)setObject:(id)obj atIndexedSubscript:({indexTypeString})idx;");
 
