@@ -4,6 +4,7 @@ import managed_dll.first.*;
 import managed_dll.first.second.*;
 import managed_dll.exceptions.*;
 import managed_dll.constructors.*;
+import managed_dll.enums.*;
 
 import mono.embeddinator.*;
 
@@ -112,6 +113,20 @@ public class Tests {
 
         AllTypeCode all4 = new AllTypeCode(Float.MAX_VALUE, Double.MAX_VALUE);
         assertTrue(all4.getTestResult());
+    }
+
+    @Test
+    public void testEnums() {
+        Ref<IntEnum> i = new Ref<IntEnum>(IntEnum.Min);
+        Ref<ShortEnum> s = new Ref<ShortEnum>(ShortEnum.Min);
+        ByteFlags f = Enumer.test(ByteEnum.Max, i, s);
+        assertEquals(0x22, f.getValue());
+        assertEquals(IntEnum.Max, i.get());
+        assertEquals(ShortEnum.Max, s.get());
+
+        f = Enumer.test(ByteEnum.Zero, i, s);
+        assertEquals(IntEnum.Min, i.get());
+        assertEquals(ShortEnum.Min, s.get());
     }
 
     static long UCHAR_MAX = (long)(Math.pow(2, Byte.SIZE) - 1);
