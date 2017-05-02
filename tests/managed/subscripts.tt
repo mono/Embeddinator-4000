@@ -50,6 +50,19 @@ namespace Subscripts
 			set { c[key] = value; }
 		}
 	}
-
 <# } #>
+
+	public class IntCollectionNoSetter
+	{
+		public int this[int index] {
+			get { return index; }
+		}
+	}
+
+	public class IntCollectionNoGetter
+	{
+		public int this[int index] {
+			set { }
+		}
+	}
 }
