@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Embeddinator;
+using IKVM.Reflection;
 using Type = IKVM.Reflection.Type;
 
 namespace ObjC {
@@ -121,9 +122,10 @@ namespace ObjC {
 			}
 		}
 
-		public static string GetObjCParamName (Type pt, List<ProcessedType> allTypes)
+		public static string GetObjCParamTypeName (ParameterInfo param, List<ProcessedType> allTypes)
 		{
-			var ptname = NameGenerator.GetTypeName (pt);
+			Type pt = param.ParameterType;
+			string ptname = GetTypeName (pt);
 			if (pt.IsInterface)
 				ptname = $"id<{ptname}>";
 			if (allTypes.Contains (pt))

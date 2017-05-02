@@ -43,7 +43,7 @@ namespace ObjC {
 				}
 
 				if (n > 0 || !isExtension) {
-					string ptname = NameGenerator.GetObjCParamName (p.ParameterType, types);
+					string ptname = NameGenerator.GetObjCParamTypeName (p, types);
 					objc.Append (":(").Append (ptname).Append (")").Append (p.Name);
 				}
 				mono.Append (NameGenerator.GetMonoName (p.ParameterType));
