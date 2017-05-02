@@ -102,7 +102,7 @@ namespace MonoEmbeddinator4000.Generators
             PushBlock(BlockKind.Enum);
             GenerateDeclarationCommon(@enum);
 
-            Write("{0} enum {1} ", AccessIdentifier(@enum.Access), @enum.Name);
+            Write("{0} final class {1} ", AccessIdentifier(@enum.Access), @enum.Name);
 
             WriteStartBraceIndent();
             GenerateEnumItems(@enum);
@@ -115,9 +115,9 @@ namespace MonoEmbeddinator4000.Generators
             WriteLine($"public {typeName} getValue() {{ return id; }}");
 
             NewLine();
-            var index = @enum.BuiltinType.IsUnsigned ? "n.intValue()" : "n";
+            var value = @enum.BuiltinType.IsUnsigned ? "n.intValue()" : "n";
             WriteLine($"public static {@enum.Name} fromOrdinal({typeName} n) {{");
-            WriteLineIndent($"return valuesMap.get({index});");
+            WriteLineIndent($"return valuesMap.containsKey({value}) ? valuesMap.get({value}) : new {@enum.Name}(n);");
             WriteLine("}");
 
             TypePrinter.PushContext(TypePrinterContextKind.Template);
@@ -132,8 +132,13 @@ namespace MonoEmbeddinator4000.Generators
             WriteLine("static {");
             PushIndent();
 
-            WriteLine($"for (final {@enum.Name} type : {@enum.Name}.values()) {{");
-            WriteLineIndent($"valuesMap.put(type.getValue(), type);");
+            WriteLine("try {");
+            WriteLine($"java.lang.reflect.Field[] constants = {@enum.Name}.class.getFields();");
+            WriteLine($"for (final java.lang.reflect.Field field : constants) {{");
+            WriteLineIndent($"{@enum.Name} item = ({@enum.Name}) field.get(null);");
+            WriteLineIndent($"valuesMap.put(item.getValue(), item);");
+            WriteLine("}");
+            WriteLine("} catch(java.lang.IllegalAccessException ex) {");
             WriteLine("}");
 
             PopIndent();
@@ -150,7 +155,7 @@ namespace MonoEmbeddinator4000.Generators
             for (int i = 0; i < @enum.Items.Count; i++)
             {
                 @enum.Items[i].Visit(this);
-                WriteLine(i == @enum.Items.Count - 1 ? ";" : ",");
+                NewLine();
             }
         }
 
@@ -159,18 +164,18 @@ namespace MonoEmbeddinator4000.Generators
             if (item.Comment != null)
                 GenerateInlineSummary(item.Comment);
 
-            Write(item.Name);
-
             var @enum = item.Namespace as Enumeration;
+            Write($"public static final {@enum.Name} {item.Name} = new {@enum.Name}");
+
             var typeName = @enum.BuiltinType.Visit(TypePrinter);
             if (item.ExplicitValue)
             {
                 var value = @enum.GetItemValueAsString(item);
 
                 if (@enum.BuiltinType.IsUnsigned)
-                    Write($"(new {typeName}({value}))");
+                    Write($"(new {typeName}({value}));");
                 else
-                    Write($"(({typeName}){value})");
+                    Write($"(({typeName}){value});");
             }
 
             return true;
