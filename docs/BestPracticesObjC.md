@@ -70,7 +70,7 @@ namespace Xamarin.Xml.Configuration {
 would be used like:
 
 ```
-id reader = [[Xamarin_Xml_Configuration.Reader alloc] init];
+id reader = [[Xamarin_Xml_Configuration_Reader alloc] init];
 ```
 
 However you can re-expose the type as:
