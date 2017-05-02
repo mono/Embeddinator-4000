@@ -133,11 +133,15 @@ namespace MonoEmbeddinator4000.Generators
             PushIndent();
 
             WriteLine("try {");
+            PushIndent();
+
             WriteLine($"java.lang.reflect.Field[] constants = {@enum.Name}.class.getFields();");
             WriteLine($"for (final java.lang.reflect.Field field : constants) {{");
             WriteLineIndent($"{@enum.Name} item = ({@enum.Name}) field.get(null);");
             WriteLineIndent($"valuesMap.put(item.getValue(), item);");
             WriteLine("}");
+
+            PopIndent();
             WriteLine("} catch(java.lang.IllegalAccessException ex) {");
             WriteLine("}");
 
