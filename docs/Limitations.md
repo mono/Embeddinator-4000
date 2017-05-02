@@ -10,6 +10,18 @@ It is not possible to have two mono runtimes co-exists inside the same applicati
 
 **Workaround:** You can use the generator to create a single library that includes several assemblies (from different projects).
 
+### Subclassing
+
+The embeddinator ease the integration of the mono runtime inside applications by exposing a set of ready-to-use API for the target language and platform.
+
+However this is not a two way integration, e.g. you cannot subclass a managed type and expect managed code to call back inside your native code, since your managed code is unaware of this co-existance.
+
+Depending on your needs it might be possible to workaround parts of this limitation, e.g.
+
+* your managed code can p/invoke into your native code. This requires customizing your managed code to allow customization from native code;
+
+* use products like Xamarin.iOS and expose a managed library that would allow (ObjC in this case) to subclass some managed NSObject subclasses.
+
 
 ## ObjC generated code
 
