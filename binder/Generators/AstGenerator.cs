@@ -525,10 +525,11 @@ namespace MonoEmbeddinator4000.Generators
         /// <returns></returns>
         static ParameterUsage ConvertToParameterUsage(ParameterInfo param)
         {
+            if (param.IsOut)
+                return ParameterUsage.Out;
+
             if (param.ParameterType.IsByRef)
                 return ParameterUsage.InOut;
-            else if (param.IsOut)
-                return ParameterUsage.Out;
 
             return ParameterUsage.In;
         }

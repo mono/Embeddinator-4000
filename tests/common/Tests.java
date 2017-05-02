@@ -118,7 +118,7 @@ public class Tests {
     @Test
     public void testEnums() {
         Ref<IntEnum> i = new Ref<IntEnum>(IntEnum.Min);
-        Ref<ShortEnum> s = new Ref<ShortEnum>(ShortEnum.Min);
+        Out<ShortEnum> s = new Out<ShortEnum>(ShortEnum.Min);
         ByteFlags f = Enumer.test(ByteEnum.Max, i, s);
         assertEquals(0x22, f.getValue());
         assertEquals(IntEnum.Max, i.get());
