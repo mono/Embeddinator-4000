@@ -5,6 +5,7 @@ import managed_dll.first.second.*;
 import managed_dll.exceptions.*;
 import managed_dll.constructors.*;
 import managed_dll.enums.*;
+import managed_dll.methods.*;
 
 import mono.embeddinator.*;
 
@@ -113,6 +114,37 @@ public class Tests {
 
         AllTypeCode all4 = new AllTypeCode(Float.MAX_VALUE, Double.MAX_VALUE);
         assertTrue(all4.getTestResult());
+    }
+
+    @Test
+    public void testMethods() {
+        Static static_method = Static.create(1);
+        assertEquals(1, static_method.getId());
+
+        assertEquals(null, Parameters.concat(null, null));
+        assertEquals("first", Parameters.concat("first", null));
+        assertEquals("second", Parameters.concat(null, "second"));
+        assertEquals("firstsecond", Parameters.concat("first", "second"));
+
+        Ref<Boolean> b = new Ref<Boolean>(true);
+        Ref<String> s = new Ref<String>(null);
+        Parameters.ref(b, s);
+        assertFalse(b.get());
+        assertEquals("hello", s.get());
+
+        Parameters.ref(b, s);
+        assertTrue(b.get());
+        assertEquals(null, s.get());
+
+        Out<Integer> l = new Out<Integer>();
+        Out<String> os = new Out<String>();
+        Parameters.out(null, l, os);
+        assertEquals(new Integer(0), l.get());
+        assertEquals(null, os.get());
+
+        Parameters.out("Xamarin", l, os);
+        assertEquals(new Integer(7), l.get());
+        assertEquals("XAMARIN", os.get());
     }
 
     @Test
