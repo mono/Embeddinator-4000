@@ -68,6 +68,11 @@ namespace Overloads {
 			return new AllOperators (c1.Value / c2);
 		}
 
+		public static AllOperators operator / (int c1, AllOperators c2)
+		{
+			return new AllOperators (c1 / c2.Value);
+		}
+
 		public static AllOperators operator / (AllOperators c1, long c2) 
 		{
 			return new AllOperators (c1.Value / (int)c2);

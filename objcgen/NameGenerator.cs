@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-
+using Embeddinator;
 using Type = IKVM.Reflection.Type;
 
 namespace ObjC {
@@ -119,6 +119,16 @@ namespace ObjC {
 			default:
 				throw new NotImplementedException ($"Converting type {t.Name} to a mono type name");
 			}
+		}
+
+		public static string GetObjCParamName (Type pt, List<ProcessedType> allTypes)
+		{
+			var ptname = NameGenerator.GetTypeName (pt);
+			if (pt.IsInterface)
+				ptname = $"id<{ptname}>";
+			if (allTypes.Contains (pt))
+					ptname += " *";
+			return ptname;
 		}
 	}
 }

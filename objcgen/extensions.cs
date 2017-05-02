@@ -62,6 +62,11 @@ namespace Embeddinator {
 				return sb.ToString ();
 			return self;
 		}
+
+		public static bool StartsWithOrd (this string self, string value)
+		{
+			return self.StartsWith (value, StringComparison.Ordinal);
+		}
 	}
 
 	public static class TypeExtensions {
