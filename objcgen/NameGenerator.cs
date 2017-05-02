@@ -1,10 +1,35 @@
 ﻿using System;
 using System.Collections.Generic;
-
+using System.Linq;
+using Embeddinator;
+using IKVM.Reflection;
 using Type = IKVM.Reflection.Type;
 
 namespace ObjC {
 	public static class NameGenerator {
+		public static Dictionary<string, string> ObjCTypeToArgument = new Dictionary<string, string> {
+			{ "int", "anInt" },
+			{ "unsigned int", "aUint" },
+			{ "double", "aDouble" },
+			{ "float", "aFloat" },
+			{ "NSString", "aString" },
+			{ "NSString *", "aString" },
+			{ "id", "anObject" },
+			{ "NSObject", "anObject" },
+			{ "NSPoint", "aPoint" },
+			{ "NSRect", "aRect" },
+			{ "NSFont", "fontObj" },
+			{ "SEL", "aSelector" },
+			{ "short", "aShort" },
+			{ "unsigned short", "aUshort" },
+			{ "long long", "aLong" },
+			{ "unsigned long long", "aUlong" },
+			{ "bool", "aBool" },
+			{ "char", "aChar" },
+			{ "unsigned char", "aChar" },
+			{ "signed char", "aChar" }
+		};
+
 		public static string GetObjCName (Type t)
 		{
 			return t.FullName.Replace ('.', '_');
@@ -119,6 +144,22 @@ namespace ObjC {
 			default:
 				throw new NotImplementedException ($"Converting type {t.Name} to a mono type name");
 			}
+		}
+
+		public static string GetExtendedParameterName (ParameterInfo p, ParameterInfo [] parameters)
+		{
+			string pName = p.Name;
+			string ptname = GetTypeName (p.ParameterType);
+			if (p.Name.Length < 3) {
+				if (!ObjCTypeToArgument.TryGetValue (ptname, out pName))
+					pName = "anObject";
+
+				if (parameters.Count (p2 => GetTypeName (p2.ParameterType) == ptname && p2.Name.Length < 3) > 1 ||
+					pName == "anObject" && parameters.Count (p2 => !ObjCTypeToArgument.ContainsKey (GetTypeName (p2.ParameterType))) > 1)
+					pName += p.Name.PascalCase ();
+			}
+
+			return pName;
 		}
 	}
 }

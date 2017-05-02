@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -43,8 +43,9 @@ namespace ObjC {
 
 				if (types.Contains (pt))
 					ptname += " *";
+
 				if (n > 0 || !isExtension)
-					objc.Append (":(").Append (ptname).Append (")").Append (p.Name);
+					objc.Append (":(").Append (ptname).Append (")").Append (NameGenerator.GetExtendedParameterName (p, parameters));
 				mono.Append (NameGenerator.GetMonoName (p.ParameterType));
 				n++;
 			}
