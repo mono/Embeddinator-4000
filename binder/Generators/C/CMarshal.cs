@@ -390,11 +390,15 @@ namespace MonoEmbeddinator4000.Generators
 
         public override bool VisitClassDecl(Class @class)
         {
-            var instanceId = CGenerator.GenId($"{Context.ArgName}_instance");
             var handle = CSources.GetMonoObjectField(Options, CSources.MonoObjectFieldUsage.Parameter,
                 Context.ArgName, "_handle");
-            Context.SupportBefore.WriteLine($"MonoObject* {instanceId} = mono_gchandle_get_target({handle});");
-            Context.Return.Write("{0}", instanceId);
+
+            var @object = $"mono_gchandle_get_target({handle})";
+
+            if (@class.IsValueType)
+                @object = $"mono_object_unbox({@object})";
+
+            Context.Return.Write("{0}", @object);
             return true;
         }
 

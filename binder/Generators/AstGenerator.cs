@@ -131,9 +131,15 @@ namespace MonoEmbeddinator4000.Generators
             var @class = new Class
             {
                 Name = UnmangleTypeName(type.Name),
-                Type = type.IsInterface ? ClassType.Interface : ClassType.RefType,
+                Type = ClassType.RefType,
                 IsFinal = type.IsSealed
             };
+
+            if (type.IsInterface)
+                @class.Type = ClassType.Interface;
+
+            if (type.IsValueType)
+                @class.Type = ClassType.ValueType;
 
             HandleNamespace(type, @class);
             VisitMembers(type, @class);

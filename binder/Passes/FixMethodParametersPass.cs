@@ -39,7 +39,7 @@ namespace MonoEmbeddinator4000.Passes
             replacementType = new QualifiedType(
                 new PointerType(new QualifiedType(new TagType(@class))));
 
-            return !@class.IsValueType;
+            return true;
         }
 
         public override bool VisitMethodDecl(Method method)

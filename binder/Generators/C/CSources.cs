@@ -285,6 +285,14 @@ namespace MonoEmbeddinator4000.Generators
             var methodId = GeneratedIdentifier("method");
             var instanceId = method.IsStatic ? "0" : GeneratedIdentifier("instance");
 
+            var @class = method.Namespace as Class;
+            if (@class.IsValueType && !method.IsStatic)
+            {
+                var unboxedId = CGenerator.GenId("unboxed");
+                WriteLine($"void* {unboxedId} = mono_object_unbox({instanceId});");
+                instanceId = unboxedId;
+            }
+
             WriteLine("{0} = mono_runtime_invoke({1}, {2}, {3}, &{4});", resultId,
                 methodId, instanceId, argsId, exceptionId);
             NewLine();
