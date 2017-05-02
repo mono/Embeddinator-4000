@@ -1,6 +1,6 @@
 # General
 
-The **Embeddinator-4000** project is under the Mono umbrella and most of the [contribution rules](http://www.mono-project.com/community/contributing/), tools and process are identical. Even if it is a bit out of date the spirit of [Mono Contribution HowTo](http://www.mono-project.com/community/contributing/contribution-howto/) still applies, including the **DO WRITE TESTS!!!**
+The **Embeddinator-4000** project is under the Mono umbrella and most of the [contribution rules](http://www.mono-project.com/community/contributing/), tools and process are identical. Even if it is a bit out of date, the spirit of [Mono Contribution HowTo](http://www.mono-project.com/community/contributing/contribution-howto/) still applies, including the **DO WRITE TESTS!!!**
 
 * Bug reporting: Issues and enhancement requests are presently tracked in [github](https://github.com/mono/Embeddinator-4000/issues) (not bugzilla).
 * Chat: https://gitter.im/managed-interop
@@ -8,7 +8,7 @@ The **Embeddinator-4000** project is under the Mono umbrella and most of the [co
 
 ## Objective-C
 
-The work on the Objective-C generator occurs in the `[objc](https://github.com/mono/Embeddinator-4000/tree/objc)` branch. Here are the steps to build it from our repository/branch:
+The work on the Objective-C generator occurs in the [`objc`](https://github.com/mono/Embeddinator-4000/tree/objc) branch. Here are the steps to build it from our repository/branch:
 
 ```
 > git clone https://github.com/mono/Embeddinator-4000.git
@@ -30,9 +30,9 @@ Tests can be executed by running `make` from the `tests/objc-cli` directory.
 
 ### Specific Goals
 
-In addition to mapping .NET API to Objective-C we aim to:
+In addition to mapping .NET APIs to Objective-C we aim to:
 
-* Generate modern and pleasing API to use from Objective-C;
+* Generate modern and pleasing APIs to use from Objective-C;
 * Bridge similar concepts between .NET and Objective-C, e.g. convert interfaces into protocols;
 * Increase interoperability with Foundation.framework, e.g. map all `System.String` to `NSString`;
 * Expose extra types from .NET base class libraries (BCL) when required (and when no native alternative exists);
