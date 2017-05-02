@@ -17,7 +17,7 @@ The use of Automatic Reference Counting (ARC) is **required** to call the genera
 
 ### NSString support
 
-API that expose `System.String` types are converted into `NSString`. This makes memory management easier than dealing with `char*`.
+APIs that expose `System.String` types are converted into `NSString`. This makes memory management easier than dealing with `char*`.
 
 ### Protocols support
 
