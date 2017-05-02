@@ -749,6 +749,11 @@
 
 	XCTAssertTrue ([[Overloads_AllOperatorsWithFriendly decrementC1:oneFriend] value] == (1 - 1), "1 - 1 All");
 	XCTAssertTrue ([[Overloads_AllOperatorsWithFriendly incrementC1:oneFriend] value] == (1 + 1), "1 + 1 All");
+
+	Overloads_EqualOverrides * equalOverrideTwo = [[Overloads_EqualOverrides alloc] initWithVal:2];
+	Overloads_EqualOverrides * equalOverrideFour = [[Overloads_EqualOverrides alloc] initWithVal:4];
+
+	XCTAssertTrue ([equalOverrideTwo areEqual:equalOverrideFour] == NO, "2 != 4 EqualOverride");
 }
 
 - (void)testShortParamters {

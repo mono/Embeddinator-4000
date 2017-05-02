@@ -12,10 +12,10 @@ namespace ObjC {
 	// A set of post-processing steps needed to add hints
 	// to the input of the generation step
 	public partial class ObjCGenerator {
-		protected IEnumerable<ProcessedMethod> PostProcessMethods (IEnumerable<MethodInfo> methods)
+		protected IEnumerable<ProcessedMethod> PostProcessMethods (IEnumerable<MethodInfo> methods, IEnumerable <MethodInfo> equals)
 		{
 			HashSet<string> duplicateNames = FindDuplicateNames (methods);
-			HashSet<MethodInfo> operatorToIgnore = new HashSet<MethodInfo> (OperatorOverloads.FindOperatorPairToIgnore (methods));
+			HashSet<MethodInfo> operatorToIgnore = new HashSet<MethodInfo> (OperatorOverloads.FindOperatorPairToIgnore (methods, equals));
 
 			foreach (MethodInfo method in methods) {
 				ProcessedMethod processedMethod = new ProcessedMethod (method);

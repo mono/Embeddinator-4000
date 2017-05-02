@@ -269,8 +269,9 @@ namespace ObjC {
 					if (processedConstructors.Count > 0)
 						ctors.Add (t, processedConstructors);
 
+					var typeEquals = equals.Where (x => x.Key == t).Select (x => x.Value);
 					var meths = GetMethods (t).OrderBy ((arg) => arg.Name).ToList ();
-					var processedMethods = PostProcessMethods (meths).ToList ();
+					var processedMethods = PostProcessMethods (meths, typeEquals).ToList ();
 					if (processedMethods.Count > 0)
 						methods.Add (t, processedMethods);
 

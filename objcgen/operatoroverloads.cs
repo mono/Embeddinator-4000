@@ -4,21 +4,27 @@ using System.Linq;
 using IKVM.Reflection;
 using Embeddinator;
 
+using Type = IKVM.Reflection.Type;
+
 namespace ObjC
 {
 	public static class OperatorOverloads
 	{
+		delegate IEnumerable<MethodInfo> CustomOperationAction (OperatorInfo info, IEnumerable<MethodInfo> methods, IEnumerable<MethodInfo> equals);
+
 		struct OperatorInfo
 		{
 			public string MetadataName { get; set; }
 			public string FriendlyName { get; set; }
 			public int ArgumentCount { get; set; }
+			public CustomOperationAction CustomAction { get; set; }
 
-			public OperatorInfo (string metadataName, string friendlyName, int argumentCount)
+			public OperatorInfo (string metadataName, string friendlyName, int argumentCount, CustomOperationAction customAction = null)
 			{
 				MetadataName = metadataName;
 				FriendlyName = friendlyName;
 				ArgumentCount = argumentCount;
+				CustomAction = customAction;
 			}
 
 			public bool Contains (string name) => MetadataName == name || FriendlyName == name;
@@ -41,6 +47,8 @@ namespace ObjC
 			new OperatorInfo ("op_UnaryNegation", "Negate", 1),
 			new OperatorInfo ("op_UnaryPlus", "Plus", 1),
 			new OperatorInfo ("op_OnesComplement", "OnesComplement" , 1),
+			new OperatorInfo ("op_Equality", "Equals" , 2, HandleEquals),
+			new OperatorInfo ("op_Inequality", "" , 2, HandleEquals),
 		};
 
 		// We will be asking if a method is possibly an operator often in a loop, so cache
@@ -55,7 +63,7 @@ namespace ObjC
 			}
 		}
 
-		public static IEnumerable <MethodInfo> FindOperatorPairToIgnore (IEnumerable<MethodInfo> methods)
+		public static IEnumerable <MethodInfo> FindOperatorPairToIgnore (IEnumerable<MethodInfo> methods, IEnumerable <MethodInfo> equals)
 		{
 			var matches = new Dictionary<OperatorInfo, List<MethodInfo>> ();
 			foreach (var method in methods) {
@@ -64,15 +72,32 @@ namespace ObjC
 					matches.AddValue (info, method);			
 			}
 
-			foreach (var match in matches.Where (x => x.Value.Count > 1)) {
-				// If we have a friendly method, ignore op variants and vice versa
-				MethodInfo friendlyMethod = match.Value.FirstOrDefault (x => !x.Name.StartsWith ("op_", StringComparison.Ordinal));
-				if (friendlyMethod != null) {
-					foreach (var opMethod in match.Value.Where (x => x.Name.StartsWith ("op_", StringComparison.Ordinal)))
-						yield return opMethod;
-				} else {
-					yield return friendlyMethod;
+			foreach (var match in matches) {
+				if (match.Key.CustomAction != null) {
+					foreach (MethodInfo ignore in match.Key.CustomAction (match.Key, match.Value, equals))
+						yield return ignore;
+					continue;
 				}
+
+				if (match.Value.Count > 1) {
+					// If we have a friendly method, ignore op variants and vice versa
+					MethodInfo friendlyMethod = match.Value.FirstOrDefault (x => !x.Name.StartsWith ("op_", StringComparison.Ordinal));
+					if (friendlyMethod != null) {
+						foreach (var opMethod in match.Value.Where (x => x.Name.StartsWith ("op_", StringComparison.Ordinal)))
+							yield return opMethod;
+					}
+					else {
+						yield return friendlyMethod;
+					}
+				}
+			}
+		}
+
+		static IEnumerable<MethodInfo> HandleEquals (OperatorInfo info, IEnumerable<MethodInfo> methods, IEnumerable<MethodInfo> equals)
+		{
+			if (equals.Any ()) {
+				foreach (var method in methods)
+					yield return method;
 			}
 		}
 	}
