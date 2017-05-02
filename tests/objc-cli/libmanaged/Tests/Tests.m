@@ -751,6 +751,22 @@
 	XCTAssertTrue ([[Overloads_AllOperatorsWithFriendly incrementC1:oneFriend] value] == (1 + 1), "1 + 1 All");
 }
 
+- (void)testShortParamters {
+	ShortParameters_Class *testClass = [[ShortParameters_Class alloc] init];
+	XCTAssertTrue([testClass noDuplicateTypesA:@"Foo" c:1.0 e:0.1f g:1 i:2 k:3 m:4 o:5 q:6 s:YES], "Short arguments, no duplicates");
+	XCTAssert ([testClass twoIntX:1 y:2] == 3, "Two ints");
+	XCTAssert ([testClass twoBoolS:YES t:YES] == YES, "Two bools");
+	XCTAssert ([testClass twoCharQ:'c' r:'d'] == 199, "Two characters");
+	XCTAssert ([testClass twoLongM:-3 n:15] == 12, "Two longs");
+	XCTAssert ([testClass twoUintG:3 h:4] == 7, "Two uints");
+	XCTAssert ([testClass twoFloatE:1.2f f:3.4f] - 4.6f < 0.000001, "Two floats");
+	XCTAssert ([testClass twoShortI:1 j:4] == 5, "Two shorts");
+	XCTAssert ([testClass twoUlongO:2 p:3] == 5, "Two ulong");
+	XCTAssert ([testClass twoDoubleC:3.2 d:5.7] == 8.9, "Two doubles");
+	XCTAssert ([[testClass twoStringA:@"Foo" b:@"Bar"] isEqualToString:@"FooBar"], "Two strings");
+	XCTAssert ([testClass twoUshortK:5 l:8] == 13, "Two ushorts");
+}
+
 #pragma clang diagnostic pop
 
 @end

@@ -124,6 +124,12 @@ namespace Methods {
 			return @string.Length == 0;
 		}
 
+		// objc: this won't be generated until nullable are supported but we want to make sure it does not stop the build with an error
+		public static bool? GetNull (this string @string)
+		{
+			return null;
+		}
+
 		public static string NotAnExtensionMethod ()
 		{
 			return String.Empty;
