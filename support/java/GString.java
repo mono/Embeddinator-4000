@@ -33,7 +33,14 @@ import com.sun.jna.ptr.*;
 
 public final class GString extends Runtime.RuntimeLibrary.GString {
 	public GString (String string) {
-		
+		if (string == null)
+			return;
+
+		int len = string.length();
+		str = new Memory(len + 1);
+		str.setString(0, string);
+		len = len;
+		allocated_len = new NativeLong(len);
 	}
 
 	/**
@@ -41,6 +48,6 @@ public final class GString extends Runtime.RuntimeLibrary.GString {
 	* This is named getValue() for uniformity with com.sun.jna.ptr.*ByReference set of types.
 	*/
 	public String getValue() {
-		return "";
+		return (str == null) ? null : str.getString(0);
 	}
 }
