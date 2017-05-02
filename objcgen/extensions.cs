@@ -62,6 +62,11 @@ namespace Embeddinator {
 				return sb.ToString ();
 			return self;
 		}
+
+		public static bool StartsWithOrdinal (this string self, string value)
+		{
+			return self.StartsWith (value, StringComparison.Ordinal);
+		}
 	}
 
 	public static class TypeExtensions {
@@ -115,6 +120,9 @@ namespace Embeddinator {
 			}
 			return false;
 		}
+
+		public static bool IsPropertyMethod (this MethodBase method) => method.IsSpecialName && (method.Name.StartsWithOrdinal ("get") || method.Name.StartsWithOrdinal ("set"));
+		public static bool IsOperatorMethod (this MethodBase method) => method.IsSpecialName && method.Name.StartsWithOrdinal ("op_");
 	}
 
 	public static class DictionaryExtensions {

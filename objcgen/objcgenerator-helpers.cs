@@ -18,37 +18,37 @@ namespace ObjC {
 			// special case for setter-only - the underscore looks ugly
 			if ((method != null) && method.IsSpecialName)
 				objName = objName.Replace ("_", String.Empty);
-			StringBuilder objc = new StringBuilder (objName);
+
+			var objc = new StringBuilder (objName);
 			var mono = new StringBuilder (monoName);
+
 			mono.Append ('(');
-			int n = 0;
-			foreach (var p in parameters) {
+
+			for (int n = 0; n < parameters.Length; ++n) {
+				ParameterInfo p = parameters [n];
+
 				if (objc.Length > objName.Length) {
 					objc.Append (' ');
 					mono.Append (',');
 				}
+
 				string paramName = useTypeNames ? p.ParameterType.Name : p.Name;
 				if ((method != null) && (n > 0 || !isExtension)) {
 					if (n == 0) {
-						bool isPropertyMethod = method.IsSpecialName && (method.Name.StartsWith ("get") || method.Name.StartsWith ("set"));
-						if (method.IsConstructor || !method.IsSpecialName || (useTypeNames && isPropertyMethod))
+						bool mutatePropertyOrOperatorMethod = useTypeNames && (method.IsPropertyMethod () || method.IsOperatorMethod ());
+						if (method.IsConstructor || mutatePropertyOrOperatorMethod || !method.IsSpecialName)
 							objc.Append (paramName.PascalCase ());
 					} else
 						objc.Append (paramName.ToLowerInvariant ());
 				}
-				var pt = p.ParameterType;
-				var ptname = NameGenerator.GetTypeName (pt);
-				if (pt.IsInterface)
-					ptname = $"id<{ptname}>";
 
-				if (types.Contains (pt))
-					ptname += " *";
-
-				if (n > 0 || !isExtension)
+				if (n > 0 || !isExtension) {
+					string ptname = NameGenerator.GetObjCParamTypeName (p, types);
 					objc.Append (":(").Append (ptname).Append (")").Append (NameGenerator.GetExtendedParameterName (p, parameters));
+				}
 				mono.Append (NameGenerator.GetMonoName (p.ParameterType));
-				n++;
 			}
+
 			mono.Append (')');
 
 			objcSignature = objc.ToString ();

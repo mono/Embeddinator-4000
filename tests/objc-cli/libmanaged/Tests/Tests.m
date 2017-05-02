@@ -709,11 +709,11 @@
 	XCTAssertTrue ([[Overloads_AllOperators addition:oneAll c2:twoAll] value] == (1 + 2), "1 + 2 All");
 	XCTAssertTrue ([[Overloads_AllOperators subtraction:oneAll c2:twoAll] value] == (1 - 2), "1 - 2 All");
 	XCTAssertTrue ([[Overloads_AllOperators multiply:oneAll c2:twoAll] value] == (1 * 2), "1 * 2 All");
-	XCTAssertTrue ([[Overloads_AllOperators division:twoAll alloperators:oneAll] value] == (2 / 1), "2 / 1 All");
-	XCTAssertTrue ([[Overloads_AllOperators division:twoAll int32:1] value] == (2 / 1), "2 / 1 All int");
+	XCTAssertTrue ([[Overloads_AllOperators divisionAllOperators:twoAll alloperators:oneAll] value] == (2 / 1), "2 / 1 All");
+	XCTAssertTrue ([[Overloads_AllOperators divisionAllOperators:twoAll int32:1] value] == (2 / 1), "2 / 1 All int");
 
-	XCTAssertTrue ([[Overloads_AllOperators bitwiseAnd:oneAll alloperators:twoAll] value] == (1 & 2), "1 & 2 All");
-	XCTAssertTrue ([[Overloads_AllOperators bitwiseAnd:oneAll int32:2] value] == (1 & 2), "1 & 2 All int");
+	XCTAssertTrue ([[Overloads_AllOperators bitwiseAndAllOperators:oneAll alloperators:twoAll] value] == (1 & 2), "1 & 2 All");
+	XCTAssertTrue ([[Overloads_AllOperators bitwiseAndAllOperators:oneAll int32:2] value] == (1 & 2), "1 & 2 All int");
 
 	XCTAssertTrue ([[Overloads_AllOperators bitwiseOr:oneAll c2:twoAll] value] == (1 | 2), "1 | 2 All");
 	XCTAssertTrue ([[Overloads_AllOperators exclusiveOr:oneAll c2:twoAll] value] == (1 ^ 2), "1 ^ 2 All");

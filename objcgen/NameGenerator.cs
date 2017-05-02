@@ -161,5 +161,16 @@ namespace ObjC {
 
 			return pName;
 		}
+
+		public static string GetObjCParamTypeName (ParameterInfo param, List<ProcessedType> allTypes)
+		{
+			Type pt = param.ParameterType;
+			string ptname = GetTypeName (pt);
+			if (pt.IsInterface)
+				ptname = $"id<{ptname}>";
+			if (allTypes.Contains (pt))
+				ptname += " *";
+			return ptname;
+		}
 	}
 }
