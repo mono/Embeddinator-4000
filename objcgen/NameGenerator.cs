@@ -127,7 +127,7 @@ namespace ObjC {
 			if (pt.IsInterface)
 				ptname = $"id<{ptname}>";
 			if (allTypes.Contains (pt))
-					ptname += " *";
+				ptname += " *";
 			return ptname;
 		}
 	}

@@ -12,9 +12,6 @@ namespace ObjC {
 
 		// get a name that is safe to use from ObjC code
 
-		static bool IsPropertyMethod (MethodBase method) => method.IsSpecialName && (method.Name.StartsWithOrd ("get") || method.Name.StartsWithOrd ("set"));
-		static bool IsOperatorMethod (MethodBase method) => method.IsSpecialName && method.Name.StartsWithOrd ("op_");
-
 		void GetSignatures (string objName, string monoName, MemberInfo info, ParameterInfo [] parameters, bool useTypeNames, bool isExtension, out string objcSignature, out string monoSignature)
 		{
 			var method = (info as MethodBase); // else it's a PropertyInfo
@@ -28,7 +25,7 @@ namespace ObjC {
 			mono.Append ('(');
 
 			for (int n = 0; n < parameters.Length; ++n) {
-				ParameterInfo p = parameters[n];
+				ParameterInfo p = parameters [n];
 
 				if (objc.Length > objName.Length) {
 					objc.Append (' ');
@@ -38,7 +35,7 @@ namespace ObjC {
 				string paramName = useTypeNames ? p.ParameterType.Name : p.Name;
 				if ((method != null) && (n > 0 || !isExtension)) {
 					if (n == 0) {
-						bool mutatePropertyOrOperatorMethod = useTypeNames && (IsPropertyMethod (method) || IsOperatorMethod (method));
+						bool mutatePropertyOrOperatorMethod = useTypeNames && (method.IsPropertyMethod () || method.IsOperatorMethod ());
 						if (method.IsConstructor || mutatePropertyOrOperatorMethod || !method.IsSpecialName)
 							objc.Append (paramName.PascalCase ());
 					} else
