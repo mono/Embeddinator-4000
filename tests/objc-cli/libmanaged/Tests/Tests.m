@@ -657,8 +657,8 @@
     XCTAssertTrue ([c1 isEqual:c1], "equals self");
 
     EqualsHashOverrides_Class *c2 = [[EqualsHashOverrides_Class alloc] initWithX:1];
-    XCTAssertTrue ([c1 isEqual:c2], "compare equal objects");
-    XCTAssertTrue ([c2 isEqual:c1], "compare equal objects");
+    XCTAssertTrue ([c1 areEqual:c2], "compare equal objects");
+    XCTAssertTrue ([c2 areEqual:c1], "compare equal objects");
 
     EqualsHashOverrides_Class *c3 = [[EqualsHashOverrides_Class alloc] initWithX:2];
     XCTAssertFalse ([c1 isEqual:c3], "compare unequal objects");
