@@ -1,2 +1,4 @@
 Version.generated.cs
-
+_build/
+_installer/
+Xamarin.Embeddinator-4000*.pkg
