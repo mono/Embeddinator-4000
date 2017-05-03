@@ -28,49 +28,8 @@
 
 #pragma once
 
-#ifdef  __cplusplus
-#include <cstdbool>
-#include <cstdint> 
-#else
-#include <stdbool.h>
-#include <stdint.h>
-#endif
-
-#ifdef  __cplusplus
-    #define MONO_EMBEDDINATOR_BEGIN_DECLS  extern "C" {
-    #define MONO_EMBEDDINATOR_END_DECLS    }
-#else
-    #define MONO_EMBEDDINATOR_BEGIN_DECLS
-    #define MONO_EMBEDDINATOR_END_DECLS
-#endif
-
-#if defined(_MSC_VER)
-    #define MONO_EMBEDDINATOR_API_EXPORT __declspec(dllexport)
-    #define MONO_EMBEDDINATOR_API_IMPORT __declspec(dllimport)
-#else
-    #define MONO_EMBEDDINATOR_API_EXPORT __attribute__ ((visibility ("default")))
-    #define MONO_EMBEDDINATOR_API_IMPORT
-#endif
-
-#if defined(MONO_EMBEDDINATOR_DLL_EXPORT)
-    #define MONO_EMBEDDINATOR_API MONO_EMBEDDINATOR_API_EXPORT
-#else
-    #define MONO_EMBEDDINATOR_API MONO_EMBEDDINATOR_API_IMPORT
-#endif
-
 #include "embeddinator.h"
-typedef uint16_t gunichar2;
-
-typedef struct _GArray GArray;
-typedef struct _GString GString;
-
-typedef struct _MonoDomain MonoDomain;
-typedef struct _MonoException MonoException;
-typedef struct _MonoClass MonoClass;
-typedef struct _MonoObject MonoObject;
-typedef struct _MonoImage MonoImage;
-typedef struct _MonoMethod MonoMethod;
-typedef struct _MonoString MonoString;
+#include "mono-support.h"
 
 MONO_EMBEDDINATOR_BEGIN_DECLS
 

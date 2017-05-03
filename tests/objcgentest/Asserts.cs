@@ -12,6 +12,7 @@ namespace DriverTest
 		{
 			try {
 				action ();
+				Assert.Fail ($"Expected EM{code} exception, but no exception was thrown.");
 			} catch (EmbeddinatorException ee) {
 				Assert.That (ee.Error, "Error");
 				Assert.That (ee.Code, Is.EqualTo (code), "Code");
@@ -21,11 +22,27 @@ namespace DriverTest
 		{
 			try {
 				action ();
+				Assert.Fail ($"Expected EM{code} exception, but no exception was thrown.", message);
 			} catch (EmbeddinatorException ee) {
 				Assert.That (ee.Error, "Error");
 				Assert.That (ee.Code, Is.EqualTo (code), "Code");
 				Assert.That (ee.Message, Is.EqualTo (message), "Message");
 			}
 		}
+
+		public static void RunProcess (string filename, string arguments, string message)
+		{
+			string stdout;
+			int exitCode;
+			Console.WriteLine ($"{filename} {arguments}");
+			// We capture stderr too, otherwise it won't show up in the test unit pad's output.
+			if (Embedder.RunProcess (filename, arguments, out exitCode, out stdout, capture_stderr: true))
+				return;
+			Console.WriteLine ($"Command failed with exit code: {exitCode}");
+			Console.WriteLine (stdout);
+			Console.WriteLine ($"Command failed with exit code: {exitCode}");
+			Assert.Fail ($"Executing '{filename} {arguments}' failed with exit code {exitCode}: {message}");
+		}
+
 	}
 }

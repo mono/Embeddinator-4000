@@ -1,20 +1,25 @@
-all: run-test perf xctest test-leaks test-static test-dynamic
+TOP=../..
+
+all: run-test perf xctest test-leaks test-static test-dynamic test-framework-ios xctest-ios-simulator
+
+include $(TOP)/tests/managed/Makefile.include
+
 
 MONO=/Library/Frameworks/Mono.framework/Versions/Current/Commands/mono
 
-OBJC_GEN_DIR=../../objcgen
+OBJC_GEN_DIR=$(TOP)/objcgen
 OBJC_GEN=$(OBJC_GEN_DIR)/bin/Debug/objcgen.exe
 $(OBJC_GEN): $(wildcard $(OBJC_GEN_DIR)/*.cs) $(wildcard ../../support/*)
 	$(MAKE) -C $(OBJC_GEN_DIR)
 
-MANAGED_DLL_DIR=../managed
-MANAGED_DLL=$(MANAGED_DLL_DIR)/bin/Debug/managed.dll
-$(MANAGED_DLL): $(wildcard $(MANAGED_DLL_DIR)/*.cs)
-	make -C $(MANAGED_DLL_DIR)
+MANAGED_DLL=$(GENERIC_MANAGED_DLL)
 
 %/managed.dll: $(MANAGED_DLL)
 	mkdir -p $(dir $@)
 	cp $< $@
+
+debug/libmanaged-ios-framework/managed-ios.framework: $(IOS_MANAGED_DLL) $(OBJC_GEN)
+	$(MONO) --debug $(abspath $(OBJC_GEN)) --debug $(abspath $<) -c --outdir=$(abspath $(dir $@)) --target=framework --platform=ios
 
 debug/libmanaged.dylib: debug/managed.dll $(OBJC_GEN)
 	$(MONO) --debug $(OBJC_GEN) --debug debug/managed.dll -c -o debug
@@ -80,3 +85,22 @@ test-dynamic: test-dynamic-macos test-dynamic-ios test-dynamic-tvos test-dynamic
 
 test-dynamic-%: $(MANAGED_DLL) $(OBJC_GEN)
 	/Library/Frameworks/Mono.framework/Versions/Current/Commands/mono --debug $(OBJC_GEN) --debug $(MANAGED_DLL) -c --outdir=build/$@-temp-dir --target=dylib --platform=$*
+
+test-framework: test-framework-macos test-framework-ios test-framework-tvos test-framework-watchos
+
+test-framework-%: debug/managed.dll $(OBJC_GEN)
+	/Library/Frameworks/Mono.framework/Versions/Current/Commands/mono --debug $(abspath $(OBJC_GEN)) --debug $(abspath debug/managed.dll) -c --outdir=$(abspath build/$@-temp-dir) --target=framework --platform=$*
+
+xctest-ios-simulator: debug/libmanaged-ios-framework/managed-ios.framework
+	xcodebuild -quiet test -project libmanaged-ios/libmanaged-ios.xcodeproj -scheme libmanaged-ios -destination 'platform=iOS Simulator,name=iPhone 6,OS=latest'
+
+xctest-ios-device: build/ios-device-id debug/libmanaged-ios-framework/managed-ios.framework
+	xcodebuild test -project libmanaged-ios/libmanaged-ios.xcodeproj -scheme libmanaged-ios -destination 'platform=iOS,id=$(shell cat build/ios-device-id)'
+
+build/device-list.xml:
+	@mkdir -p build
+	/Library/Frameworks/Xamarin.iOS.framework/Versions/Current/bin/mlaunch --listdev=$@ --output-format=xml
+
+build/ios-device-id: build/device-list.xml
+	csharp -e 'var doc = new System.Xml.XmlDocument (); doc.Load ("$<"); Console.WriteLine (doc.SelectSingleNode ("/MTouch/Device[DeviceClass = \"iPhone\"]/DeviceIdentifier").InnerText);' > $@.tmp
+	mv $@.tmp $@

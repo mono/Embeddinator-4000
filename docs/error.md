@@ -158,6 +158,17 @@ This is a **warning** that an extension method on a primivite type (e.g. `System
 
 
 
+<h3><a name="EM1033"/>Method `M` is not generated because another method exposes the operator with a friendly name.</h3>
+
+This is a **warning** that the method `M` is not generated because another method exposes the operator with a friendly name. (https://msdn.microsoft.com/en-us/library/ms229032(v=vs.110).aspx)
+
+
+<h3><a name="EM1034"/>Extension method `M` is not generated inside a category because they cannot be created on primitive type `T`. A normal, static method was generated.</h3>
+
+This is a **warning** that an extension method on a primivite type (e.g. `System.Int32`) was found. In ObjC it is not possible to create categories on primitive type. Instead the generator will be produce a normal, static method.
+
+
+
 <h3><a name="EM1040"/>Property `P` is not generated because of parameter type `T` is not supported.</h3>
 
 This is a **warning** that the property `P` will be ignored (i.e. nothing will be generated) because the exposed type `T` is not supported.

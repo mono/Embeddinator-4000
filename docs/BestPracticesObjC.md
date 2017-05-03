@@ -125,11 +125,3 @@ In .NET a constructor must either succeed and return a (_hopefully_) valid insta
 In contrast, ObjC allows `init*` to return `nil` when an instance cannot be created. This is a common, but not general, pattern used in many of Apple's frameworks. In some other cases an `assert` can happen (and kill the current process).
 
 The generator follow the same `return nil` pattern for generated `init*` methods. If a managed exception is thrown, then it will be printed (using `NSLog`) and `nil` will be returned to the caller.
-
-## Operators
-
-ObjC does not allow operators to be overloaded as C# does, so these are converted to class selectors. 
-
-["Friendly"](https://msdn.microsoft.com/en-us/library/ms229032(v=vs.110).aspx) named method are generated in preference to the operator overloads when found, and can produce an easier to consume API.
-
-Classes that override the operators == and\or != should override the standard Equals (Object) method as well.

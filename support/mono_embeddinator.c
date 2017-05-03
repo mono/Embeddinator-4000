@@ -28,6 +28,7 @@
 
 #include "mono_embeddinator.h"
 #include "glib.h"
+#include "mono-support.h"
 
 #include <stdbool.h>
 #include <stdio.h>
@@ -49,11 +50,6 @@
 #include <unistd.h>
 #endif
 
-#include <mono/jit/jit.h>
-#include <mono/metadata/mono-config.h>
-#include <mono/metadata/assembly.h>
-#include <mono/metadata/debug-helpers.h>
-
 mono_embeddinator_context_t* _current_context;
 
 mono_embeddinator_context_t* mono_embeddinator_get_context()
@@ -71,8 +67,13 @@ int mono_embeddinator_init(mono_embeddinator_context_t* ctx, const char* domain)
     if (ctx == 0 || ctx->domain != 0)
         return false;
 
+#if defined (XAMARIN_IOS) || defined (XAMARIN_MAC)
+    xamarin_initialize_embedded ();
+    ctx->domain = mono_domain_get ();
+#else
     mono_config_parse(NULL);
     ctx->domain = mono_jit_init_version(domain, "v4.0.30319");
+#endif
 
     mono_embeddinator_set_context(ctx);
 
@@ -155,9 +156,15 @@ char* mono_embeddinator_search_assembly(const char* assembly)
 
 MonoImage* mono_embeddinator_load_assembly(mono_embeddinator_context_t* ctx, const char* assembly)
 {
-    char* path = mono_embeddinator_search_assembly(assembly);
+    char *path = NULL;
+
+#if defined (XAMARIN_IOS) || defined (XAMARIN_MAC)
+    MonoAssembly *mono_assembly = xamarin_open_assembly (assembly);
+#else
+    path = mono_embeddinator_search_assembly(assembly);
 
     MonoAssembly* mono_assembly = mono_domain_assembly_open(ctx->domain, path);
+#endif
 
     if (!mono_assembly)
     {
@@ -166,12 +173,14 @@ MonoImage* mono_embeddinator_load_assembly(mono_embeddinator_context_t* ctx, con
         error.string = path;
         mono_embeddinator_error(error);
 
-        g_free (path);
+        if (path)
+            g_free (path);
 
         return 0;
     }
 
-    g_free (path);
+    if (path)
+        g_free (path);
 
     return mono_assembly_get_image(mono_assembly);
 }

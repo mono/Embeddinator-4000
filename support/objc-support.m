@@ -33,3 +33,31 @@ NSString* mono_embeddinator_get_nsstring (MonoString* string)
 	gunichar2 *str = mono_string_chars (string);
 	return [[NSString alloc] initWithBytes: str length: length * 2 encoding: NSUTF16LittleEndianStringEncoding];
 }
+
+// helper for System.IComparable
+NSComparisonResult mono_embeddinator_compare_to (MonoEmbedObject *object, MonoMethod *method, MonoEmbedObject *other)
+{
+	if (!other)
+		return NSOrderedSame;
+	void* __args [1];
+	__args [0] = mono_gchandle_get_target (other->_handle);
+	MonoObject* __exception = nil;
+	MonoObject* __instance = mono_gchandle_get_target (object->_handle);
+	MonoObject* __result = mono_runtime_invoke (method, __instance, __args, &__exception);
+	if (__exception)
+		mono_embeddinator_throw_exception (__exception);
+	void* __unbox = mono_object_unbox (__result);
+	return (NSComparisonResult) *((int*)__unbox);
+}
+
+MonoObject* mono_embeddinator_get_object (id native, bool assertOnFailure)
+{
+	if (![native respondsToSelector:@selector (xamarinGetGCHandle)]) {
+		if (!assertOnFailure)
+			return nil;
+		NSLog (@"`%@` is not a managed instance and cannot be used like one", [native description]);
+		abort ();
+	}
+	int gchandle = (int) [native performSelector:@selector (xamarinGetGCHandle)];
+	return mono_gchandle_get_target (gchandle);
+}

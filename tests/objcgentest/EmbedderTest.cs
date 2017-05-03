@@ -52,12 +52,39 @@ namespace DriverTest
 			StringAssert.IsMatch ($"Non-fat file: .* is architecture: {abi}", output, "architecture");
 		}
 
-		string CompileLibrary (Platform platform, string code = null)
+		[TestCase ("with-dash")]
+		[TestCase ("with space")]
+		public void ValidLibraryName (string libraryName)
+		{
+			var platform = Platform.macOS;
+			var dll = CompileLibrary (platform, libraryName: libraryName);
+			var tmpdir = Xamarin.Cache.CreateTemporaryDirectory ();
+			Assert.AreEqual (0, Driver.Main2 ("--platform", platform.ToString (), "--abi", "x86_64", "-c", dll, "-o", tmpdir), "build");
+		}
+
+		[Test]
+		public void DuplicateAssemblyName ()
+		{
+			var platform = Platform.macOS;
+			var dll = CompileLibrary (platform, libraryName: "dupe");
+			var tmpdir = Xamarin.Cache.CreateTemporaryDirectory ();
+			try {
+				Driver.Main2 ("--platform", platform.ToString (), "--abi", "x86_64", dll, dll, "-o", tmpdir);
+			}
+			catch (EmbeddinatorException ee) {
+				Assert.True (ee.Error, "Error");
+				Assert.That (ee.Code, Is.EqualTo (12), "Code");
+			}
+		}
+
+		string CompileLibrary (Platform platform, string code = null, string libraryName = null)
 		{
 			int exitCode;
+			if (libraryName == null)
+				libraryName = "library";
 			var tmpdir = Xamarin.Cache.CreateTemporaryDirectory ();
-			var cs_path = Path.Combine (tmpdir, "library.cs");
-			var dll_path = Path.Combine (tmpdir, "library.dll");
+			var cs_path = Path.Combine (tmpdir, libraryName + ".cs");
+			var dll_path = Path.Combine (tmpdir, libraryName + ".dll");
 
 			if (code == null)
 				code = "public class Test { public static void X () {} }";

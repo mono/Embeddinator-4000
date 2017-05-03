@@ -1,11 +1,11 @@
 # Getting started with Objective-C
 
-This is the getting started page for Objective-C.
+This is the getting started page for Objective-C
 
 
 ## Requirements
 
-In order to use the embeddinator with Objective-C you'll need a Mac running:
+In order to use the embeddinator with Objective-C you'll need a Mac computer running:
 
 * macOS 10.12 (Sierra) or later
 * Xcode 8.3.2 or later
@@ -26,15 +26,8 @@ Your next step is to download and install the embeddinator on your Mac.
 
 **add link**
 
-There is no package to download yet. Until one is available you need to build it from our git repository, see the [contributing](Contributing.md#objective-c) document for instructions.
+There is no package to download yet. Until one is available you need to build it from our git repository, see the [constributing](Contributing#Objective-C) document for instructions.
 
-The installer is a standard pkg based installer:
-
-![Installer Introduction](Install1.png)
-![Installer Install Type](Install2.png)
-![Installer Summary](Install3.png)
-
-Once installed via an installer, you can run the tool via /Library/Frameworks/Xamarin.Embeddinator-4000/Commands/objcgen 
 
 ## Platforms
 
@@ -42,10 +35,10 @@ Objective-C is a language that is most commonly used to write applications for m
 
 ### macOS
 
-[Creating a macOS application](getting-started-objc-macos.md) is easiest since it does not involve as many additional steps, like setting up identity, provisining profiles, simulators and devices. You are encouraged to start with the macOS document before the one for iOS.
+[Creating a macOS application](getting-started-objc-macos) is easiest since it does not involve as many additional steps, like setting up identity, provisining profiles, simulators and devices. You are encouraged to start with the macOS document before the one for iOS.
 
 ### iOS
 
-Please make sure you are already set up to develop iOS applications before trying to create one using the embeddinator. The [following instructions](getting-started-objc-ios.md) assume that you have already successfully built and deployed an iOS application from your computer.
+Please make sure you are already set up to develop iOS applications before trying to create one using the embeddinator. The [following instructions](getting-started-objc-ios) assume that you have already successfully built and deployed an iOS application from your computer.
 
-*Note: Working for tvOS or watchOS is very similar to iOS. You should start with the iOS instructions and then apply them to your platform of choice.*
+Note: Working for tvOS or watchOS is very similar to iOS. You should start with the iOS instructions and then apply them to your platform of choice.

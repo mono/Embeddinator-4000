@@ -29,16 +29,7 @@
   <ItemGroup>
     <Reference Include="System" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="arrays.cs" />
-    <Compile Include="properties.cs" />
-    <Compile Include="namespaces.cs" />
-    <Compile Include="types.cs" />
-    <Compile Include="exceptions.cs" />
-    <Compile Include="constructors.cs" />
-    <Compile Include="methods.cs" />
-    <Compile Include="structs.cs" />
-    <Compile Include="enums.cs" />
-  </ItemGroup>
+  <Import Project="..\managed-shared.projitems" Label="Shared" Condition="Exists('..\managed-shared.projitems')" />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="..\CustomBuildActions.targets" />
 </Project>

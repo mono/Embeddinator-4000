@@ -1,46 +1,47 @@
 ﻿using System;
 using System.Collections.Generic;
 using IKVM.Reflection;
+using ObjC;
 using Type = IKVM.Reflection.Type;
 
 namespace Embeddinator {
 
-	public class Generator {
+	public abstract class Generator {
 
-		public virtual void Process (IEnumerable<Assembly> assemblies)
+		protected List<ProcessedAssembly> assemblies = new List<ProcessedAssembly> ();
+
+		// uniqueness checks
+		HashSet<string> assembly_name = new HashSet<string> ();
+		HashSet<string> assembly_safename = new HashSet<string> ();
+
+		public virtual void Process (IEnumerable<Assembly> input)
 		{
 		}
 
-		public virtual void Generate (IEnumerable<Assembly> assemblies)
+		public bool AddIfUnique (ProcessedAssembly assembly)
+		{
+			if (assembly_name.Contains (assembly.Name))
+				return false;
+			if (assembly_safename.Contains (assembly.SafeName))
+				return false;
+
+			assemblies.Add (assembly);
+			assembly_name.Add (assembly.Name);
+			assembly_safename.Add (assembly.SafeName);
+			return true;
+		}
+
+		public virtual void Generate ()
 		{
 			foreach (var a in assemblies) {
 				Generate (a);
 			}
 		}
 
-		protected virtual void Generate (Assembly a)
-		{
-			foreach (var t in a.GetTypes ()) {
-				if (!t.IsPublic)
-					continue;
-				Generate (t);
-			}
-		}
-
-		protected virtual void Generate (Type t)
-		{
-		}
-
-		protected virtual void Generate (PropertyInfo pi)
-		{
-		}
-
-		protected virtual void Generate (MethodInfo mi)
-		{
-		}
-
-		public virtual void Write (string outputDirectory)
-		{
-		}
+		protected abstract void Generate (ProcessedAssembly a);
+		protected abstract void Generate (ProcessedType t);
+		protected abstract void Generate (ProcessedProperty property);
+		protected abstract void Generate (ProcessedMethod method);
+		public abstract void Write (string outputDirectory);
 	}
 }

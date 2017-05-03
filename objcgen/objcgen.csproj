@@ -33,6 +33,7 @@
     <Reference Include="Mono.Options">
       <HintPath>..\packages\Mono.Options.4.4.0.0\lib\net4-client\Mono.Options.dll</HintPath>
     </Reference>
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="generator.cs" />
@@ -309,6 +310,18 @@
     <Compile Include="objcgenerator-helpers.cs" />
     <Compile Include="objcgenerator-processor.cs" />
     <Compile Include="extensions.cs" />
+    <Compile Include="methodhelper.cs" />
+    <Compile Include="objcgenerator-subscripts.cs" />
+    <Compile Include="processedtypes.cs" />
+    <Compile Include="objcgenerator-postprocessor.cs" />
+    <Compile Include="comparablehelper.cs" />
+    <Compile Include="EqualsHelper.cs" />
+    <Compile Include="HashHelper.cs" />
+    <Compile Include="sourcewriter.cs" />
+    <Compile Include="classhelper.cs" />
+    <Compile Include="OperatorOverloads.cs" />
+    <Compile Include="protocolhelper.cs" />
+    <Compile Include="NameGenerator.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="support\" />
@@ -337,6 +350,10 @@
     <EmbeddedResource Include="..\support\main.c">
       <Link>support\main.c</Link>
       <LogicalName>main.c</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\support\mono-support.h">
+      <Link>support\mono-support.h</Link>
+      <LogicalName>mono-support.h</LogicalName>
     </EmbeddedResource>
     <EmbeddedResource Include="..\support\objc-support.h">
       <Link>support\objc-support.h</Link>

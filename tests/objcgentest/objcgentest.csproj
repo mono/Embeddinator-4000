@@ -36,7 +36,8 @@
     <Compile Include="Asserts.cs" />
     <Compile Include="EmbedderTest.cs" />
     <Compile Include="Cache.cs" />
-    <Compile Include="ExtensionsTest.cs" />
+    <Compile Include="TypeExtensionsTest.cs" />
+    <Compile Include="StringExtensionsTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

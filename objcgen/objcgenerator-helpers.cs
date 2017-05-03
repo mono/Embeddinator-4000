@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,62 +11,65 @@ namespace ObjC {
 	public partial class ObjCGenerator {
 
 		// get a name that is safe to use from ObjC code
-		public static string GetObjCName (Type t)
-		{
-			return t.FullName.Replace ('.', '_');
-		}
 
-		void GetSignatures (string objName, string monoName, MemberInfo info, ParameterInfo [] parameters, out string objcSignature, out string monoSignature)
+		void GetSignatures (string objName, string monoName, MemberInfo info, ParameterInfo [] parameters, bool useTypeNames, bool isExtension, out string objcSignature, out string monoSignature)
 		{
 			var method = (info as MethodBase); // else it's a PropertyInfo
 			// special case for setter-only - the underscore looks ugly
 			if ((method != null) && method.IsSpecialName)
 				objName = objName.Replace ("_", String.Empty);
-			StringBuilder objc = new StringBuilder (objName);
+
+			var objc = new StringBuilder (objName);
 			var mono = new StringBuilder (monoName);
+
 			mono.Append ('(');
-			int n = 0;
-			foreach (var p in parameters) {
+
+			for (int n = 0; n < parameters.Length; ++n) {
+				ParameterInfo p = parameters [n];
+
 				if (objc.Length > objName.Length) {
 					objc.Append (' ');
 					mono.Append (',');
 				}
-				if (method != null) {
+
+				string paramName = useTypeNames ? p.ParameterType.Name : p.Name;
+				if ((method != null) && (n > 0 || !isExtension)) {
 					if (n == 0) {
-						if (method.IsConstructor || !method.IsSpecialName)
-							objc.Append (PascalCase (p.Name));
+						bool mutatePropertyOrOperatorMethod = useTypeNames && (method.IsPropertyMethod () || method.IsOperatorMethod ());
+						if (method.IsConstructor || mutatePropertyOrOperatorMethod || !method.IsSpecialName)
+							objc.Append (paramName.PascalCase ());
 					} else
-						objc.Append (p.Name.ToLowerInvariant ());
+						objc.Append (paramName.ToLowerInvariant ());
 				}
-				var pt = p.ParameterType;
-				var ptname = GetTypeName (p.ParameterType);
-				if (types.Contains (pt))
-					ptname += " *";
-				objc.Append (":(").Append (ptname).Append (") ").Append (p.Name);
-				mono.Append (GetMonoName (p.ParameterType));
-				n++;
+
+				if (n > 0 || !isExtension) {
+					string ptname = NameGenerator.GetObjCParamTypeName (p, types);
+					objc.Append (":(").Append (ptname).Append (")").Append (NameGenerator.GetExtendedParameterName (p, parameters));
+				}
+				mono.Append (NameGenerator.GetMonoName (p.ParameterType));
 			}
+
 			mono.Append (')');
 
 			objcSignature = objc.ToString ();
 			monoSignature = mono.ToString ();
 		}
 
-		public IEnumerable<ConstructorInfo> GetUnavailableParentCtors (Type type, List<ConstructorInfo> typeCtors)
+		public IEnumerable<ProcessedConstructor> GetUnavailableParentCtors (Type type, List<ProcessedConstructor> typeCtors)
 		{
 			var baseType = type.BaseType;
 			if (baseType.Namespace == "System" && baseType.Name == "Object")
-				return Enumerable.Empty<ConstructorInfo> ();
+				return Enumerable.Empty<ProcessedConstructor> ();
 
-			List<ConstructorInfo> parentCtors;
+			List<ProcessedConstructor> parentCtors;
 			if (!ctors.TryGetValue (baseType, out parentCtors))
-				return Enumerable.Empty<ConstructorInfo> ();
+				return Enumerable.Empty<ProcessedConstructor> ();
 
-			var finalList = new List<ConstructorInfo> ();
+			var finalList = new List<ProcessedConstructor> ();
 			foreach (var pctor in parentCtors) {
-				var pctorParams = pctor.GetParameters ();
+				var pctorParams = pctor.Constructor.GetParameters ();
 				foreach (var ctor in typeCtors) {
-					var ctorParams = ctor.GetParameters ();
+					var ctorParams = ctor.Constructor.GetParameters ();
 					if (pctorParams.Any (pc => !ctorParams.Any (p => p.Position == pc.Position && pc.ParameterType == p.ParameterType))) {
 						finalList.Add (pctor);
 						break;

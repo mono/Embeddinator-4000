@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>{C75D4267-5757-4078-BCF4-7136BE033E96}</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>managed</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)constructors.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)enums.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)equalsHashOverrides.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)exceptions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)fields.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)icomparable.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)interfaces.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)methods.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)namespaces.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)nsobjects.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)properties.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)structs.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)subscripts.cs">
+      <DependentUpon>subscripts.tt</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)types.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)shortParameters.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)overloads.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)subscripts.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>\work\Embeddinator-4000\tests\managed\subscripts.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+</Project>

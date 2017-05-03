@@ -117,3 +117,12 @@ public class BuiltinTypes
 }
 
 #endif
+
+// objc: this type won't be generated (Exception is not supported) but the generation will succeed (with warnings)
+public class MyException : Exception {
+}
+
+// objc: this type won't be generated (subclassing an unsupported type) but the generation will succeed (with warnings)
+public class MyNextException : MyException {
+}
+
