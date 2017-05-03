@@ -783,6 +783,93 @@
 	XCTAssert ([nested additionX:2 y:4] == 6, "Nested class method call");
 }
 
+- (void)testArraySupport {
+	Arrays_Arr *testClass = [[Arrays_Arr alloc] init];
+
+	NSArray<NSString *> *strArr = [testClass stringArrMethod];
+	XCTAssertEqual([strArr count], 3, @"strArr count");
+	XCTAssertEqualObjects(@"Hola", strArr[0], @"strArr[0] Hola");
+	XCTAssertEqualObjects(@"Hello", strArr[1], @"strArr[1] Hello");
+	XCTAssertEqualObjects(@"Bonjour", strArr[2], @"strArr[2] Bonjour");
+
+	NSArray<Arrays_ValueHolder *> *vhArr = [testClass valueHolderArrMethod];
+	XCTAssertEqual([vhArr count], 3, @"vhArr count");
+	XCTAssertEqual(vhArr[0].intValue, 1, @"vhArr[0] 1");
+	XCTAssertEqual(vhArr[1].intValue, 2, @"vhArr[1] 2");
+	XCTAssertEqual(vhArr[2].intValue, 3, @"vhArr[2] 3");
+
+	NSArray<NSNumber *> *boolArr = [testClass boolArrMethod];
+	XCTAssertEqual([boolArr count], 3, @"boolArr count");
+	XCTAssertEqual(boolArr[0].boolValue, YES, @"boolArr[0] YES");
+	XCTAssertEqual(boolArr[1].boolValue, NO, @"boolArr[1] NO");
+	XCTAssertEqual(boolArr[2].boolValue, YES, @"boolArr[2] YES");
+
+	NSArray<NSNumber *> *charArr = [testClass charArrMethod];
+	XCTAssertEqual([charArr count], 3, @"charArr count");
+	XCTAssertEqual(charArr[0].unsignedShortValue, 'a', @"charArr[0] a");
+	XCTAssertEqual(charArr[1].unsignedShortValue, 'b', @"charArr[1] b");
+	XCTAssertEqual(charArr[2].unsignedShortValue, '@', @"charArr[2] @");
+
+	NSArray<NSNumber *> *doubleArr = [testClass doubleArrMethod];
+	XCTAssertEqual([doubleArr count], 3, @"doubleArr count");
+	XCTAssertEqual(doubleArr[0].doubleValue, 1.5, @"doubleArr[0] 1.5");
+	XCTAssertEqual(doubleArr[1].doubleValue, 5.1, @"doubleArr[1] 5.1");
+	XCTAssertEqual(doubleArr[2].doubleValue, 3.1416, @"doubleArr[2] 3.1416");
+
+	NSArray<NSNumber *> *floatArr = [testClass floatArrMethod];
+	XCTAssertEqual([floatArr count], 3, @"floatArr count");
+	XCTAssertEqual(floatArr[0].floatValue, 1.5f, @"floatArr[0] 1.5");
+	XCTAssertEqual(floatArr[1].floatValue, 5.1f, @"floatArr[1] 5.1");
+	XCTAssertEqual(floatArr[2].floatValue, 3.1416f, @"floatArr[2] 3.1416");
+
+	NSArray<NSNumber *> *sbyteArr = [testClass sbyteArrMethod];
+	XCTAssertEqual([sbyteArr count], 3, @"sbyteArr count");
+	XCTAssertEqual(sbyteArr[0].charValue, 127, @"sbyteArr[0] 127");
+	XCTAssertEqual(sbyteArr[1].charValue, -128, @"sbyteArr[1] -128");
+	XCTAssertEqual(sbyteArr[2].charValue, 0, @"sbyteArr[2] 0");
+
+	NSArray<NSNumber *> *shortArr = [testClass shortArrMethod];
+	XCTAssertEqual([shortArr count], 3, @"shortArr count");
+	XCTAssertEqual(shortArr[0].shortValue, SHRT_MAX, @"shortArr[0] SHRT_MAX");
+	XCTAssertEqual(shortArr[1].shortValue, SHRT_MIN, @"shortArr[1] SHRT_MIN");
+	XCTAssertEqual(shortArr[2].shortValue, 0, @"shortArr[2] 0");
+
+	NSArray<NSNumber *> *intArr = [testClass intArrMethod];
+	XCTAssertEqual([intArr count], 3, @"intArr count");
+	XCTAssertEqual(intArr[0].intValue, INT_MAX, @"intArr[0] INT_MAX");
+	XCTAssertEqual(intArr[1].intValue, INT_MIN, @"intArr[1] INT_MIN");
+	XCTAssertEqual(intArr[2].intValue, 0, @"intArr[2] 0");
+
+	NSArray<NSNumber *> *longArr = [testClass longArrMethod];
+	XCTAssertEqual([longArr count], 3, @"longArr count");
+	XCTAssertEqual(longArr[0].longLongValue, LONG_MAX, @"longArr[0] LONG_MAX");
+	XCTAssertEqual(longArr[1].longLongValue, LONG_MIN, @"longArr[1] LONG_MIN");
+	XCTAssertEqual(longArr[2].longLongValue, 0, @"longArr[2] 0");
+
+	NSArray<NSNumber *> *ushortArr = [testClass ushortArrMethod];
+	XCTAssertEqual([ushortArr count], 3, @"ushortArr count");
+	XCTAssertEqual(ushortArr[0].unsignedShortValue, USHRT_MAX, @"ushortArr[0] USHRT_MAX");
+	XCTAssertEqual(ushortArr[1].unsignedShortValue, 0, @"ushortArr[1] 0");
+	XCTAssertEqual(ushortArr[2].unsignedShortValue, 10, @"ushortArr[2] 10");
+
+	NSArray<NSNumber *> *uintArr = [testClass uintArrMethod];
+	XCTAssertEqual([uintArr count], 3, @"uintArr count");
+	XCTAssertEqual(uintArr[0].unsignedIntValue, UINT_MAX, @"uintArr[0] INT_MAX");
+	XCTAssertEqual(uintArr[1].unsignedIntValue, 0, @"uintArr[1] 0");
+	XCTAssertEqual(uintArr[2].unsignedIntValue, 15, @"uintArr[2] 15");
+
+	NSArray<NSNumber *> *ulongArr = [testClass ulongArrMethod];
+	XCTAssertEqual([ulongArr count], 3, @"longArr count");
+	XCTAssertEqual(ulongArr[0].unsignedLongLongValue, ULONG_MAX, @"ulongArr[0] ULONG_MAX");
+	XCTAssertEqual(ulongArr[1].unsignedLongLongValue, 0, @"ulongArr[1] 0");
+	XCTAssertEqual(ulongArr[2].unsignedLongLongValue, 117, @"ulongArr[2] 117");
+
+	NSData *data = [testClass byteArrMethod];
+	char bytes[5] = {0x0, 0x01, 0x02, 0x04, 0x08};
+	NSData *cData = [NSData dataWithBytes:bytes length:sizeof(bytes)];
+	XCTAssertEqualObjects(cData, data, @"data");
+}
+
 #pragma clang diagnostic pop
 
 @end

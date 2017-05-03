@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -664,7 +664,7 @@ namespace ObjC {
 				return "instancetype";
 
 			var return_type = NameGenerator.GetTypeName (returnType);
-			if (HasClass (returnType))
+			if (HasClass (returnType) || returnType.IsArray)
 				return_type += "*";
 			return return_type;
 		}
@@ -796,8 +796,124 @@ namespace ObjC {
 				GenerateDefaultValuesWrappers (objcsig, method.Method);
 		}
 
+		void ReturnArrayValue (Type t)
+		{
+			var typecode = Type.GetTypeCode (t);
+			implementation.WriteLine ("MonoArray* __resarr = (MonoArray *) __result;");
+			implementation.WriteLine ("int __resarrlength = mono_array_length (__resarr);");
+
+			if (typecode == TypeCode.Byte)
+				implementation.WriteLine ("NSMutableData* __resobj = [NSMutableData dataWithCapacity:__resarrlength];");
+			else {
+				implementation.WriteLine ("id __autoreleasing* __resarrbuf = (id __autoreleasing *) malloc (sizeof (id) * __resarrlength);");
+				implementation.WriteLine ("id __resobj;");
+			}
+			implementation.WriteLine ("int __residx;");
+			implementation.WriteLine ();
+			implementation.WriteLine ("for (__residx = 0; __residx < __resarrlength; __residx++) {");
+			implementation.Indent++;
+
+			switch (typecode) {
+			case TypeCode.Boolean:
+				implementation.WriteLine ("bool __resarrval = mono_array_get (__resarr, bool, __residx);");
+				implementation.WriteLine ("__resobj = [NSNumber numberWithBool:__resarrval ? YES : NO];");
+				break;
+			case TypeCode.Char:
+				implementation.WriteLine ("unsigned short __resarrval = mono_array_get (__resarr, unsigned short, __residx);");
+				implementation.WriteLine ("__resobj = [NSNumber numberWithUnsignedShort:__resarrval];");
+				break;
+			case TypeCode.Double:
+				implementation.WriteLine ("double __resarrval = mono_array_get (__resarr, double, __residx);");
+				implementation.WriteLine ("__resobj = [NSNumber numberWithDouble:__resarrval];");
+				break;
+			case TypeCode.Single:
+				implementation.WriteLine ("float __resarrval = mono_array_get (__resarr, float, __residx);");
+				implementation.WriteLine ("__resobj = [NSNumber numberWithFloat:__resarrval];");
+				break;
+			case TypeCode.SByte:
+				implementation.WriteLine ("signed char __resarrval = mono_array_get (__resarr, signed char, __residx);");
+				implementation.WriteLine ("__resobj = [NSNumber numberWithChar:__resarrval];");
+				break;
+			case TypeCode.Int16:
+				implementation.WriteLine ("short __resarrval = mono_array_get (__resarr, short, __residx);");
+				implementation.WriteLine ("__resobj = [NSNumber numberWithShort:__resarrval];");
+				break;
+			case TypeCode.Int32:
+				implementation.WriteLine ("int __resarrval = mono_array_get (__resarr, int, __residx);");
+				implementation.WriteLine ("__resobj = [NSNumber numberWithInt:__resarrval];");
+				break;
+			case TypeCode.Int64:
+				implementation.WriteLine ("long long __resarrval = mono_array_get (__resarr, long long, __residx);");
+				implementation.WriteLine ("__resobj = [NSNumber numberWithLongLong:__resarrval];");
+				break;
+			case TypeCode.UInt16:
+				implementation.WriteLine ("unsigned short __resarrval = mono_array_get (__resarr, unsigned short, __residx);");
+				implementation.WriteLine ("__resobj = [NSNumber numberWithUnsignedShort:__resarrval];");
+				break;
+			case TypeCode.UInt32:
+				implementation.WriteLine ("unsigned int __resarrval = mono_array_get (__resarr, unsigned int, __residx);");
+				implementation.WriteLine ("__resobj = [NSNumber numberWithUnsignedInt:__resarrval];");
+				break;
+			case TypeCode.UInt64:
+				implementation.WriteLine ("unsigned long long __resarrval = mono_array_get (__resarr, unsigned long long, __residx);");
+				implementation.WriteLine ("__resobj = [NSNumber numberWithUnsignedLongLong:__resarrval];");
+				break;
+			case TypeCode.Byte:
+				implementation.WriteLine ("unsigned char __resarrval = mono_array_get (__resarr, unsigned char, __residx);");
+				implementation.WriteLine ("[__resobj appendBytes:&__resarrval length:1];");
+				break;
+			case TypeCode.String:
+				implementation.WriteLine ("MonoString* __resarrval = mono_array_get (__resarr, MonoString *, __residx);");
+				implementation.WriteLine ("if (__resarrval)");
+				implementation.Indent++;
+				implementation.WriteLine ("__resobj = mono_embeddinator_get_nsstring (__resarrval);");
+				implementation.Indent--;
+				implementation.WriteLine ("else");
+				implementation.Indent++;
+				implementation.WriteLine ("__resobj = [NSNull null];");
+				implementation.Indent--;
+				break;
+			case TypeCode.Object:
+				var tname = NameGenerator.GetTypeName (t);
+				if (HasProtocol (t))
+					tname = "__" + tname + "Wrapper";
+				implementation.WriteLine ("MonoObject* __resarrval = mono_array_get (__resarr, MonoObject *, __residx);");
+				implementation.WriteLine ($"{tname}* __tmpobj = [[{tname} alloc] initForSuper];");
+				implementation.WriteLine ("if (__resarrval) {");
+				implementation.Indent++;
+				implementation.WriteLine ("__tmpobj->_object = mono_embeddinator_create_object (__resarrval);");
+				implementation.WriteLine ("__resobj = __tmpobj;");
+				implementation.Indent--;
+				implementation.WriteLine ("} else");
+				implementation.Indent++;
+				implementation.WriteLine ("__resobj = [NSNull null];");
+				implementation.Indent--;
+				break;
+			default:
+				throw new NotImplementedException ($"Converting type {t.Name} to a native type name");
+			}
+
+			if (typecode == TypeCode.Byte) {
+				implementation.WriteLine ("}");
+				implementation.WriteLine ("return __resobj;");
+			}
+			else {
+				implementation.WriteLine ("__resarrbuf[__residx] = __resobj;");
+				implementation.Indent--;
+				implementation.WriteLine ("}");
+				implementation.WriteLine ("NSArray *__retarr = [[NSArray alloc] initWithObjects: __resarrbuf count: __resarrlength];");
+				implementation.WriteLine ("free(__resarrbuf);");
+				implementation.WriteLine ("return __retarr;");
+			}
+		}
+
 		void ReturnValue (Type t)
 		{
+			if (t.IsArray) {
+				ReturnArrayValue (t.GetElementType ());
+				return;
+			}
+
 			switch (Type.GetTypeCode (t)) {
 			case TypeCode.String:
 				implementation.WriteLine ("return mono_embeddinator_get_nsstring ((MonoString *) __result);");
@@ -832,7 +948,7 @@ namespace ObjC {
 				var tname = NameGenerator.GetTypeName (t);
 				if (HasProtocol (t))
 					tname = "__" + tname + "Wrapper";
-				implementation.WriteLine ($"\t{tname}* __peer = [[{tname} alloc] initForSuper];");
+				implementation.WriteLine ($"{tname}* __peer = [[{tname} alloc] initForSuper];");
 				implementation.WriteLine ("__peer->_object = mono_embeddinator_create_object (__result);");
 				implementation.WriteLine ("return __peer;");
 				break;

@@ -47,6 +47,9 @@ namespace ObjC {
 			if (t.IsEnum)
 				return GetObjCName (t);
 
+			if (t.IsArray)
+				return GetArrayTypeName (t.GetElementType ());
+
 			switch (Type.GetTypeCode (t)) {
 			case TypeCode.Object:
 				switch (t.Namespace) {
@@ -143,6 +146,32 @@ namespace ObjC {
 				return "string";
 			default:
 				throw new NotImplementedException ($"Converting type {t.Name} to a mono type name");
+			}
+		}
+
+		public static string GetArrayTypeName (Type t)
+		{
+			switch (Type.GetTypeCode (t)) {
+			case TypeCode.Boolean:
+			case TypeCode.Char:
+			case TypeCode.Double:
+			case TypeCode.Single:
+			case TypeCode.SByte:
+			case TypeCode.Int16:
+			case TypeCode.Int32:
+			case TypeCode.Int64:
+			case TypeCode.UInt16:
+			case TypeCode.UInt32:
+			case TypeCode.UInt64:
+				return "NSArray <NSNumber *>";
+			case TypeCode.Byte:
+				return "NSData";
+			case TypeCode.String:
+				return "NSArray <NSString *>";
+			case TypeCode.Object:
+				return $"NSArray<{GetObjCName (t)} *>";
+			default:
+				throw new NotImplementedException ($"Converting type {t.Name} to a native type name");
 			}
 		}
 
