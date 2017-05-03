@@ -204,6 +204,8 @@
 	XCTAssert ([default_item integer] == 0, "default creation 0");
 
 	XCTAssertEqualObjects (@"", [Methods_SomeExtensions notAnExtensionMethod], "empty string");
+
+	XCTAssert ([Methods_SomeExtensions incrementValue:1] == 2, "no category on primitive types");
 }
 
 - (void)testCategories {
@@ -235,16 +237,16 @@
 	XCTAssert ([p2 x] == 2.0f, "x 2");
 	XCTAssert ([p2 y] == -2.0f, "y 2");
 
-	XCTAssert ([Structs_Point equality:p1 right:p1], "p1 == p1");
-	XCTAssert ([Structs_Point equality:p2 right:p2], "p2 == p2");
-	XCTAssert ([Structs_Point inequality:p1 right:p2], "p1 != p2");
+	XCTAssert ([Structs_Point areEqual:p1 right:p1], "p1 == p1");
+	XCTAssert ([Structs_Point areEqual:p1 right:p1], "p2 == p2");
+	XCTAssert ([Structs_Point areEqual:p1 right:p2] == NO, "p1 != p2");
 
 	Structs_Point* p3 = [Structs_Point addition:p1 right:p2];
 	XCTAssert ([p3 x] == 3.0f, "x 3");
 	XCTAssert ([p3 y] == -3.0f, "y 3");
 
 	Structs_Point* p4 = [Structs_Point subtraction:p3 right:p2];
-	XCTAssert ([Structs_Point equality:p4 right:p1], "p4 == p1");
+	XCTAssert ([Structs_Point areEqual:p4 right:p1], "p4 == p1");
 
 	Structs_Point* z = [Structs_Point zero];
 	XCTAssert ([z x] == 0.0f, "x 4");
@@ -749,6 +751,11 @@
 
 	XCTAssertTrue ([[Overloads_AllOperatorsWithFriendly decrementC1:oneFriend] value] == (1 - 1), "1 - 1 All");
 	XCTAssertTrue ([[Overloads_AllOperatorsWithFriendly incrementC1:oneFriend] value] == (1 + 1), "1 + 1 All");
+
+	Overloads_EqualOverrides * equalOverrideTwo = [[Overloads_EqualOverrides alloc] initWithVal:2];
+	Overloads_EqualOverrides * equalOverrideFour = [[Overloads_EqualOverrides alloc] initWithVal:4];
+
+	XCTAssertTrue ([Overloads_EqualOverrides areEqual:equalOverrideFour b:equalOverrideTwo] == NO, "2 != 4 EqualOverride");
 }
 
 - (void)testShortParamters {

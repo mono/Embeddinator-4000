@@ -282,4 +282,37 @@ namespace Overloads {
 			return new AllOperatorsWithFriendly (-c1.Value);
 		}	
 	}
+
+	public class EqualOverrides {
+		public int Value { get; private set; }
+
+		public EqualOverrides (int val)
+		{
+			Value = val;
+		}
+
+		public static bool operator == (EqualOverrides a, EqualOverrides b)
+		{
+			return a.Value == b.Value;
+		}
+
+		public static bool operator != (EqualOverrides a, EqualOverrides b)
+		{
+			return a.Value == b.Value;
+		}
+
+		public override bool Equals (Object obj)
+		{
+			if (obj == null || GetType () != obj.GetType ())
+				return false;
+
+			EqualOverrides p = (EqualOverrides)obj;
+			return Value == p.Value;
+		}
+
+		public override int GetHashCode ()
+		{
+			return Value.GetHashCode ();
+		}
+	}
 }
