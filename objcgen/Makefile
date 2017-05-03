@@ -1,5 +1,15 @@
 all: bin/Debug/objcgen.exe shellcheck
 
+-include Make.config.inc
+
+PACKAGE_VERSION=0.1.0
+PACKAGE_FULLVERSION=$(PACKAGE_VERSION).$(COMMIT_DISTANCE)
+
+Make.config.inc: Makefile
+	@rm -f $@
+	@printf "COMMIT_DISTANCE:=$(shell LANG=C; export LANG && git log `git blame Makefile HEAD | grep PACKAGE_VERSION= | sed 's/ .*//' `..HEAD --oneline | wc -l | sed 's/ //g')\n" >> $@
+	@printf "VERSION:=$(PACKAGE_VERSION).$(shell LANG=C; export LANG && git log `git blame Makefile HEAD | grep PACKAGE_VERSION= | sed 's/ .*//' `..HEAD --oneline | wc -l | sed 's/ //g')\n" >> $@
+
 OBJCGEN_FILES := \
 	$(shell grep "Compile Include" *.csproj | grep -v Version.generated.cs | sed 's/.*Include="\(.*\)".*/\1/' | sed 's_\\_/_'g) \
 	$(shell grep "EmbeddedResource Include" *.csproj | sed 's/.*Include="\(.*\)".*/\1/' | sed 's_\\_/_'g) \
@@ -16,15 +26,14 @@ else
 	$(SHELLCHECK) $^
 endif
 
-VERSION = 0.1
 FRAMEWORK_DIR = _build/Library/Frameworks/Xamarin.Embeddinator-4000
-INSTALLER_FILES = Xamarin.Embeddinator-4000-$(VERSION).pkg
+INSTALLER_FILES = Xamarin.Embeddinator-4000-$(PACKAGE_FULLVERSION).pkg
 
-package:: bin/Debug/objcgen.exe
+package:: bin/Debug/objcgen.exe Make.config.inc
 	mkdir -p $(FRAMEWORK_DIR)/Commands/
-	mkdir -p $(FRAMEWORK_DIR)/Versions/$(VERSION)/bin
-	ln -fs $(VERSION) $(FRAMEWORK_DIR)/Versions/Current
-	cp bin/Debug/objcgen.exe $(FRAMEWORK_DIR)/Versions/Current/bin/
+	mkdir -p $(FRAMEWORK_DIR)/Versions/$(PACKAGE_FULLVERSION)/bin
+	ln -fs $(PACKAGE_FULLVERSION) $(FRAMEWORK_DIR)/Versions/Current
+	cp bin/Debug/objcgen.{exe,pdb} $(FRAMEWORK_DIR)/Versions/Current/bin/
 	cp bin/Debug/Mono.Options.dll $(FRAMEWORK_DIR)/Versions/Current/bin/
 	cp script/objcgen  $(FRAMEWORK_DIR)/Commands/
 	chmod +x $(FRAMEWORK_DIR)/Commands/objcgen
@@ -32,12 +41,12 @@ package:: bin/Debug/objcgen.exe
 clean-package::
 	rm -rf _build/
 	rm -rf _installer/
-
+	rm Make.config.inc
 
 $(INSTALLER_FILES): package
 	rm -rf _installer/
 	mkdir -p _installer/ROOT/
 	cp -R _build/ _installer/ROOT/
-	pkgbuild --root _installer/ROOT --identifier com.xamarin.embeddinator-4000 --version 0.1 $(INSTALLER_FILES)
+	pkgbuild --root _installer/ROOT --identifier com.xamarin.embeddinator-4000 --version $(PACKAGE_FULLVERSION) $(INSTALLER_FILES)
 
 installer:: $(INSTALLER_FILES)
