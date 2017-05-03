@@ -93,7 +93,7 @@ namespace Embeddinator {
 				Console.WriteLine ($"Embeddinator-4000 v0.1 ({Info.Branch}: {Info.Hash})");
 				Console.WriteLine ("Generates target language bindings for interop with managed code.");
 				Console.WriteLine ("");
-				Console.WriteLine ($"Usage: {Path.GetFileName (System.Reflection.Assembly.GetExecutingAssembly ().Location)} [options]+ ManagedAssembly1.dll [ManagedAssembly2.dll ...]");
+				Console.WriteLine ($"Usage: objcgen [options]+ ManagedAssembly1.dll [ManagedAssembly2.dll ...]");
 				Console.WriteLine ();
 				os.WriteOptionDescriptions (Console.Out);
 				return 0;
