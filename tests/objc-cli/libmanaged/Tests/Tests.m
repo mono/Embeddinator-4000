@@ -204,6 +204,8 @@
 	XCTAssert ([default_item integer] == 0, "default creation 0");
 
 	XCTAssertEqualObjects (@"", [Methods_SomeExtensions notAnExtensionMethod], "empty string");
+
+	XCTAssert ([Methods_SomeExtensions incrementValue:1] == 2, "no category on primitive types");
 }
 
 - (void)testCategories {
