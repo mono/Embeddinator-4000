@@ -6,6 +6,7 @@ import managed_dll.exceptions.*;
 import managed_dll.constructors.*;
 import managed_dll.enums.*;
 import managed_dll.methods.*;
+import managed_dll.structs.*;
 
 import mono.embeddinator.*;
 
@@ -165,6 +166,28 @@ public class Tests {
 
         collection.remove(item2);
         assertEquals(0, collection.getCount());
+    }
+
+    @Test
+    public void testStructs() {
+        Point p1 = new Point(1.0f, -1.0f);
+        doublesAreEqual(1.0f, p1.getX());
+        doublesAreEqual(-1.0f, p1.getY());
+
+        Point p2 = new Point(2.0f, -2.0f);
+        doublesAreEqual(2.0f, p2.getX());
+        doublesAreEqual(-2.0f, p2.getY());
+
+        assertTrue(Point.opEquality(p1, p1));
+        assertTrue(Point.opEquality(p2, p2));
+        assertTrue(Point.opInequality(p1, p2));
+
+        Point p3 = Point.opAddition(p1, p2);
+        doublesAreEqual(3.0f, p3.getX());
+        doublesAreEqual(-3.0f, p3.getY());
+
+        Point p4 = Point.opSubtraction(p3, p2);
+        assertTrue(Point.opEquality(p4, p1));
     }
 
     @Test
