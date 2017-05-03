@@ -110,7 +110,7 @@ namespace ObjC {
 					case "Void":
 						return "void";
 					default:
-						return "object";
+						return t.IsInterface ? t.FullName : "object";
 					}
 				default:
 					return t.FullName;

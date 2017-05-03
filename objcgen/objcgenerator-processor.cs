@@ -13,6 +13,7 @@ namespace ObjC {
 
 		List<Exception> delayed = new List<Exception> ();
 		HashSet<Type> unsupported = new HashSet<Type> ();
+		List<Type> extra_types = new List<Type> ();
 
 		bool IsNSObjectSubclass (Type t)
 		{
@@ -60,17 +61,28 @@ namespace ObjC {
 				case "Object": // we cannot accept arbitrary NSObject (which we might not have bound) into mono
 				case "DBNull":
 				case "Exception":
-				case "IFormatProvider":
 				case "Type":
 					delayed.Add (ErrorHelper.CreateWarning (1011, $"Type `{t}` is not generated because it lacks a native counterpart."));
 					unsupported.Add (t);
 					return false;
 				case "DateTime": // FIXME: NSDateTime
 				case "Decimal": // FIXME: NSDecimal
-				case "TimeSpan":
 					delayed.Add (ErrorHelper.CreateWarning (1012, $"Type `{t}` is not generated because it lacks a marshaling code with a native counterpart."));
 					unsupported.Add (t);
 					return false;
+				case "IFormatProvider":
+				case "TimeSpan":
+					if (!extra_types.Contains (t))
+						extra_types.Add (t);
+					break;
+				}
+				break;
+			case "System.Globalization":
+				switch (t.Name) {
+				case "TimeSpanStyles": // for TimeSpan support
+					if (!extra_types.Contains (t))
+						extra_types.Add (t);
+					break;
 				}
 				break;
 			}
@@ -248,75 +260,91 @@ namespace ObjC {
 					throw ErrorHelper.CreateError (12, $"The assembly name `{pa.Name}` is not unique");
 
 				foreach (var t in GetTypes (a)) {
-					if (t.IsEnum) {
-						enums.Add (new ProcessedType (t));
-						continue;
-					}
-
-					if (t.IsInterface) {
-						protocols.Add (new ProcessedType (t));
-					} else {
-						types.Add (new ProcessedType (t));
-					}
-
-					extension_type = t.HasCustomAttribute ("System.Runtime.CompilerServices", "ExtensionAttribute");
-
-					implement_system_icomparable = t.Implements ("System", "IComparable");
-					implement_system_icomparable_t = t.Implements("System", "IComparable`1");
-
-					var constructors = GetConstructors (t).OrderBy ((arg) => arg.ParameterCount).ToList ();
-					var processedConstructors = PostProcessConstructors (constructors).ToList ();
-					if (processedConstructors.Count > 0)
-						ctors.Add (t, processedConstructors);
-
-					var meths = GetMethods (t).OrderBy ((arg) => arg.Name).ToList ();
-					var processedMethods = PostProcessMethods (meths).ToList ();
-					if (processedMethods.Count > 0)
-						methods.Add (t, processedMethods);
-
-					var props = new List<PropertyInfo> ();
-					var subscriptProps = new List<PropertyInfo> ();
-					foreach (var pi in GetProperties (t)) {
-						var getter = pi.GetGetMethod ();
-						var setter = pi.GetSetMethod ();
-						// setter only property are valid in .NET and we need to generate a method in ObjC (there's no writeonly properties)
-						if (getter == null)
-							continue;
-
-						// indexers are implemented as methods and object subscripting
-						if ((getter.ParameterCount > 0) || ((setter != null) && setter.ParameterCount > 1)) {
-							subscriptProps.Add (pi);
-							continue;
-						}
-
-						// we can do better than methods for the more common cases (readonly and readwrite)
-						processedMethods.RemoveAll (x => x.Method == getter);
-						processedMethods.RemoveAll (x => x.Method == setter);
-						props.Add (pi);
-					}
-					props = props.OrderBy ((arg) => arg.Name).ToList ();
-					var processedProperties = PostProcessProperties (props).ToList ();
-					if (processedProperties.Count > 0)
-						properties.Add (t, processedProperties);
-
-					if (subscriptProps.Count > 0) {
-						if (subscriptProps.Count > 1)
-							delayed.Add (ErrorHelper.CreateWarning (1041, $"Indexed properties on {t.Name} is not generated because multiple indexed properties not supported."));
-						else
-							subscriptProperties.Add (t, PostProcessSubscriptProperties (subscriptProps).ToList ());
-					}
-
-					// fields will need to be wrapped within properties
-					var f = GetFields (t).OrderBy ((arg) => arg.Name).ToList ();
-					var processedFields = PostProcessFields (f).ToList ();
-					if (processedFields.Count > 0)
-						fields.Add (t, processedFields);
+					Process (t);
 				}
 			}
+
+			// we might have collected types that needs help (and collecting them can bring more)
+			for (int i = 0; i < extra_types.Count; i++) {
+				var t = extra_types [i];
+				Process (t);
+				// extra types are (most likely) outside the input list of assemblies
+				AddIfUnique (new ProcessedAssembly (t.Assembly));
+			}
+
 			types = types.OrderBy ((arg) => arg.Type.FullName).OrderBy ((arg) => types.Contains (arg.Type.BaseType)).ToList ();
 			Console.WriteLine ($"\t{types.Count} types found");
 
 			ErrorHelper.Show (delayed);
+		}
+
+		public void Process (Type t)
+		{
+			var pt = new ProcessedType (t);
+
+			if (t.IsEnum) {
+				enums.Add (pt);
+				return;
+			}
+
+			if (t.IsInterface) {
+				protocols.Add (pt);
+			} else {
+				types.Add (pt);
+			}
+
+			extension_type = t.HasCustomAttribute ("System.Runtime.CompilerServices", "ExtensionAttribute");
+
+			implement_system_icomparable = t.Implements ("System", "IComparable");
+			implement_system_icomparable_t = t.Implements ("System", "IComparable`1");
+
+			var constructors = GetConstructors (t).OrderBy ((arg) => arg.ParameterCount).ToList ();
+			var processedConstructors = PostProcessConstructors (constructors).ToList ();
+			if (processedConstructors.Count > 0)
+				ctors.Add (t, processedConstructors);
+
+			var meths = GetMethods (t).OrderBy ((arg) => arg.Name).ToList ();
+			var processedMethods = PostProcessMethods (meths).ToList ();
+			if (processedMethods.Count > 0)
+				methods.Add (t, processedMethods);
+
+			var props = new List<PropertyInfo> ();
+			var subscriptProps = new List<PropertyInfo> ();
+			foreach (var pi in GetProperties (t)) {
+				var getter = pi.GetGetMethod ();
+				var setter = pi.GetSetMethod ();
+				// setter only property are valid in .NET and we need to generate a method in ObjC (there's no writeonly properties)
+				if (getter == null)
+					continue;
+
+				// indexers are implemented as methods and object subscripting
+				if ((getter.ParameterCount > 0) || ((setter != null) && setter.ParameterCount > 1)) {
+					subscriptProps.Add (pi);
+					continue;
+				}
+
+				// we can do better than methods for the more common cases (readonly and readwrite)
+				processedMethods.RemoveAll (x => x.Method == getter);
+				processedMethods.RemoveAll (x => x.Method == setter);
+				props.Add (pi);
+			}
+			props = props.OrderBy ((arg) => arg.Name).ToList ();
+			var processedProperties = PostProcessProperties (props).ToList ();
+			if (processedProperties.Count > 0)
+				properties.Add (t, processedProperties);
+
+			if (subscriptProps.Count > 0) {
+				if (subscriptProps.Count > 1)
+					delayed.Add (ErrorHelper.CreateWarning (1041, $"Indexed properties on {t.Name} is not generated because multiple indexed properties not supported."));
+				else
+					subscriptProperties.Add (t, PostProcessSubscriptProperties (subscriptProps).ToList ());
+			}
+
+			// fields will need to be wrapped within properties
+			var f = GetFields (t).OrderBy ((arg) => arg.Name).ToList ();
+			var processedFields = PostProcessFields (f).ToList ();
+			if (processedFields.Count > 0)
+				fields.Add (t, processedFields);
 		}
 	}
 }

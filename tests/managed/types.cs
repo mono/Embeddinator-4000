@@ -80,3 +80,9 @@ public static class Type_String
 	public static string NonEmptyString { get { return "Hello World"; } }
 }
 
+public class ExposeExtraTypes {
+
+	public TimeSpan TimeOfDay {
+		get { return DateTime.Now.TimeOfDay; }
+	}
+}

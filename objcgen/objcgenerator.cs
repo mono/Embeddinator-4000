@@ -94,13 +94,20 @@ namespace ObjC {
 			implementation.WriteLine ("return;");
 			implementation.Indent--;
 			implementation.WriteLine ("__initialize_mono ();");
-			implementation.WriteLine ($"__{name}_image = mono_embeddinator_load_assembly (&__mono_context, \"{originalName}.dll\");");
+			if (name == "mscorlib") {
+				// skip extra logic - we know it's already loaded into memory
+				implementation.WriteLine ($"__{name}_image = mono_get_corlib ();");
+			} else {
+				implementation.WriteLine ($"__{name}_image = mono_embeddinator_load_assembly (&__mono_context, \"{originalName}.dll\");");
+			}
 			implementation.WriteLine ($"assert (__{name}_image && \"Could not load the assembly '{originalName}.dll'.\");");
 			var categories = extensions_methods.Keys;
 			if (categories.Count > 0) {
 				implementation.WriteLine ("// we cannot use `+initialize` inside categories as they would replace the original type code");
 				implementation.WriteLine ("// since there should not be tons of them we're pre-loading them when loading the assembly");
 				foreach (var definedType in extensions_methods.Keys) {
+					if (definedType.Assembly != a.Assembly)
+						continue;
 					var managed_name = NameGenerator.GetObjCName (definedType);
 					implementation.WriteLineUnindented ("#if TOKENLOOKUP");
 					implementation.WriteLine ($"{managed_name}_class = mono_class_get (__{name}_image, 0x{definedType.MetadataToken:X8});");
@@ -693,7 +700,7 @@ namespace ObjC {
 				ObjCSignature = objcsig,
 				ObjCTypeName = managed_type_name,
 				IsValueType = type.IsValueType,
-				IsVirtual = info.IsVirtual,
+				IsVirtual = info.IsVirtual && !info.IsFinal,
 			};
 
 			if (pi == null)
