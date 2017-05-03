@@ -9,4 +9,5 @@ clean:
 IOS_SAMPLES=
 
 MAC_SAMPLES=\
-	mac/weather\
+	mac/weather	\
+	UnitsNet
