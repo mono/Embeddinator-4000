@@ -45,8 +45,15 @@ namespace Embeddinator {
 	public class ProcessedMethod : ProcessedMemberBase {
 		public MethodInfo Method { get; private set; }
 		public bool IsOperator { get; set; }
+		public string NameOverride { get; set; }
 
-		public string BaseName => IsOperator ? Method.Name.Substring (3).CamelCase () : Method.Name.CamelCase ();
+		public string BaseName {
+			get {
+				if (NameOverride != null)
+					return NameOverride;
+				return IsOperator? Method.Name.Substring (3).CamelCase () : Method.Name.CamelCase ();
+			}
+		}
 
 		public ProcessedMethod (MethodInfo method)
 		{

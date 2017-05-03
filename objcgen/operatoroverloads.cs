@@ -95,10 +95,10 @@ namespace ObjC
 
 		static IEnumerable<MethodInfo> HandleEquals (OperatorInfo info, IEnumerable<MethodInfo> methods, IEnumerable<MethodInfo> equals)
 		{
-			if (equals.Any ()) {
-				foreach (var method in methods)
-					yield return method;
-			}
+			foreach (var method in equals)
+				yield return method;
+			foreach (var method in methods.Where (x => x.Name == "op_Inequality"))
+				yield return method;
 		}
 	}
 }

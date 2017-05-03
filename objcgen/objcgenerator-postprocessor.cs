@@ -25,6 +25,9 @@ namespace ObjC {
 
 				if (method.IsSpecialName && method.IsStatic && method.Name.StartsWith ("op_", StringComparison.Ordinal))
 					processedMethod.IsOperator = true;
+
+				if (method.IsSpecialName && method.IsStatic && method.Name == "op_Equality")
+					processedMethod.NameOverride = "areEqual";
 				
 				if (operatorToIgnore.Contains (method)) {
 					delayed.Add (ErrorHelper.CreateWarning (1033, $"Method {processedMethod.Method.Name} is not generated because another method exposes the operator with a friendly name"));

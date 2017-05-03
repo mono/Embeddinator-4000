@@ -7,7 +7,7 @@ namespace ObjC {
 		public EqualsHelper (SourceWriter headers, SourceWriter implementation) : base (headers, implementation)
 		{
 			MonoSignature = "Equals(object)";
-			ObjCSignature = "areEqual:(id _Nullable)other";
+			ObjCSignature = "isEqual:(id _Nullable)other";
 			ReturnType = "bool";
 		}
 
