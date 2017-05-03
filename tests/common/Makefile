@@ -7,7 +7,7 @@ binder:
 	msbuild /nologo /v:minimal ../../build/MonoEmbeddinator4000.sln || xbuild /nologo /v:minimal ../../build/MonoEmbeddinator4000.sln
 
 EMBEDDINATOR_EXE=../../build/lib/Debug/MonoEmbeddinator4000.exe
-MANAGED_DLL=../managed/bin/Debug/managed.dll
+MANAGED_DLL=../managed/generic/bin/Debug/managed.dll
 
 gen:
 	mono --debug $(EMBEDDINATOR_EXE) -gen=c -out=c -p=macos -compile -target=shared $(MANAGED_DLL)
@@ -18,8 +18,8 @@ BUILD_FLAGS=/v:minimal /p:DefineConstants="NON_OBJC_SUPPORTED_TESTS"
 managed:
 	BUILD_FLAGS="$(BUILD_FLAGS)" make -C ../managed clean all
 	mkdir -p mk/bin/Debug
-	cp ../managed/bin/Debug/managed.dll* mk/bin/Debug 
-	cp ../managed/bin/Debug/managed.dll* .
+	cp $(MANAGED_DLL)* mk/bin/Debug 
+	cp $(MANAGED_DLL)* .
 
 compile_c_objc:
 	../../external/CppSharp/build/premake5-osx gmake
@@ -45,4 +45,4 @@ run:
 	mk/bin/Debug/common.Tests
 
 clean:
-	rm -rf mk c objc java *.dylib *.jar *.class
+	rm -rf mk c objc java *.dylib *.jar *.class *.dll
