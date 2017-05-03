@@ -74,7 +74,9 @@ namespace ObjC {
 				}
 				break;
 			}
-			return true;
+
+			var base_type = t.BaseType;
+			return (base_type == null) || base_type.Is ("System", "Object") ? true : IsSupported (base_type);
 		}
 
 		protected IEnumerable<Type> GetTypes (Assembly a)
