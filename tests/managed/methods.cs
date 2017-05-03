@@ -130,6 +130,12 @@ namespace Methods {
 			return null;
 		}
 
+		// objc: this will be generated as a normal method since categories cannot be created on primitive types
+		public static int Increment (this int value)
+		{
+			return value + 1;
+		}
+
 		public static string NotAnExtensionMethod ()
 		{
 			return String.Empty;
