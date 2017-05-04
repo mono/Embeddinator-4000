@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿﻿using System.Collections.Generic;
 using System.Linq;
 using CppSharp;
 using CppSharp.AST;
@@ -83,13 +83,15 @@ namespace MonoEmbeddinator4000.Generators
             var referencedClasses = new GetReferencedClasses();
             Unit.Visit(referencedClasses);
 
-            foreach (var @class in referencedClasses.Classes)
-            {
-                if (@class == GenerateObjectTypesPass.MonoEmbedObject)
-                    continue;
+            var classNames = referencedClasses.Classes
+                .Where(c => c != GenerateObjectTypesPass.MonoEmbedObject)
+                .Select(c => c.QualifiedName)
+                .Distinct();
 
+            foreach (var @class in classNames)
+            {
                 PushBlock();
-                WriteLine($"static MonoClass* class_{@class.QualifiedName} = 0;");
+                WriteLine($"static MonoClass* class_{@class} = 0;");
                 PopBlock(NewLineKind.Never);
             }
 
