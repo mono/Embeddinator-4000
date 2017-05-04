@@ -64,6 +64,19 @@ namespace MonoEmbeddinator4000.Generators
         {
         }
 
+        public override bool VisitDeclContext(DeclarationContext context)
+        {
+            foreach (var decl in context.Enums)
+                if (decl.IsGenerated)
+                    decl.Visit(this);
+
+            foreach (var decl in context.Declarations.Where(d => !(d is Enumeration)))
+                if (decl.IsGenerated)
+                    decl.Visit(this);
+
+            return true;
+        }
+
         public override bool VisitEnumDecl(Enumeration @enum)
         {
             PushBlock();
