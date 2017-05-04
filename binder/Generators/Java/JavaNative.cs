@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using CppSharp;
 using CppSharp.AST;
@@ -10,6 +11,7 @@ namespace MonoEmbeddinator4000.Generators
     /// This class is responsible for generating JNA-compatible method and class
     /// Java code for a given managed library represented as a translation unit.
     /// </summary>
+    [DebuggerDisplay("Unit = {TranslationUnit}")]
     public class JavaNative : JavaSources
     {
         public JavaNative(BindingContext context, TranslationUnit unit)

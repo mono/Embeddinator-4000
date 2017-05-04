@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using CppSharp;
@@ -8,6 +9,7 @@ using CppSharp.Generators;
 
 namespace MonoEmbeddinator4000.Generators
 {
+    [DebuggerDisplay("Decl = {Declaration}")]
     public class JavaSources : CodeGenerator
     {
         public JavaTypePrinter TypePrinter;
