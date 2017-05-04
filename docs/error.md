@@ -146,9 +146,15 @@ This is a **warning** that the default parameters of method `M` are not generati
 
 Note: Supported features will evolve with new versions of the tool.
 
+
 <h3><a name="EM1033"/>Method `M` is not generated because another method exposes the operator with a friendly name.</h3>
 
 This is a **warning** that the method `M` is not generated because another method exposes the operator with a friendly name. (https://msdn.microsoft.com/en-us/library/ms229032(v=vs.110).aspx)
+
+
+<h3><a name="EM1034"/>Extension method `M` is not generated inside a category because they cannot be created on primitive type `T`. A normal, static method was generated.</h3>
+
+This is a **warning** that an extension method on a primivite type (e.g. `System.Int32`) was found. In ObjC it is not possible to create categories on primitive type. Instead the generator will be produce a normal, static method.
 
 
 
