@@ -107,6 +107,9 @@ namespace MonoEmbeddinator4000.Generators
             if (decl.Namespace == null)
                 throw new Exception("Declaration should have a namespace");
 
+            if (typeInfo.IsGenericParameter || typeInfo.IsGenericType)
+                decl.GenerationKind = GenerationKind.None;
+
             return decl;
         }
 
