@@ -266,7 +266,7 @@ namespace ObjC {
 			var typeQueue = new Queue<ProcessedType> (types);
 			types.Clear (); // reuse
 			while (typeQueue.Count > 0) {
-		                Process (typeQueue.Dequeue ());
+				Process (typeQueue.Dequeue ());
 			}
 
 			types = types.OrderBy ((arg) => arg.Type.FullName).OrderBy ((arg) => types.HasClass (arg.Type.BaseType)).ToList ();
