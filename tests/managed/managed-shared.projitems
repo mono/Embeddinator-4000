@@ -11,6 +11,8 @@
   <ItemGroup>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)arrays.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)builtins.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)constructors.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)enums.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)equalsHashOverrides.cs" />

@@ -1,5 +1,3 @@
-#if NON_OBJC_SUPPORTED_TESTS
-
 using System;
 using System.Linq;
 
@@ -23,5 +21,3 @@ namespace Arrays {
 		}
 	}
 }
-
-#endif
