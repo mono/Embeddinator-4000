@@ -153,7 +153,7 @@ to
 + (instancetype)addition:(Overloads_AllOperators *)anObjectC1 c2:(Overloads_AllOperators *)anObjectC2;
 ```
 
-However, some .NET languages do not support operator overloading so it is common to also include a ["friendly"](https://msdn.microsoft.com/en-us/library/ms229032(v=vs.110).aspx) named method in addition.
+However, some .NET languages do not support operator overloading, so it is common to also include a ["friendly"](https://msdn.microsoft.com/en-us/library/ms229032(v=vs.110).aspx) named method in addition to the operator overload.
 
 If both the operator version and the "friendly" version are found, only the friendly version will be generated.
 
@@ -177,6 +177,6 @@ becomes:
 
 ### Equality operator
 
-In general operator == in C# is handled as a general operators as noted above.
+In general operator == in C# is handled as a general operator as noted above.
 
 However, if the "friendly" Equals operator is found, both operator == and operator != will be skipped in generation.

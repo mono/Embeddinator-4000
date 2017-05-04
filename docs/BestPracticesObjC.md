@@ -128,8 +128,8 @@ The generator follow the same `return nil` pattern for generated `init*` methods
 
 ## Operators
 
-ObjC does not allow operators to be overloaded as C# does and these are converted to class selectors. 
+ObjC does not allow operators to be overloaded as C# does, so these are converted to class selectors. 
 
-["Friendly"](https://msdn.microsoft.com/en-us/library/ms229032(v=vs.110).aspx) named method are generated in preference to the operator overloads when found and can produce an easier to consume API.
+["Friendly"](https://msdn.microsoft.com/en-us/library/ms229032(v=vs.110).aspx) named method are generated in preference to the operator overloads when found, and can produce an easier to consume API.
 
-Classes that override operator == and\or != should override the standard Equals (Object) method as well.
+Classes that override the operators == and\or != should override the standard Equals (Object) method as well.
