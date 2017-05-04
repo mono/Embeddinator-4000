@@ -49,6 +49,7 @@ namespace ObjC {
 			headers.WriteLine (" {");
 			if (!IsStatic && !IsBaseTypeBound) {
 				headers.Indent++;
+				headers.WriteLine ("// This field is not meant to be accessed from user code");
 				headers.WriteLine ("@public MonoEmbedObject* _object;");
 				headers.Indent--;
 			}
