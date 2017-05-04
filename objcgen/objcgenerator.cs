@@ -28,7 +28,7 @@ namespace ObjC {
 			headers.WriteLine ();
 
 			headers.WriteLine ("// forward declarations");
-			foreach (var t in types)
+			foreach (var t in types.Where ((arg) => arg.IsClass))
 				headers.WriteLine ($"@class {t.TypeName};");
 			headers.WriteLine ();
 			headers.WriteLine ("NS_ASSUME_NONNULL_BEGIN");
@@ -48,9 +48,9 @@ namespace ObjC {
 				implementation.WriteLine ($"MonoImage* __{a.SafeName}_image;");
 			implementation.WriteLine ();
 
-			foreach (var t in types)
+			foreach (var t in types.Where ((arg) => arg.IsClass))
 				implementation.WriteLine ($"static MonoClass* {t.ObjCName}_class = nil;");
-			foreach (var t in protocols) {
+			foreach (var t in types.Where ((arg) => arg.IsProtocol)) {
 				var pname = t.TypeName;
 				headers.WriteLine ($"@protocol {pname};");
 				implementation.WriteLine ($"@class __{pname}Wrapper;");
@@ -115,15 +115,15 @@ namespace ObjC {
 
 			var assembly = a.Assembly;
 
-			foreach (var t in enums.Where ((ProcessedType arg) => arg.Type.Assembly == assembly)) {
+			foreach (var t in types.Where ((arg) => arg.IsEnum && arg.Assembly == a)) {
 				GenerateEnum (t);
 			}
 
-			foreach (var t in protocols.Where ((ProcessedType arg) => arg.Type.Assembly == assembly)) {
+			foreach (var t in types.Where ((arg) => arg.IsProtocol && arg.Assembly == a)) {
 				GenerateProtocol (t);
 			}
 
-			foreach (var t in types.Where ((ProcessedType arg) => arg.Type.Assembly == assembly)) {
+			foreach (var t in types.Where ((arg) => arg.IsClass && arg.Assembly == a)) {
 				Generate (t);
 			}
 
@@ -265,7 +265,7 @@ namespace ObjC {
 
 			List<string> conformed_protocols = new List<string> ();
 			foreach (var i in t.GetInterfaces ()) {
-				if (protocols.Contains (i))
+				if (types.HasProtocol (i))
 					conformed_protocols.Add (NameGenerator.GetObjCName (i));
 			}
 
@@ -277,7 +277,7 @@ namespace ObjC {
 				Namespace = t.Namespace,
 				ManagedName = t.Name,
 				Protocols = conformed_protocols,
-				IsBaseTypeBound = types.Contains (t.BaseType),
+				IsBaseTypeBound = types.HasClass (t.BaseType),
 				IsStatic = t.IsSealed && t.IsAbstract,
 				MetadataToken = t.MetadataToken,
 			};
@@ -350,7 +350,7 @@ namespace ObjC {
 					implementation.WriteLine ("_object = mono_embeddinator_create_object (__instance);");
 					implementation.Indent--;
 					implementation.WriteLine ("}");
-					if (types.Contains (t.BaseType))
+					if (types.HasClass (t.BaseType))
 						implementation.WriteLine ("return self = [super initForSuper];");
 					else
 						implementation.WriteLine ("return self = [super init];");
@@ -388,7 +388,7 @@ namespace ObjC {
 				implementation.WriteLine ("_object = mono_embeddinator_create_object (__instance);");
 				implementation.Indent--;
 				implementation.WriteLine ("}");
-				if (types.Contains (t.BaseType))
+				if (types.HasClass (t.BaseType))
 					implementation.WriteLine ("return self = [super initForSuper];");
 				else
 					implementation.WriteLine ("return self = [super init];");
@@ -521,9 +521,9 @@ namespace ObjC {
 				if (t.IsValueType)
 					implementation.WriteLine ($"{argumentName} = mono_object_unbox (mono_gchandle_get_target ({paramaterName}->_object->_handle));");
 				else 
-				if (types.Contains (t))
+				if (types.HasClass (t))
 					implementation.WriteLine ($"{argumentName} = {paramaterName} ? mono_gchandle_get_target ({paramaterName}->_object->_handle): nil;");
-				else if (protocols.Contains (t))
+				else if (types.HasProtocol (t))
 					implementation.WriteLine ($"{argumentName} = {paramaterName} ? mono_embeddinator_get_object ({paramaterName}, true) : nil;");
 				else
 					throw new NotImplementedException ($"Converting type {t.FullName} to mono code");
@@ -549,7 +549,7 @@ namespace ObjC {
 				headers.Write (", readonly");
 			var pt = pi.PropertyType;
 			var property_type = NameGenerator.GetTypeName (pt);
-			if (types.Contains (pt))
+			if (types.HasClass (pt))
 				property_type += " *";
 
 			var spacing = property_type [property_type.Length - 1] == '*' ? string.Empty : " ";
@@ -573,7 +573,7 @@ namespace ObjC {
 			if (read_only)
 				headers.Write (", readonly");
 			var ft = fi.FieldType;
-			var bound = types.Contains (ft);
+			var bound = types.HasClass (ft);
 			if (bound && ft.IsValueType)
 				headers.Write (", nonnull");
 
@@ -613,7 +613,7 @@ namespace ObjC {
 				instance = "__instance";
 			}
 			implementation.WriteLine ($"MonoObject* __result = mono_field_get_value_object (__mono_context.domain, __field, {instance});");
-			if (types.Contains (ft)) {
+			if (types.HasClass (ft)) {
 				implementation.WriteLine ("if (!__result)");
 				implementation.Indent++;
 				implementation.WriteLine ("return nil;");
@@ -658,13 +658,13 @@ namespace ObjC {
 
 		public string GetReturnType (Type declaringType, Type returnType)
 		{
-			if (protocols.Contains (returnType))
+			if (types.HasProtocol (returnType))
 				return "id<" + NameGenerator.GetTypeName (returnType) + ">";
 			if (declaringType == returnType)
 				return "instancetype";
 
 			var return_type = NameGenerator.GetTypeName (returnType);
-			if (types.Contains (returnType))
+			if (types.HasClass (returnType))
 				return_type += "*";
 			return return_type;
 		}
@@ -821,7 +821,7 @@ namespace ObjC {
 			case TypeCode.Object:
 				if (t.Namespace == "System" && t.Name == "Void")
 					return;
-				if (!types.Contains (t) && !protocols.Contains (t))
+				if (!types.HasClass (t) && !types.HasProtocol (t))
 					goto default;
 
 				implementation.WriteLine ("if (!__result)");
@@ -830,7 +830,7 @@ namespace ObjC {
 				implementation.Indent--;
 				// TODO: cheating by reusing `initForSuper` - maybe a better name is needed
 				var tname = NameGenerator.GetTypeName (t);
-				if (protocols.Contains (t))
+				if (types.HasProtocol (t))
 					tname = "__" + tname + "Wrapper";
 				implementation.WriteLine ($"\t{tname}* __peer = [[{tname} alloc] initForSuper];");
 				implementation.WriteLine ("__peer->_object = mono_embeddinator_create_object (__result);");

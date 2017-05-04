@@ -17,6 +17,8 @@ namespace Embeddinator {
 		public string Name { get; private set; }
 		public string SafeName { get; private set; }
 
+		public bool UserCode { get; set; }
+
 		public ProcessedAssembly (Assembly assembly)
 		{
 			Assembly = assembly;
@@ -29,6 +31,14 @@ namespace Embeddinator {
 		public Type Type { get; private set; }
 		public string TypeName { get; private set; }
 		public string ObjCName { get; private set; }
+
+		public ProcessedAssembly Assembly { get; set; }
+
+		public bool IsClass => !IsEnum && !IsProtocol;
+		public bool IsEnum => Type.IsEnum;
+		public bool IsProtocol => Type.IsInterface;
+
+		public bool UserCode => Assembly.UserCode;
 
 		public ProcessedType (Type type)
 		{

@@ -230,9 +230,7 @@ namespace ObjC {
 			}
 		}
 
-		List<ProcessedType> enums = new List<ProcessedType> ();
 		List<ProcessedType> types = new List<ProcessedType> ();
-		List<ProcessedType> protocols = new List<ProcessedType> ();
 
 		Dictionary<Type, List<ProcessedConstructor>> ctors = new Dictionary<Type, List<ProcessedConstructor>> ();
 		Dictionary<Type, List<ProcessedMethod>> methods = new Dictionary<Type, List<ProcessedMethod>> ();
@@ -245,85 +243,115 @@ namespace ObjC {
 		bool implement_system_icomparable_t;
 		bool extension_type;
 
+		Queue<ProcessedAssembly> AssemblyQueue;
+
 		public override void Process (IEnumerable<Assembly> input)
 		{
+			AssemblyQueue = new Queue<ProcessedAssembly> ();
 			foreach (var a in input) {
-				var pa = new ProcessedAssembly (a);
+				var pa = new ProcessedAssembly (a) {
+					UserCode = true,
+				};
 				// ignoring/warning one is not an option as they could be different (e.g. different builds/versions)
 				if (!AddIfUnique (pa))
 					throw ErrorHelper.CreateError (12, $"The assembly name `{pa.Name}` is not unique");
-
-				foreach (var t in GetTypes (a)) {
-					if (t.IsEnum) {
-						enums.Add (new ProcessedType (t));
-						continue;
-					}
-
-					if (t.IsInterface) {
-						protocols.Add (new ProcessedType (t));
-					} else {
-						types.Add (new ProcessedType (t));
-					}
-
-					extension_type = t.HasCustomAttribute ("System.Runtime.CompilerServices", "ExtensionAttribute");
-
-					implement_system_icomparable = t.Implements ("System", "IComparable");
-					implement_system_icomparable_t = t.Implements("System", "IComparable`1");
-
-					var constructors = GetConstructors (t).OrderBy ((arg) => arg.ParameterCount).ToList ();
-					var processedConstructors = PostProcessConstructors (constructors).ToList ();
-					if (processedConstructors.Count > 0)
-						ctors.Add (t, processedConstructors);
-
-					var typeEquals = equals.Where (x => x.Key == t).Select (x => x.Value);
-					var meths = GetMethods (t).OrderBy ((arg) => arg.Name).ToList ();
-					var processedMethods = PostProcessMethods (meths, typeEquals).ToList ();
-					if (processedMethods.Count > 0)
-						methods.Add (t, processedMethods);
-
-					var props = new List<PropertyInfo> ();
-					var subscriptProps = new List<PropertyInfo> ();
-					foreach (var pi in GetProperties (t)) {
-						var getter = pi.GetGetMethod ();
-						var setter = pi.GetSetMethod ();
-						// setter only property are valid in .NET and we need to generate a method in ObjC (there's no writeonly properties)
-						if (getter == null)
-							continue;
-
-						// indexers are implemented as methods and object subscripting
-						if ((getter.ParameterCount > 0) || ((setter != null) && setter.ParameterCount > 1)) {
-							subscriptProps.Add (pi);
-							continue;
-						}
-
-						// we can do better than methods for the more common cases (readonly and readwrite)
-						processedMethods.RemoveAll (x => x.Method == getter);
-						processedMethods.RemoveAll (x => x.Method == setter);
-						props.Add (pi);
-					}
-					props = props.OrderBy ((arg) => arg.Name).ToList ();
-					var processedProperties = PostProcessProperties (props).ToList ();
-					if (processedProperties.Count > 0)
-						properties.Add (t, processedProperties);
-
-					if (subscriptProps.Count > 0) {
-						if (subscriptProps.Count > 1)
-							delayed.Add (ErrorHelper.CreateWarning (1041, $"Indexed properties on {t.Name} is not generated because multiple indexed properties not supported."));
-						else
-							subscriptProperties.Add (t, PostProcessSubscriptProperties (subscriptProps).ToList ());
-					}
-
-					// fields will need to be wrapped within properties
-					var f = GetFields (t).OrderBy ((arg) => arg.Name).ToList ();
-					var processedFields = PostProcessFields (f).ToList ();
-					if (processedFields.Count > 0)
-						fields.Add (t, processedFields);
-				}
+				AssemblyQueue.Enqueue (pa);
 			}
-			types = types.OrderBy ((arg) => arg.Type.FullName).OrderBy ((arg) => types.Contains (arg.Type.BaseType)).ToList ();
+
+			while (AssemblyQueue.Count > 0) {
+				Process (AssemblyQueue.Dequeue ());
+			}
+
+			// we can add new types while processing some (e.g. categories)
+			var typeQueue = new Queue<ProcessedType> (types);
+			types.Clear (); // reuse
+			while (typeQueue.Count > 0) {
+		                Process (typeQueue.Dequeue ());
+			}
+
+			types = types.OrderBy ((arg) => arg.Type.FullName).OrderBy ((arg) => types.HasClass (arg.Type.BaseType)).ToList ();
 			Console.WriteLine ($"\t{types.Count} types found");
 
 			ErrorHelper.Show (delayed);
+		}
+
+		List<ProcessedAssembly> Assemblies = new List<ProcessedAssembly> ();
+
+		void Process (ProcessedAssembly a)
+		{
+			Assemblies.Add (a);
+			if (!a.UserCode)
+				return;
+
+			foreach (var t in GetTypes (a.Assembly)) {
+				var pt = new ProcessedType (t) {
+					Assembly = a,
+				};
+				types.Add (pt);
+			}
+		}
+
+		void Process (ProcessedType pt)
+		{
+			var t = pt.Type;
+
+			types.Add (pt);
+			if (t.IsEnum)
+				return;
+
+			extension_type = t.HasCustomAttribute ("System.Runtime.CompilerServices", "ExtensionAttribute");
+
+			implement_system_icomparable = t.Implements ("System", "IComparable");
+			implement_system_icomparable_t = t.Implements("System", "IComparable`1");
+
+			var constructors = GetConstructors (t).OrderBy ((arg) => arg.ParameterCount).ToList ();
+			var processedConstructors = PostProcessConstructors (constructors).ToList ();
+			if (processedConstructors.Count > 0)
+				ctors.Add (t, processedConstructors);
+
+			var typeEquals = equals.Where (x => x.Key == t).Select (x => x.Value);
+			var meths = GetMethods (t).OrderBy ((arg) => arg.Name).ToList ();
+			var processedMethods = PostProcessMethods (meths, typeEquals).ToList ();
+			if (processedMethods.Count > 0)
+				methods.Add (t, processedMethods);
+
+			var props = new List<PropertyInfo> ();
+			var subscriptProps = new List<PropertyInfo> ();
+			foreach (var pi in GetProperties (t)) {
+				var getter = pi.GetGetMethod ();
+				var setter = pi.GetSetMethod ();
+				// setter only property are valid in .NET and we need to generate a method in ObjC (there's no writeonly properties)
+				if (getter == null)
+					continue;
+
+				// indexers are implemented as methods and object subscripting
+				if ((getter.ParameterCount > 0) || ((setter != null) && setter.ParameterCount > 1)) {
+					subscriptProps.Add (pi);
+					continue;
+				}
+
+				// we can do better than methods for the more common cases (readonly and readwrite)
+				processedMethods.RemoveAll (x => x.Method == getter);
+				processedMethods.RemoveAll (x => x.Method == setter);
+				props.Add (pi);
+			}
+			props = props.OrderBy ((arg) => arg.Name).ToList ();
+			var processedProperties = PostProcessProperties (props).ToList ();
+			if (processedProperties.Count > 0)
+				properties.Add (t, processedProperties);
+
+			if (subscriptProps.Count > 0) {
+				if (subscriptProps.Count > 1)
+					delayed.Add (ErrorHelper.CreateWarning (1041, $"Indexed properties on {t.Name} is not generated because multiple indexed properties not supported."));
+				else
+					subscriptProperties.Add (t, PostProcessSubscriptProperties (subscriptProps).ToList ());
+			}
+
+			// fields will need to be wrapped within properties
+			var f = GetFields (t).OrderBy ((arg) => arg.Name).ToList ();
+			var processedFields = PostProcessFields (f).ToList ();
+			if (processedFields.Count > 0)
+				fields.Add (t, processedFields);
 		}
 	}
 }
