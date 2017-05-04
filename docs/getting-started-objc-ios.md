@@ -29,7 +29,7 @@ First let's build a simple hello world example in C#.
 
 ### Create C# sample
 
-Open Visual Studio for Mac, and create a new iOS Class Library project, and name it `hello-from-csharp`, and save it to `~/Projects/hello-from-csharp`.
+Open Visual Studio for Mac, create a new iOS Class Library project, name it `hello-from-csharp`, and save it to `~/Projects/hello-from-csharp`.
 
 Replace the code in the `MyClass.cs` file with the following snippet:
 
@@ -48,7 +48,7 @@ Build the project, the resulting assembly will be saved as `~/Projects/hello-fro
 
 ### Bind the managed assembly
 
-Run the embeddinator, to create a native framework for the managed assembly:
+Run the embeddinator to create a native framework for the managed assembly:
 
 ```shell
 cd ~/Projects/hello-from-csharp
@@ -59,7 +59,7 @@ The framework will be placed in `~/Projects/hello-from-csharp/output/hello-from-
 
 ### Use the generated output in an Xcode project
 
-Open Xcode, and create a new iOS Single View Application, name it `hello-from-csharp`.
+Open Xcode and create a new iOS Single View Application, name it `hello-from-csharp`.
 
 Open the `~/Projects/hello-from-csharp/output` directory in Finder, select `hello-from-csharp.framework`, drag it to the Xcode project and drop it just above the `hello-from-csharp` folder in the project.
 
