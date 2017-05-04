@@ -9,3 +9,4 @@ workspace ""
   SetupTestProjectC("common")
   SetupTestProjectObjC("common")
   SetupTestProjectsRunner("common")
+  SetupMono()

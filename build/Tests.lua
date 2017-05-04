@@ -82,7 +82,7 @@ function SetupTestGeneratorBuildEvent(name)
   end
 end
 
-local function SetupMono()
+function SetupMono()
   local monoDir = nil
 
   -- Find system-specific Mono include/library paths.
