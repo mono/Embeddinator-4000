@@ -664,7 +664,7 @@ namespace ObjC {
 				return "instancetype";
 
 			var return_type = NameGenerator.GetTypeName (returnType);
-			if (HasClass (returnType) || returnType.IsArray)
+			if (HasClass (returnType))
 				return_type += "*";
 			return return_type;
 		}
@@ -800,18 +800,20 @@ namespace ObjC {
 		{
 			var typecode = Type.GetTypeCode (t);
 			implementation.WriteLine ("MonoArray* __resarr = (MonoArray *) __result;");
+			implementation.WriteLine ("if (!__resarr)");
+			implementation.Indent++;
+			implementation.WriteLine ("return nil;");
+			implementation.Indent--;
 			implementation.WriteLine ("int __resarrlength = mono_array_length (__resarr);");
 
-			if (typecode == TypeCode.Byte)
-				implementation.WriteLine ("NSMutableData* __resobj = [NSMutableData dataWithCapacity:__resarrlength];");
-			else {
-				implementation.WriteLine ("id __autoreleasing* __resarrbuf = (id __autoreleasing *) malloc (sizeof (id) * __resarrlength);");
+			if (typecode != TypeCode.Byte) {
+				implementation.WriteLine ("__strong id * __resarrbuf = (id __strong *) calloc (__resarrlength, sizeof (id));");
 				implementation.WriteLine ("id __resobj;");
+				implementation.WriteLine ("int __residx;");
+				implementation.WriteLine ();
+				implementation.WriteLine ("for (__residx = 0; __residx < __resarrlength; __residx++) {");
+				implementation.Indent++;
 			}
-			implementation.WriteLine ("int __residx;");
-			implementation.WriteLine ();
-			implementation.WriteLine ("for (__residx = 0; __residx < __resarrlength; __residx++) {");
-			implementation.Indent++;
 
 			switch (typecode) {
 			case TypeCode.Boolean:
@@ -859,8 +861,7 @@ namespace ObjC {
 				implementation.WriteLine ("__resobj = [NSNumber numberWithUnsignedLongLong:__resarrval];");
 				break;
 			case TypeCode.Byte:
-				implementation.WriteLine ("unsigned char __resarrval = mono_array_get (__resarr, unsigned char, __residx);");
-				implementation.WriteLine ("[__resobj appendBytes:&__resarrval length:1];");
+				implementation.WriteLine ("NSData *__resobj = [NSData dataWithBytes:mono_array_addr (__resarr, unsigned char, 0) length:__resarrlength];");
 				break;
 			case TypeCode.String:
 				implementation.WriteLine ("MonoString* __resarrval = mono_array_get (__resarr, MonoString *, __residx);");
@@ -893,15 +894,17 @@ namespace ObjC {
 				throw new NotImplementedException ($"Converting type {t.Name} to a native type name");
 			}
 
-			if (typecode == TypeCode.Byte) {
-				implementation.WriteLine ("}");
+			if (typecode == TypeCode.Byte)
 				implementation.WriteLine ("return __resobj;");
-			}
 			else {
 				implementation.WriteLine ("__resarrbuf[__residx] = __resobj;");
 				implementation.Indent--;
 				implementation.WriteLine ("}");
 				implementation.WriteLine ("NSArray *__retarr = [[NSArray alloc] initWithObjects: __resarrbuf count: __resarrlength];");
+				implementation.WriteLine ("for (__residx = 0; __residx < __resarrlength; __residx++)");
+				implementation.Indent++;
+				implementation.WriteLine ("__resarrbuf [__residx] = nil;");
+				implementation.Indent--;
 				implementation.WriteLine ("free(__resarrbuf);");
 				implementation.WriteLine ("return __retarr;");
 			}

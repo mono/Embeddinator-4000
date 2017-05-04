@@ -868,6 +868,33 @@
 	char bytes[5] = {0x0, 0x01, 0x02, 0x04, 0x08};
 	NSData *cData = [NSData dataWithBytes:bytes length:sizeof(bytes)];
 	XCTAssertEqualObjects(cData, data, @"data");
+
+	NSArray<NSString *> *nullArr = [testClass getNullMethod];
+	XCTAssertNil(nullArr, @"nullArr");
+
+	NSArray<NSString *> *nullArrProp = testClass.getNull;
+	XCTAssertNil(nullArrProp, @"nullArrProp");
+
+	NSArray<NSString *> *strArrProp = testClass.stringArr;
+	XCTAssertEqual([strArrProp count], 3, @"strArrProp count");
+	XCTAssertEqualObjects(@"Hola", strArrProp[0], @"strArrProp[0] Hola");
+	XCTAssertEqualObjects(@"Hello", strArrProp[1], @"strArrProp[1] Hello");
+	XCTAssertEqualObjects(@"Bonjour", strArrProp[2], @"strArrProp[2] Bonjour");
+
+	NSArray<NSNumber *> *intArrProp = testClass.intArr;
+	XCTAssertEqual([intArrProp count], 3, @"intArrProp count");
+	XCTAssertEqual(intArrProp[0].intValue, INT_MAX, @"intArrProp[0] INT_MAX");
+	XCTAssertEqual(intArrProp[1].intValue, INT_MIN, @"intArrProp[1] INT_MIN");
+	XCTAssertEqual(intArrProp[2].intValue, 0, @"intArrProp[2] 0");
+
+	NSArray<Arrays_ValueHolder *> *vhArrProp = testClass.valueHolderArr;
+	XCTAssertEqual([vhArrProp count], 3, @"vhArrProp count");
+	XCTAssertEqual(vhArrProp[0].intValue, 1, @"vhArrProp[0] 1");
+	XCTAssertEqual(vhArrProp[1].intValue, 2, @"vhArrProp[1] 2");
+	XCTAssertEqual(vhArrProp[2].intValue, 3, @"vhArrProp[2] 3");
+
+	NSData *dataProp = testClass.byteArr;
+	XCTAssertEqualObjects(cData, dataProp, @"dataProp");
 }
 
 #pragma clang diagnostic pop

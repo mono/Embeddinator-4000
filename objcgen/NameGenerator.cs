@@ -163,13 +163,13 @@ namespace ObjC {
 			case TypeCode.UInt16:
 			case TypeCode.UInt32:
 			case TypeCode.UInt64:
-				return "NSArray <NSNumber *>";
+				return "NSArray <NSNumber *> *";
 			case TypeCode.Byte:
-				return "NSData";
+				return "NSData *";
 			case TypeCode.String:
-				return "NSArray <NSString *>";
+				return "NSArray <NSString *> *";
 			case TypeCode.Object:
-				return $"NSArray<{GetObjCName (t)} *>";
+				return $"NSArray<{GetObjCName (t)} *> *";
 			default:
 				throw new NotImplementedException ($"Converting type {t.Name} to a native type name");
 			}
