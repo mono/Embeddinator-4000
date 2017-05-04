@@ -28,6 +28,9 @@ Your next step is to download and install the embeddinator on your Mac.
 
 There is no package to download yet. Until one is available you need to build it from our git repository, see the [constributing](Contributing#Objective-C) document for instructions.
 
+Installers can be built by running "make installer" in hte objcgen directory.
+
+Once installed via an installer, you can run the tool via /Library/Frameworks/Xamarin.Embeddinator-4000/Commands/objcgen 
 
 ## Platforms
 
