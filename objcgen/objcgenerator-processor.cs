@@ -288,6 +288,13 @@ namespace ObjC {
 					Assembly = a,
 				};
 				types.Add (pt);
+
+				foreach (var nt in t.GetNestedTypes ()) {
+					var pnt = new ProcessedType (nt) {
+						Assembly = a
+					};
+					types.Add (pnt);
+				}
 			}
 		}
 
