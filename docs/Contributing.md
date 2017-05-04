@@ -27,6 +27,7 @@ $ mono objcgen/bin/Debug/objcgen.exe
 
 Tests can be executed by running `make` from the `tests/objc-cli` directory.
 
+The installer can be built by running `make installer` in the `objcgen` directory.
 
 ### Specific Goals
 
