@@ -16,6 +16,7 @@ addons:
 
 install:
   - source external/CppSharp/build/InstallMono.sh
+  - build/SetupCI.sh
 
 script: |
   build/Compile.sh && tests/RunTestsuite.sh
