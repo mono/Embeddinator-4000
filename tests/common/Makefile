@@ -1,7 +1,7 @@
 MAKEFLAGS += --no-builtin-rules
 .PHONY: java
 
-all: binder managed gen compile_c_objc java run 
+all: binder managed c java run 
 
 binder:
 	msbuild /nologo /v:minimal ../../build/MonoEmbeddinator4000.sln || xbuild /nologo /v:minimal ../../build/MonoEmbeddinator4000.sln
@@ -9,11 +9,13 @@ binder:
 EMBEDDINATOR_EXE=../../build/lib/Debug/MonoEmbeddinator4000.exe
 MANAGED_DLL=../managed/generic/bin/Debug/managed.dll
 
-gen:
+gen_c:
 	mono --debug $(EMBEDDINATOR_EXE) -gen=c -out=c -p=macos -compile -target=shared $(MANAGED_DLL)
+
+gen_objc:
 	mono --debug $(EMBEDDINATOR_EXE) -gen=objc -out=objc -p=macos -compile -target=shared $(MANAGED_DLL)
 
-BUILD_FLAGS=/v:minimal /p:DefineConstants="NON_OBJC_SUPPORTED_TESTS"
+BUILD_FLAGS=/v:minimal
 
 managed:
 	BUILD_FLAGS="$(BUILD_FLAGS)" make -C ../managed clean all
@@ -24,6 +26,8 @@ managed:
 compile_c_objc:
 	../../external/CppSharp/build/premake5-osx gmake
 	make -C mk
+
+c: gen_c compile_c_objc
 
 JAVA_FILES=`find ../../support/java -name "*.java"` `find java -name "*.java"`
 JUNIT_CLASSPATH=../../external/junit/hamcrest-core-1.3.jar:../../external/junit/junit-4.12.jar
