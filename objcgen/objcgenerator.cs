@@ -31,8 +31,6 @@ namespace ObjC {
 			foreach (var t in types.Where ((arg) => arg.IsClass))
 				headers.WriteLine ($"@class {t.TypeName};");
 			headers.WriteLine ();
-			headers.WriteLine ("NS_ASSUME_NONNULL_BEGIN");
-			headers.WriteLine ();
 
 			implementation.WriteLine ("#include \"bindings.h\"");
 			implementation.WriteLine ("#include \"glib.h\"");
@@ -55,6 +53,9 @@ namespace ObjC {
 				headers.WriteLine ($"@protocol {pname};");
 				implementation.WriteLine ($"@class __{pname}Wrapper;");
 			}
+			headers.WriteLine ();
+			headers.WriteLine ("NS_ASSUME_NONNULL_BEGIN");
+			headers.WriteLine ();
 			implementation.WriteLine ();
 
 			implementation.WriteLine ("static void __initialize_mono ()");
