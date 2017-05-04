@@ -44,6 +44,9 @@ void            mono_field_set_value (MonoObject *obj, MonoClassField *field, vo
 MonoVTable *    mono_class_vtable          (MonoDomain *domain, MonoClass *klass);
 void            mono_field_static_set_value (MonoVTable *vt, MonoClassField *field, void *value);
 MonoString *    mono_object_to_string (MonoObject *obj, MonoObject **exc);
+MonoClass *     mono_class_get (MonoImage *image, uint32_t type_token);
+MonoMethod *    mono_get_method (MonoImage *image, uint32_t token, MonoClass *klass);
+MonoClassField* mono_class_get_field (MonoClass *klass, uint32_t field_token);
 
 MONO_EMBEDDINATOR_END_DECLS
 #else

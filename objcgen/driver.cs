@@ -519,6 +519,8 @@ namespace Embeddinator {
 						mtouch.Append ($"--sdkroot {XcodeApp} ");
 						mtouch.Append ($"--targetver {build_info.MinVersion} ");
 						mtouch.Append ("--dsym:false ");
+						mtouch.Append ("--msym:false ");
+						mtouch.Append ("--nosymbolstrip ");
 						mtouch.Append ($"--embeddinator ");
 						foreach (var asm in Assemblies)
 							mtouch.Append (Quote (Path.GetFullPath (asm.Location))).Append (" ");
