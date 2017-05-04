@@ -80,6 +80,13 @@ public static class Type_String
 	public static string NonEmptyString { get { return "Hello World"; } }
 }
 
+public class ExposeExtraTypes {
+
+	public TimeSpan TimeOfDay {
+		get { return DateTime.Now.TimeOfDay; }
+	}
+}
+
 // objc: this type won't be generated (Exception is not supported) but the generation will succeed (with warnings)
 public class MyException : Exception {
 }

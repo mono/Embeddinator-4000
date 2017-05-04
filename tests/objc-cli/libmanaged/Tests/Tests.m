@@ -774,6 +774,29 @@
 	XCTAssert ([testClass twoUshortK:5 l:8] == 13, "Two ushorts");
 }
 
+- (void)testTimeSpan {
+	// because we have an API that expose TimeSpan we generate the type from mscorlib.dll (because NSTimeInterval is not a very good alternative)
+	System_TimeSpan *ts = [[System_TimeSpan alloc] initWithDays:1 hours:2 minutes:3 seconds:4 milliseconds:5];
+	XCTAssertTrue ([ts days] == 1, "days");
+	XCTAssertTrue ([ts hours] == 2, "hours");
+	XCTAssertTrue ([ts minutes] == 3, "minutes");
+	XCTAssertTrue ([ts seconds] == 4, "seconds");
+	XCTAssertTrue ([ts milliseconds] == 5, "milliseconds");
+
+	XCTAssertTrue ([ts ticks] == 937840050000ll, "ticks");
+}
+
+- (void)testIFormatProvider {
+	// TimeSpan also expose IFormatProvider which we can't really support but can't really ignore
+	// because IFormatProvider-less overloads might not exists and null is generally accepted
+	System_TimeSpan *ts = [[System_TimeSpan alloc] initWithTicks:937840050000ll];
+
+	NSString *s1 = [ts toStringFormat:@"c" formatprovider:nil];
+	NSString *s2 = [ts toStringFormat:@"c"];
+	XCTAssertEqualObjects (s1, @"1.02:03:04.0050000", "0");
+	XCTAssertEqualObjects (s1, s2, "1");
+}
+
 #pragma clang diagnostic pop
 
 @end

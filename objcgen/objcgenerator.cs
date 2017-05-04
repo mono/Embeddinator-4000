@@ -94,7 +94,12 @@ namespace ObjC {
 			implementation.WriteLine ("return;");
 			implementation.Indent--;
 			implementation.WriteLine ("__initialize_mono ();");
-			implementation.WriteLine ($"__{name}_image = mono_embeddinator_load_assembly (&__mono_context, \"{originalName}.dll\");");
+			if (name == "mscorlib") {
+				// skip extra logic - we know it's already loaded into memory
+				implementation.WriteLine ($"__{name}_image = mono_get_corlib ();");
+			} else {
+				implementation.WriteLine ($"__{name}_image = mono_embeddinator_load_assembly (&__mono_context, \"{originalName}.dll\");");
+			}
 			implementation.WriteLine ($"assert (__{name}_image && \"Could not load the assembly '{originalName}.dll'.\");");
 			var categories = extensions_methods.Keys;
 			if (categories.Count > 0) {
