@@ -144,10 +144,19 @@ namespace Embeddinator {
 	}
 
 	public static class ListExtensions {
-		public static bool Contains (this List<ProcessedType> list, Type type)
+		public static bool HasClass (this List<ProcessedType> list, Type type)
 		{
 			foreach (ProcessedType t in list) {
-				if (t.Type == type)
+				if (t.IsClass && (type == t.Type))
+					return true;
+			}
+			return false;
+		}
+
+		public static bool HasProtocol (this List<ProcessedType> list, Type type)
+		{
+			foreach (ProcessedType t in list) {
+				if (t.IsProtocol && (type == t.Type))
 					return true;
 			}
 			return false;

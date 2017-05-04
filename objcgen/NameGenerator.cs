@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Embeddinator;
@@ -168,7 +168,7 @@ namespace ObjC {
 			string ptname = GetTypeName (pt);
 			if (pt.IsInterface)
 				ptname = $"id<{ptname}>";
-			if (allTypes.Contains (pt))
+			if (allTypes.HasClass (pt))
 				ptname += " *";
 			return ptname;
 		}
