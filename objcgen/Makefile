@@ -26,7 +26,7 @@ else
 	$(SHELLCHECK) $^
 endif
 
-FRAMEWORK_DIR = _build/Library/Frameworks/Xamarin.Embeddinator-4000
+FRAMEWORK_DIR = _build/Library/Frameworks/Xamarin.Embeddinator-4000.framework
 INSTALLER_FILES = Xamarin.Embeddinator-4000-$(PACKAGE_FULLVERSION).pkg
 
 package:: bin/Debug/objcgen.exe Make.config.inc
