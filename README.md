@@ -63,4 +63,3 @@ To generate C bindings for a `Xamarin.Foo.dll` assembly you would call
 the tool like:
 
 `MonoEmbeddinator4000.exe -gen=c -out=foo Xamarin.Foo.dll`
-
