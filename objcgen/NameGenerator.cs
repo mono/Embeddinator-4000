@@ -32,7 +32,7 @@ namespace ObjC {
 
 		public static string GetObjCName (Type t)
 		{
-			return t.FullName.Replace ('.', '_');
+			return t.FullName.Replace ('.', '_').Replace ("+", "_");
 		}
 
 		// TODO complete mapping (only with corresponding tests)

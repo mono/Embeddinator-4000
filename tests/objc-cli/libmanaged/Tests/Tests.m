@@ -774,6 +774,15 @@
 	XCTAssert ([testClass twoUshortK:5 l:8] == 13, "Two ushorts");
 }
 
+- (void)testNestedClasses {
+	NestedClasses_ParentClass *parent = [[NestedClasses_ParentClass alloc] init];
+	XCTAssert ([parent addNumbersX:3 y:5] == 8, "Parent class calling nested class method");
+	XCTAssert ([parent sum] == 8, "Parent class retrieving nested class property");
+
+	NestedClasses_ParentClass_NestedClass *nested = [[NestedClasses_ParentClass_NestedClass alloc] init];
+	XCTAssert ([nested additionX:2 y:4] == 6, "Nested class method call");
+}
+
 #pragma clang diagnostic pop
 
 @end

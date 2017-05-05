@@ -278,7 +278,7 @@ namespace ObjC {
 				BaseTypeName = NameGenerator.GetTypeName (t.BaseType),
 				Name = NameGenerator.GetTypeName (t),
 				Namespace = t.Namespace,
-				ManagedName = t.Name,
+				ManagedName = (t.DeclaringType != null ? t.DeclaringType.Name + "/" : "") + t.Name,
 				Protocols = conformed_protocols,
 				IsBaseTypeBound = types.HasClass (t.BaseType),
 				IsStatic = t.IsSealed && t.IsAbstract,
