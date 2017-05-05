@@ -5,13 +5,12 @@ using System.Linq;
 using IKVM.Reflection;
 using Type = IKVM.Reflection.Type;
 
-using Embeddinator;
 using System.Text;
 
-namespace ObjC {
+namespace Embeddinator {
 	// A set of post-processing steps needed to add hints
 	// to the input of the generation step
-	public partial class ObjCGenerator {
+	public abstract partial class Processor {
 		protected IEnumerable<ProcessedMethod> PostProcessMethods (IEnumerable<MethodInfo> methods, IEnumerable <MethodInfo> equals)
 		{
 			HashSet<string> duplicateNames = FindDuplicateNames (methods);
@@ -30,7 +29,7 @@ namespace ObjC {
 					processedMethod.NameOverride = "areEqual";
 				
 				if (operatorToIgnore.Contains (method)) {
-					delayed.Add (ErrorHelper.CreateWarning (1033, $"Method {processedMethod.Method.Name} is not generated because another method exposes the operator with a friendly name"));
+					Delayed.Add (ErrorHelper.CreateWarning (1033, $"Method {processedMethod.Method.Name} is not generated because another method exposes the operator with a friendly name"));
 					continue;
 				}
 

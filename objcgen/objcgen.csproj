@@ -308,7 +308,7 @@
     <Compile Include="ErrorHelper.cs" />
     <Compile Include="Version.generated.cs" />
     <Compile Include="objcgenerator-helpers.cs" />
-    <Compile Include="objcgenerator-processor.cs" />
+    <Compile Include="objcprocessor.cs" />
     <Compile Include="extensions.cs" />
     <Compile Include="methodhelper.cs" />
     <Compile Include="objcgenerator-subscripts.cs" />
@@ -322,6 +322,7 @@
     <Compile Include="OperatorOverloads.cs" />
     <Compile Include="protocolhelper.cs" />
     <Compile Include="NameGenerator.cs" />
+    <Compile Include="processor.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="support\" />

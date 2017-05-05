@@ -2,11 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using IKVM.Reflection;
-using Embeddinator;
-
 using Type = IKVM.Reflection.Type;
 
-namespace ObjC
+namespace Embeddinator
 {
 	public static class OperatorOverloads
 	{

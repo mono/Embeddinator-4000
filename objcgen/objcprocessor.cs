@@ -9,9 +9,8 @@ using Embeddinator;
 
 namespace ObjC {
 
-	public partial class ObjCGenerator {
+	public partial class ObjCProcessor : Processor {
 
-		List<Exception> delayed = new List<Exception> ();
 		HashSet<Type> unsupported = new HashSet<Type> ();
 
 		bool IsNSObjectSubclass (Type t)
@@ -37,19 +36,19 @@ namespace ObjC {
 				return false;
 
 			if (t.IsArray) {
-				delayed.Add (ErrorHelper.CreateWarning (1010, $"Type `{t}` is not generated because `arrays` are not supported."));
+				Delayed.Add (ErrorHelper.CreateWarning (1010, $"Type `{t}` is not generated because `arrays` are not supported."));
 				unsupported.Add (t);
 				return false;
 			}
 
 			if (t.IsPointer) {
-				delayed.Add (ErrorHelper.CreateWarning (1010, $"Type `{t}` is not generated because `unsafe pointers` are not supported."));
+				Delayed.Add (ErrorHelper.CreateWarning (1010, $"Type `{t}` is not generated because `unsafe pointers` are not supported."));
 				unsupported.Add (t);
 				return false;
 			}
 
 			if (t.IsGenericParameter || t.IsGenericType) {
-				delayed.Add (ErrorHelper.CreateWarning (1010, $"Type `{t}` is not generated because `generics` are not supported."));
+				Delayed.Add (ErrorHelper.CreateWarning (1010, $"Type `{t}` is not generated because `generics` are not supported."));
 				unsupported.Add (t);
 				return false;
 			}
@@ -62,13 +61,13 @@ namespace ObjC {
 				case "Exception":
 				case "IFormatProvider":
 				case "Type":
-					delayed.Add (ErrorHelper.CreateWarning (1011, $"Type `{t}` is not generated because it lacks a native counterpart."));
+					Delayed.Add (ErrorHelper.CreateWarning (1011, $"Type `{t}` is not generated because it lacks a native counterpart."));
 					unsupported.Add (t);
 					return false;
 				case "DateTime": // FIXME: NSDateTime
 				case "Decimal": // FIXME: NSDecimal
 				case "TimeSpan":
-					delayed.Add (ErrorHelper.CreateWarning (1012, $"Type `{t}` is not generated because it lacks a marshaling code with a native counterpart."));
+					Delayed.Add (ErrorHelper.CreateWarning (1012, $"Type `{t}` is not generated because it lacks a marshaling code with a native counterpart."));
 					unsupported.Add (t);
 					return false;
 				}
@@ -79,7 +78,7 @@ namespace ObjC {
 			return (base_type == null) || base_type.Is ("System", "Object") ? true : IsSupported (base_type);
 		}
 
-		protected IEnumerable<Type> GetTypes (Assembly a)
+		protected override IEnumerable<Type> GetTypes (Assembly a)
 		{
 			foreach (var t in a.GetTypes ()) {
 				if (!t.IsPublic)
@@ -108,7 +107,7 @@ namespace ObjC {
 				foreach (var p in ctor.GetParameters ()) {
 					var pt = p.ParameterType;
 					if (!IsSupported (pt)) {
-						delayed.Add (ErrorHelper.CreateWarning (1020, $"Constructor `{ctor}` is not generated because of parameter type `{pt}` is not supported."));
+						Delayed.Add (ErrorHelper.CreateWarning (1020, $"Constructor `{ctor}` is not generated because of parameter type `{pt}` is not supported."));
 						pcheck = false;
 					} else if (p.HasDefaultValue) {
 						members_with_default_values.Add (ctor);
@@ -121,13 +120,13 @@ namespace ObjC {
 			}
 		}
 
-		Dictionary<Type,MethodInfo> icomparable = new Dictionary<Type, MethodInfo> ();
-		Dictionary<Type, MethodInfo> equals = new Dictionary<Type, MethodInfo> ();
-		Dictionary<Type, MethodInfo> hashes = new Dictionary<Type, MethodInfo> ();
-		HashSet<MemberInfo> members_with_default_values = new HashSet<MemberInfo> ();
+		internal Dictionary<Type,MethodInfo> icomparable = new Dictionary<Type, MethodInfo> ();
+		internal Dictionary<Type, MethodInfo> equals = new Dictionary<Type, MethodInfo> ();
+		internal Dictionary<Type, MethodInfo> hashes = new Dictionary<Type, MethodInfo> ();
+		internal HashSet<MemberInfo> members_with_default_values = new HashSet<MemberInfo> ();
 
 		// defining type / extended type / methods
-		Dictionary<Type, Dictionary<Type, List<MethodInfo>>> extensions_methods = new Dictionary<Type, Dictionary<Type, List<MethodInfo>>> ();
+		internal Dictionary<Type, Dictionary<Type, List<MethodInfo>>> extensions_methods = new Dictionary<Type, Dictionary<Type, List<MethodInfo>>> ();
 
 		protected IEnumerable<MethodInfo> GetMethods (Type t)
 		{
@@ -162,7 +161,7 @@ namespace ObjC {
 
 				var rt = mi.ReturnType;
 				if (!IsSupported (rt)) {
-					delayed.Add (ErrorHelper.CreateWarning (1030, $"Method `{mi}` is not generated because return type `{rt}` is not supported."));
+					Delayed.Add (ErrorHelper.CreateWarning (1030, $"Method `{mi}` is not generated because return type `{rt}` is not supported."));
 					continue;
 				}
 
@@ -170,7 +169,7 @@ namespace ObjC {
 				foreach (var p in mi.GetParameters ()) {
 					var pt = p.ParameterType;
 					if (!IsSupported (pt)) {
-						delayed.Add (ErrorHelper.CreateWarning (1031, $"Method `{mi}` is not generated because of parameter type `{pt}` is not supported."));
+						Delayed.Add (ErrorHelper.CreateWarning (1031, $"Method `{mi}` is not generated because of parameter type `{pt}` is not supported."));
 						pcheck = false;
 					} else if (p.HasDefaultValue) {
 						members_with_default_values.Add (mi);
@@ -183,7 +182,7 @@ namespace ObjC {
 				if (extension_type && mi.HasCustomAttribute ("System.Runtime.CompilerServices", "ExtensionAttribute")) {
 					var extended_type = mi.GetParameters () [0].ParameterType;
 					if (extended_type.IsPrimitive) {
-						delayed.Add (ErrorHelper.CreateWarning (1034, $"Extension method `{mi}` is not generated inside a category because they cannot be created on primitive type `{extended_type}`. A normal, static method was generated."));
+						Delayed.Add (ErrorHelper.CreateWarning (1034, $"Extension method `{mi}` is not generated inside a category because they cannot be created on primitive type `{extended_type}`. A normal, static method was generated."));
 					} else {
 						Dictionary<Type, List<MethodInfo>> extensions;
 						if (!extensions_methods.TryGetValue (t, out extensions)) {
@@ -209,7 +208,7 @@ namespace ObjC {
 			foreach (var pi in t.GetProperties (BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly)) {
 				var pt = pi.PropertyType;
 				if (!IsSupported (pt)) {
-					delayed.Add (ErrorHelper.CreateWarning (1040, $"Property `{pi}` is not generated because of parameter type `{pt}` is not supported."));
+					Delayed.Add (ErrorHelper.CreateWarning (1040, $"Property `{pi}` is not generated because of parameter type `{pt}` is not supported."));
 					continue;
 				}
 				yield return pi;
@@ -223,86 +222,44 @@ namespace ObjC {
 					continue;
 				var ft = fi.FieldType;
 				if (!IsSupported (ft)) {
-					delayed.Add (ErrorHelper.CreateWarning (1050, $"Field `{fi}` is not generated because of field type `{ft}` is not supported."));
+					Delayed.Add (ErrorHelper.CreateWarning (1050, $"Field `{fi}` is not generated because of field type `{ft}` is not supported."));
 					continue;
 				}
 				yield return fi;
 			}
 		}
 
-		List<ProcessedType> types = new List<ProcessedType> ();
-
-		Dictionary<Type, List<ProcessedConstructor>> ctors = new Dictionary<Type, List<ProcessedConstructor>> ();
-		Dictionary<Type, List<ProcessedMethod>> methods = new Dictionary<Type, List<ProcessedMethod>> ();
-		Dictionary<Type, List<ProcessedProperty>> properties = new Dictionary<Type, List<ProcessedProperty>> ();
-		Dictionary<Type, List<ProcessedFieldInfo>> fields = new Dictionary<Type, List<ProcessedFieldInfo>> ();
-		Dictionary<Type, List<ProcessedProperty>> subscriptProperties = new Dictionary<Type, List<ProcessedProperty>> ();
+		internal Dictionary<Type, List<ProcessedProperty>> subscriptProperties = new Dictionary<Type, List<ProcessedProperty>> ();
 
 		// special cases
 		bool implement_system_icomparable;
 		bool implement_system_icomparable_t;
 		bool extension_type;
 
-		Queue<ProcessedAssembly> AssemblyQueue;
 
 		public override void Process (IEnumerable<Assembly> input)
 		{
-			AssemblyQueue = new Queue<ProcessedAssembly> ();
-			foreach (var a in input) {
-				var pa = new ProcessedAssembly (a) {
-					UserCode = true,
-				};
-				// ignoring/warning one is not an option as they could be different (e.g. different builds/versions)
-				if (!AddIfUnique (pa))
-					throw ErrorHelper.CreateError (12, $"The assembly name `{pa.Name}` is not unique");
-				AssemblyQueue.Enqueue (pa);
-			}
+			base.Process (input);
 
-			while (AssemblyQueue.Count > 0) {
-				Process (AssemblyQueue.Dequeue ());
-			}
+			Types = Types.OrderBy ((arg) => arg.Type.FullName).OrderBy ((arg) => Types.HasClass (arg.Type.BaseType)).ToList ();
+			Console.WriteLine ($"\t{Types.Count} types found");
 
-			// we can add new types while processing some (e.g. categories)
-			var typeQueue = new Queue<ProcessedType> (types);
-			types.Clear (); // reuse
-			while (typeQueue.Count > 0) {
-				Process (typeQueue.Dequeue ());
-			}
-
-			types = types.OrderBy ((arg) => arg.Type.FullName).OrderBy ((arg) => types.HasClass (arg.Type.BaseType)).ToList ();
-			Console.WriteLine ($"\t{types.Count} types found");
-
-			ErrorHelper.Show (delayed);
-		}
-
-		List<ProcessedAssembly> Assemblies = new List<ProcessedAssembly> ();
-
-		void Process (ProcessedAssembly a)
-		{
-			Assemblies.Add (a);
-			if (!a.UserCode)
-				return;
-
-			foreach (var t in GetTypes (a.Assembly)) {
-				var pt = new ProcessedType (t) {
-					Assembly = a,
-				};
-				types.Add (pt);
-
-				foreach (var nt in t.GetNestedTypes ()) {
-					var pnt = new ProcessedType (nt) {
-						Assembly = a
-					};
-					types.Add (pnt);
+			// proceed with extra adjustments before giving results to the generator
+			foreach (var t in Types) {
+				foreach (var uctor in GetUnavailableParentCtors (t)) {
+					var c = new ProcessedConstructor (uctor.Constructor) { Unavailable = true };
+					t.Constructors.Add (c);
 				}
 			}
+
+			ErrorHelper.Show (Delayed);
 		}
 
-		void Process (ProcessedType pt)
+		public override void Process (ProcessedType pt)
 		{
 			var t = pt.Type;
 
-			types.Add (pt);
+			Types.Add (pt);
 			if (t.IsEnum)
 				return;
 
@@ -313,14 +270,12 @@ namespace ObjC {
 
 			var constructors = GetConstructors (t).OrderBy ((arg) => arg.ParameterCount).ToList ();
 			var processedConstructors = PostProcessConstructors (constructors).ToList ();
-			if (processedConstructors.Count > 0)
-				ctors.Add (t, processedConstructors);
+			pt.Constructors = processedConstructors;
 
 			var typeEquals = equals.Where (x => x.Key == t).Select (x => x.Value);
 			var meths = GetMethods (t).OrderBy ((arg) => arg.Name).ToList ();
 			var processedMethods = PostProcessMethods (meths, typeEquals).ToList ();
-			if (processedMethods.Count > 0)
-				methods.Add (t, processedMethods);
+			pt.Methods = processedMethods;
 
 			var props = new List<PropertyInfo> ();
 			var subscriptProps = new List<PropertyInfo> ();
@@ -344,12 +299,11 @@ namespace ObjC {
 			}
 			props = props.OrderBy ((arg) => arg.Name).ToList ();
 			var processedProperties = PostProcessProperties (props).ToList ();
-			if (processedProperties.Count > 0)
-				properties.Add (t, processedProperties);
+			pt.Properties = processedProperties;
 
 			if (subscriptProps.Count > 0) {
 				if (subscriptProps.Count > 1)
-					delayed.Add (ErrorHelper.CreateWarning (1041, $"Indexed properties on {t.Name} is not generated because multiple indexed properties not supported."));
+					Delayed.Add (ErrorHelper.CreateWarning (1041, $"Indexed properties on {t.Name} is not generated because multiple indexed properties not supported."));
 				else
 					subscriptProperties.Add (t, PostProcessSubscriptProperties (subscriptProps).ToList ());
 			}
@@ -357,8 +311,36 @@ namespace ObjC {
 			// fields will need to be wrapped within properties
 			var f = GetFields (t).OrderBy ((arg) => arg.Name).ToList ();
 			var processedFields = PostProcessFields (f).ToList ();
-			if (processedFields.Count > 0)
-				fields.Add (t, processedFields);
+			pt.Fields = processedFields;
+		}
+
+		IEnumerable<ProcessedConstructor> GetUnavailableParentCtors (ProcessedType pt)
+		{
+			var type = pt.Type;
+			var baseType = type.BaseType;
+			if ((baseType == null) || (baseType.Namespace == "System" && baseType.Name == "Object"))
+				return Enumerable.Empty<ProcessedConstructor> ();
+
+			var baseProcessedType = GetProcessedType (baseType);
+			if ((baseProcessedType == null) || !baseProcessedType.HasConstructors)
+				return Enumerable.Empty<ProcessedConstructor> ();
+			
+			var typeCtors = pt.Constructors;
+			List<ProcessedConstructor> parentCtors = baseProcessedType.Constructors;
+
+			var finalList = new List<ProcessedConstructor> ();
+			foreach (var pctor in parentCtors) {
+				var pctorParams = pctor.Constructor.GetParameters ();
+				foreach (var ctor in typeCtors) {
+					var ctorParams = ctor.Constructor.GetParameters ();
+					if (pctorParams.Any (pc => !ctorParams.Any (p => p.Position == pc.Position && pc.ParameterType == p.ParameterType))) {
+						finalList.Add (pctor);
+						break;
+					}
+				}
+			}
+
+			return finalList;
 		}
 	}
 }
