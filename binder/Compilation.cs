@@ -392,9 +392,17 @@ namespace MonoEmbeddinator4000
 
                 vsSdk = exactVersion.Value;
             }
-            
-            var clBin = Path.GetFullPath(
-                Path.Combine(vsSdk.Directory, "..", "..", "VC", "bin", "cl.exe"));
+
+            var clBin = String.Empty;
+            if ((int)vsSdk.Version == (int)VisualStudioVersion.VS2017)
+            {
+                var clFiles = System.IO.Directory.EnumerateFiles(Path.Combine(vsSdk.Directory, @"..\..\VC\Tools\MSVC"), "cl.exe", SearchOption.AllDirectories);
+                clBin = clFiles.Where(s => s.Contains(@"x86\cl.exe")).First();
+            }
+            else
+                clBin = Path.GetFullPath(Path.Combine(vsSdk.Directory, "..", "..", "VC", "bin", "cl.exe"));
+
+            Diagnostics.Debug($"VS path {vsSdk.Directory}");
 
             var monoPath = ManagedToolchain.FindMonoPath();
             var output = Path.Combine(Options.OutputDir, Options.LibraryName ??

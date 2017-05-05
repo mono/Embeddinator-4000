@@ -113,7 +113,7 @@ workspace "MonoEmbeddinator4000"
   end
 
     local xamarinMacios = "../../xamarin-macios"
-    if os.isdir(xamarinMacios) and _OPTIONS["dev"] then
+    if _OPTIONS["dev"] then
       --[[
       externalproject "mtouch"
         SetupManagedProject()

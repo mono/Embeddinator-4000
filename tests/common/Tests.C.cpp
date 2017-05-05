@@ -1,6 +1,6 @@
 ﻿#define CATCH_CONFIG_RUNNER
 #include <catch.hpp>
-
+#include <cstdint>
 #include "managed.h"
 #include "glib.h"
 
@@ -8,32 +8,32 @@
 
 TEST_CASE("Types.C", "[C][Types]") {
     REQUIRE(Type_Char_get_Min() == 0);
-    REQUIRE(Type_Char_get_Max() == USHRT_MAX);
+    REQUIRE(Type_Char_get_Max() == UINT16_MAX);
     REQUIRE(Type_Char_get_Zero() == 0);
 
-    REQUIRE(Type_SByte_get_Min() == SCHAR_MIN);
-    REQUIRE(Type_SByte_get_Max() == SCHAR_MAX);
+    REQUIRE(Type_SByte_get_Min() == INT8_MIN);
+    REQUIRE(Type_SByte_get_Max() == INT8_MAX);
 
     REQUIRE(Type_Byte_get_Min() == 0);
-    REQUIRE(Type_Byte_get_Max() == UCHAR_MAX);
+    REQUIRE(Type_Byte_get_Max() == UINT8_MAX);
 
-    REQUIRE(Type_Int16_get_Min() == SHRT_MIN);
-    REQUIRE(Type_Int16_get_Max() == SHRT_MAX);
+    REQUIRE(Type_Int16_get_Min() == INT16_MIN);
+    REQUIRE(Type_Int16_get_Max() == INT16_MAX);
 
-    REQUIRE(Type_Int32_get_Min() == INT_MIN);
-    REQUIRE(Type_Int32_get_Max() == INT_MAX);
+    REQUIRE(Type_Int32_get_Min() == INT32_MIN);
+    REQUIRE(Type_Int32_get_Max() == INT32_MAX);
 
-    REQUIRE(Type_Int64_get_Min() == LONG_MIN);
-    REQUIRE(Type_Int64_get_Max() == LONG_MAX);
+    REQUIRE(Type_Int64_get_Min() == INT64_MIN);
+    REQUIRE(Type_Int64_get_Max() == INT64_MAX);
     
     REQUIRE(Type_UInt16_get_Min() == 0);
-    REQUIRE(Type_UInt16_get_Max() == USHRT_MAX);
+    REQUIRE(Type_UInt16_get_Max() == UINT16_MAX);
 
     REQUIRE(Type_UInt32_get_Min() == 0);
-    REQUIRE(Type_UInt32_get_Max() == UINT_MAX);
+    REQUIRE(Type_UInt32_get_Max() == UINT32_MAX);
 
     REQUIRE(Type_UInt64_get_Min() == 0);
-    REQUIRE(Type_UInt64_get_Max() == ULONG_MAX);
+    REQUIRE(Type_UInt64_get_Max() == UINT64_MAX);
 
     REQUIRE(Type_Single_get_Min() == -FLT_MAX);
     REQUIRE(Type_Single_get_Max() == FLT_MAX);
@@ -89,7 +89,6 @@ TEST_CASE("Types.C", "[C][Types]") {
 }
 
 TEST_CASE("Properties.C", "[C][Properties]") {
-    REQUIRE(Platform_get_IsWindows() == false);
 
     Platform_set_ExitCode(255);
     REQUIRE(Platform_get_ExitCode() == 255);
@@ -152,13 +151,13 @@ TEST_CASE("Constructors.C", "[C][Constructors]") {
     Constructors_Implicit* implicit = Constructors_Implicit_new();
     REQUIRE(strcmp(Constructors_Implicit_get_TestResult(implicit), "OK") == 0);
 
-    Constructors_AllTypeCode* all1 = Constructors_AllTypeCode_new(true, USHRT_MAX, "Mono");
+    Constructors_AllTypeCode* all1 = Constructors_AllTypeCode_new(true, UINT16_MAX, "Mono");
     REQUIRE(Constructors_AllTypeCode_get_TestResult(all1) == true);
 
-    Constructors_AllTypeCode* all2 = Constructors_AllTypeCode_new_1(SCHAR_MAX, SHRT_MAX, INT_MAX, LONG_MAX);
+    Constructors_AllTypeCode* all2 = Constructors_AllTypeCode_new_1(INT8_MAX, INT16_MAX, INT32_MAX, INT64_MAX);
     REQUIRE(Constructors_AllTypeCode_get_TestResult(all2) == true);
 
-    Constructors_AllTypeCode* all3 = Constructors_AllTypeCode_new_2(UCHAR_MAX, USHRT_MAX, UINT_MAX, ULONG_MAX);
+    Constructors_AllTypeCode* all3 = Constructors_AllTypeCode_new_2(UINT8_MAX , UINT16_MAX, UINT32_MAX, UINT64_MAX);
     REQUIRE(Constructors_AllTypeCode_get_TestResult(all3) == true);
 
     Constructors_AllTypeCode* all4 = Constructors_AllTypeCode_new_3(FLT_MAX, DBL_MAX);
@@ -259,7 +258,7 @@ TEST_CASE("Enums.C", "[C][Enums]") {
 }
 
 TEST_CASE("FieldsInReference.C", "[C][Fields]") {
-    REQUIRE(Fields_Class_get_MaxLong() == LONG_MAX);
+    REQUIRE(Fields_Class_get_MaxLong() == INT64_MAX);
 
     REQUIRE(Fields_Class_get_Integer() == 0);
     Fields_Class_set_Integer(1);

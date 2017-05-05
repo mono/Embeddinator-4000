@@ -8,7 +8,7 @@ function SetupTestProject(name, extraFiles)
   objdir("!obj")
   targetdir "."
 
-  SetupTestProjectGenerator()
+  SetupTestProjectGenerator(name)
   SetupTestProjectC(name)
   SetupTestProjectObjC(name)
   SetupTestProjectsCSharp(name, nil, extraFiles)
@@ -23,7 +23,7 @@ function SetupManagedTestProject()
     location "mk"
 end
 
-function SetupTestProjectGenerator()
+function SetupTestProjectGenerator(name)
   if os.is("windows") then
     SetupTestProjectGeneratorVS(name)
   else
@@ -104,9 +104,16 @@ function SetupMono()
   end
 
   includedirs { path.join(monoDir, "include", "mono-2.0") }
-  libdirs { path.join(monoDir, "lib") }
-  links { "monosgen-2.0" }
-
+  monoLibdir = path.join(monoDir, "lib")
+  libdirs { monoLibdir }
+  if(os.is("windows")) then
+    libFiles = os.matchfiles(path.join(monoLibdir, "monosgen-2.0.lib"))
+    table.insert(libFiles, os.matchfiles(path.join(monoLibdir, "mono-2.0-sgen.lib")))
+    links { libFiles }
+  else
+    links { "monosgen-2.0" }
+  end
+  
   filter { "system:macosx" }
     links { "CoreFoundation.framework" }
 
@@ -114,17 +121,16 @@ function SetupMono()
 end
 
 function SetupTestProjectC(name, depends)
-  if string.starts(action, "vs") and not os.is("windows") then
-    return
-  end
+  -- if string.starts(action, "vs") and not os.is("windows") then
+    -- return
+  -- end
 
   project(name .. ".C")
-    location "mk"
 
     kind "SharedLib"
     language "C"
 
-    defines { "MONO_DLL_IMPORT", "MONO_M2N_DLL_EXPORT" }
+    defines { "MONO_EMBEDDINATOR_DLL_EXPORT", "MONO_DLL_IMPORT"}
 
     flags { common_flags }
     files
@@ -155,7 +161,6 @@ function SetupTestProjectObjC(name, depends)
   end
 
   project(name .. ".ObjC")
-    location "mk"
 
     kind "SharedLib"
     language "C"
@@ -221,8 +226,9 @@ function SetupTestProjectsRunner(name)
       path.join(supportdir, "glib.*"),
     }
 
-    links { name .. ".C", name .. ".ObjC" }
-    links { "objc", "CoreFoundation.framework", "Foundation.framework" }
+    links { name .. ".C"}
+    filter { "macosx" }
+      links { name .. ".ObjC", "objc", "CoreFoundation.framework", "Foundation.framework" }
 
     dependson { name .. ".Managed" }
 
