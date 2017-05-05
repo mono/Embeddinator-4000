@@ -92,7 +92,7 @@ Now right click on *Weather* project node and select *Reveal in Finder*. In Find
 
 ## Using Embeddinator-4000
 
-If you installed Embeddinator-4000 using our pkg installer you should find **objcgen** in the following path `/Library/Frameworks/Xamarin.Embeddinator-4000/Commands/objcgen`; **objcgen** is the tool that we need to generate a native library from a .NET assembly.
+If you installed Embeddinator-4000 using our pkg installer you should find **objcgen** in the following path `/Library/Frameworks/Xamarin.Embeddinator-4000.framework/Commands/objcgen`; **objcgen** is the tool that we need to generate a native library from a .NET assembly.
 
 Open terminal, `cd` into the folder containing Weather.dll, and execute **objcgen** with the arguments shown below:
 
