@@ -5,13 +5,12 @@ using System.Linq;
 using IKVM.Reflection;
 using Type = IKVM.Reflection.Type;
 
-using Embeddinator;
 using System.Text;
 
-namespace ObjC {
+namespace Embeddinator {
 	// A set of post-processing steps needed to add hints
 	// to the input of the generation step
-	public partial class ObjCGenerator {
+	public abstract partial class Processor {
 		protected IEnumerable<ProcessedMethod> PostProcessMethods (IEnumerable<MethodInfo> methods, IEnumerable <MethodInfo> equals)
 		{
 			HashSet<string> duplicateNames = FindDuplicateNames (methods);

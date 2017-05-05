@@ -260,10 +260,11 @@ namespace Embeddinator {
 				LibraryName = Path.GetFileNameWithoutExtension (args [0]);
 
 			Console.WriteLine ("Processing assemblies...");
-			var g = new ObjCGenerator ();
-			g.Process (Assemblies);
+			var p = new ObjCProcessor ();
+			p.Process (Assemblies);
 
 			Console.WriteLine ("Generating binding code...");
+			var g = new ObjCGenerator () { Processor = p };
 			g.Generate ();
 			g.Write (OutputDirectory);
 

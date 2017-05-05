@@ -33,6 +33,15 @@ namespace Embeddinator {
 		public string ObjCName { get; private set; }
 
 		public ProcessedAssembly Assembly { get; set; }
+		public List<ProcessedConstructor> Constructors { get; set; }
+		public List<ProcessedFieldInfo> Fields { get; set; }
+		public List<ProcessedMethod> Methods { get; set; }
+		public List<ProcessedProperty> Properties { get; set; }
+
+		public bool HasConstructors => Constructors != null && Constructors.Count > 0;
+		public bool HasFields => Fields != null && Fields.Count > 0;
+		public bool HasMethods => Methods != null && Methods.Count > 0;
+		public bool HasProperties => Properties != null && Properties.Count > 0;
 
 		public bool IsClass => !IsEnum && !IsProtocol;
 		public bool IsEnum => Type.IsEnum;

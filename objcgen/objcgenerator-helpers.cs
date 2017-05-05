@@ -43,7 +43,7 @@ namespace ObjC {
 				}
 
 				if (n > 0 || !isExtension) {
-					string ptname = NameGenerator.GetObjCParamTypeName (p, types);
+					string ptname = NameGenerator.GetObjCParamTypeName (p, Processor.Types);
 					objc.Append (":(").Append (ptname).Append (")").Append (NameGenerator.GetExtendedParameterName (p, parameters));
 				}
 				mono.Append (NameGenerator.GetMonoName (p.ParameterType));
@@ -53,31 +53,6 @@ namespace ObjC {
 
 			objcSignature = objc.ToString ();
 			monoSignature = mono.ToString ();
-		}
-
-		public IEnumerable<ProcessedConstructor> GetUnavailableParentCtors (Type type, List<ProcessedConstructor> typeCtors)
-		{
-			var baseType = type.BaseType;
-			if (baseType.Namespace == "System" && baseType.Name == "Object")
-				return Enumerable.Empty<ProcessedConstructor> ();
-
-			List<ProcessedConstructor> parentCtors;
-			if (!ctors.TryGetValue (baseType, out parentCtors))
-				return Enumerable.Empty<ProcessedConstructor> ();
-
-			var finalList = new List<ProcessedConstructor> ();
-			foreach (var pctor in parentCtors) {
-				var pctorParams = pctor.Constructor.GetParameters ();
-				foreach (var ctor in typeCtors) {
-					var ctorParams = ctor.Constructor.GetParameters ();
-					if (pctorParams.Any (pc => !ctorParams.Any (p => p.Position == pc.Position && pc.ParameterType == p.ParameterType))) {
-						finalList.Add (pctor);
-						break;
-					}
-				}
-			}
-
-			return finalList;
 		}
 	}
 }
