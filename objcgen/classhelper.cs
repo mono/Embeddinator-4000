@@ -8,12 +8,14 @@ namespace ObjC {
 	public class ClassHelper {
 
 		protected SourceWriter headers;
+		protected SourceWriter private_headers;
 		protected SourceWriter implementation;
 
-		public ClassHelper (SourceWriter headers, SourceWriter implementation)
+		public ClassHelper (SourceWriter headers, SourceWriter implementation, SourceWriter privateHeaders = null)
 		{
 			this.headers = headers;
 			this.implementation = implementation;
+			this.private_headers = privateHeaders;
 		}
 
 		public bool IsBaseTypeBound { get; set; }

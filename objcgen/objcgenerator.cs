@@ -14,6 +14,7 @@ namespace ObjC {
 	public partial class ObjCGenerator : Generator {
 
 		SourceWriter headers = new SourceWriter ();
+		SourceWriter private_headers = new SourceWriter ();
 		SourceWriter implementation = new SourceWriter ();
 
 		public override void Generate ()
@@ -33,7 +34,11 @@ namespace ObjC {
 				headers.WriteLine ($"@class {t.TypeName};");
 			headers.WriteLine ();
 
+			private_headers.WriteLine ("#import <Foundation/Foundation.h>");
+			private_headers.WriteLine ();
+
 			implementation.WriteLine ("#include \"bindings.h\"");
+			implementation.WriteLine ("#include \"bindings-private.h\"");
 			implementation.WriteLine ("#include \"glib.h\"");
 			implementation.WriteLine ("#include \"objc-support.h\"");
 			implementation.WriteLine ("#include \"mono_embeddinator.h\"");
@@ -96,7 +101,12 @@ namespace ObjC {
 			implementation.WriteLine ("return;");
 			implementation.Indent--;
 			implementation.WriteLine ("__initialize_mono ();");
-			implementation.WriteLine ($"__{name}_image = mono_embeddinator_load_assembly (&__mono_context, \"{originalName}.dll\");");
+			if (name == "mscorlib") {
+				// skip extra logic - we know mscorlib is already loaded into memory
+				implementation.WriteLine ($"__{name}_image = mono_get_corlib ();");
+			} else {
+				implementation.WriteLine ($"__{name}_image = mono_embeddinator_load_assembly (&__mono_context, \"{originalName}.dll\");");
+			}
 			implementation.WriteLine ($"assert (__{name}_image && \"Could not load the assembly '{originalName}.dll'.\");");
 			var categories = extensions_methods.Keys;
 			if (categories.Count > 0) {
@@ -208,10 +218,10 @@ namespace ObjC {
 		void GenerateProtocol (ProcessedType type)
 		{
 			Type t = type.Type;
-			var pbuilder = new ProtocolHelper (headers, implementation) {
+			var pbuilder = new ProtocolHelper (headers, implementation, private_headers) {
 				AssemblyQualifiedName = t.AssemblyQualifiedName,
-				AssemblyName = t.Assembly.GetName ().Name.Sanitize (),
-				ProtocolName = NameGenerator.GetTypeName (t),
+				AssemblyName = type.Assembly.SafeName,
+				ProtocolName = type.TypeName,
 				Namespace = t.Namespace,
 				ManagedName = t.Name,
 				MetadataToken = t.MetadataToken,
@@ -840,6 +850,7 @@ namespace ObjC {
 		public override void Write (string outputDirectory)
 		{
 			WriteFile (Path.Combine (outputDirectory, "bindings.h"), headers.ToString ());
+			WriteFile (Path.Combine (outputDirectory, "bindings-private.h"), private_headers.ToString ());
 			WriteFile (Path.Combine (outputDirectory, "bindings.m"), implementation.ToString ());
 		}
 
