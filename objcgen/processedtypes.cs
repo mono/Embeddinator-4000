@@ -55,6 +55,11 @@ namespace Embeddinator {
 			TypeName = ObjC.NameGenerator.GetTypeName (Type);
 			ObjCName = ObjC.NameGenerator.GetObjCName (Type);
 		}
+
+		public override string ToString ()
+		{
+			return Type.ToString ();
+		}
 	}
 
 	public abstract class ProcessedMemberBase {
@@ -92,9 +97,16 @@ namespace Embeddinator {
 	public class ProcessedConstructor : ProcessedMemberBase {
 		public ConstructorInfo Constructor { get; private set; }
 
+		public bool Unavailable { get; set; }
+
 		public ProcessedConstructor (ConstructorInfo constructor)
 		{
 			Constructor = constructor;
+		}
+
+		public override string ToString ()
+		{
+			return Constructor.ToString ();
 		}
 	}
 

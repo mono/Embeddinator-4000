@@ -290,25 +290,6 @@ namespace ObjC {
 
 			var default_init = false;
 			if (type.HasConstructors) {
-				// First get the unavailable init ctor selectors in parent class
-				// FIXME: this needs to move into the processor
-				var unavailableCtors = (Processor as ObjCProcessor).GetUnavailableParentCtors (type);
-				if (unavailableCtors.Count () > 0) {
-					// TODO: Print a #pragma mark once we have a well defined header structure http://nshipster.com/pragma/
-					foreach (var uctor in unavailableCtors) {
-						var ctorparams = uctor.Constructor.GetParameters ();
-						string name = "init";
-						string signature = ".ctor()";
-						if (ctorparams.Length > 0)
-							GetSignatures ("initWith", uctor.Constructor.Name, uctor.Constructor, ctorparams, uctor.FallBackToTypeName, false, out name, out signature);
-						headers.WriteLine ("/** This initializer is not available as it was not re-exposed from the base type");
-						headers.WriteLine (" *  For more details consult https://github.com/mono/Embeddinator-4000/blob/master/docs/ObjC.md#constructors-vs-initializers");
-						headers.WriteLine (" */");
-						headers.WriteLine ($"- (nullable instancetype){name} NS_UNAVAILABLE;");
-						headers.WriteLine ();
-					}
-				}
-
 				foreach (var ctor in type.Constructors) {
 					var pcount = ctor.Constructor.ParameterCount;
 					default_init |= pcount == 0;
@@ -318,6 +299,15 @@ namespace ObjC {
 					string signature = ".ctor()";
 					if (parameters.Length > 0)
 						GetSignatures ("initWith", ctor.Constructor.Name, ctor.Constructor, parameters, ctor.FallBackToTypeName, false, out name, out signature);
+
+					if (ctor.Unavailable) {
+						headers.WriteLine ("/** This initializer is not available as it was not re-exposed from the base type");
+						headers.WriteLine (" *  For more details consult https://github.com/mono/Embeddinator-4000/blob/master/docs/ObjC.md#constructors-vs-initializers");
+						headers.WriteLine (" */");
+						headers.WriteLine ($"- (nullable instancetype){name} NS_UNAVAILABLE;");
+						headers.WriteLine ();
+						continue;
+					}
 
 					var builder = new MethodHelper (headers, implementation) {
 						AssemblySafeName = aname,

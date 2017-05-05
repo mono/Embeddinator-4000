@@ -244,6 +244,14 @@ namespace ObjC {
 			Types = Types.OrderBy ((arg) => arg.Type.FullName).OrderBy ((arg) => Types.HasClass (arg.Type.BaseType)).ToList ();
 			Console.WriteLine ($"\t{Types.Count} types found");
 
+			// proceeed with extra adjustments before giving results to the generator
+			foreach (var t in Types) {
+				foreach (var uctor in GetUnavailableParentCtors (t)) {
+					var c = new ProcessedConstructor (uctor.Constructor) { Unavailable = true };
+					t.Constructors.Add (c);
+				}
+			}
+
 			ErrorHelper.Show (delayed);
 		}
 
@@ -306,18 +314,18 @@ namespace ObjC {
 			pt.Fields = processedFields;
 		}
 
-		public IEnumerable<ProcessedConstructor> GetUnavailableParentCtors (ProcessedType pt)
+		IEnumerable<ProcessedConstructor> GetUnavailableParentCtors (ProcessedType pt)
 		{
 			var type = pt.Type;
-			var typeCtors = pt.Constructors;
 			var baseType = type.BaseType;
-			if (baseType.Namespace == "System" && baseType.Name == "Object")
+			if ((baseType == null) || (baseType.Namespace == "System" && baseType.Name == "Object"))
 				return Enumerable.Empty<ProcessedConstructor> ();
 
 			var baseProcessedType = GetProcessedType (baseType);
 			if ((baseProcessedType == null) || !baseProcessedType.HasConstructors)
 				return Enumerable.Empty<ProcessedConstructor> ();
 			
+			var typeCtors = pt.Constructors;
 			List<ProcessedConstructor> parentCtors = baseProcessedType.Constructors;
 
 			var finalList = new List<ProcessedConstructor> ();
