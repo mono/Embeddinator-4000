@@ -1,5 +1,5 @@
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 	<Target Name="BeforeBuild" Inputs="$(MSBuildThisFileDirectory)subscripts.tt" Outputs="$(MSBuildThisFileDirectory)subscripts.cs">
-		<Exec WorkingDirectory="$(MSBuildThisFileDirectory)" Command="/Library/Frameworks/Mono.framework/Commands/mono &quot;/Applications/Xamarin Studio.app/Contents/Resources/lib/monodevelop/AddIns/MonoDevelop.TextTemplating/TextTransform.exe&quot; subscripts.tt -o subscripts.cs" />
+		<Exec WorkingDirectory="$(MSBuildThisFileDirectory)" Command="&quot;$(MSBuildThisFileDirectory)../../deps/Mono.TextTransform.1.0.0/tools/TextTransform.exe&quot; subscripts.tt -o subscripts.cs" />
     	</Target>  
 </Project>
