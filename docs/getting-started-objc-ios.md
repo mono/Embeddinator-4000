@@ -12,6 +12,7 @@ In order to use the embeddinator to generate bindings for iOS you'll need a Mac 
 * Xcode 8.3.2 or later
 * [Mono 5.0](http://www.mono-project.com/download/beta/) _presently in beta_ or later
 * [Xamarin.iOS](https://jenkins.mono-project.com/view/Xamarin.MaciOS/job/xamarin-macios-builds-master/) from our _master_ branch.
+* [Embeddinator-4000](https://jenkins.mono-project.com/view/Xamarin.MaciOS/job/embeddinator-4000-objc/lastSuccessfulBuild/Azure/).
 
 Optionally you can install [Xamarin Studio](https://developer.xamarin.com/guides/cross-platform/xamarin-studio/)
 or the new [Visual Studio for Mac](https://www.visualstudio.com/vs/visual-studio-mac/)
