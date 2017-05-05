@@ -11,7 +11,7 @@ namespace Embeddinator {
 		public List<ProcessedType> Types { get; set; } = new List<ProcessedType> ();
 
 		Queue<ProcessedAssembly> AssemblyQueue = new Queue<ProcessedAssembly> ();
-		protected List<Exception> delayed = new List<Exception> ();
+		protected List<Exception> Delayed = new List<Exception> ();
 
 		public virtual void Process (IEnumerable<Assembly> input)
 		{
@@ -55,7 +55,7 @@ namespace Embeddinator {
 		public abstract void Process (ProcessedType pt);
 
 		// useful to get BaseType - but can only be called (safely) once processing is done
-		public ProcessedType GetProcessedType (Type t)
+		protected ProcessedType GetProcessedType (Type t)
 		{
 			return Types.Find ((pt) => pt.Type == t);
 		}
@@ -64,7 +64,7 @@ namespace Embeddinator {
 		HashSet<string> assembly_name = new HashSet<string> ();
 		HashSet<string> assembly_safename = new HashSet<string> ();
 
-		public bool AddIfUnique (ProcessedAssembly assembly)
+		bool AddIfUnique (ProcessedAssembly assembly)
 		{
 			if (assembly_name.Contains (assembly.Name))
 				return false;

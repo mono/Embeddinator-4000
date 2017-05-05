@@ -36,19 +36,19 @@ namespace ObjC {
 				return false;
 
 			if (t.IsArray) {
-				delayed.Add (ErrorHelper.CreateWarning (1010, $"Type `{t}` is not generated because `arrays` are not supported."));
+				Delayed.Add (ErrorHelper.CreateWarning (1010, $"Type `{t}` is not generated because `arrays` are not supported."));
 				unsupported.Add (t);
 				return false;
 			}
 
 			if (t.IsPointer) {
-				delayed.Add (ErrorHelper.CreateWarning (1010, $"Type `{t}` is not generated because `unsafe pointers` are not supported."));
+				Delayed.Add (ErrorHelper.CreateWarning (1010, $"Type `{t}` is not generated because `unsafe pointers` are not supported."));
 				unsupported.Add (t);
 				return false;
 			}
 
 			if (t.IsGenericParameter || t.IsGenericType) {
-				delayed.Add (ErrorHelper.CreateWarning (1010, $"Type `{t}` is not generated because `generics` are not supported."));
+				Delayed.Add (ErrorHelper.CreateWarning (1010, $"Type `{t}` is not generated because `generics` are not supported."));
 				unsupported.Add (t);
 				return false;
 			}
@@ -61,13 +61,13 @@ namespace ObjC {
 				case "Exception":
 				case "IFormatProvider":
 				case "Type":
-					delayed.Add (ErrorHelper.CreateWarning (1011, $"Type `{t}` is not generated because it lacks a native counterpart."));
+					Delayed.Add (ErrorHelper.CreateWarning (1011, $"Type `{t}` is not generated because it lacks a native counterpart."));
 					unsupported.Add (t);
 					return false;
 				case "DateTime": // FIXME: NSDateTime
 				case "Decimal": // FIXME: NSDecimal
 				case "TimeSpan":
-					delayed.Add (ErrorHelper.CreateWarning (1012, $"Type `{t}` is not generated because it lacks a marshaling code with a native counterpart."));
+					Delayed.Add (ErrorHelper.CreateWarning (1012, $"Type `{t}` is not generated because it lacks a marshaling code with a native counterpart."));
 					unsupported.Add (t);
 					return false;
 				}
@@ -107,7 +107,7 @@ namespace ObjC {
 				foreach (var p in ctor.GetParameters ()) {
 					var pt = p.ParameterType;
 					if (!IsSupported (pt)) {
-						delayed.Add (ErrorHelper.CreateWarning (1020, $"Constructor `{ctor}` is not generated because of parameter type `{pt}` is not supported."));
+						Delayed.Add (ErrorHelper.CreateWarning (1020, $"Constructor `{ctor}` is not generated because of parameter type `{pt}` is not supported."));
 						pcheck = false;
 					} else if (p.HasDefaultValue) {
 						members_with_default_values.Add (ctor);
@@ -161,7 +161,7 @@ namespace ObjC {
 
 				var rt = mi.ReturnType;
 				if (!IsSupported (rt)) {
-					delayed.Add (ErrorHelper.CreateWarning (1030, $"Method `{mi}` is not generated because return type `{rt}` is not supported."));
+					Delayed.Add (ErrorHelper.CreateWarning (1030, $"Method `{mi}` is not generated because return type `{rt}` is not supported."));
 					continue;
 				}
 
@@ -169,7 +169,7 @@ namespace ObjC {
 				foreach (var p in mi.GetParameters ()) {
 					var pt = p.ParameterType;
 					if (!IsSupported (pt)) {
-						delayed.Add (ErrorHelper.CreateWarning (1031, $"Method `{mi}` is not generated because of parameter type `{pt}` is not supported."));
+						Delayed.Add (ErrorHelper.CreateWarning (1031, $"Method `{mi}` is not generated because of parameter type `{pt}` is not supported."));
 						pcheck = false;
 					} else if (p.HasDefaultValue) {
 						members_with_default_values.Add (mi);
@@ -182,7 +182,7 @@ namespace ObjC {
 				if (extension_type && mi.HasCustomAttribute ("System.Runtime.CompilerServices", "ExtensionAttribute")) {
 					var extended_type = mi.GetParameters () [0].ParameterType;
 					if (extended_type.IsPrimitive) {
-						delayed.Add (ErrorHelper.CreateWarning (1034, $"Extension method `{mi}` is not generated inside a category because they cannot be created on primitive type `{extended_type}`. A normal, static method was generated."));
+						Delayed.Add (ErrorHelper.CreateWarning (1034, $"Extension method `{mi}` is not generated inside a category because they cannot be created on primitive type `{extended_type}`. A normal, static method was generated."));
 					} else {
 						Dictionary<Type, List<MethodInfo>> extensions;
 						if (!extensions_methods.TryGetValue (t, out extensions)) {
@@ -208,7 +208,7 @@ namespace ObjC {
 			foreach (var pi in t.GetProperties (BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly)) {
 				var pt = pi.PropertyType;
 				if (!IsSupported (pt)) {
-					delayed.Add (ErrorHelper.CreateWarning (1040, $"Property `{pi}` is not generated because of parameter type `{pt}` is not supported."));
+					Delayed.Add (ErrorHelper.CreateWarning (1040, $"Property `{pi}` is not generated because of parameter type `{pt}` is not supported."));
 					continue;
 				}
 				yield return pi;
@@ -222,7 +222,7 @@ namespace ObjC {
 					continue;
 				var ft = fi.FieldType;
 				if (!IsSupported (ft)) {
-					delayed.Add (ErrorHelper.CreateWarning (1050, $"Field `{fi}` is not generated because of field type `{ft}` is not supported."));
+					Delayed.Add (ErrorHelper.CreateWarning (1050, $"Field `{fi}` is not generated because of field type `{ft}` is not supported."));
 					continue;
 				}
 				yield return fi;
@@ -252,7 +252,7 @@ namespace ObjC {
 				}
 			}
 
-			ErrorHelper.Show (delayed);
+			ErrorHelper.Show (Delayed);
 		}
 
 		public override void Process (ProcessedType pt)
@@ -303,7 +303,7 @@ namespace ObjC {
 
 			if (subscriptProps.Count > 0) {
 				if (subscriptProps.Count > 1)
-					delayed.Add (ErrorHelper.CreateWarning (1041, $"Indexed properties on {t.Name} is not generated because multiple indexed properties not supported."));
+					Delayed.Add (ErrorHelper.CreateWarning (1041, $"Indexed properties on {t.Name} is not generated because multiple indexed properties not supported."));
 				else
 					subscriptProperties.Add (t, PostProcessSubscriptProperties (subscriptProps).ToList ());
 			}

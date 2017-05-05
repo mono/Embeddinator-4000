@@ -29,7 +29,7 @@ namespace Embeddinator {
 					processedMethod.NameOverride = "areEqual";
 				
 				if (operatorToIgnore.Contains (method)) {
-					delayed.Add (ErrorHelper.CreateWarning (1033, $"Method {processedMethod.Method.Name} is not generated because another method exposes the operator with a friendly name"));
+					Delayed.Add (ErrorHelper.CreateWarning (1033, $"Method {processedMethod.Method.Name} is not generated because another method exposes the operator with a friendly name"));
 					continue;
 				}
 
