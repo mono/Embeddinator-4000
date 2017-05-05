@@ -6,6 +6,6 @@ fi
 
 mono $BUILD_DIR/nuget.exe install Mono.TextTransform -OutputDirectory $BUILD_DIR/../deps
 
-TEXT_TEMPLATE_DIR="/Applications/Xamarin Studio.app/Contents/Resources/lib/monodevelop/AddIns/MonoDevelop.TextTemplating2/"
+TEXT_TEMPLATE_DIR="/Applications/Xamarin Studio.app/Contents/Resources/lib/monodevelop/AddIns/MonoDevelop.TextTemplating/"
 mkdir -p "$TEXT_TEMPLATE_DIR"
 cp -R $BUILD_DIR/../deps/Mono.TextTransform.1.0.0/tools "$TEXT_TEMPLATE_DIR"
