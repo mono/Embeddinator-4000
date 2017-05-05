@@ -1,4 +1,4 @@
-﻿﻿using System.Collections.Generic;
+﻿﻿﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -221,7 +221,7 @@ namespace MonoEmbeddinator4000.Generators
                 if (classes.Count() > 0)
                     Write(" extends {0}", string.Join(", ", classes));
 
-                var interfaces = bases.Where(@base => @base.Class.IsInterface)
+                var interfaces = bases.Where(@base => @base.Class.IsInterface && @base.Class.IsGenerated)
                                       .Select(@base => @base.Class.Visit(TypePrinter).Type);
                 if (interfaces.Count() > 0)
                     Write(" implements {0}", string.Join(", ", interfaces));
@@ -235,13 +235,19 @@ namespace MonoEmbeddinator4000.Generators
             Write(" ");
             WriteStartBraceIndent();
 
-            if (!@class.IsStatic && !@class.HasBase)
+            var hasBase = @class.HasBaseClass && @class.BaseClass.IsGenerated;
+            if (!@class.IsStatic)
             {
                 var objectIdent = JavaGenerator.GeneratedIdentifier("object");
-                WriteLine($"public {JavaGenerator.IntPtrType} {objectIdent};");
-                NewLine();
                 
-                WriteLine($"{@class.Name}({JavaGenerator.IntPtrType} object) {{ this.{objectIdent} = object; }}");
+                if (!hasBase)
+                {
+                    WriteLine($"public {JavaGenerator.IntPtrType} {objectIdent};");
+                    NewLine();
+                }
+                
+                Write($"public {@class.Name}({JavaGenerator.IntPtrType} object) {{ ");
+                WriteLine(hasBase ? "super(object); }" : $"this.{objectIdent} = object; }}");
                 NewLine();
             }
 
@@ -303,7 +309,7 @@ namespace MonoEmbeddinator4000.Generators
                 Write(" ");
                 WriteStartBraceIndent();
 
-                if (method.IsConstructor && @class.HasBase)
+                if (method.IsConstructor && @class.HasBaseClass && @class.BaseClass.IsGenerated)
                     WriteLine("super((com.sun.jna.Pointer)null);");
 
                 GenerateMethodInvocation(method);
