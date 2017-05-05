@@ -49,6 +49,13 @@ namespace Embeddinator {
 					Assembly = a,
 				};
 				Types.Add (pt);
+
+				foreach (var nt in t.GetNestedTypes ()) {
+					var pnt = new ProcessedType (nt) {
+						Assembly = a
+					};
+					Types.Add (pnt);
+				}
 			}
 		}
 

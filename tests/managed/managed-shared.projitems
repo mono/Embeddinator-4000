@@ -29,6 +29,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)types.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)shortParameters.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)overloads.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)nestedClasses.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="$(MSBuildThisFileDirectory)subscripts.tt">

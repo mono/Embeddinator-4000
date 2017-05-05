@@ -244,7 +244,7 @@ namespace ObjC {
 			Types = Types.OrderBy ((arg) => arg.Type.FullName).OrderBy ((arg) => Types.HasClass (arg.Type.BaseType)).ToList ();
 			Console.WriteLine ($"\t{Types.Count} types found");
 
-			// proceeed with extra adjustments before giving results to the generator
+			// proceed with extra adjustments before giving results to the generator
 			foreach (var t in Types) {
 				foreach (var uctor in GetUnavailableParentCtors (t)) {
 					var c = new ProcessedConstructor (uctor.Constructor) { Unavailable = true };
