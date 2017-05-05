@@ -165,7 +165,7 @@ namespace ObjC {
 			implementation.WriteLine ();
 
 			foreach (var mi in methods) {
-				ImplementMethod (mi, mi.Name.CamelCase (), true);
+				ImplementMethod (mi, mi.Name.CamelCase (), null, isExtension: true);
 			}
 
 			headers.WriteLine ("@end");
@@ -308,7 +308,7 @@ namespace ObjC {
 					string name = "init";
 					string signature = ".ctor()";
 					if (parameters.Length > 0)
-						GetSignatures ("initWith", ctor.Constructor.Name, ctor.Constructor, parameters, ctor.FallBackToTypeName, false, out name, out signature);
+						GetSignatures (ctor, "initWith", ctor.Constructor.Name, ctor.Constructor, parameters, false, out name, out signature);
 
 					if (ctor.Unavailable) {
 						headers.WriteLine ("/** This initializer is not available as it was not re-exposed from the base type");
@@ -668,11 +668,11 @@ namespace ObjC {
 			var spacing = property_type [property_type.Length - 1] == '*' ? string.Empty : " ";
 			headers.WriteLine ($") {property_type}{spacing}{name};");
 
-			ImplementMethod (getter, name, false, pi);
+			ImplementMethod (getter, name, null, pi: pi);
 			if (setter == null)
 				return;
 
-			ImplementMethod (setter, "set" + pi.Name, false, pi);
+			ImplementMethod (setter, "set" + pi.Name, null, pi: pi);
 		}
 
 		protected void Generate (ProcessedFieldInfo field)
@@ -783,7 +783,8 @@ namespace ObjC {
 		}
 
 		// TODO override with attribute ? e.g. [ObjC.Selector ("foo")]
-		string ImplementMethod (MethodInfo info, string name, bool isExtension = false, PropertyInfo pi = null, bool useTypeNames = false)
+		// HACK - This should take a ProcessedMethod and not much of this stuff - https://github.com/mono/Embeddinator-4000/issues/276
+		string ImplementMethod (MethodInfo info, string name, ProcessedMethod method, bool isExtension = false, PropertyInfo pi = null)
 		{
 			var type = info.DeclaringType;
 			var managed_type_name = NameGenerator.GetObjCName (type);
@@ -793,7 +794,7 @@ namespace ObjC {
 			var managed_name = info.Name;
 			var parametersInfo = info.GetParameters ();
 
-			GetSignatures (name, managed_name, (MemberInfo)pi ?? info, parametersInfo, useTypeNames, isExtension, out objcsig, out monosig);
+			GetSignatures (method, name, managed_name, (MemberInfo)pi ?? info, parametersInfo, isExtension, out objcsig, out monosig);
 
 			var builder = new MethodHelper (headers, implementation) {
 				AssemblySafeName = type.Assembly.GetName ().Name.Sanitize (),
@@ -876,7 +877,7 @@ namespace ObjC {
 			else
 				name = mb.Name.CamelCase ();
 			
-			GetSignatures (name, mb.Name, mb, plist.ToArray (), false, false, out objcsig, out monosig);
+			GetSignatures (null, name, mb.Name, mb, plist.ToArray (), false, out objcsig, out monosig);
 			var type = mb.DeclaringType;
 			var builder = new MethodHelper (headers, implementation) {
 				IsStatic = mb.IsStatic,
@@ -903,7 +904,7 @@ namespace ObjC {
 
 		protected override void Generate (ProcessedMethod method)
 		{
-			var objcsig = ImplementMethod (method.Method, method.BaseName, useTypeNames: method.FallBackToTypeName);
+			var objcsig = ImplementMethod (method.Method, method.BaseName, method);
 
 			if (members_with_default_values.Contains (method.Method))
 				GenerateDefaultValuesWrappers (objcsig, method.Method);
