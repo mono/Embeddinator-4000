@@ -27,6 +27,9 @@ namespace ObjC {
 			headers.WriteLine ();
 			headers.WriteLine ($"/** Protocol {ProtocolName}");
 			headers.WriteLine ($" *  Corresponding .NET Qualified Name: `{AssemblyQualifiedName}`");
+			headers.WriteLine (" *");
+			headers.WriteLine (" * @warning This expose a managed (.net) interface. Conforming to this protocol from Objective-C code");
+			headers.WriteLine (" * does not allow interop with managed code. https://mono.github.io/Embeddinator-4000/Limitations#Subclassing");
 			headers.WriteLine (" */");
 			headers.WriteLine ($"@protocol {ProtocolName} <NSObject>");
 			headers.WriteLine ();

@@ -11,6 +11,15 @@ namespace ObjC {
 			ReturnType = "bool";
 		}
 
+		public override void WriteHeaders ()
+		{
+			headers.WriteLine ();
+			headers.WriteLine ("/** This override the default equality check (defined in NSObject Protocol)");
+			headers.WriteLine (" * https://developer.apple.com/reference/objectivec/1418956-nsobject/1418795-isequal?language=objc");
+			headers.WriteLine (" */");
+			base.WriteHeaders ();
+		}
+
 		public void WriteImplementation ()
 		{
 			BeginImplementation ();
