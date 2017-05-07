@@ -537,22 +537,22 @@ namespace ObjC {
 				implementation.Indent--;
 				implementation.WriteLine ("else");
 				implementation.Indent++;
-				implementation.WriteLine ($"mono_array_set({pnameArr}, {typeName}, {pnameIdx}, {pnameRet}.{returnValue});");
+				implementation.WriteLine ($"mono_array_set ({pnameArr}, {typeName}, {pnameIdx}, {pnameRet}.{returnValue});");
 				break;
 			case TypeCode.String:
 				implementation.WriteLine ($"NSString* {pnameRet} = {parameterName}[{pnameIdx}];");
 				implementation.WriteLine ($"if (!{pnameRet} || [{pnameRet} isKindOfClass:[NSNull class]])");
 				implementation.Indent++;
-				implementation.WriteLine ($"mono_array_set({pnameArr}, MonoString *, {pnameIdx}, NULL);");
+				implementation.WriteLine ($"mono_array_set ({pnameArr}, MonoString *, {pnameIdx}, NULL);");
 				implementation.Indent--;
 				implementation.WriteLine ("else");
 				implementation.Indent++;
-				implementation.WriteLine ($"mono_array_set({pnameArr}, MonoString *, {pnameIdx}, mono_string_new (__mono_context.domain, [{pnameRet} UTF8String]));");
+				implementation.WriteLine ($"mono_array_set ({pnameArr}, MonoString *, {pnameIdx}, mono_string_new (__mono_context.domain, [{pnameRet} UTF8String]));");
 				implementation.Indent--;
 				break;
 			case TypeCode.Byte:
-				implementation.WriteLine ($"int esize = mono_array_element_size(mono_object_get_class((MonoObject *){pnameArr}));");
-				implementation.WriteLine ($"char* buff = mono_array_addr_with_size({pnameArr}, esize, 0);");
+				implementation.WriteLine ($"int esize = mono_array_element_size (mono_object_get_class ((MonoObject *){pnameArr}));");
+				implementation.WriteLine ($"char* buff = mono_array_addr_with_size ({pnameArr}, esize, 0);");
 				implementation.WriteLine ($"[{parameterName} getBytes:buff length:{pnameLength}];");
 				break;
 			case TypeCode.Object:
@@ -571,14 +571,14 @@ namespace ObjC {
 					goto default;
 				implementation.WriteLine ($"if (!{pnameRet} || [{pnameRet} isKindOfClass:[NSNull class]])");
 				implementation.Indent++;
-				implementation.WriteLine ($"mono_array_set({pnameArr}, MonoObject *, {pnameIdx}, NULL);");
+				implementation.WriteLine ($"mono_array_set ({pnameArr}, MonoObject *, {pnameIdx}, NULL);");
 				implementation.Indent--;
 				implementation.WriteLine ("else");
 				implementation.Indent++;
 				if (hasClass)
-					implementation.WriteLine ($"mono_array_set({pnameArr}, MonoObject *, {pnameIdx}, mono_gchandle_get_target ({pnameRet}->_object->_handle));");
+					implementation.WriteLine ($"mono_array_set ({pnameArr}, MonoObject *, {pnameIdx}, mono_gchandle_get_target ({pnameRet}->_object->_handle));");
 				else if (hasProtocol)
-					implementation.WriteLine ($"mono_array_set({pnameArr}, MonoObject *, {pnameIdx}, mono_embeddinator_get_object ({pnameRet}, true));");
+					implementation.WriteLine ($"mono_array_set ({pnameArr}, MonoObject *, {pnameIdx}, mono_embeddinator_get_object ({pnameRet}, true));");
 				break;
 			default:
 				throw new NotImplementedException ($"Converting type {type.FullName} to mono code");
@@ -943,7 +943,7 @@ namespace ObjC {
 				var ctype = NameGenerator.GetTypeName (t);
 				string ctypep;
 				if (typecode == TypeCode.SByte)
-					ctypep = $"Char"; // GetTypeName returns signed char
+					ctypep = "Char"; // GetTypeName returns signed char
 				else
 					ctypep = ctype.PascalCase (true);
 				implementation.WriteLine ($"{ctype} __resarrval = mono_array_get (__resarr, {ctype}, __residx);");
