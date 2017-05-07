@@ -105,6 +105,9 @@ namespace ObjC {
 			if (t.IsEnum)
 				return t.FullName;
 
+			if (t.IsArray)
+				return $"{GetMonoName (t.GetElementType ())}[]";
+
 			switch (Type.GetTypeCode (t)) {
 			case TypeCode.Object:
 				switch (t.Namespace) {
@@ -169,6 +172,9 @@ namespace ObjC {
 			case TypeCode.String:
 				return "NSArray <NSString *> *";
 			case TypeCode.Object:
+				if (t.IsInterface)
+					return $"NSArray<id<{GetObjCName (t)}>> *";
+
 				return $"NSArray<{GetObjCName (t)} *> *";
 			default:
 				throw new NotImplementedException ($"Converting type {t.Name} to a native type name");

@@ -1,7 +1,8 @@
 ﻿using System;
+using Interfaces;
+
 namespace Arrays {
 	public class Arr {
-		public string [] GetNullMethod () => null;
 		public string [] StringArrMethod () => new [] { "Hola", "Hello", "Bonjour" };
 		public ValueHolder [] ValueHolderArrMethod () => new [] { new ValueHolder (1), new ValueHolder (2), new ValueHolder (3) };
 		public bool [] BoolArrMethod () => new [] { true, false, true };
@@ -15,13 +16,36 @@ namespace Arrays {
 		public ushort [] UshortArrMethod () => new ushort [] { ushort.MaxValue, ushort.MinValue, 10 };
 		public uint [] UintArrMethod () => new uint [] { uint.MaxValue, uint.MinValue, 15 };
 		public ulong [] UlongArrMethod () => new ulong [] { ulong.MaxValue, ulong.MinValue, 117 };
-		public byte [] ByteArrMethod () => new byte[] { 0x0, 0x01, 0x02, 0x04, 0x08 };
+		public byte [] ByteArrMethod () => new byte [] { 0x0, 0x01, 0x02, 0x04, 0x08 };
+		public IMakeItUp [] InterfaceArrMethod () => new [] { Supplier.Create (), Supplier.Create (), Supplier.Create () };
 
 		public string [] GetNull { get; } = null;
 		public string [] StringArr { get; } = new [] { "Hola", "Hello", "Bonjour" };
 		public int [] IntArr { get; } = new [] { int.MaxValue, int.MinValue, 0 };
 		public ValueHolder [] ValueHolderArr { get; } = new [] { new ValueHolder (1), new ValueHolder (2), new ValueHolder (3) };
 		public byte [] ByteArr { get; } = new byte [] { 0x0, 0x01, 0x02, 0x04, 0x08 };
+		public IMakeItUp [] InterfaceArr { get; } = new [] { Supplier.Create (), Supplier.Create (), Supplier.Create () };
+
+		public string [] StringArrMethod (string [] strArr) => strArr;
+		public bool [] BoolArrMethod (bool [] boolArr) => boolArr;
+		public char [] CharArrMethod (char [] charArr) => charArr;
+		public sbyte [] SbyteArrMethod (sbyte [] sbyteArr) => sbyteArr;
+		public short [] ShortArrMethod (short [] shortArr) => shortArr;
+		public int [] IntArrMethod (int [] intArr) => intArr;
+		public long [] LongArrMethod (long [] longArr) => longArr;
+		public ushort [] UshortArrMethod (ushort [] ushortArr) => ushortArr;
+		public uint [] UintArrMethod (uint [] uintArr) => uintArr;
+		public ulong [] UlongArrMethod (ulong [] ulongArr) => ulongArr;
+		public float [] FloatArrMethod (float [] floatArr) => floatArr;
+		public double [] DoubleArrMethod (double [] doubleArr) => doubleArr;
+		public ValueHolder [] ValueHolderArrMethod (ValueHolder [] valhArr) => valhArr;
+		public IMakeItUp [] InterfaceArrMethod (IMakeItUp [] interArr) => interArr;
+		public byte [] ByteArrMethod (byte [] byteArr) => byteArr;
+
+		public string [] GetNullMethod () => null;
+		public string [] StringNullArrMethod () => new [] { "Hola", null, "Bonjour" };
+		public ValueHolder [] ValueHolderNullArrMethod () => new [] { new ValueHolder (1), null, new ValueHolder (3) };
+		public IMakeItUp [] InterfaceNullArrMethod () => new [] { Supplier.Create (), null, Supplier.Create () };
 	}
 
 	public class ValueHolder {
