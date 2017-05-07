@@ -47,6 +47,20 @@ MonoString *    mono_object_to_string (MonoObject *obj, MonoObject **exc);
 MonoClass *     mono_class_get (MonoImage *image, uint32_t type_token);
 MonoMethod *    mono_get_method (MonoImage *image, uint32_t token, MonoClass *klass);
 MonoClassField* mono_class_get_field (MonoClass *klass, uint32_t field_token);
+MonoClass*      mono_get_string_class(void);
+MonoClass*      mono_get_boolean_class(void);
+MonoClass*      mono_get_char_class(void);
+MonoClass*      mono_get_sbyte_class(void);
+MonoClass*      mono_get_int16_class(void);
+MonoClass*      mono_get_int32_class(void);
+MonoClass*      mono_get_int64_class(void);
+MonoClass*      mono_get_byte_class(void);
+MonoClass*      mono_get_uint16_class(void);
+MonoClass*      mono_get_uint32_class(void);
+MonoClass*      mono_get_uint64_class(void);
+MonoClass*      mono_get_single_class(void);
+MonoClass*      mono_get_double_class(void);
+int             mono_array_element_size(MonoClass *ac);
 
 MONO_EMBEDDINATOR_END_DECLS
 #else
