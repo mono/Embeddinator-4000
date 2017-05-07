@@ -10,7 +10,10 @@ namespace Embeddinator {
 		public List<ProcessedAssembly> Assemblies { get; set; } = new List<ProcessedAssembly> ();
 		public List<ProcessedType> Types { get; set; } = new List<ProcessedType> ();
 
-		Queue<ProcessedAssembly> AssemblyQueue = new Queue<ProcessedAssembly> ();
+		Queue<ProcessedAssembly> assemblyQueue = new Queue<ProcessedAssembly> ();
+		Queue<ProcessedType> typeQueue;
+		bool processing_ended;
+
 		protected List<Exception> Delayed = new List<Exception> ();
 
 		public virtual void Process (IEnumerable<Assembly> input)
@@ -22,24 +25,17 @@ namespace Embeddinator {
 				// ignoring/warning one is not an option as they could be different (e.g. different builds/versions)
 				if (!AddIfUnique (pa))
 					throw ErrorHelper.CreateError (12, $"The assembly name `{pa.Name}` is not unique");
-				AssemblyQueue.Enqueue (pa);
+				assemblyQueue.Enqueue (pa);
 			}
 
-			while (AssemblyQueue.Count > 0) {
-				Process (AssemblyQueue.Dequeue ());
-			}
-
-			// we can add new types while processing some (e.g. categories)
-			var typeQueue = new Queue<ProcessedType> (Types);
-			Types.Clear (); // reuse
-			while (typeQueue.Count > 0) {
-				Process (typeQueue.Dequeue ());
+			while (assemblyQueue.Count > 0) {
+				Process (assemblyQueue.Dequeue ());
 			}
 		}
 
 		protected abstract IEnumerable<Type> GetTypes (Assembly a);
 
-		public virtual void Process (ProcessedAssembly a)
+		public void Process (ProcessedAssembly a)
 		{
 			if (!a.UserCode)
 				return;
@@ -57,13 +53,30 @@ namespace Embeddinator {
 					Types.Add (pnt);
 				}
 			}
+
+			// we can add new types while processing some (e.g. categories)
+			typeQueue = new Queue<ProcessedType> (Types);
+			Types.Clear (); // reuse
+			while (typeQueue.Count > 0) {
+				Process (typeQueue.Dequeue ());
+			}
+			processing_ended = true;
 		}
 
 		public abstract void Process (ProcessedType pt);
 
+		protected void AddExtraType (ProcessedType pt)
+		{
+			typeQueue.Enqueue (pt);
+			// extra types are (most likely) outside the input list of assemblies
+			AddIfUnique (new ProcessedAssembly (pt.Type.Assembly));
+		}
+
 		// useful to get BaseType - but can only be called (safely) once processing is done
 		protected ProcessedType GetProcessedType (Type t)
 		{
+			if (!processing_ended)
+				throw ErrorHelper.CreateError (99, "Internal error `Invalid state for GetProcessedType`. Please file a bug report with a test case (https://github.com/mono/Embeddinator-4000/issues).");
 			return Types.Find ((pt) => pt.Type == t);
 		}
 
