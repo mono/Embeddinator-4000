@@ -421,7 +421,7 @@
     [boolCollection addItem:YES];
     XCTAssert ([boolCollection count] == 1, "count 1");
     XCTAssert ([boolCollection [0] isEqual:@YES], "get 0");
-    boolCollection[0] = NO;
+    boolCollection[0] = @NO;
     XCTAssert ([boolCollection [0] isEqual:@NO], "get 1");
     
     Subscripts_SbyteCollection *sbyteCollection = [[Subscripts_SbyteCollection alloc] init];
