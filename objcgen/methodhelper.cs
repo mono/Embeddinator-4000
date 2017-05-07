@@ -43,7 +43,7 @@ namespace ObjC {
 			writer.Write ($" ({ReturnType}){ObjCSignature}");
 		}
 
-		public void WriteHeaders ()
+		public virtual void WriteHeaders ()
 		{
 			WriteSignature (headers);
 			headers.WriteLine (';');
