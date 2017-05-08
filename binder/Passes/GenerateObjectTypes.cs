@@ -18,6 +18,9 @@ namespace MonoEmbeddinator4000.Passes
 
         public override bool VisitClassDecl(Class @class)
         {
+            if (AlreadyVisited(@class))
+                return false;
+
             // Check if we already handled this class.
             if (Classes.Contains(@class))
                 return false;
