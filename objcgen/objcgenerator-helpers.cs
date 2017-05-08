@@ -16,6 +16,7 @@ namespace ObjC {
 		void GetSignatures (ProcessedMemberBase member, string objName, string monoName, MemberInfo info, ParameterInfo [] parameters, bool isExtension, out string objcSignature, out string monoSignature)
 		{
 			bool useTypeNames = member != null ? member.FallBackToTypeName : false; // https://github.com/mono/Embeddinator-4000/issues/276
+			bool isOperator = member != null ? (member is ProcessedMethod) && ((ProcessedMethod)member).IsOperator : false;  // https://github.com/mono/Embeddinator-4000/issues/276
 
 			var method = (info as MethodBase); // else it's a PropertyInfo
 			// special case for setter-only - the underscore looks ugly
@@ -38,7 +39,7 @@ namespace ObjC {
 				string paramName = useTypeNames ? p.ParameterType.Name : p.Name;
 				if ((method != null) && (n > 0 || !isExtension)) {
 					if (n == 0) {
-						if (useTypeNames || method.IsConstructor || !method.IsSpecialName)
+						if (useTypeNames || method.IsConstructor || (!method.IsSpecialName && !isOperator))
 							objc.Append (paramName.PascalCase ());
 					} else
 						objc.Append (paramName.ToLowerInvariant ());
