@@ -67,7 +67,6 @@ namespace ObjCGenErrWarnTests {
 		static readonly string XcodeFolderPath = $"{AppDomain.CurrentDomain.BaseDirectory}../../xcode";
 		static readonly string MonoMsBuildPath = "/Library/Frameworks/Mono.framework/Versions/Current/Commands/msbuild";
 		static readonly string MonoPath = "/Library/Frameworks/Mono.framework/Versions/Current/Commands/mono";
-		static readonly string ClangPath = "/usr/bin/clang";
 
 		[Test]
 		[TestCase ("NoInitInSubclassTest", "ConstructorsLib", "main.m", Platform.macOS, Configuration.Debug, "error: 'initWithId:' is unavailable")]
@@ -76,7 +75,6 @@ namespace ObjCGenErrWarnTests {
 			Assert.IsTrue (Directory.Exists (XcodeFolderPath), "XcodeFolderPath");
 			Assert.IsTrue (File.Exists (MonoMsBuildPath), "MonoMsBuildPath");
 			Assert.IsTrue (File.Exists (MonoPath), "MonoPath");
-			Assert.IsTrue (File.Exists (ClangPath), "ClangPath");
 
 			var testcaseBaseDir = Path.Combine (XcodeFolderPath, directoryTest);
 			var tempWorkingDir = Xamarin.Cache.CreateTemporaryDirectory ();
@@ -113,7 +111,7 @@ namespace ObjCGenErrWarnTests {
 				break;
 			}
 
-			var clangArgs = new StringBuilder ();
+			var clangArgs = new StringBuilder ("clang ");
 			if (config == Configuration.Debug)
 				clangArgs.Append ("-g -O0 ");
 			else
@@ -128,7 +126,7 @@ namespace ObjCGenErrWarnTests {
 			clangArgs.Append ($"-o {Path.Combine (tempWorkingDir, "foo.o")} ");
 
 			// Embedder.RunProcess returns false if exitcode != 0
-			Assert.IsFalse (Embedder.RunProcess (ClangPath, clangArgs.ToString (), out int exitCode, out string output, capture_stderr: true), "clangbuild");
+			Assert.IsFalse (Embedder.RunProcess ("xcrun", clangArgs.ToString (), out int exitCode, out string output, capture_stderr: true), "clangbuild");
 			Assert.That (output, Does.Contain (errorToSearch), $"Not found: {errorToSearch}");
 		}
 	}
