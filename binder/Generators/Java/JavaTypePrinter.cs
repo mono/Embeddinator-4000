@@ -153,5 +153,11 @@ namespace MonoEmbeddinator4000.Generators
 
             throw new NotSupportedException();
         }
+
+        public override TypePrinterResult VisitUnsupportedType(UnsupportedType type,
+            TypeQualifiers quals)
+        {
+            return type.Description;
+        }
     }
 }
