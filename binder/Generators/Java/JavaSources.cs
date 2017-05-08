@@ -235,20 +235,30 @@ namespace MonoEmbeddinator4000.Generators
             Write(" ");
             WriteStartBraceIndent();
 
-            var hasBase = @class.HasBaseClass && @class.BaseClass.IsGenerated;
-            if (!@class.IsStatic)
+            var hasNonInterfaceBase = @class.HasBaseClass && @class.BaseClass.IsGenerated
+                && !@class.BaseClass.IsInterface;
+
+            var objectIdent = JavaGenerator.GeneratedIdentifier("object");
+
+            if (!@class.IsStatic && !@class.IsInterface)
             {
-                var objectIdent = JavaGenerator.GeneratedIdentifier("object");
-                
-                if (!hasBase)
+                if (!hasNonInterfaceBase)
                 {
                     WriteLine($"public {JavaGenerator.IntPtrType} {objectIdent};");
                     NewLine();
                 }
                 
                 Write($"public {@class.Name}({JavaGenerator.IntPtrType} object) {{ ");
-                WriteLine(hasBase ? "super(object); }" : $"this.{objectIdent} = object; }}");
+                WriteLine(hasNonInterfaceBase ? "super(object); }" : $"this.{objectIdent} = object; }}");
                 NewLine();
+
+                var implementsInterfaces = @class.Bases.Any(b => b.Class.IsGenerated && b.Class.IsInterface);
+                if (implementsInterfaces)
+                {
+                    WriteLine("@Override");
+                    WriteLine($"public com.sun.jna.Pointer __getObject() {{ return this.{objectIdent}; }}");
+                    NewLine();
+                }
             }
 
             VisitDeclContext(@class);
@@ -261,7 +271,7 @@ namespace MonoEmbeddinator4000.Generators
         {
             var keywords = new List<string>();
 
-            if (method.IsGeneratedOverride())
+            if (method.IsGeneratedOverride() || method.IsOverride)
             {
                 Write("@Override");
                 NewLine();
@@ -275,7 +285,7 @@ namespace MonoEmbeddinator4000.Generators
             if (method.IsStatic)
                 keywords.Add("static");
 
-            if (method.IsPure)
+            if (method.IsPure && !@class.IsInterface)
                 keywords.Add("abstract");
 
             keywords = keywords.Where(s => !string.IsNullOrWhiteSpace(s)).ToList();
@@ -309,7 +319,10 @@ namespace MonoEmbeddinator4000.Generators
                 Write(" ");
                 WriteStartBraceIndent();
 
-                if (method.IsConstructor && @class.HasBaseClass && @class.BaseClass.IsGenerated)
+                var hasNonInterfaceBase = @class.HasBaseClass && @class.BaseClass.IsGenerated
+                    && !@class.BaseClass.IsInterface;
+
+                if (method.IsConstructor && hasNonInterfaceBase)
                     WriteLine("super((com.sun.jna.Pointer)null);");
 
                 GenerateMethodInvocation(method);

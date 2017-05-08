@@ -1,4 +1,4 @@
-﻿﻿using System;
+﻿﻿﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -139,10 +139,7 @@ namespace MonoEmbeddinator4000.Generators
             };
 
             if (type.IsInterface)
-            {
                 @class.Type = ClassType.Interface;
-                @class.GenerationKind = GenerationKind.None;
-            }
 
             if (type.IsValueType)
                 @class.Type = ClassType.ValueType;

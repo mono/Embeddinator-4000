@@ -74,6 +74,12 @@ namespace MonoEmbeddinator4000.Generators
 
         public override bool VisitMethodDecl(Method method)
         {
+            if (!VisitDeclaration(method))
+                return false;
+
+            if (method.IsImplicit)
+                return false;
+
             PushBlock(BlockKind.Method, method);
 
             TypePrinter.PushContext(TypePrinterContextKind.Native);
@@ -91,18 +97,19 @@ namespace MonoEmbeddinator4000.Generators
 
         public override bool VisitClassDecl(Class @class)
         {
+            if (!VisitDeclaration(@class))
+                return false;
+
             VisitDeclContext(@class);
             return true;
         }
 
         public override bool VisitEnumDecl(Enumeration @enum)
         {
-            return true;
-        }
+            if (!VisitDeclaration(@enum))
+                return false;
 
-        public override bool VisitNamespace(Namespace @namespace)
-        {
-            return VisitDeclContext(@namespace);
+            return true;
         }
     }
 }

@@ -33,7 +33,8 @@ namespace MonoEmbeddinator4000.Generators
 
         public override bool VisitClassDecl(Class @class)
         {
-            Context.Return.Write($"{Context.ArgName}.__object");
+            var objectRef = @class.IsInterface ? "__getObject()" : "__object";
+            Context.Return.Write($"{Context.ArgName}.{objectRef}");
             return true;
         }
 
@@ -135,6 +136,9 @@ namespace MonoEmbeddinator4000.Generators
         {
             var typePrinter = new JavaTypePrinter(Context.Context);
             var typeName = @class.Visit(typePrinter);
+
+            if (@class.IsInterface)
+                typeName = $"{typeName}Impl";
 
             Context.Return.Write($"new {typeName}({Context.ReturnVarName})");
             return true;
