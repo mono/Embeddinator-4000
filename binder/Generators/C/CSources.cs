@@ -287,6 +287,13 @@ namespace MonoEmbeddinator4000.Generators
             var methodId = GeneratedIdentifier("method");
             var instanceId = method.IsStatic ? "0" : GeneratedIdentifier("instance");
 
+            if (method.IsVirtual)
+            {
+                var virtualMethodId = GeneratedIdentifier("virtual_method");
+                WriteLine($"MonoMethod* {virtualMethodId} = mono_object_get_virtual_method({instanceId}, {methodId});");
+                methodId = virtualMethodId;
+            }
+
             var @class = method.Namespace as Class;
             if (@class.IsValueType && !method.IsStatic)
             {
