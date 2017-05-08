@@ -367,8 +367,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-    <None Include="..\docs\error.md">
-      <Link>error.md</Link>
+    <None Include="..\docs\errors.md">
+      <Link>errors.md</Link>
     </None>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
