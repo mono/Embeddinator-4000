@@ -90,6 +90,7 @@ namespace MonoEmbeddinator4000.Generators
             Context.TranslationUnitPasses.AddPass(new PropertyToGetterSetterPass());
             Context.TranslationUnitPasses.RenameDeclsLowerCase(
                 RenameTargets.Function | RenameTargets.Method | RenameTargets.Property);
+            Context.TranslationUnitPasses.AddPass(new InterfacesPass());
             return true;
         }
 
