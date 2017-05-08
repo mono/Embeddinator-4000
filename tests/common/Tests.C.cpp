@@ -254,6 +254,19 @@ TEST_CASE("Enums.C", "[C][Enums]") {
     REQUIRE(s == Enums_ShortEnum_Min);
 }
 
+TEST_CASE("Interfaces.C", "[C][Interfaces]") {
+    Interfaces_IMakeItUp* m = Interfaces_Supplier_Create();
+    REQUIRE(Interfaces_IMakeItUp_get_Boolean(m) == true);
+    REQUIRE(Interfaces_IMakeItUp_get_Boolean(m) == false);
+
+    REQUIRE(strcmp(Interfaces_IMakeItUp_Convert(m, 0), "0") == 0);
+    REQUIRE(strcmp(Interfaces_IMakeItUp_Convert_1(m, 1), "1") == 0);
+
+    Interfaces_ManagedAdder *adder = Interfaces_ManagedAdder_new();
+    REQUIRE(Interfaces_OpConsumer_DoAddition(adder, 40, 2) == 42);
+    REQUIRE(Interfaces_OpConsumer_TestManagedAdder(1, -1) == true);
+}
+
 TEST_CASE("Arrays.C", "[C][Arrays]") {
     char _byte_arr[] = { 1, 2, 3 };
     _UnsignedcharArray _byte;
