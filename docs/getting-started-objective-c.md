@@ -49,3 +49,12 @@ Objective-C is a language that is most commonly used to write applications for m
 Please make sure you are already set up to develop iOS applications before trying to create one using the embeddinator. The [following instructions](getting-started-objc-ios.md) assume that you have already successfully built and deployed an iOS application from your computer.
 
 *Note: Working for tvOS or watchOS is very similar to iOS. You should start with the iOS instructions and then apply them to your platform of choice.*
+
+
+## Further Reading
+
+* [Embeddinator features specific to Objective-C.md](ObjC.md)
+* [Best Practices for Objective-C](BestPracticesObjC.md)
+* [Embeddinator Limitations](Limitations.md)
+* [Contributing to the open source project](Contributing.md)
+* [Error codes and descriptions](errors.md)
