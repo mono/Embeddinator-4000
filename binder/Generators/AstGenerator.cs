@@ -353,7 +353,8 @@ namespace MonoEmbeddinator4000.Generators
             var method = VisitMethodBase(methodInfo);
             method.ReturnType = VisitType(methodInfo.ReturnType);
 
-            if (method.ReturnType.Type == null)
+            if (method.ReturnType.Type == null
+             || method.ReturnType.Type is UnsupportedType)
                 method.Ignore = true;
 
             return method;
@@ -558,7 +559,8 @@ namespace MonoEmbeddinator4000.Generators
 
             var type = param.QualifiedType.Type;
 
-            if (type == null || (type.IsPointer() && type.GetFinalPointee() == null))
+            if (type == null || (type.IsPointer() && type.GetFinalPointee() == null) ||
+                type is UnsupportedType)
                 param.Ignore = true;
 
             if (paramInfo.ParameterType.ContainsGenericParameters)
