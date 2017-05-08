@@ -52,7 +52,7 @@ Run the embeddinator to create a native framework for the managed assembly:
 
 ```shell
 cd ~/Projects/hello-from-csharp
-/Library/Frameworks/Xamarin.Embeddinator-4000.framework/Commands/objcgen ~/Projects/hello-from-csharp/hello-from-csharp/bin/Debug/hello-from-csharp.dll --target=framework --platform=iOS --outdir=output -c --debug
+objcgen ~/Projects/hello-from-csharp/hello-from-csharp/bin/Debug/hello-from-csharp.dll --target=framework --platform=iOS --outdir=output -c --debug
 ```
 
 The framework will be placed in `~/Projects/hello-from-csharp/output/hello-from-csharp.framework`.
