@@ -241,11 +241,11 @@
 	XCTAssert ([Structs_Point areEqual:p1 right:p1], "p2 == p2");
 	XCTAssert ([Structs_Point areEqual:p1 right:p2] == NO, "p1 != p2");
 
-	Structs_Point* p3 = [Structs_Point addition:p1 right:p2];
+	Structs_Point* p3 = [Structs_Point add:p1 right:p2];
 	XCTAssert ([p3 x] == 3.0f, "x 3");
 	XCTAssert ([p3 y] == -3.0f, "y 3");
 
-	Structs_Point* p4 = [Structs_Point subtraction:p3 right:p2];
+	Structs_Point* p4 = [Structs_Point subtract:p3 right:p2];
 	XCTAssert ([Structs_Point areEqual:p4 right:p1], "p4 == p1");
 
 	Structs_Point* z = [Structs_Point zero];
@@ -702,30 +702,30 @@
 	Overloads_OperatorCollision * one = [[Overloads_OperatorCollision alloc] initWithVal:1];
 	Overloads_OperatorCollision * two = [[Overloads_OperatorCollision alloc] initWithVal:2];
 	XCTAssertTrue ([[Overloads_OperatorCollision addC1:one c2:two] value] == 3, "1 + 2");
-	XCTAssertTrue ([[Overloads_OperatorCollision subtraction:two c2:one] value] == 1, "2 - 1");
+	XCTAssertTrue ([[Overloads_OperatorCollision subtract:two c2:one] value] == 1, "2 - 1");
 	XCTAssertTrue ([[Overloads_OperatorCollision multiplyC1:two c2:two] value] == 4, "2 * 2");
 
 	// Overloads_AllOperators defines just operator versions of all
 	Overloads_AllOperators * oneAll = [[Overloads_AllOperators alloc] initWithVal:1];
 	Overloads_AllOperators * twoAll = [[Overloads_AllOperators alloc] initWithVal:2];
-	XCTAssertTrue ([[Overloads_AllOperators addition:oneAll c2:twoAll] value] == (1 + 2), "1 + 2 All");
-	XCTAssertTrue ([[Overloads_AllOperators subtraction:oneAll c2:twoAll] value] == (1 - 2), "1 - 2 All");
+	XCTAssertTrue ([[Overloads_AllOperators add:oneAll c2:twoAll] value] == (1 + 2), "1 + 2 All");
+	XCTAssertTrue ([[Overloads_AllOperators subtract:oneAll c2:twoAll] value] == (1 - 2), "1 - 2 All");
 	XCTAssertTrue ([[Overloads_AllOperators multiply:oneAll c2:twoAll] value] == (1 * 2), "1 * 2 All");
-	XCTAssertTrue ([[Overloads_AllOperators divisionAllOperators:twoAll alloperators:oneAll] value] == (2 / 1), "2 / 1 All");
-	XCTAssertTrue ([[Overloads_AllOperators divisionAllOperators:twoAll int32:1] value] == (2 / 1), "2 / 1 All int");
+	XCTAssertTrue ([[Overloads_AllOperators divideAllOperators:twoAll alloperators:oneAll] value] == (2 / 1), "2 / 1 All");
+	XCTAssertTrue ([[Overloads_AllOperators divideAllOperators:twoAll int32:1] value] == (2 / 1), "2 / 1 All int");
 
 	XCTAssertTrue ([[Overloads_AllOperators bitwiseAndAllOperators:oneAll alloperators:twoAll] value] == (1 & 2), "1 & 2 All");
 	XCTAssertTrue ([[Overloads_AllOperators bitwiseAndAllOperators:oneAll int32:2] value] == (1 & 2), "1 & 2 All int");
 
 	XCTAssertTrue ([[Overloads_AllOperators bitwiseOr:oneAll c2:twoAll] value] == (1 | 2), "1 | 2 All");
-	XCTAssertTrue ([[Overloads_AllOperators exclusiveOr:oneAll c2:twoAll] value] == (1 ^ 2), "1 ^ 2 All");
+	XCTAssertTrue ([[Overloads_AllOperators xor:oneAll c2:twoAll] value] == (1 ^ 2), "1 ^ 2 All");
 
 	XCTAssertTrue ([[Overloads_AllOperators leftShift:oneAll a:2] value] == (1 << 2), "1 << 2 All");
 	XCTAssertTrue ([[Overloads_AllOperators rightShift:oneAll a:2] value] == (1 >> 2), "1 >> 2 All");
 
 	XCTAssertTrue ([[Overloads_AllOperators onesComplement:oneAll] value] == (~1), "!1 All");
-	XCTAssertTrue ([[Overloads_AllOperators unaryNegation:oneAll] value] == (-1), "- 1 All");
-	XCTAssertTrue ([[Overloads_AllOperators unaryPlus:oneAll] value] == (+1), "+ 1 All");
+	XCTAssertTrue ([[Overloads_AllOperators negate:oneAll] value] == (-1), "- 1 All");
+	XCTAssertTrue ([[Overloads_AllOperators plus:oneAll] value] == (+1), "+ 1 All");
 
 	XCTAssertTrue ([[Overloads_AllOperators decrement:oneAll] value] == (1 - 1), "1 - 1 All");
 	XCTAssertTrue ([[Overloads_AllOperators increment:oneAll] value] == (1 + 1), "1 + 1 All");
