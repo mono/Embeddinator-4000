@@ -130,7 +130,7 @@ namespace DriverTest {
 		public void Static_Unsupported ()
 		{
 			try {
-				Driver.Main2 (new [] { "--static" });
+				Driver.Main2 (new [] { "--target=staticlibrary" });
 			} catch (EmbeddinatorException ee) {
 				Assert.True (ee.Error, "Error");
 				Assert.That (ee.Code, Is.EqualTo (2), "Code");
