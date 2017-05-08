@@ -27,6 +27,10 @@ namespace ObjC {
 			return IsNSObjectSubclass (t.BaseType);
 		}
 
+		// extras
+		ProcessedAssembly mscorlib;
+		ProcessedType system_iformatprovider;
+
 		bool IsSupported (Type t)
 		{
 			if (t.IsByRef)
@@ -53,7 +57,6 @@ namespace ObjC {
 				case "Object": // we cannot accept arbitrary NSObject (which we might not have bound) into mono
 				case "DBNull":
 				case "Exception":
-				case "IFormatProvider":
 				case "Type":
 					Delayed.Add (ErrorHelper.CreateWarning (1011, $"Type `{t}` is not generated because it lacks a native counterpart."));
 					unsupported.Add (t);
@@ -64,6 +67,14 @@ namespace ObjC {
 					Delayed.Add (ErrorHelper.CreateWarning (1012, $"Type `{t}` is not generated because it lacks a marshaling code with a native counterpart."));
 					unsupported.Add (t);
 					return false;
+				case "IFormatProvider":
+					if (mscorlib == null)
+						mscorlib = new ProcessedAssembly (t.Assembly) { UserCode = false };
+					if (system_iformatprovider == null) {
+						system_iformatprovider = new ProcessedType (t) { Assembly = mscorlib };
+						AddExtraType (system_iformatprovider);
+					}
+					break;
 				}
 				break;
 			}
@@ -117,7 +128,7 @@ namespace ObjC {
 		internal Dictionary<Type,MethodInfo> icomparable = new Dictionary<Type, MethodInfo> ();
 		internal Dictionary<Type, MethodInfo> equals = new Dictionary<Type, MethodInfo> ();
 		internal Dictionary<Type, MethodInfo> hashes = new Dictionary<Type, MethodInfo> ();
-		internal HashSet<MemberInfo> members_with_default_values = new HashSet<MemberInfo> ();
+		HashSet<MemberInfo> members_with_default_values = new HashSet<MemberInfo> ();
 
 		// defining type / extended type / methods
 		internal Dictionary<Type, Dictionary<Type, List<MethodInfo>>> extensions_methods = new Dictionary<Type, Dictionary<Type, List<MethodInfo>>> ();
@@ -246,6 +257,28 @@ namespace ObjC {
 				}
 			}
 
+			// we want to create wrappers only if the signature does not already exists, e.g. both `.ctor ()` and `.ctor (int i = 0)` can co-exists in .net
+			foreach (var dv in members_with_default_values) {
+				var pt = GetProcessedType (dv.DeclaringType);
+				var ci = dv as ConstructorInfo;
+				if (ci != null) {
+					foreach (var pc in AddDefaultValuesWrappers (ci)) {
+						if (!pt.SignatureExists (pc))
+							pt.Constructors.Add (pc);
+						else
+							Delayed.Add (ErrorHelper.CreateWarning (1021, $"Constructor `{ci}` has default values for which no wrapper is generated."));
+					}
+					continue;
+				}
+				var mi = dv as MethodInfo;
+				foreach (var pm in AddDefaultValuesWrappers (mi)) {
+					if (!pt.SignatureExists (pm))
+						pt.Methods.Add (pm);
+					else
+						Delayed.Add (ErrorHelper.CreateWarning (1032, $"Method `{mi}` has default values for which no wrapper is generated."));
+				}
+			}
+
 			ErrorHelper.Show (Delayed);
 		}
 
@@ -308,6 +341,8 @@ namespace ObjC {
 			pt.Fields = processedFields;
 		}
 
+		// post processing logic
+
 		IEnumerable<ProcessedConstructor> GetUnavailableParentCtors (ProcessedType pt)
 		{
 			var type = pt.Type;
@@ -335,6 +370,38 @@ namespace ObjC {
 			}
 
 			return finalList;
+		}
+
+		IEnumerable<ProcessedConstructor> AddDefaultValuesWrappers (ConstructorInfo ci)
+		{
+			// parameters with default values must be at the end and there can be many of them
+			var parameters = ci.GetParameters ();
+			for (int i = parameters.Length - 1; i >= 0; i--) {
+				if (!parameters [i].HasDefaultValue)
+					continue;
+				var pc = new ProcessedConstructor (ci) {
+					ConstructorType = ConstructorType.DefaultValueWrapper,
+					FirstDefaultParameter = i,
+				};
+				pc.ComputeSignatures (this);
+				yield return pc;
+			}
+		}
+
+		IEnumerable<ProcessedMethod> AddDefaultValuesWrappers (MethodInfo mi)
+		{
+			// parameters with default values must be at the end and there can be many of them
+			var parameters = mi.GetParameters ();
+			for (int i = parameters.Length - 1; i >= 0; i--) {
+				if (!parameters [i].HasDefaultValue)
+					continue;
+				var pm = new ProcessedMethod (mi) {
+					MethodType = MethodType.DefaultValueWrapper,
+					FirstDefaultParameter = i,
+				};
+				pm.ComputeSignatures (this);
+				yield return pm;
+			}
 		}
 	}
 }

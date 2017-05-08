@@ -1,16 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+//using System.Linq;
 
 using IKVM.Reflection;
 using Type = IKVM.Reflection.Type;
+
+using ObjC;
 
 namespace Embeddinator {
 
 	// While processing user assemblies, we may come across conditions that will affect
 	// final code generation that we need to pass to the generation pass
 
-	public class ProcessedAssembly {
+	public class ProcessedAssembly : IEquatable<Assembly>, IEquatable<ProcessedAssembly> {
 
 		public Assembly Assembly { get; private set; }
 
@@ -25,11 +27,46 @@ namespace Embeddinator {
 			Name = assembly.GetName ().Name;
 			SafeName = Name.Sanitize ();
 		}
+
+		public bool Equals (Assembly other)
+		{
+			return Assembly == other;
+		}
+
+		public bool Equals (ProcessedAssembly other)
+		{
+			return Assembly == other?.Assembly;
+		}
+
+		public override bool Equals (object obj)
+		{
+			return Assembly.Equals (obj);
+		}
+
+		public override int GetHashCode ()
+		{
+			return Assembly.GetHashCode ();
+		}
+
+		public static bool operator == (ProcessedAssembly a, ProcessedAssembly b)
+		{
+			return a?.Assembly == b?.Assembly;
+		}
+
+		public static bool operator != (ProcessedAssembly a, ProcessedAssembly b)
+		{
+			return a?.Assembly != b?.Assembly;
+		}
+
+		public override string ToString ()
+		{
+			return Assembly.ToString ();
+		}
 	}
 
 	public class ProcessedType {
 		public Type Type { get; private set; }
-		public string TypeName { get; private set; }
+		public string TypeName { get; set; }
 		public string ObjCName { get; private set; }
 
 		public ProcessedAssembly Assembly { get; set; }
@@ -56,6 +93,20 @@ namespace Embeddinator {
 			ObjCName = ObjC.NameGenerator.GetObjCName (Type);
 		}
 
+		public bool SignatureExists (ProcessedMemberBase p)
+		{
+			foreach (var pc in Constructors) {
+				if (p.ObjCSignature == pc.ObjCSignature)
+					return true;
+			}
+			foreach (var pm in Methods) {
+				if (p.ObjCSignature == pm.ObjCSignature)
+					return true;
+			}
+			// FIXME signature clashes can happen on properties, fields (turned into properties) ...
+			return false;
+		}
+
 		public override string ToString ()
 		{
 			return Type.ToString ();
@@ -64,6 +115,17 @@ namespace Embeddinator {
 
 	public abstract class ProcessedMemberBase {
 		public bool FallBackToTypeName { get; set; }
+		public int FirstDefaultParameter { get; set; }
+
+		public string ObjCSignature { get; set; }
+		public string MonoSignature { get; set; }
+
+		public abstract void ComputeSignatures (Processor p);
+	}
+
+	public enum MethodType {
+		Normal,
+		DefaultValueWrapper,
 	}
 
 	public class ProcessedMethod : ProcessedMemberBase {
@@ -79,9 +141,22 @@ namespace Embeddinator {
 			}
 		}
 
+		public MethodType MethodType { get; set; }
+
 		public ProcessedMethod (MethodInfo method)
 		{
 			Method = method;
+			MethodType = MethodType.Normal;
+		}
+
+		public override void ComputeSignatures (Processor p)
+		{
+			// FIXME this is a quite crude hack waiting for a correct move of the signature code
+			string objcsig;
+			string monosig;
+			(p as ObjCProcessor).GetSignatures (BaseName, Method.Name, Method, Method.GetParameters (), FallBackToTypeName, false, out objcsig, out monosig);
+			ObjCSignature = objcsig;
+			MonoSignature = monosig;
 		}
 	}
 
@@ -92,6 +167,17 @@ namespace Embeddinator {
 		{
 			Property = property;
 		}
+
+		public override void ComputeSignatures (Processor p)
+		{
+			throw new NotImplementedException ();
+		}
+	}
+
+	public enum ConstructorType {
+		Normal,
+		// a `init*` method generated wrapper should not be decorated with NS_DESIGNATED_INITIALIZER
+		DefaultValueWrapper,
 	}
 
 	public class ProcessedConstructor : ProcessedMemberBase {
@@ -99,9 +185,21 @@ namespace Embeddinator {
 
 		public bool Unavailable { get; set; }
 
+		public ConstructorType ConstructorType { get; set; }
+
 		public ProcessedConstructor (ConstructorInfo constructor)
 		{
 			Constructor = constructor;
+		}
+
+		public override void ComputeSignatures (Processor p)
+		{
+			// FIXME this is a quite crude hack waiting for a correct move of the signature code
+			string objcsig;
+			string monosig;
+			(p as ObjCProcessor).GetSignatures (Constructor.ParameterCount == 0 ? "init" : "initWith", Constructor.Name, Constructor, Constructor.GetParameters (), FallBackToTypeName, false, out objcsig, out monosig);
+			ObjCSignature = objcsig;
+			MonoSignature = monosig;
 		}
 
 		public override string ToString ()
@@ -120,6 +218,11 @@ namespace Embeddinator {
 			Field = field;
 			TypeName = ObjC.NameGenerator.GetTypeName (Field.DeclaringType);
 			ObjCName = ObjC.NameGenerator.GetObjCName (Field.DeclaringType);
+		}
+
+		public override void ComputeSignatures (Processor p)
+		{
+			throw new NotImplementedException ();
 		}
 	}
 }

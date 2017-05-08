@@ -8,11 +8,11 @@ using Type = IKVM.Reflection.Type;
 
 using Embeddinator;
 namespace ObjC {
-	public partial class ObjCGenerator {
+	public partial class ObjCProcessor {
 
 		// get a name that is safe to use from ObjC code
 
-		void GetSignatures (string objName, string monoName, MemberInfo info, ParameterInfo [] parameters, bool useTypeNames, bool isExtension, out string objcSignature, out string monoSignature)
+		public void GetSignatures (string objName, string monoName, MemberInfo info, ParameterInfo [] parameters, bool useTypeNames, bool isExtension, out string objcSignature, out string monoSignature)
 		{
 			var method = (info as MethodBase); // else it's a PropertyInfo
 			// special case for setter-only - the underscore looks ugly
@@ -43,7 +43,7 @@ namespace ObjC {
 				}
 
 				if (n > 0 || !isExtension) {
-					string ptname = NameGenerator.GetObjCParamTypeName (p, Processor.Types);
+					string ptname = NameGenerator.GetObjCParamTypeName (p, Types);
 					objc.Append (":(").Append (ptname).Append (")").Append (NameGenerator.GetExtendedParameterName (p, parameters));
 				}
 				mono.Append (NameGenerator.GetMonoName (p.ParameterType));
