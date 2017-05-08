@@ -209,6 +209,20 @@ namespace MonoEmbeddinator4000.Generators
             return @enum;
         }
 
+        public bool IsSystemObjectMethod(MethodInfo method)
+        {
+            if (method.Match ("System.Int32", "CompareTo", "System.Object"))
+                return true;
+
+            if (method.Match ("System.Boolean", "Equals", "System.Object"))
+                return true;
+
+            if (method.Match ("System.Int32", "GetHashCode"))
+                return true;
+
+            return false;
+        }
+
         public void VisitMembers(TypeInfo type, Class @class)
         {
             foreach (var ctor in type.DeclaredConstructors)
@@ -220,6 +234,9 @@ namespace MonoEmbeddinator4000.Generators
             foreach (var method in type.DeclaredMethods)
             {
                 if (method.IsGenericMethod)
+                    continue;
+
+                if (IsSystemObjectMethod(method))
                     continue;
 
                 var decl = VisitMethod(method, @class);
@@ -635,6 +652,27 @@ namespace MonoEmbeddinator4000.Generators
         public static bool Is (this IKVM.Reflection.Type self, string @namespace, string name)
         {
             return (self.Namespace == @namespace) && (self.Name == name);
+        }
+
+        public static bool Match (this MethodInfo self, string returnType, string name,
+            params string[] parameterTypes)
+        {
+            if (self.Name != name)
+                return false;
+            var parameters = self.GetParameters ();
+            var pc = parameters.Length;
+            if (pc != parameterTypes.Length)
+                return false;
+            if (self.ReturnType.FullName != returnType)
+                return false;
+            for (int i = 0; i < pc; i++) {
+                // parameter type not specified, useful for generics
+                if (parameterTypes [i] == null)
+                    continue;
+                if (parameterTypes [i] != parameters [i].ParameterType.FullName)
+                    return false;
+            }
+            return true;
         }
 
         public static bool HasCustomAttribute (this IKVM.Reflection.Type self, string @namespace, string name)
