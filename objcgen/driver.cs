@@ -73,13 +73,11 @@ namespace Embeddinator {
 				},
 				{ "o|out|outdir=", "Output directory", v => embedder.OutputDirectory = v },
 				{ "p|platform=", $"Target platform (iOS, macOS [default], watchOS, tvOS)", v => embedder.SetPlatform (v) },
-				{ "dll|shared", "Compiles as a shared library (default)", v => embedder.CompilationTarget = CompilationTarget.SharedLibrary },
-				{ "static", "Compiles as a static library (unsupported)", v => embedder.CompilationTarget = CompilationTarget.StaticLibrary },
 				{ "vs=", $"Visual Studio version for compilation (unsupported)", v => { throw new EmbeddinatorException (2, $"Option `--vs` is not supported"); } },
 				{ "h|?|help", "Displays the help", v => action = Action.Help },
 				{ "v|verbose", "generates diagnostic verbose output", v => ErrorHelper.Verbosity++ },
 				{ "version", "Display the version information.", v => action = Action.Version },
-				{ "target=", "The compilation target (static, shared, framework).", v => embedder.SetCompilationTarget (v) },
+				{ "target=", "The compilation target (staticlibrary, sharedlibrary, framework).", embedder.SetCompilationTarget },
 			};
 
 			var assemblies = os.Parse (args);
