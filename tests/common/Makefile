@@ -50,3 +50,4 @@ run:
 
 clean:
 	rm -rf mk c objc java *.dylib *.jar *.class *.dll
+	make -C ../managed clean
