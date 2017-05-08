@@ -284,7 +284,7 @@ namespace Embeddinator {
 		}
 
 		static string xcode_app;
-		static string XcodeApp {
+		public static string XcodeApp {
 			get {
 				if (string.IsNullOrEmpty (xcode_app)) {
 					int exitCode;
