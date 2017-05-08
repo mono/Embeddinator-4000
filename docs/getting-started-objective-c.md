@@ -34,7 +34,8 @@ The installer is a standard pkg based installer:
 ![Installer Install Type](Install2.png)
 ![Installer Summary](Install3.png)
 
-Once installed via an installer, you can run the tool via /Library/Frameworks/Xamarin.Embeddinator-4000.framework/Commands/objcgen 
+Once installed via the installer, after you start a new terminal session, you can use the `objcgen` command.  
+Otherwise you can always run the tool via its absolute path: `/Library/Frameworks/Xamarin.Embeddinator-4000.framework/Commands/objcgen`.
 
 ## Platforms
 
