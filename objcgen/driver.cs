@@ -312,9 +312,28 @@ namespace Embeddinator {
 			}
 		}
 
+		void VerifyDependencies ()
+		{
+			SystemCheck.VerifyMono ();
+			switch (Platform) {
+			case Platform.iOS:
+			case Platform.tvOS:
+			case Platform.watchOS:
+				SystemCheck.VerifyXamariniOS ();
+				break;
+			case Platform.macOS:
+				SystemCheck.VerifyXamarinMac ();
+				break;
+			default:
+				throw ErrorHelper.CreateError (99, "Internal error: invalid platform {0}. Please file a bug report with a test case (https://github.com/mono/Embeddinator-4000/issues).", Platform);
+			}
+		}
+
 		public int Compile ()
 		{
 			Console.WriteLine ("Compiling binding code...");
+			
+			VerifyDependencies ();
 
 			BuildInfo [] build_infos;
 
