@@ -24,9 +24,9 @@ Notes:
 
 Your next step is to download and install the embeddinator on your Mac.
 
-**add link**
+The latest package is available [here](https://jenkins.mono-project.com/view/Xamarin.MaciOS/job/embeddinator-4000-objc/lastSuccessfulBuild/Azure/).
 
-There is no package to download yet. Until one is available you need to build it from our git repository, see the [contributing](Contributing.md#objective-c) document for instructions.
+As an alternative it's possible to build from our git repository, see the [contributing](Contributing.md#objective-c) document for instructions.
 
 The installer is a standard pkg based installer:
 
