@@ -6,22 +6,9 @@ This is the getting started page for iOS.
 
 ## Requirements
 
-In order to use the embeddinator to generate bindings for iOS you'll need a Mac running:
+In addition to the requirements from our [Getting started with Objective-C](getting-started-objective-c.md) guide you'll also need:
 
-* macOS 10.12 (Sierra) or later
-* Xcode 8.3.2 or later
-* [Mono 5.0](http://www.mono-project.com/download/beta/) _presently in beta_ or later
-* [Xamarin.iOS](https://jenkins.mono-project.com/view/Xamarin.MaciOS/job/xamarin-macios-builds-master/) from our _master_ branch.
-
-Optionally you can install [Xamarin Studio](https://developer.xamarin.com/guides/cross-platform/xamarin-studio/)
-or the new [Visual Studio for Mac](https://www.visualstudio.com/vs/visual-studio-mac/)
-to edit and compile your C# code. The rest of the getting started
-guide assume you'll be using **Visual Studio for Mac**.
-
-Notes:
-
-* Earlier versions of macOS, Xcode and Mono _might_ work, but are untested and unsupported;
-* Code generation can be done on Windows, but it is only possible to compile it on a Mac computer where Xcode is installed;
+* [Xamarin.iOS 10.11+](https://jenkins.mono-project.com/view/Xamarin.MaciOS/job/xamarin-macios-builds-master/) from our _master_ branch.
 
 ## Hello world
 
