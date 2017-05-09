@@ -15,7 +15,7 @@ Optional
 
 * [Xamarin Studio](https://developer.xamarin.com/guides/cross-platform/xamarin-studio/); or 
 * [Visual Studio for Mac](https://www.visualstudio.com/vs/visual-studio-mac/);
-* **Xamarin.iOS 10.11 preview** Available from the alpha channel of XS or VSfM
+* **Xamarin.iOS 10.11 preview** Available from the alpha channel of Xamarin Studio and Visual Studio for Mac
 
 
 What's New
