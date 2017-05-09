@@ -90,3 +90,29 @@ mono_embeddinator_find_assembly_in_bundle (const char *assembly)
 	}
 #endif
 }
+
+NSDecimalNumber* mono_embeddinator_get_nsdecimalnumber (void* __unboxedresult)
+{
+	static NSDictionary* __forcedotseparator = nil;
+	static MonoMethod* __tostringmethod = nil;
+
+	MonoObject* __invariantculture = mono_embeddinator_get_cultureinfo_invariantculture_object ();
+	void* __tostringargs [1];
+	__tostringargs [0] = __invariantculture;
+
+	if (!__tostringmethod)
+		__tostringmethod = mono_embeddinator_lookup_method (":ToString(System.IFormatProvider)", mono_embeddinator_get_decimal_class ());
+
+	MonoObject* __ex = nil;
+	MonoString* __decimalmonostr = (MonoString *) mono_runtime_invoke (__tostringmethod, __unboxedresult, __tostringargs, &__ex);
+	if (__ex)
+		mono_embeddinator_throw_exception (__ex);
+	NSString* __decimalnsstr = mono_embeddinator_get_nsstring (__decimalmonostr);
+
+	// Force NSDecimalNumber to parse the number using dot as decimal separator http://stackoverflow.com/a/7905775/572076
+	if (!__forcedotseparator)
+		__forcedotseparator = @{ NSLocaleDecimalSeparator : @"." };
+	NSDecimalNumber* __nsdecresult = [NSDecimalNumber decimalNumberWithString:__decimalnsstr locale:__forcedotseparator];
+
+	return __nsdecresult;
+}

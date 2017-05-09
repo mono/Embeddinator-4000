@@ -305,3 +305,12 @@ MonoObject* mono_embeddinator_get_cultureinfo_invariantculture_object ()
     }
     return invariantculture;
 }
+
+MonoClass* mono_embeddinator_get_decimal_class ()
+{
+    static MonoClass* decimalclass = nil;
+    if (!decimalclass) {
+        decimalclass = mono_class_from_name (mono_get_corlib (), "System", "Decimal");
+    }
+    return decimalclass;
+}

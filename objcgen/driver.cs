@@ -549,6 +549,7 @@ namespace Embeddinator {
 						mtouch.Append ("--dsym:false ");
 						mtouch.Append ("--msym:false ");
 						mtouch.Append ($"--embeddinator ");
+						mtouch.Append ($"--xml={Path.Combine (OutputDirectory, "linker.xml")} ");
 						foreach (var asm in Assemblies)
 							mtouch.Append (Quote (Path.GetFullPath (asm.Location))).Append (" ");
 						mtouch.Append ($"-r:{GetPlatformAssembly ()} ");

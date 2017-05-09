@@ -192,4 +192,45 @@ void mono_embeddinator_destroy_object(MonoEmbedObject *object);
 MONO_EMBEDDINATOR_API
 MonoObject* mono_embeddinator_get_cultureinfo_invariantculture_object ();
 
+/**
+ * Gets decimal MonoClass.
+ */
+MONO_EMBEDDINATOR_API
+MonoClass* mono_embeddinator_get_decimal_class ();
+
+// from: https://github.com/mono/mono/blob/master/mono/metadata/decimal-ms.h
+typedef struct {
+    // Decimal.cs treats the first two shorts as one long
+    // And they seriable the data so we need to little endian
+    // seriliazation
+    // The wReserved overlaps with Variant's vt member
+#if G_BYTE_ORDER != G_LITTLE_ENDIAN
+    union {
+        struct {
+            uint8_t sign;
+            uint8_t scale;
+        } u;
+        uint16_t signscale;
+    } u;
+    uint16_t reserved;
+#else
+    uint16_t reserved;
+    union {
+        struct {
+            uint8_t scale;
+            uint8_t sign;
+        } u;
+        uint16_t signscale;
+    } u;
+#endif
+    uint32_t Hi32;
+    union {
+        struct {
+            uint32_t Lo32;
+            uint32_t Mid32;
+        } v;
+        uint64_t Lo64;
+    } v;
+} MonoDecimal;
+
 MONO_EMBEDDINATOR_END_DECLS

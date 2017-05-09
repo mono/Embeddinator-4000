@@ -414,17 +414,48 @@
 	XCTAssertEqualObjects (@"", [Type_String emptyString], "empty string");
 	XCTAssertEqualObjects (@"Hello World", [Type_String nonEmptyString], "non-empty string");
 
-	NSDecimalNumber * decimalzero = [Type_Decimal zero];
-	NSDecimalNumber * nsdecimalzero = [NSDecimalNumber zero];
-	XCTAssertEqualObjects (nsdecimalzero, decimalzero, "NSDecimalNumber zero");
+	NSDecimalNumber *decimalmax = [Type_Decimal max];
+	NSDecimalNumber *nsdecimalmax = [NSDecimalNumber decimalNumberWithString:@"79228162514264337593543950335"];
+	XCTAssertEqualObjects (nsdecimalmax, decimalmax, "NSDecimalNumber max");
 
-	NSDecimalNumber * decimalmin = [Type_Decimal min];
-	NSDecimalNumber * nsdecimalmin = [NSDecimalNumber decimalNumberWithString:@"-79228162514264337593543950335"];
+	NSDecimalNumber *decimalmin = [Type_Decimal min];
+	NSDecimalNumber *nsdecimalmin = [NSDecimalNumber decimalNumberWithString:@"-79228162514264337593543950335"];
 	XCTAssertEqualObjects (nsdecimalmin, decimalmin, "NSDecimalNumber min");
 
-	NSDecimalNumber * decimalmax = [Type_Decimal max];
-	NSDecimalNumber * nsdecimalmax = [NSDecimalNumber decimalNumberWithString:@"79228162514264337593543950335"];
-	XCTAssertEqualObjects (nsdecimalmax, decimalmax, "NSDecimalNumber max");
+	NSDecimalNumber *decimalzero = [Type_Decimal zero];
+	NSDecimalNumber *nsdecimalzero = [NSDecimalNumber zero];
+	XCTAssertEqualObjects (nsdecimalzero, decimalzero, "NSDecimalNumber zero");
+
+	NSDecimalNumber *decimalone = [Type_Decimal one];
+	NSDecimalNumber *nsdecimalone = [NSDecimalNumber one];
+	XCTAssertEqualObjects (nsdecimalone, decimalone, "NSDecimalNumber one");
+
+	NSDecimalNumber *decimalminusone = [Type_Decimal minusOne];
+	NSDecimalNumber *nsdecimalminusone = [NSDecimalNumber decimalNumberWithString:@"-1"];
+	XCTAssertEqualObjects (nsdecimalminusone, decimalminusone, "NSDecimalNumber minusOne");
+
+	NSDecimalNumber *decimalpi = [Type_Decimal pi];
+	NSDecimalNumber *nsdecimalpi = [NSDecimalNumber decimalNumberWithString:@"3.14159265358979323846264"];
+	XCTAssertEqualObjects (nsdecimalpi, decimalpi, "NSDecimalNumber pi");
+
+	NSDecimalNumber *decimalminustau = [Type_Decimal minusTau];
+	NSDecimalNumber *nsdecimalminustau = [NSDecimalNumber decimalNumberWithString:@"-6.28318530717958647692"];
+	XCTAssertEqualObjects (nsdecimalminustau, decimalminustau, "NSDecimalNumber pi");
+
+	NSDecimalNumber *decimalfortytwo = [Type_Decimal fortyTwo];
+	NSDecimalNumber *nsdecimalfortytwo = [NSDecimalNumber decimalNumberWithString:@"42"];
+	XCTAssertEqualObjects (nsdecimalfortytwo, decimalfortytwo, "NSDecimalNumber fortytwo");
+
+	NSArray<NSDecimalNumber *> *decimalarr = [Type_Decimal decArr];
+	XCTAssertEqual([decimalarr count], 8, "decimalarr count");
+	XCTAssertEqualObjects (nsdecimalmax, decimalarr[0], "decimalarr[0] max");
+	XCTAssertEqualObjects (nsdecimalmin, decimalarr[1], "decimalarr[1] min");
+	XCTAssertEqualObjects (nsdecimalzero, decimalarr[2], "decimalarr[2] zero");
+	XCTAssertEqualObjects (nsdecimalone, decimalarr[3], "decimalarr[3] one");
+	XCTAssertEqualObjects (nsdecimalminusone, decimalarr[4], "decimalarr[4] minusOne");
+	XCTAssertEqualObjects (nsdecimalpi, decimalarr[5], "decimalarr[5] pi");
+	XCTAssertEqualObjects (nsdecimalminustau, decimalarr[6], "decimalarr[6] pi");
+	XCTAssertEqualObjects (nsdecimalfortytwo, decimalarr[7], "decimalarr[7] fortytwo");
 }
 
 - (void) testObjectIndexedSubscripting {
