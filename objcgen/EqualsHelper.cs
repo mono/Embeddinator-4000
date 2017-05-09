@@ -1,10 +1,10 @@
 ﻿using System;
-
 using Embeddinator;
+using Type = IKVM.Reflection.Type;
 
 namespace ObjC {
 	public class EqualsHelper : MethodHelper{
-		public IKVM.Reflection.Type ParameterType { get; set; }
+		public Type ParameterType { get; set; }
 
 		public EqualsHelper (SourceWriter headers, SourceWriter implementation) : base (headers, implementation)
 		{

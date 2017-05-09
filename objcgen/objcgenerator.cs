@@ -438,8 +438,7 @@ namespace ObjC {
 					MetadataToken = m.MetadataToken,
 					ObjCTypeName = managed_name,
 					ManagedTypeName = t.FullName,
-					MonoSignature = $"CompareTo({NameGenerator.GetMonoName (pt)})",
-
+					MonoSignature = $"CompareTo({NameGenerator.GetMonoName (pt)})"
 				};
 				builder.WriteHeaders ();
 				builder.WriteImplementation ();
@@ -465,7 +464,7 @@ namespace ObjC {
 
 			if (equals.TryGetValue (t, out m)) {
 				var builder = new EqualsHelper (headers, implementation) {
-					ObjCSignature = $"isEqual:(id _Nullable)other",
+					ObjCSignature = "isEqual:(id _Nullable)other",
 					MonoSignature = "Equals(object)",
 					AssemblySafeName = aname,
 					MetadataToken = m.MetadataToken,

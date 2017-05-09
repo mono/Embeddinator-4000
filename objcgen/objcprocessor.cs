@@ -144,15 +144,13 @@ namespace ObjC {
 					continue;
 				}
 
-				if (implement_system_iequatable_t) {
-					if (mi.Match ("System.Boolean", "Equals", new string [] { null }) && !mi.Match ("System.Boolean", "Equals", "System.Object")) {
-						iequatable [t] = mi;
-						continue;
-					}
-				}
-
 				if (mi.Match ("System.Boolean", "Equals", "System.Object")) {
 					equals.Add (t, mi);
+					continue;
+				} 
+
+				if (implement_system_iequatable_t && mi.Match ("System.Boolean", "Equals", new string [] { null })) {
+					iequatable [t] = mi;
 					continue;
 				}
 
