@@ -1,9 +1,5 @@
 # Getting started with iOS
 
-This is the getting started page for iOS.
-
-*Working for tvOS or watchOS is very similar to iOS. You should start with the iOS instructions and then apply them to your platform of choice.*
-
 ## Requirements
 
 In addition to the requirements from our [Getting started with Objective-C](getting-started-objective-c.md) guide you'll also need:
