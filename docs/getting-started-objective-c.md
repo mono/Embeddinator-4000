@@ -26,7 +26,7 @@ Your next step is to download and install the embeddinator on your Mac.
 
 **add link**
 
-There is no package to download yet. Until one is available you need to build it from our git repository, see the [contributing](Contributing.md#objective-c) document for instructions.
+As an alternative it is possible to build it from our git repository, see the [contributing](Contributing.md#objective-c) document for instructions.
 
 The installer is a standard pkg based installer:
 
@@ -34,7 +34,8 @@ The installer is a standard pkg based installer:
 ![Installer Install Type](Install2.png)
 ![Installer Summary](Install3.png)
 
-Once installed via an installer, you can run the tool via /Library/Frameworks/Xamarin.Embeddinator-4000/Commands/objcgen 
+Once installed via the installer, after you start a new terminal session, you can use the `objcgen` command.  
+Otherwise you can always run the tool via its absolute path: `/Library/Frameworks/Xamarin.Embeddinator-4000.framework/Commands/objcgen`.
 
 ## Platforms
 
@@ -49,3 +50,12 @@ Objective-C is a language that is most commonly used to write applications for m
 Please make sure you are already set up to develop iOS applications before trying to create one using the embeddinator. The [following instructions](getting-started-objc-ios.md) assume that you have already successfully built and deployed an iOS application from your computer.
 
 *Note: Working for tvOS or watchOS is very similar to iOS. You should start with the iOS instructions and then apply them to your platform of choice.*
+
+
+## Further Reading
+
+* [Embeddinator features specific to Objective-C](ObjC.md)
+* [Best Practices for Objective-C](BestPracticesObjC.md)
+* [Embeddinator Limitations](Limitations.md)
+* [Contributing to the open source project](Contributing.md)
+* [Error codes and descriptions](errors.md)
