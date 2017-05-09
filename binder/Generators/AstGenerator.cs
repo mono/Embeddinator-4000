@@ -445,7 +445,8 @@ namespace MonoEmbeddinator4000.Generators
                 type = new TagType(decl);
                 break;
             case TypeCode.DBNull:
-                throw new NotSupportedException();
+                type = new UnsupportedType() { Description = "DBNull" };
+                break;
             case TypeCode.Boolean:
                 type = new BuiltinType(PrimitiveType.Bool);
                 break;
