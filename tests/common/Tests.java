@@ -5,6 +5,7 @@ import managed_dll.first.second.*;
 import managed_dll.exceptions.*;
 import managed_dll.constructors.*;
 import managed_dll.enums.*;
+import managed_dll.interfaces.*;
 import managed_dll.methods.*;
 import managed_dll.structs.*;
 
@@ -202,6 +203,20 @@ public class Tests {
         f = Enumer.test(ByteEnum.Zero, i, s);
         assertEquals(IntEnum.Min, i.get());
         assertEquals(ShortEnum.Min, s.get());
+    }
+
+    @Test
+    public void testInterfaces() {
+        IMakeItUp m = Supplier.create();
+        assertEquals(true, m.getBoolean());
+        assertEquals(false, m.getBoolean());
+
+        assertEquals("0", m.convert(0));
+        assertEquals("1", m.convert(1));
+
+        ManagedAdder adder = new ManagedAdder();
+        assertEquals(42, OpConsumer.doAddition(adder, 40, 2));
+        assertEquals(true, OpConsumer.testManagedAdder(1, -1));
     }
 
     static long UCHAR_MAX = (long)(Math.pow(2, Byte.SIZE) - 1);
