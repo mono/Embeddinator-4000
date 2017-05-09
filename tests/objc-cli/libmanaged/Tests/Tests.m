@@ -676,6 +676,20 @@
     XCTAssertFalse ([c1 hash] == [c3 hash], "Non-equal objects have different hashes");
 }
 
+- (void) testEquatable {
+	EqualsHashOverrides_EquatableClass *c1 = [[EqualsHashOverrides_EquatableClass alloc] initWithY:3];
+	EqualsHashOverrides_Class *c2 = [[EqualsHashOverrides_Class alloc] initWithX:3];
+	EqualsHashOverrides_Class *c3 = [[EqualsHashOverrides_Class alloc] initWithX:1];
+
+	XCTAssertTrue ([c1 isEqualToEqualsHashOverrides_Class:c2], "Equatable matches another class");
+	XCTAssertFalse ([c1 isEqualToEqualsHashOverrides_Class:c3], "Equatable does not match another class");
+
+	EqualsHashOverrides_EquatableInt *c4 = [[EqualsHashOverrides_EquatableInt alloc] initWithY:5];
+
+	XCTAssertTrue ([c4 isEqualToInt:5], "Equatable int matches");
+	XCTAssertFalse ([c4 isEqualToInt:7], "Equatable int does not match");
+}
+
 - (void)testProtocols {
 	id<Interfaces_IMakeItUp> m = [Interfaces_Supplier create];
 	XCTAssertTrue ([m conformsToProtocol:@protocol(Interfaces_IMakeItUp)], "conformsToProtocol 1");

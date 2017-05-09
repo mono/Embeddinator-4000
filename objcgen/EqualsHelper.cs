@@ -4,10 +4,10 @@ using Embeddinator;
 
 namespace ObjC {
 	public class EqualsHelper : MethodHelper{
+		public IKVM.Reflection.Type ParameterType { get; set; }
+
 		public EqualsHelper (SourceWriter headers, SourceWriter implementation) : base (headers, implementation)
 		{
-			MonoSignature = "Equals(object)";
-			ObjCSignature = "isEqual:(id _Nullable)other";
 			ReturnType = "bool";
 		}
 
@@ -23,15 +23,22 @@ namespace ObjC {
 		public void WriteImplementation ()
 		{
 			BeginImplementation ();
-			implementation.WriteLine ("MonoObject* __other = mono_embeddinator_get_object (other, false);");
-			implementation.WriteLine ("if (!__other)");
-			implementation.Indent++;
-			implementation.WriteLine ("return false;");
-			implementation.Indent--;
-			WriteMethodLookup ();
+			if (ParameterType == null || !ParameterType.IsPrimitive) {
+				implementation.WriteLine ("MonoObject* __other = mono_embeddinator_get_object (other, false);");
+				implementation.WriteLine ("if (!__other)");
+				implementation.Indent++;
+				implementation.WriteLine ("return false;");
+				implementation.Indent--;
+				WriteMethodLookup ();
 
-			implementation.WriteLine ("void* __args [1];");
-			implementation.WriteLine ("__args [0] = __other;");
+				implementation.WriteLine ("void* __args [1];");
+				implementation.WriteLine ("__args [0] = __other;");
+			} else {
+				WriteMethodLookup ();
+
+				implementation.WriteLine ("void* __args [1];");
+				implementation.WriteLine ("__args [0] = &other;");
+			}
 
 			WriteInvoke ("__args");
 
