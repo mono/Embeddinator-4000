@@ -560,6 +560,7 @@ namespace ObjC {
 				implementation.WriteLine ($"continue;");
 				implementation.Indent--;
 				implementation.WriteLine ($"mono_array_set ({pnameArr}, {typeName}, {pnameIdx}, {pnameRet}.{returnValue});");
+				implementation.Indent--;
 				break;
 			case TypeCode.String:
 				implementation.WriteLine ($"NSString* {pnameRet} = {parameterName}[{pnameIdx}];");
@@ -1030,6 +1031,24 @@ namespace ObjC {
 			switch (Type.GetTypeCode (t)) {
 			case TypeCode.String:
 				implementation.WriteLine ("return mono_embeddinator_get_nsstring ((MonoString *) __result);");
+				break;
+			case TypeCode.Decimal:
+				implementation.WriteLine ("void* __unboxedresult = mono_object_unbox (__result);");
+				implementation.WriteLine ("MonoObject* __invariantculture = mono_embeddinator_get_cultureinfo_invariantculture_object ();");
+				implementation.WriteLine ($"MonoMethod* __tostringmethod = mono_embeddinator_lookup_method (\":ToString(System.IFormatProvider)\", mono_object_get_class (__result));");
+				implementation.WriteLine ("void* __tostringargs [1];");
+				implementation.WriteLine ("__tostringargs [0] = __invariantculture;");
+				implementation.WriteLine ("MonoObject* __ex = nil;");
+				implementation.WriteLine ("MonoString* __decimalmonostr = (MonoString *) mono_runtime_invoke (__tostringmethod, __unboxedresult, __tostringargs, &__ex);");
+				implementation.WriteLine ("if (__ex)");
+				implementation.Indent++;
+				implementation.WriteLine ("mono_embeddinator_throw_exception (__ex);");
+				implementation.Indent--;
+				implementation.WriteLine ("NSString* __decimalnsstr = mono_embeddinator_get_nsstring (__decimalmonostr);");
+				// Force NSDecimalNumber to parse the number using dot as decimal separator http://stackoverflow.com/a/7905775/572076
+				implementation.WriteLine ("NSDictionary* __forcedotseparator = @{ NSLocaleDecimalSeparator : @\".\" };");
+				implementation.WriteLine ("NSDecimalNumber* __nsdecresult = [NSDecimalNumber decimalNumberWithString:__decimalnsstr locale:__forcedotseparator];");
+				implementation.WriteLine ("return __nsdecresult;");
 				break;
 			case TypeCode.Boolean:
 			case TypeCode.Char:

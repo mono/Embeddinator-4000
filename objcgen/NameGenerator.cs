@@ -92,6 +92,8 @@ namespace ObjC {
 				return "unsigned long long";
 			case TypeCode.String:
 				return "NSString *";
+			case TypeCode.Decimal:
+				return "NSDecimalNumber *";
 			default:
 				throw new NotImplementedException ($"Converting type {t.Name} to a native type name");
 			}
@@ -147,6 +149,8 @@ namespace ObjC {
 				return "ulong";
 			case TypeCode.String:
 				return "string";
+			case TypeCode.Decimal:
+				return "decimal";
 			default:
 				throw new NotImplementedException ($"Converting type {t.Name} to a mono type name");
 			}
@@ -176,6 +180,8 @@ namespace ObjC {
 					return $"NSArray<id<{GetObjCName (t)}>> *";
 
 				return $"NSArray<{GetObjCName (t)} *> *";
+			case TypeCode.Decimal:
+				return "NSArray <NSDecimalNumber *> *";
 			default:
 				throw new NotImplementedException ($"Converting type {t.Name} to a native type name");
 			}

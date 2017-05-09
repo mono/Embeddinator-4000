@@ -413,6 +413,18 @@
 	XCTAssertEqualObjects ((__bridge NSString *) nil, [Type_String nullString], "null string");
 	XCTAssertEqualObjects (@"", [Type_String emptyString], "empty string");
 	XCTAssertEqualObjects (@"Hello World", [Type_String nonEmptyString], "non-empty string");
+
+	NSDecimalNumber * decimalzero = [Type_Decimal zero];
+	NSDecimalNumber * nsdecimalzero = [NSDecimalNumber zero];
+	XCTAssertEqualObjects (nsdecimalzero, decimalzero, "NSDecimalNumber zero");
+
+	NSDecimalNumber * decimalmin = [Type_Decimal min];
+	NSDecimalNumber * nsdecimalmin = [NSDecimalNumber decimalNumberWithString:@"-79228162514264337593543950335"];
+	XCTAssertEqualObjects (nsdecimalmin, decimalmin, "NSDecimalNumber min");
+
+	NSDecimalNumber * decimalmax = [Type_Decimal max];
+	NSDecimalNumber * nsdecimalmax = [NSDecimalNumber decimalNumberWithString:@"79228162514264337593543950335"];
+	XCTAssertEqualObjects (nsdecimalmax, decimalmax, "NSDecimalNumber max");
 }
 
 - (void) testObjectIndexedSubscripting {

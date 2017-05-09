@@ -87,3 +87,9 @@ public class MyException : Exception {
 // objc: this type won't be generated (subclassing an unsupported type) but the generation will succeed (with warnings)
 public class MyNextException : MyException {
 }
+
+public static class Type_Decimal {
+	public static decimal Max { get { return decimal.MaxValue; } }
+	public static decimal Min { get { return decimal.MinValue; } }
+	public static decimal Zero { get { return decimal.Zero; } }
+}
