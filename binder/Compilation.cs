@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -236,21 +236,6 @@ namespace MonoEmbeddinator4000
             case TargetPlatform.iOS:
             case TargetPlatform.TVOS:
             case TargetPlatform.WatchOS:
-            {
-                string aotCompiler = GetAppleAotCompiler(Options.Compilation.Platform,
-                    XamarinSdkRoot, is64bits: false);
-
-                // Call the Mono AOT cross compiler for all input assemblies.
-                foreach (var assembly in Project.Assemblies)
-                {
-                    var args = GetAotArguments(App, assembly, Abi.ARMv7,
-                        Path.GetFullPath(Options.OutputDir), assembly + ".o",
-                        assembly + ".llvm.o", assembly + ".data");
-                
-                    Diagnostics.Debug("{0} {1}", aotCompiler, args);
-                }
-                break;
-            }
             case TargetPlatform.Windows:
             case TargetPlatform.Android:
                 throw new NotSupportedException(string.Format(
@@ -261,39 +246,8 @@ namespace MonoEmbeddinator4000
             }
         }
 
-        Xamarin.iOS.Tasks.DetectIPhoneSdks DetectIPhoneSdks
-        {
-            get
-            {
-                var detectAppleSdks = new Xamarin.iOS.Tasks.DetectIPhoneSdks {
-                    TargetFrameworkIdentifier = GetXamarinTargetFrameworkName(Options.Compilation.Platform)
-                };
-                
-                if (!detectAppleSdks.Execute())
-                    throw new Exception("Error detecting Xamarin.iOS SDK.");
-                
-                return detectAppleSdks;
-            }
-        }
 
-        Xamarin.MacDev.MonoTouchSdk MonoTouchSdk
-        {
-            get
-            {
-                var monoTouchSdk = Xamarin.iOS.Tasks.IPhoneSdks.MonoTouch;
-                if (monoTouchSdk.ExtendedVersion.Version.Major < 10)
-                    throw new Exception("Unsupported Xamarin.iOS version, upgrade to 10 or newer.");
-                
-                return monoTouchSdk;
-            }
-        }
 
-        Xamarin.MacDev.XamMacSdk XamMacSdk => new Xamarin.MacDev.XamMacSdk(null);
-
-        Xamarin.MacDev.AppleSdk AppleSdk => DetectIPhoneSdks.CurrentSdk;
-
-        string XamarinSdkRoot => DetectIPhoneSdks.XamarinSdkRoot;
-        
         string OutputName => Path.GetFileNameWithoutExtension(Project.Assemblies[0]);
 
         string GetOutputFolder()
@@ -316,44 +270,6 @@ namespace MonoEmbeddinator4000
 
             return Path.Combine(Options.OutputDir, Options.Compilation.Platform.ToString(),
                 App.Abi.ToString(), appName);
-        }
-
-        void MTouch()
-        {
-            var sdk = AppleSdk.InstalledSdkVersions.First();
-
-            var args = new List<string> {
-                $"--embeddinator {Options.OutputDir}",
-                $"--nostrip",
-                $"--sdkroot {AppleSdk.DeveloperRoot}",
-                $"--sdk {sdk}",
-                $"--targetver {sdk}",
-                $"--target-framework {Xamarin.Utils.TargetFramework.Xamarin_iOS_1_0}",
-                $"--assembly-build-target=@all=framework={OutputName}.framework"
-            };
-
-            if (Options.Compilation.DebugMode)
-                args.Add("--debug");
-
-            var targetArg = App.Abi.IsSimulator() ? "--sim" : "--dev";
-            args.Add($"{targetArg} {GetOutputFolder()}");
-
-            var xamarinAppleFramework = GetXamarinTargetFrameworkName(Options.Compilation.Platform);
-            var references = new List<string> {
-                Path.Combine(MonoTouchSdk.LibDir, "mono", xamarinAppleFramework, $"{xamarinAppleFramework}.dll"),
-                Path.Combine(MonoTouchSdk.LibDir, "mono", xamarinAppleFramework, "mscorlib.dll")
-            };
-
-            foreach (var @ref in references)
-                args.Add($"--r {@ref}");
-
-            foreach (var assembly in Project.Assemblies)
-                args.Add(assembly);
- 
-            var mtouchPath = Path.Combine(MonoTouchSdk.BinDir, "mtouch");
-            var expandedArgs = string.Join(" ", args);
-
-            Invoke(mtouchPath, expandedArgs);
         }
 
         void CompileCode()
@@ -553,8 +469,6 @@ namespace MonoEmbeddinator4000
                 case TargetPlatform.iOS:
                 case TargetPlatform.TVOS:
                 case TargetPlatform.WatchOS:
-                    MTouch();
-                    break;
                 case TargetPlatform.Windows:
                 case TargetPlatform.Android:
                     throw new NotSupportedException(
