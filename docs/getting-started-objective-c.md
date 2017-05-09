@@ -26,7 +26,7 @@ Your next step is to download and install the embeddinator on your Mac.
 
 **add link**
 
-There is no package to download yet. Until one is available you need to build it from our git repository, see the [contributing](Contributing.md#objective-c) document for instructions.
+As an alternative it is possible to build it from our git repository, see the [contributing](Contributing.md#objective-c) document for instructions.
 
 The installer is a standard pkg based installer:
 
@@ -54,7 +54,7 @@ Please make sure you are already set up to develop iOS applications before tryin
 
 ## Further Reading
 
-* [Embeddinator features specific to Objective-C.md](ObjC.md)
+* [Embeddinator features specific to Objective-C](ObjC.md)
 * [Best Practices for Objective-C](BestPracticesObjC.md)
 * [Embeddinator Limitations](Limitations.md)
 * [Contributing to the open source project](Contributing.md)
