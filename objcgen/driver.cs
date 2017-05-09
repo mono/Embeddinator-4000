@@ -529,7 +529,7 @@ namespace Embeddinator {
 					case Platform.tvOS:
 					case Platform.watchOS:
 						var mtouch = new StringBuilder ();
-						var appdir = Path.GetFullPath (Path.Combine (OutputDirectory, build_info.Sdk, "appdir"));
+						var appdir = Path.GetFullPath (Path.Combine (OutputDirectory, build_info.Sdk, LibraryName));
 						var cachedir = Path.GetFullPath (Path.Combine (outputDirectory, build_info.Sdk, "mtouch-cache"));
 						mtouch.Append (build_info.IsSimulator ? "--sim " : "--dev ");
 						mtouch.Append ($"{Quote (appdir)} ");
