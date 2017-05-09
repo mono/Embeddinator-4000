@@ -323,6 +323,7 @@
     <Compile Include="protocolhelper.cs" />
     <Compile Include="NameGenerator.cs" />
     <Compile Include="processor.cs" />
+    <Compile Include="system-check.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="support\" />
@@ -363,6 +364,9 @@
     <EmbeddedResource Include="..\support\objc-support.m">
       <Link>support\objc-support.m</Link>
       <LogicalName>objc-support.m</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Make.config">
+      <LogicalName>Make.config</LogicalName>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
