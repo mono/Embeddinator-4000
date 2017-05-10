@@ -1,6 +1,6 @@
 # Getting started with Objective-C
 
-This is the getting started page for Objective-C.
+This is the getting started page for Objective-C and cover the basic for all supported platforms.
 
 
 ## Requirements
@@ -26,7 +26,7 @@ Your next step is to download and install the embeddinator on your Mac.
 
 **add link**
 
-As an alternative it is possible to build it from our git repository, see the [contributing](Contributing.md#objective-c) document for instructions.
+As an alternative it is possible to build it from our [git repository](https://github.com/mono/Embeddinator-4000/tree/objc), see the [contributing](Contributing.md) document for instructions.
 
 The installer is a standard pkg based installer:
 
@@ -49,7 +49,7 @@ Objective-C is a language that is most commonly used to write applications for m
 
 Please make sure you are already set up to develop iOS applications before trying to create one using the embeddinator. The [following instructions](getting-started-objc-ios.md) assume that you have already successfully built and deployed an iOS application from your computer.
 
-*Note: Working for tvOS or watchOS is very similar to iOS. You should start with the iOS instructions and then apply them to your platform of choice.*
+*Note: Support for tvOS or watchOS will be available in a future release and will be very similar to iOS.*
 
 
 ## Further Reading

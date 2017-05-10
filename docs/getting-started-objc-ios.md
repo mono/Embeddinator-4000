@@ -1,9 +1,5 @@
 # Getting started with iOS
 
-This is the getting started page for iOS.
-
-*Working for tvOS or watchOS is very similar to iOS. You should start with the iOS instructions and then apply them to your platform of choice.*
-
 ## Requirements
 
 In addition to the requirements from our [Getting started with Objective-C](getting-started-objective-c.md) guide you'll also need:
@@ -46,13 +42,19 @@ The framework will be placed in `~/Projects/hello-from-csharp/output/hello-from-
 
 ### Use the generated output in an Xcode project
 
-Open Xcode and create a new iOS Single View Application, name it `hello-from-csharp`.
+Open Xcode and create a new iOS Single View Application, name it `hello-from-csharp` and select the **Objective-C** language.
 
 Open the `~/Projects/hello-from-csharp/output` directory in Finder, select `hello-from-csharp.framework`, drag it to the Xcode project and drop it just above the `hello-from-csharp` folder in the project.
 
+![Drag and drop framework](hello-from-csharp-ios-drag-drop-framework.png)
+
 Make sure `Copy items if needed` is checked in the dialog that pops up, and click `Finish`.
 
-In the project's General tab, add `hello-from-csharp.framework` as an Embedded Binary.
+![Copy items if needed](hello-from-csharp-ios-copy-items-if-needed.png)
+
+Select the `hello-from-csharp` project and navigate to the `hello-from-csharp` target's **General tab**. In the **Embedded Binary** section, add `hello-from-csharp.framework`.
+
+![Embedded binaries](hello-from-csharp-ios-embedded-binaries.png)
 
 Open ViewController.m, and replace the contents with:
 
