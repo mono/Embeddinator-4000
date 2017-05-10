@@ -61,3 +61,32 @@ MonoObject* mono_embeddinator_get_object (id native, bool assertOnFailure)
 	int gchandle = (int) [native performSelector:@selector (xamarinGetGCHandle)];
 	return mono_gchandle_get_target (gchandle);
 }
+
+#if !defined (XAMARIN_IOS) && !defined (XAMARIN_MAC)
+@interface MonoEmbeddinatorFindBundleObject : NSObject
+@end
+@implementation MonoEmbeddinatorFindBundleObject
+@end
+#endif
+
+MonoAssembly *
+mono_embeddinator_find_assembly_in_bundle (const char *assembly)
+{
+#if defined (XAMARIN_IOS) || defined (XAMARIN_MAC)
+	return xamarin_open_assembly (assembly);
+#else
+	// Locating the bundle in which this code is located is surprisingly
+	// difficult. There's an NSBundle API that can find the bundle in which a
+	// particular Objective-C class is in, so we create a dummy Objective-C
+	// class for only this purpose, and use it to get the bundle.
+	NSBundle *bundle = [NSBundle bundleForClass: [MonoEmbeddinatorFindBundleObject class]];
+	NSString *path = [bundle resourcePath];
+	path = [path stringByAppendingPathComponent: @"MonoBundle"];
+	path = [path stringByAppendingPathComponent: [NSString stringWithUTF8String:assembly]];
+	if ([[NSFileManager defaultManager] fileExistsAtPath: path]) {
+		return mono_assembly_open ([path UTF8String], NULL);
+	} else {
+		return NULL;
+	}
+#endif
+}

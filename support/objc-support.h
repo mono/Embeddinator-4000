@@ -42,5 +42,8 @@ NSComparisonResult mono_embeddinator_compare_to (MonoEmbedObject *object, MonoMe
 MONO_EMBEDDINATOR_API
 MonoObject* mono_embeddinator_get_object (id native, bool assertOnFailure);
 
+MONO_EMBEDDINATOR_API
+MonoAssembly *mono_embeddinator_find_assembly_in_bundle (const char *assembly);
+
 MONO_EMBEDDINATOR_END_DECLS
 	

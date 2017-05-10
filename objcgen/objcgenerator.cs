@@ -72,6 +72,7 @@ namespace ObjC {
 			implementation.WriteLine ("return;");
 			implementation.Indent--;
 			implementation.WriteLine ("mono_embeddinator_init (&__mono_context, \"mono_embeddinator_binding\");");
+			implementation.WriteLine ("mono_embeddinator_install_assembly_load_hook (&mono_embeddinator_find_assembly_in_bundle);");
 			implementation.Indent--;
 			implementation.WriteLine ("}");
 			implementation.WriteLine ();
