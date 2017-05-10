@@ -91,28 +91,28 @@ mono_embeddinator_find_assembly_in_bundle (const char *assembly)
 #endif
 }
 
-NSDecimalNumber* mono_embeddinator_get_nsdecimalnumber (void* __unboxedresult)
+NSDecimalNumber* mono_embeddinator_get_nsdecimalnumber (void* unboxedresult)
 {
-	static NSDictionary* __forcedotseparator = nil;
-	static MonoMethod* __tostringmethod = nil;
+	static NSDictionary* forcedotseparator = nil;
+	static MonoMethod* tostringmethod = nil;
 
-	MonoObject* __invariantculture = mono_embeddinator_get_cultureinfo_invariantculture_object ();
-	void* __tostringargs [1];
-	__tostringargs [0] = __invariantculture;
+	MonoObject* invariantculture = mono_embeddinator_get_cultureinfo_invariantculture_object ();
+	void* tostringargs [1];
+	tostringargs [0] = invariantculture;
 
-	if (!__tostringmethod)
-		__tostringmethod = mono_embeddinator_lookup_method (":ToString(System.IFormatProvider)", mono_embeddinator_get_decimal_class ());
+	if (!tostringmethod)
+		tostringmethod = mono_embeddinator_lookup_method (":ToString(System.IFormatProvider)", mono_embeddinator_get_decimal_class ());
 
-	MonoObject* __ex = nil;
-	MonoString* __decimalmonostr = (MonoString *) mono_runtime_invoke (__tostringmethod, __unboxedresult, __tostringargs, &__ex);
-	if (__ex)
-		mono_embeddinator_throw_exception (__ex);
-	NSString* __decimalnsstr = mono_embeddinator_get_nsstring (__decimalmonostr);
+	MonoObject* ex = nil;
+	MonoString* decimalmonostr = (MonoString *) mono_runtime_invoke (tostringmethod, unboxedresult, tostringargs, &ex);
+	if (ex)
+		mono_embeddinator_throw_exception (ex);
+	NSString* decimalnsstr = mono_embeddinator_get_nsstring (decimalmonostr);
 
 	// Force NSDecimalNumber to parse the number using dot as decimal separator http://stackoverflow.com/a/7905775/572076
-	if (!__forcedotseparator)
-		__forcedotseparator = @{ NSLocaleDecimalSeparator : @"." };
-	NSDecimalNumber* __nsdecresult = [NSDecimalNumber decimalNumberWithString:__decimalnsstr locale:__forcedotseparator];
+	if (!forcedotseparator)
+		forcedotseparator = @{ NSLocaleDecimalSeparator : @"." };
+	NSDecimalNumber* nsdecresult = [NSDecimalNumber decimalNumberWithString:decimalnsstr locale:forcedotseparator];
 
-	return __nsdecresult;
+	return nsdecresult;
 }
