@@ -202,25 +202,38 @@ namespace MonoEmbeddinator4000
             return args.ToString ();
         }    
 
-        void Invoke(string program, string arguments, Dictionary<string, string> envVars = null)
+        string Invoke(string program, string arguments, Dictionary<string, string> envVars = null)
         {
-            Diagnostics.Debug("Invoking: {0} {1}", program, arguments);
+            var process = new Process
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = program,
+                    Arguments = arguments,
+                    WindowStyle = ProcessWindowStyle.Hidden,
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true
+                }
+            };
 
-            var process = new Process();
-            process.StartInfo.FileName = program;
-            process.StartInfo.Arguments = arguments;
-            process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-            process.StartInfo.UseShellExecute = false;
-            process.StartInfo.RedirectStandardOutput = true;
             if (envVars != null)
                 foreach (var kvp in envVars)
                     process.StartInfo.EnvironmentVariables[kvp.Key] = kvp.Value;
-            process.OutputDataReceived += (sender, args) => Diagnostics.Message("{0}", args.Data);
-            Diagnostics.PushIndent();
+
+            var standardOut = new StringBuilder();
+            process.OutputDataReceived += (sender, args) => standardOut.Append(args.Data);
+
             process.Start();
             process.BeginOutputReadLine();
             process.WaitForExit();
+
+            Diagnostics.Debug("Invoking: {0} {1}", program, arguments);
+            Diagnostics.PushIndent();
+            if (standardOut.Length > 0)
+                Diagnostics.Message("{0}", standardOut.ToString());
             Diagnostics.PopIndent();
+
+            return standardOut.ToString();
         }
 
         private IEnumerable<string> GetOutputFiles(string pattern)
@@ -245,8 +258,6 @@ namespace MonoEmbeddinator4000
                 break;
             }
         }
-
-
 
         string OutputName => Path.GetFileNameWithoutExtension(Project.Assemblies[0]);
 
