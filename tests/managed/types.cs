@@ -98,4 +98,8 @@ public static class Type_Decimal {
 	public static decimal MinusTau { get; } = -6.28318530717958647692m;
 	public static decimal FortyTwo { get; } = 42m;
 	public static decimal [] DecArr { get; } = { Max, Min, Zero, One, MinusOne, Pi, MinusTau, FortyTwo };
+
+	public static decimal GetDecimal (decimal dec) => dec;
+	public static void GetRefPi (ref decimal dec) => dec = Pi;
+	public static decimal [] GetDecimalArr (decimal [] dec) => dec;
 }

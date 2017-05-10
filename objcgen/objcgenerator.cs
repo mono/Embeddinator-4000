@@ -562,6 +562,17 @@ namespace ObjC {
 				implementation.WriteLine ($"mono_array_set ({pnameArr}, {typeName}, {pnameIdx}, {pnameRet}.{returnValue});");
 				implementation.Indent--;
 				break;
+			case TypeCode.Decimal:
+				implementation.WriteLine ($"NSDecimalNumber* {pnameRet} = {parameterName}[{pnameIdx}];");
+				implementation.WriteLine ($"if (!{pnameRet} || [{pnameRet} isKindOfClass:[NSNull class]])");
+				implementation.Indent++;
+				implementation.WriteLine ($"continue;");
+				implementation.Indent--;
+				implementation.WriteLine ("else");
+				implementation.Indent++;
+				implementation.WriteLine ($"mono_array_set ({pnameArr}, MonoDecimal, {pnameIdx}, mono_embeddinator_get_monodecimal ({pnameRet}, &__mono_context));");
+				implementation.Indent--;
+				break;
 			case TypeCode.String:
 				implementation.WriteLine ($"NSString* {pnameRet} = {parameterName}[{pnameIdx}];");
 				implementation.WriteLine ($"if (!{pnameRet} || [{pnameRet} isKindOfClass:[NSNull class]])");
@@ -636,6 +647,12 @@ namespace ObjC {
 					post.AppendLine ($"*{paramaterName} = mono_embeddinator_get_nsstring (__string);");
 				} else
 					implementation.WriteLine ($"{argumentName} = {paramaterName} ? mono_string_new (__mono_context.domain, [{paramaterName} UTF8String]) : nil;");
+				break;
+			case TypeCode.Decimal:
+				implementation.WriteLine ($"MonoDecimal __mdec = mono_embeddinator_get_monodecimal ({(is_by_ref ? "*" : string.Empty)}{paramaterName}, &__mono_context);");
+				implementation.WriteLine ($"{argumentName} = &__mdec;");
+				if (is_by_ref)
+					post.AppendLine ($"*{paramaterName} = mono_embeddinator_get_nsdecimalnumber (&__mdec);");
 				break;
 			case TypeCode.Boolean:
 			case TypeCode.Char:
@@ -1163,6 +1180,8 @@ namespace ObjC {
 				return string.Format (arrayCreator, "mono_get_double_class ()");
 			case TypeCode.Object:
 				return string.Format (arrayCreator, $"{NameGenerator.GetObjCName (type)}_class");
+			case TypeCode.Decimal:
+				return string.Format (arrayCreator, "mono_embeddinator_get_decimal_class ()");
 			default:
 				throw new NotImplementedException ($"Converting type {type.FullName} to mono class");
 			}

@@ -91,9 +91,10 @@ mono_embeddinator_find_assembly_in_bundle (const char *assembly)
 #endif
 }
 
+static NSDictionary* forcedotseparator = nil;
+
 NSDecimalNumber* mono_embeddinator_get_nsdecimalnumber (void* unboxedresult)
 {
-	static NSDictionary* forcedotseparator = nil;
 	static MonoMethod* tostringmethod = nil;
 
 	MonoObject* invariantculture = mono_embeddinator_get_cultureinfo_invariantculture_object ();
@@ -115,4 +116,33 @@ NSDecimalNumber* mono_embeddinator_get_nsdecimalnumber (void* unboxedresult)
 	NSDecimalNumber* nsdecresult = [NSDecimalNumber decimalNumberWithString:decimalnsstr locale:forcedotseparator];
 
 	return nsdecresult;
+}
+
+MonoDecimal mono_embeddinator_get_monodecimal (NSDecimalNumber* nsdecimalnumber, mono_embeddinator_context_t* context)
+{
+	static MonoMethod* decimalparsemethod = nil;
+
+	// Force NSDecimalNumber to parse the number using dot as decimal separator http://stackoverflow.com/a/7905775/572076
+	if (!forcedotseparator)
+		forcedotseparator = @{ NSLocaleDecimalSeparator : @"." };
+
+	NSString* nsdecimalstr = [nsdecimalnumber descriptionWithLocale:forcedotseparator];
+	MonoString* decimalstr = mono_string_new (context->domain, [nsdecimalstr UTF8String]);
+
+	MonoObject* invariantculture = mono_embeddinator_get_cultureinfo_invariantculture_object ();
+	void* parseargs [2];
+	parseargs [0] = decimalstr;
+	parseargs [1] = invariantculture;
+
+	if (!decimalparsemethod)
+		decimalparsemethod = mono_embeddinator_lookup_method ("System.Decimal:Parse(string,System.IFormatProvider)", mono_embeddinator_get_decimal_class ());
+
+	MonoObject* ex = nil;
+	MonoObject* boxeddecimal = mono_runtime_invoke (decimalparsemethod, NULL, parseargs, &ex);
+	if (ex)
+		mono_embeddinator_throw_exception (ex);
+
+	MonoDecimal mdecimal = *(MonoDecimal*) mono_object_unbox (boxeddecimal);
+
+	return mdecimal;
 }

@@ -440,7 +440,7 @@
 
 	NSDecimalNumber *decimalminustau = [Type_Decimal minusTau];
 	NSDecimalNumber *nsdecimalminustau = [NSDecimalNumber decimalNumberWithString:@"-6.28318530717958647692"];
-	XCTAssertEqualObjects (nsdecimalminustau, decimalminustau, "NSDecimalNumber pi");
+	XCTAssertEqualObjects (nsdecimalminustau, decimalminustau, "NSDecimalNumber tau");
 
 	NSDecimalNumber *decimalfortytwo = [Type_Decimal fortyTwo];
 	NSDecimalNumber *nsdecimalfortytwo = [NSDecimalNumber decimalNumberWithString:@"42"];
@@ -454,8 +454,29 @@
 	XCTAssertEqualObjects (nsdecimalone, decimalarr[3], "decimalarr[3] one");
 	XCTAssertEqualObjects (nsdecimalminusone, decimalarr[4], "decimalarr[4] minusOne");
 	XCTAssertEqualObjects (nsdecimalpi, decimalarr[5], "decimalarr[5] pi");
-	XCTAssertEqualObjects (nsdecimalminustau, decimalarr[6], "decimalarr[6] pi");
+	XCTAssertEqualObjects (nsdecimalminustau, decimalarr[6], "decimalarr[6] tau");
 	XCTAssertEqualObjects (nsdecimalfortytwo, decimalarr[7], "decimalarr[7] fortytwo");
+
+	for (NSDecimalNumber *dec in decimalarr) {
+		NSDecimalNumber *decimalmeth = [Type_Decimal getDecimalDec:dec];
+		XCTAssertEqualObjects (dec, decimalmeth, "decimal array");
+	}
+
+	NSArray<NSDecimalNumber *> *decimalarr2 = [Type_Decimal getDecimalArrDec:decimalarr];
+	XCTAssertEqual([decimalarr count], 8, "decimalarr count");
+	XCTAssertEqualObjects (decimalarr[0], decimalarr2[0], "decimalarr2[0] max");
+	XCTAssertEqualObjects (decimalarr[1], decimalarr2[1], "decimalarr2[1] min");
+	XCTAssertEqualObjects (decimalarr[2], decimalarr2[2], "decimalarr2[2] zero");
+	XCTAssertEqualObjects (decimalarr[3], decimalarr2[3], "decimalarr2[3] one");
+	XCTAssertEqualObjects (decimalarr[4], decimalarr2[4], "decimalarr2[4] minusOne");
+	XCTAssertEqualObjects (decimalarr[5], decimalarr2[5], "decimalarr2[5] pi");
+	XCTAssertEqualObjects (decimalarr[6], decimalarr2[6], "decimalarr2[6] tau");
+	XCTAssertEqualObjects (decimalarr[7], decimalarr2[7], "decimalarr2[7] fortytwo");
+
+	NSDecimalNumber *refDec = [Type_Decimal minusTau];
+	XCTAssertEqualObjects (nsdecimalminustau, refDec, "NSDecimalNumber refDec tau");
+	[Type_Decimal getRefPiDec:&refDec];
+	XCTAssertEqualObjects (nsdecimalpi, refDec, "NSDecimalNumber refDec pi");
 }
 
 - (void) testObjectIndexedSubscripting {
