@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 using IKVM.Reflection;
 using Type = IKVM.Reflection.Type;
+using Embeddinator;
 
-using System.Text;
-
-namespace Embeddinator {
+namespace ObjC {
 	// A set of post-processing steps needed to add hints
 	// to the input of the generation step
-	public abstract partial class Processor {
+	public partial class ObjCProcessor {
 		protected IEnumerable<ProcessedMethod> PostProcessMethods (IEnumerable<MethodInfo> methods, IEnumerable <MethodInfo> equals)
 		{
 			HashSet<string> duplicateNames = FindDuplicateNames (methods);
@@ -32,6 +32,7 @@ namespace Embeddinator {
 
 				ProcessPotentialNameOverride (processedMethod);
 
+				processedMethod.ComputeSignatures (this);
 				yield return processedMethod;
 			}
 		}
@@ -85,6 +86,7 @@ namespace Embeddinator {
 				if (duplicateNames.Contains (CreateStringRep(constructor)))
 					processedConstructor.FallBackToTypeName = true;
 
+				processedConstructor.ComputeSignatures (this);
 				yield return processedConstructor;
 			}
 		}

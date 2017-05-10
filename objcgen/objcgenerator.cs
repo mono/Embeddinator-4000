@@ -308,7 +308,7 @@ namespace ObjC {
 					string name = "init";
 					string signature = ".ctor()";
 					if (parameters.Length > 0)
-						GetSignatures (ctor, "initWith", ctor.Constructor.Name, ctor.Constructor, parameters, false, out name, out signature);
+						(Processor as ObjCProcessor).GetSignatures (ctor, "initWith", ctor.Constructor.Name, ctor.Constructor, parameters, false, out name, out signature);
 
 					if (ctor.Unavailable) {
 						headers.WriteLine ("/** This initializer is not available as it was not re-exposed from the base type");
@@ -316,6 +316,12 @@ namespace ObjC {
 						headers.WriteLine (" */");
 						headers.WriteLine ($"- (nullable instancetype){name} NS_UNAVAILABLE;");
 						headers.WriteLine ();
+						continue;
+					}
+
+					if (ctor.ConstructorType == ConstructorType.DefaultValueWrapper) {
+						default_init |= ctor.FirstDefaultParameter == 0;
+						GenerateDefaultValuesWrapper (name, ctor.Constructor, parameters, ctor.FirstDefaultParameter);
 						continue;
 					}
 
@@ -360,9 +366,6 @@ namespace ObjC {
 					builder.EndImplementation ();
 
 					headers.WriteLine ();
-
-					if (members_with_default_values.Contains (ctor.Constructor))
-						default_init |= GenerateDefaultValuesWrappers (name, ctor.Constructor);
 				}
 			}
 
@@ -814,7 +817,7 @@ namespace ObjC {
 			var managed_name = info.Name;
 			var parametersInfo = info.GetParameters ();
 
-			GetSignatures (method, name, managed_name, (MemberInfo)pi ?? info, parametersInfo, isExtension, out objcsig, out monosig);
+			(Processor as ObjCProcessor).GetSignatures (method, name, managed_name, (MemberInfo)pi ?? info, parametersInfo, isExtension, out objcsig, out monosig);
 
 			var builder = new MethodHelper (headers, implementation) {
 				AssemblySafeName = type.Assembly.GetName ().Name.Sanitize (),
@@ -852,18 +855,6 @@ namespace ObjC {
 			return objcsig;
 		}
 
-		bool GenerateDefaultValuesWrappers (string name, MethodBase mb)
-		{
-			// parameters with default values must be at the end and there can be many of them
-			var parameters = mb.GetParameters ();
-			for (int i = parameters.Length - 1; i >= 0; i--) {
-				if (!parameters [i].HasDefaultValue)
-					return false;
-				GenerateDefaultValuesWrapper (name, mb, parameters, i);
-			}
-			return true;
-		}
-
 		void GenerateDefaultValuesWrapper (string name, MethodBase mb, ParameterInfo[] parameters, int start)
 		{
 			MethodInfo mi = mb as MethodInfo;
@@ -897,7 +888,7 @@ namespace ObjC {
 			else
 				name = mb.Name.CamelCase ();
 			
-			GetSignatures (null, name, mb.Name, mb, plist.ToArray (), false, out objcsig, out monosig);
+			(Processor as ObjCProcessor).GetSignatures (null, name, mb.Name, mb, plist.ToArray (), false, out objcsig, out monosig);
 			var type = mb.DeclaringType;
 			var builder = new MethodHelper (headers, implementation) {
 				IsStatic = mb.IsStatic,
@@ -924,10 +915,19 @@ namespace ObjC {
 
 		protected override void Generate (ProcessedMethod method)
 		{
-			var objcsig = ImplementMethod (method.Method, method.BaseName, method);
-
-			if (members_with_default_values.Contains (method.Method))
-				GenerateDefaultValuesWrappers (objcsig, method.Method);
+			string objcsig;
+			switch (method.MethodType) {
+			case MethodType.DefaultValueWrapper:
+				string monosig;
+				var managed_name = method.Method.Name;
+				var parametersInfo = method.Method.GetParameters ();
+				(Processor as ObjCProcessor).GetSignatures (method, method.BaseName, managed_name, method.Method, parametersInfo, false, out objcsig, out monosig);
+				GenerateDefaultValuesWrapper (objcsig, method.Method, parametersInfo, method.FirstDefaultParameter);
+				break;
+			default:
+				ImplementMethod (method.Method, method.BaseName, method);
+				break;
+			}
 		}
 
 		void ReturnArrayValue (Type t)
@@ -1119,6 +1119,44 @@ namespace ObjC {
 			if (t.IsEnum)
 				return NameGenerator.GetTypeName (t) + t.GetEnumName (o);
 			return o.ToString ();
+		}
+
+		public static string GetArrayCreator (string parameterName, Type type)
+		{
+			string arrayCreator = $"MonoArray* __{parameterName}arr = mono_array_new (__mono_context.domain, {{0}}, __{parameterName}length);";
+
+			switch (Type.GetTypeCode (type)) {
+			case TypeCode.String:
+				return string.Format (arrayCreator, "mono_get_string_class ()");
+			case TypeCode.Boolean:
+				return string.Format (arrayCreator, "mono_get_boolean_class ()");
+			case TypeCode.Char:
+				return string.Format (arrayCreator, "mono_get_char_class ()");
+			case TypeCode.SByte:
+				return string.Format (arrayCreator, "mono_get_sbyte_class ()");
+			case TypeCode.Int16:
+				return string.Format (arrayCreator, "mono_get_int16_class ()");
+			case TypeCode.Int32:
+				return string.Format (arrayCreator, "mono_get_int32_class ()");
+			case TypeCode.Int64:
+				return string.Format (arrayCreator, "mono_get_int64_class ()");
+			case TypeCode.Byte:
+				return string.Format (arrayCreator, "mono_get_byte_class ()");
+			case TypeCode.UInt16:
+				return string.Format (arrayCreator, "mono_get_uint16_class ()");
+			case TypeCode.UInt32:
+				return string.Format (arrayCreator, "mono_get_uint32_class ()");
+			case TypeCode.UInt64:
+				return string.Format (arrayCreator, "mono_get_uint64_class ()");
+			case TypeCode.Single:
+				return string.Format (arrayCreator, "mono_get_single_class ()");
+			case TypeCode.Double:
+				return string.Format (arrayCreator, "mono_get_double_class ()");
+			case TypeCode.Object:
+				return string.Format (arrayCreator, $"{NameGenerator.GetObjCName (type)}_class");
+			default:
+				throw new NotImplementedException ($"Converting type {type.FullName} to mono class");
+			}
 		}
 	}
 }

@@ -16,7 +16,6 @@ namespace Embeddinator {
 			// FIXME: remove asap
 			var op = (Processor as ObjC.ObjCProcessor);
 			extensions_methods = op.extensions_methods;
-			members_with_default_values = op.members_with_default_values;
 			subscriptProperties = op.subscriptProperties;
 			icomparable = op.icomparable;
 			iequatable = op.iequatable;
@@ -48,7 +47,6 @@ namespace Embeddinator {
 
 		// to be removed / replaced
 		public Dictionary<Type, Dictionary<Type, List<MethodInfo>>> extensions_methods { get; private set; }
-		public HashSet<MemberInfo> members_with_default_values { get; private set; }
 		public Dictionary<Type, List<ProcessedProperty>> subscriptProperties { get; private set; }
 		public Dictionary<Type, MethodInfo> icomparable { get; private set; }
 		public Dictionary<Type, MethodInfo> iequatable { get; private set; }

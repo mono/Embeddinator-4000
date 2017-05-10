@@ -1098,6 +1098,18 @@
 	XCTAssertEqualObjects (@"1", [interNullArr2[2] convertInt64:1ll], "interNullArr2[2] 1");
 }
 
+- (void)testIFormatProvider {
+	id<System_IFormatProvider> enUS = [Interfaces_ExposeIFormatProvider getCultureName:@"en-US"];
+	XCTAssertNotNil (enUS, "en-US");
+	NSString *s1 = [Interfaces_ExposeIFormatProvider formatValue:1.2 provider:enUS];
+	XCTAssertEqualObjects (@"1.2", s1, "1.2");
+
+	id<System_IFormatProvider> frCA = [Interfaces_ExposeIFormatProvider getCultureName:@"fr-CA"];
+	XCTAssertNotNil (frCA, "fr-CA");
+	NSString *s2 = [Interfaces_ExposeIFormatProvider formatValue:1.2 provider:frCA];
+	XCTAssertEqualObjects (@"1,2", s2, "1,2");
+}
+
 #pragma clang diagnostic pop
 
 @end
