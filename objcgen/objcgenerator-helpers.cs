@@ -37,7 +37,7 @@ namespace ObjC {
 					mono.Append (',');
 				}
 
-				string paramName = useTypeNames ? p.ParameterType.Name : p.Name;
+				string paramName = useTypeNames ? NameGenerator.GetParameterTypeName (p.ParameterType) : p.Name;
 				if ((method != null) && (n > 0 || !isExtension)) {
 					if (n == 0) {
 						if (useTypeNames || method.IsConstructor || (!method.IsSpecialName && !isOperator))
