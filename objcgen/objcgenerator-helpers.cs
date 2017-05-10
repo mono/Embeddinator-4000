@@ -43,7 +43,7 @@ namespace ObjC {
 						if (useTypeNames || method.IsConstructor || (!method.IsSpecialName && !isOperator))
 							objc.Append (paramName.PascalCase ());
 					} else
-						objc.Append (paramName.ToLowerInvariant ());
+						objc.Append (paramName.CamelCase ());
 				}
 
 				if (n > 0 || !isExtension) {

@@ -30,6 +30,27 @@ namespace ObjC {
 			{ "signed char", "aChar" }
 		};
 
+		public static Dictionary<string, string> ObjCTypeToMethodName = new Dictionary<string, string> {
+			{ "int", "IntValue" },
+			{ "unsigned int", "UIntValue" },
+			{ "double", "DoubleValue" },
+			{ "float", "FloatValue" },
+			{ "NSString *", "StringValue" },
+			{ "NSObject", "ObjectValue" },
+			{ "NSPoint", "PointValue" },
+			{ "NSRect", "RectValue" },
+			{ "NSFont", "FontValue" },
+			{ "SEL", "SelectorValue" },
+			{ "short", "ShortValue" },
+			{ "unsigned short", "UShortValue" },
+			{ "long long", "LongValue" },
+			{ "unsigned long long", "ULongValue" },
+			{ "bool", "BoolValue" },
+			{ "char", "CharValue" },
+			{ "unsigned char", "UCharValue" },
+			{ "signed char", "SCharValue" }
+		};
+
 		public static string GetObjCName (Type t)
 		{
 			return t.FullName.Replace ('.', '_').Replace ("+", "_");
@@ -183,13 +204,13 @@ namespace ObjC {
 
 		public static string GetParameterTypeName (Type t)
 		{
-			var name = t.Name;
 			if (t.IsArray)
 				return t.GetElementType ().Name + "Array";
-			else if (t.IsByRef)
+			if (t.IsByRef)
 				return t.GetElementType ().Name + "Ref";
-			else
-				return t.Name;
+			if (!ObjCTypeToMethodName.TryGetValue (GetTypeName (t), out string name))
+				name = t.Name;
+			return name;
 		}
 
 		public static string GetExtendedParameterName (ParameterInfo p, ParameterInfo [] parameters)
