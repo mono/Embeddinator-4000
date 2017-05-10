@@ -560,7 +560,6 @@ namespace ObjC {
 				implementation.WriteLine ($"continue;");
 				implementation.Indent--;
 				implementation.WriteLine ($"mono_array_set ({pnameArr}, {typeName}, {pnameIdx}, {pnameRet}.{returnValue});");
-				implementation.Indent--;
 				break;
 			case TypeCode.Decimal:
 				implementation.WriteLine ($"NSDecimalNumber* {pnameRet} = {parameterName}[{pnameIdx}];");
@@ -613,7 +612,6 @@ namespace ObjC {
 					implementation.WriteLine ($"mono_array_set ({pnameArr}, MonoObject *, {pnameIdx}, mono_gchandle_get_target ({pnameRet}->_object->_handle));");
 				else if (hasProtocol)
 					implementation.WriteLine ($"mono_array_set ({pnameArr}, MonoObject *, {pnameIdx}, mono_embeddinator_get_object ({pnameRet}, true));");
-				implementation.Indent--;
 				break;
 			default:
 				throw new NotImplementedException ($"Converting type {type.FullName} to mono code");
