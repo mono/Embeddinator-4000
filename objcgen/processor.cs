@@ -31,6 +31,7 @@ namespace Embeddinator {
 			while (assemblyQueue.Count > 0) {
 				Process (assemblyQueue.Dequeue ());
 			}
+			processing_ended = true;
 		}
 
 		protected abstract IEnumerable<Type> GetTypes (Assembly a);
@@ -60,7 +61,6 @@ namespace Embeddinator {
 			while (typeQueue.Count > 0) {
 				Process (typeQueue.Dequeue ());
 			}
-			processing_ended = true;
 		}
 
 		public abstract void Process (ProcessedType pt);
@@ -69,7 +69,7 @@ namespace Embeddinator {
 		{
 			typeQueue.Enqueue (pt);
 			// extra types are (most likely) outside the input list of assemblies
-			AddIfUnique (new ProcessedAssembly (pt.Type.Assembly));
+			AddIfUnique (pt.Assembly);
 		}
 
 		// useful to get BaseType - but can only be called (safely) once processing is done
