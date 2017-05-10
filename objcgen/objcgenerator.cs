@@ -438,14 +438,34 @@ namespace ObjC {
 					MetadataToken = m.MetadataToken,
 					ObjCTypeName = managed_name,
 					ManagedTypeName = t.FullName,
-					MonoSignature = $"CompareTo({NameGenerator.GetMonoName (pt)})",
+					MonoSignature = $"CompareTo({NameGenerator.GetMonoName (pt)})"
 				};
+				builder.WriteHeaders ();
+				builder.WriteImplementation ();
+			}
+
+			if (iequatable.TryGetValue (t, out m)) {
+				var pt = m.GetParameters () [0].ParameterType;
+				var objc = NameGenerator.GetTypeName (pt);
+				var nullable = !pt.IsPrimitive ? " * _Nullable" : "";
+				var builder = new EqualsHelper (headers, implementation) {
+					ParameterType = pt,
+					ObjCSignature = $"isEqualTo{objc.PascalCase ()}:({objc}{nullable})other",
+					MonoSignature = $"Equals({NameGenerator.GetMonoName (pt)})",
+					AssemblySafeName = aname,
+					MetadataToken = m.MetadataToken,
+					ObjCTypeName = managed_name,
+					ManagedTypeName = t.FullName,
+				};
+
 				builder.WriteHeaders ();
 				builder.WriteImplementation ();
 			}
 
 			if (equals.TryGetValue (t, out m)) {
 				var builder = new EqualsHelper (headers, implementation) {
+					ObjCSignature = "isEqual:(id _Nullable)other",
+					MonoSignature = "Equals(object)",
 					AssemblySafeName = aname,
 					MetadataToken = m.MetadataToken,
 					ObjCTypeName = managed_name,

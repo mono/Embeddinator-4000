@@ -19,6 +19,7 @@ namespace Embeddinator {
 			members_with_default_values = op.members_with_default_values;
 			subscriptProperties = op.subscriptProperties;
 			icomparable = op.icomparable;
+			iequatable = op.iequatable;
 			equals = op.equals;
 			hashes = op.hashes;
 
@@ -50,6 +51,7 @@ namespace Embeddinator {
 		public HashSet<MemberInfo> members_with_default_values { get; private set; }
 		public Dictionary<Type, List<ProcessedProperty>> subscriptProperties { get; private set; }
 		public Dictionary<Type, MethodInfo> icomparable { get; private set; }
+		public Dictionary<Type, MethodInfo> iequatable { get; private set; }
 		public Dictionary<Type, MethodInfo> equals { get; private set; }
 		public Dictionary<Type, MethodInfo> hashes { get; private set; }
 	}
