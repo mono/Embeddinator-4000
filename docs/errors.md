@@ -123,11 +123,18 @@ There should be an earlier warning giving more information why type `T` is not s
 Note: Supported features will evolve with new versions of the tool.
 
 
-<h3><a name="EM1021"/>Constructor `C` parameter `P` has a default value that is not supported.</h3>
+<h3><a name="EM1021"/>Constructor `C` has default values for which no wrapper is generated.</h3>
 
-This is a **warning** that the default parameters of constructor `C` are not generating any extra code.
+This is a **warning** that the default parameters of constructor `C` are not generating any extra code. The most common cause is that an existing method already has the same signature. E.g. in .net it's possible to have:
 
-Note: Supported features will evolve with new versions of the tool.
+```
+public class MyType {
+	public MyType () { ... }
+	public MyType (int i = 0) { ... }
+}
+```
+
+In such cases only two generated `init` selectors will be created, both calling into mono, but no wrapper for the later will exist.
 
 
 <h3><a name="EM1030"/>Method `M` is not generated because return type `T` is not supported.</h3>
@@ -148,11 +155,18 @@ There should be an earlier warning giving more information why type `T` is not s
 Note: Supported features will evolve with new versions of the tool.
 
 
-<h3><a name="EM1032"/>Method `M` parameter `P` has a default value that is not supported.</h3>
+<h3><a name="EM1032"/>Method `M` has default values for which no wrapper is generated.</h3>
 
-This is a **warning** that the default parameters of method `M` are not generating any extra code.
+This is a **warning** that the default parameters of method `M` are not generating any extra code. The most common cause is that an existing method already has the same signature. E.g. in .net it's possible to have:
 
-Note: Supported features will evolve with new versions of the tool.
+```
+public class MyType {
+	public int Increment () { ... }
+	public int Increment (int i = 0) { ... }
+}
+```
+
+In such cases only two generated `increment` selectors will be created, both calling into mono, but no wrapper for the later will exist.
 
 
 <h3><a name="EM1033"/>Method `M` is not generated because another method exposes the operator with a friendly name.</h3>

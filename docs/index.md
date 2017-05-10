@@ -22,8 +22,8 @@ idiomatic code in the target language.   This is the list of langauge
 support that we have been working on:
 
 * *Objective-C*: mapping .NET to idiomatic Objective-C APIs.
-* *C*: mapping .NET code to an object-oriented like C API.
-* *Java*: mapping .NET code to idiomatic Java APIs.
+* *C*: mapping .NET code to an object-oriented like C API (coming soon).
+* *Java*: mapping .NET code to idiomatic Java APIs (coming soon).
 
 More languages will come later.
 
@@ -32,8 +32,4 @@ More languages will come later.
 To get started, check one of our guides for each of the currently
 supported languages:
 
-* [Objective-C](getting-started-objective-c): covers macOS, iOS, tvOS.
-* [Java](getting-started-java): covers Android and Java desktop.
-* [C/C++](getting-started-c): for C targets
-
-
+* [Objective-C](getting-started-objective-c): covers macOS and iOS.
