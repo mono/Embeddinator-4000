@@ -181,6 +181,17 @@ namespace ObjC {
 			}
 		}
 
+		public static string GetParameterTypeName (Type t)
+		{
+			var name = t.Name;
+			if (t.IsArray)
+				return t.GetElementType ().Name + "Array";
+			else if (t.IsByRef)
+				return t.GetElementType ().Name + "Ref";
+			else
+				return t.Name;
+		}
+
 		public static string GetExtendedParameterName (ParameterInfo p, ParameterInfo [] parameters)
 		{
 			string pName = p.Name;
