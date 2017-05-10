@@ -73,13 +73,11 @@ namespace Embeddinator {
 				},
 				{ "o|out|outdir=", "Output directory", v => embedder.OutputDirectory = v },
 				{ "p|platform=", $"Target platform (iOS, macOS [default], watchOS, tvOS)", v => embedder.SetPlatform (v) },
-				{ "dll|shared", "Compiles as a shared library (default)", v => embedder.CompilationTarget = CompilationTarget.SharedLibrary },
-				{ "static", "Compiles as a static library (unsupported)", v => embedder.CompilationTarget = CompilationTarget.StaticLibrary },
 				{ "vs=", $"Visual Studio version for compilation (unsupported)", v => { throw new EmbeddinatorException (2, $"Option `--vs` is not supported"); } },
 				{ "h|?|help", "Displays the help", v => action = Action.Help },
 				{ "v|verbose", "generates diagnostic verbose output", v => ErrorHelper.Verbosity++ },
 				{ "version", "Display the version information.", v => action = Action.Version },
-				{ "target=", "The compilation target (static, shared, framework).", v => embedder.SetCompilationTarget (v) },
+				{ "target=", "The compilation target (staticlibrary, sharedlibrary, framework).", embedder.SetCompilationTarget },
 			};
 
 			var assemblies = os.Parse (args);
@@ -284,7 +282,7 @@ namespace Embeddinator {
 		}
 
 		static string xcode_app;
-		static string XcodeApp {
+		public static string XcodeApp {
 			get {
 				if (string.IsNullOrEmpty (xcode_app)) {
 					int exitCode;
@@ -312,9 +310,28 @@ namespace Embeddinator {
 			}
 		}
 
+		void VerifyDependencies ()
+		{
+			SystemCheck.VerifyMono ();
+			switch (Platform) {
+			case Platform.iOS:
+			case Platform.tvOS:
+			case Platform.watchOS:
+				SystemCheck.VerifyXamariniOS ();
+				break;
+			case Platform.macOS:
+				SystemCheck.VerifyXamarinMac ();
+				break;
+			default:
+				throw ErrorHelper.CreateError (99, "Internal error: invalid platform {0}. Please file a bug report with a test case (https://github.com/mono/Embeddinator-4000/issues).", Platform);
+			}
+		}
+
 		public int Compile ()
 		{
 			Console.WriteLine ("Compiling binding code...");
+			
+			VerifyDependencies ();
 
 			BuildInfo [] build_infos;
 

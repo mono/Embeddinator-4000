@@ -18,6 +18,7 @@ namespace Embeddinator {
 			extensions_methods = op.extensions_methods;
 			subscriptProperties = op.subscriptProperties;
 			icomparable = op.icomparable;
+			iequatable = op.iequatable;
 			equals = op.equals;
 			hashes = op.hashes;
 
@@ -48,6 +49,7 @@ namespace Embeddinator {
 		public Dictionary<Type, Dictionary<Type, List<MethodInfo>>> extensions_methods { get; private set; }
 		public Dictionary<Type, List<ProcessedProperty>> subscriptProperties { get; private set; }
 		public Dictionary<Type, MethodInfo> icomparable { get; private set; }
+		public Dictionary<Type, MethodInfo> iequatable { get; private set; }
 		public Dictionary<Type, MethodInfo> equals { get; private set; }
 		public Dictionary<Type, MethodInfo> hashes { get; private set; }
 	}

@@ -17,25 +17,39 @@ namespace ObjC {
 			HashSet<MethodInfo> operatorToIgnore = new HashSet<MethodInfo> (OperatorOverloads.FindOperatorPairToIgnore (methods, equals));
 
 			foreach (MethodInfo method in methods) {
+				if (operatorToIgnore.Contains (method)) {
+					Delayed.Add (ErrorHelper.CreateWarning (1033, $"Method {method.Name} is not generated because another method exposes the operator with a friendly name"));
+					continue;
+				}
+
 				ProcessedMethod processedMethod = new ProcessedMethod (method);
 
 				if (duplicateNames.Contains (CreateStringRep (method)) && method.Name != "CompareTo") // HACK
 					processedMethod.FallBackToTypeName = true;
 
-				if (method.IsSpecialName && method.IsStatic && method.Name.StartsWith ("op_", StringComparison.Ordinal))
+				if (IsOperatorOrFriendlyVersion (method))
 					processedMethod.IsOperator = true;
 
-				if (method.IsSpecialName && method.IsStatic && method.Name == "op_Equality")
-					processedMethod.NameOverride = "areEqual";
-				
-				if (operatorToIgnore.Contains (method)) {
-					Delayed.Add (ErrorHelper.CreateWarning (1033, $"Method {processedMethod.Method.Name} is not generated because another method exposes the operator with a friendly name"));
-					continue;
-				}
+				ProcessPotentialNameOverride (processedMethod);
 
 				processedMethod.ComputeSignatures (this);
 				yield return processedMethod;
 			}
+		}
+
+		void ProcessPotentialNameOverride (ProcessedMethod processedMethod)
+		{
+			MethodInfo method = processedMethod.Method;
+			if (IsOperatorOrFriendlyVersion (method)) {
+				string nameOverride = OperatorOverloads.GetObjCName (processedMethod.Method.Name, processedMethod.Method.ParameterCount);
+				if (nameOverride != null)
+					processedMethod.NameOverride = nameOverride;
+			}
+		}
+
+		public bool IsOperatorOrFriendlyVersion (MethodInfo method)
+		{
+			return method.IsOperatorMethod () || OperatorOverloads.MatchesOperatorFriendlyName (method);
 		}
 
 		protected IEnumerable<ProcessedProperty> PostProcessProperties (IEnumerable<PropertyInfo> properties)

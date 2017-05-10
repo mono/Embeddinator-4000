@@ -165,7 +165,7 @@ namespace ObjC {
 			implementation.WriteLine ();
 
 			foreach (var mi in methods) {
-				ImplementMethod (mi, mi.Name.CamelCase (), true);
+				ImplementMethod (mi, mi.Name.CamelCase (), null, isExtension: true);
 			}
 
 			headers.WriteLine ("@end");
@@ -308,7 +308,7 @@ namespace ObjC {
 					string name = "init";
 					string signature = ".ctor()";
 					if (parameters.Length > 0)
-						(Processor as ObjCProcessor).GetSignatures ("initWith", ctor.Constructor.Name, ctor.Constructor, parameters, ctor.FallBackToTypeName, false, out name, out signature);
+						(Processor as ObjCProcessor).GetSignatures (ctor, "initWith", ctor.Constructor.Name, ctor.Constructor, parameters, false, out name, out signature);
 
 					if (ctor.Unavailable) {
 						headers.WriteLine ("/** This initializer is not available as it was not re-exposed from the base type");
@@ -441,14 +441,34 @@ namespace ObjC {
 					MetadataToken = m.MetadataToken,
 					ObjCTypeName = managed_name,
 					ManagedTypeName = t.FullName,
-					MonoSignature = $"CompareTo({NameGenerator.GetMonoName (pt)})",
+					MonoSignature = $"CompareTo({NameGenerator.GetMonoName (pt)})"
 				};
+				builder.WriteHeaders ();
+				builder.WriteImplementation ();
+			}
+
+			if (iequatable.TryGetValue (t, out m)) {
+				var pt = m.GetParameters () [0].ParameterType;
+				var objc = NameGenerator.GetTypeName (pt);
+				var nullable = !pt.IsPrimitive ? " * _Nullable" : "";
+				var builder = new EqualsHelper (headers, implementation) {
+					ParameterType = pt,
+					ObjCSignature = $"isEqualTo{objc.PascalCase ()}:({objc}{nullable})other",
+					MonoSignature = $"Equals({NameGenerator.GetMonoName (pt)})",
+					AssemblySafeName = aname,
+					MetadataToken = m.MetadataToken,
+					ObjCTypeName = managed_name,
+					ManagedTypeName = t.FullName,
+				};
+
 				builder.WriteHeaders ();
 				builder.WriteImplementation ();
 			}
 
 			if (equals.TryGetValue (t, out m)) {
 				var builder = new EqualsHelper (headers, implementation) {
+					ObjCSignature = "isEqual:(id _Nullable)other",
+					MonoSignature = "Equals(object)",
 					AssemblySafeName = aname,
 					MetadataToken = m.MetadataToken,
 					ObjCTypeName = managed_name,
@@ -671,11 +691,11 @@ namespace ObjC {
 			var spacing = property_type [property_type.Length - 1] == '*' ? string.Empty : " ";
 			headers.WriteLine ($") {property_type}{spacing}{name};");
 
-			ImplementMethod (getter, name, false, pi);
+			ImplementMethod (getter, name, null, pi: pi);
 			if (setter == null)
 				return;
 
-			ImplementMethod (setter, "set" + pi.Name, false, pi);
+			ImplementMethod (setter, "set" + pi.Name, null, pi: pi);
 		}
 
 		protected void Generate (ProcessedFieldInfo field)
@@ -786,7 +806,8 @@ namespace ObjC {
 		}
 
 		// TODO override with attribute ? e.g. [ObjC.Selector ("foo")]
-		string ImplementMethod (MethodInfo info, string name, bool isExtension = false, PropertyInfo pi = null, bool useTypeNames = false)
+		// HACK - This should take a ProcessedMethod and not much of this stuff - https://github.com/mono/Embeddinator-4000/issues/276
+		string ImplementMethod (MethodInfo info, string name, ProcessedMethod method, bool isExtension = false, PropertyInfo pi = null)
 		{
 			var type = info.DeclaringType;
 			var managed_type_name = NameGenerator.GetObjCName (type);
@@ -796,7 +817,7 @@ namespace ObjC {
 			var managed_name = info.Name;
 			var parametersInfo = info.GetParameters ();
 
-			(Processor as ObjCProcessor).GetSignatures (name, managed_name, (MemberInfo)pi ?? info, parametersInfo, useTypeNames, isExtension, out objcsig, out monosig);
+			(Processor as ObjCProcessor).GetSignatures (method, name, managed_name, (MemberInfo)pi ?? info, parametersInfo, isExtension, out objcsig, out monosig);
 
 			var builder = new MethodHelper (headers, implementation) {
 				AssemblySafeName = type.Assembly.GetName ().Name.Sanitize (),
@@ -867,7 +888,7 @@ namespace ObjC {
 			else
 				name = mb.Name.CamelCase ();
 			
-			(Processor as ObjCProcessor).GetSignatures (name, mb.Name, mb, plist.ToArray (), false, false, out objcsig, out monosig);
+			(Processor as ObjCProcessor).GetSignatures (null, name, mb.Name, mb, plist.ToArray (), false, out objcsig, out monosig);
 			var type = mb.DeclaringType;
 			var builder = new MethodHelper (headers, implementation) {
 				IsStatic = mb.IsStatic,
@@ -900,11 +921,11 @@ namespace ObjC {
 				string monosig;
 				var managed_name = method.Method.Name;
 				var parametersInfo = method.Method.GetParameters ();
-				(Processor as ObjCProcessor).GetSignatures (method.BaseName, managed_name, method.Method, parametersInfo, method.FallBackToTypeName, false, out objcsig, out monosig);
+				(Processor as ObjCProcessor).GetSignatures (method, method.BaseName, managed_name, method.Method, parametersInfo, false, out objcsig, out monosig);
 				GenerateDefaultValuesWrapper (objcsig, method.Method, parametersInfo, method.FirstDefaultParameter);
 				break;
 			default:
-				ImplementMethod (method.Method, method.BaseName, useTypeNames: method.FallBackToTypeName);
+				ImplementMethod (method.Method, method.BaseName, method);
 				break;
 			}
 		}
@@ -1098,6 +1119,44 @@ namespace ObjC {
 			if (t.IsEnum)
 				return NameGenerator.GetTypeName (t) + t.GetEnumName (o);
 			return o.ToString ();
+		}
+
+		public static string GetArrayCreator (string parameterName, Type type)
+		{
+			string arrayCreator = $"MonoArray* __{parameterName}arr = mono_array_new (__mono_context.domain, {{0}}, __{parameterName}length);";
+
+			switch (Type.GetTypeCode (type)) {
+			case TypeCode.String:
+				return string.Format (arrayCreator, "mono_get_string_class ()");
+			case TypeCode.Boolean:
+				return string.Format (arrayCreator, "mono_get_boolean_class ()");
+			case TypeCode.Char:
+				return string.Format (arrayCreator, "mono_get_char_class ()");
+			case TypeCode.SByte:
+				return string.Format (arrayCreator, "mono_get_sbyte_class ()");
+			case TypeCode.Int16:
+				return string.Format (arrayCreator, "mono_get_int16_class ()");
+			case TypeCode.Int32:
+				return string.Format (arrayCreator, "mono_get_int32_class ()");
+			case TypeCode.Int64:
+				return string.Format (arrayCreator, "mono_get_int64_class ()");
+			case TypeCode.Byte:
+				return string.Format (arrayCreator, "mono_get_byte_class ()");
+			case TypeCode.UInt16:
+				return string.Format (arrayCreator, "mono_get_uint16_class ()");
+			case TypeCode.UInt32:
+				return string.Format (arrayCreator, "mono_get_uint32_class ()");
+			case TypeCode.UInt64:
+				return string.Format (arrayCreator, "mono_get_uint64_class ()");
+			case TypeCode.Single:
+				return string.Format (arrayCreator, "mono_get_single_class ()");
+			case TypeCode.Double:
+				return string.Format (arrayCreator, "mono_get_double_class ()");
+			case TypeCode.Object:
+				return string.Format (arrayCreator, $"{NameGenerator.GetObjCName (type)}_class");
+			default:
+				throw new NotImplementedException ($"Converting type {type.FullName} to mono class");
+			}
 		}
 	}
 }

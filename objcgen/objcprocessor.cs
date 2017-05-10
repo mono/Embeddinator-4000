@@ -36,6 +36,9 @@ namespace ObjC {
 			if (t.IsByRef)
 				return IsSupported (t.GetElementType ());
 
+			if (t.IsArray)
+				return IsSupported (t.GetElementType ());
+
 			if (unsupported.Contains (t))
 				return false;
 
@@ -126,6 +129,7 @@ namespace ObjC {
 		}
 
 		internal Dictionary<Type,MethodInfo> icomparable = new Dictionary<Type, MethodInfo> ();
+		internal Dictionary<Type, MethodInfo> iequatable = new Dictionary<Type, MethodInfo> ();
 		internal Dictionary<Type, MethodInfo> equals = new Dictionary<Type, MethodInfo> ();
 		internal Dictionary<Type, MethodInfo> hashes = new Dictionary<Type, MethodInfo> ();
 		HashSet<MemberInfo> members_with_default_values = new HashSet<MemberInfo> ();
@@ -156,6 +160,11 @@ namespace ObjC {
 
 				if (mi.Match ("System.Boolean", "Equals", "System.Object")) {
 					equals.Add (t, mi);
+					continue;
+				} 
+
+				if (implement_system_iequatable_t && mi.Match ("System.Boolean", "Equals", new string [] { null })) {
+					iequatable [t] = mi;
 					continue;
 				}
 
@@ -239,6 +248,7 @@ namespace ObjC {
 		// special cases
 		bool implement_system_icomparable;
 		bool implement_system_icomparable_t;
+		bool implement_system_iequatable_t;
 		bool extension_type;
 
 
@@ -294,6 +304,7 @@ namespace ObjC {
 
 			implement_system_icomparable = t.Implements ("System", "IComparable");
 			implement_system_icomparable_t = t.Implements("System", "IComparable`1");
+			implement_system_iequatable_t = t.Implements ("System", "IEquatable`1");
 
 			var constructors = GetConstructors (t).OrderBy ((arg) => arg.ParameterCount).ToList ();
 			var processedConstructors = PostProcessConstructors (constructors).ToList ();

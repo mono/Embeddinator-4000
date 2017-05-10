@@ -1,27 +1,10 @@
 # Getting started with iOS
 
-This is the getting started page for iOS.
-
-*Working for tvOS or watchOS is very similar to iOS. You should start with the iOS instructions and then apply them to your platform of choice.*
-
 ## Requirements
 
-In order to use the embeddinator to generate bindings for iOS you'll need a Mac running:
+In addition to the requirements from our [Getting started with Objective-C](getting-started-objective-c.md) guide you'll also need:
 
-* macOS 10.12 (Sierra) or later
-* Xcode 8.3.2 or later
-* [Mono 5.0](http://www.mono-project.com/download/beta/) _presently in beta_ or later
-* [Xamarin.iOS](https://jenkins.mono-project.com/view/Xamarin.MaciOS/job/xamarin-macios-builds-master/) from our _master_ branch.
-
-Optionally you can install [Xamarin Studio](https://developer.xamarin.com/guides/cross-platform/xamarin-studio/)
-or the new [Visual Studio for Mac](https://www.visualstudio.com/vs/visual-studio-mac/)
-to edit and compile your C# code. The rest of the getting started
-guide assume you'll be using **Visual Studio for Mac**.
-
-Notes:
-
-* Earlier versions of macOS, Xcode and Mono _might_ work, but are untested and unsupported;
-* Code generation can be done on Windows, but it is only possible to compile it on a Mac computer where Xcode is installed;
+* [Xamarin.iOS 10.11+](https://jenkins.mono-project.com/view/Xamarin.MaciOS/job/xamarin-macios-builds-master/) from our _master_ branch.
 
 ## Hello world
 
@@ -52,20 +35,26 @@ Run the embeddinator to create a native framework for the managed assembly:
 
 ```shell
 cd ~/Projects/hello-from-csharp
-/Library/Frameworks/Xamarin.Embeddinator-4000.framework/Commands/objcgen ~/Projects/hello-from-csharp/hello-from-csharp/bin/Debug/hello-from-csharp.dll --target=framework --platform=iOS --outdir=output -c --debug
+objcgen ~/Projects/hello-from-csharp/hello-from-csharp/bin/Debug/hello-from-csharp.dll --target=framework --platform=iOS --outdir=output -c --debug
 ```
 
 The framework will be placed in `~/Projects/hello-from-csharp/output/hello-from-csharp.framework`.
 
 ### Use the generated output in an Xcode project
 
-Open Xcode and create a new iOS Single View Application, name it `hello-from-csharp`.
+Open Xcode and create a new iOS Single View Application, name it `hello-from-csharp` and select the **Objective-C** language.
 
 Open the `~/Projects/hello-from-csharp/output` directory in Finder, select `hello-from-csharp.framework`, drag it to the Xcode project and drop it just above the `hello-from-csharp` folder in the project.
 
+![Drag and drop framework](hello-from-csharp-ios-drag-drop-framework.png)
+
 Make sure `Copy items if needed` is checked in the dialog that pops up, and click `Finish`.
 
-In the project's General tab, add `hello-from-csharp.framework` as an Embedded Binary.
+![Copy items if needed](hello-from-csharp-ios-copy-items-if-needed.png)
+
+Select the `hello-from-csharp` project and navigate to the `hello-from-csharp` target's **General tab**. In the **Embedded Binary** section, add `hello-from-csharp.framework`.
+
+![Embedded binaries](hello-from-csharp-ios-embedded-binaries.png)
 
 Open ViewController.m, and replace the contents with:
 

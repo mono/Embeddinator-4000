@@ -323,6 +323,7 @@
     <Compile Include="protocolhelper.cs" />
     <Compile Include="NameGenerator.cs" />
     <Compile Include="processor.cs" />
+    <Compile Include="system-check.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="support\" />
@@ -364,11 +365,14 @@
       <Link>support\objc-support.m</Link>
       <LogicalName>objc-support.m</LogicalName>
     </EmbeddedResource>
+    <EmbeddedResource Include="Make.config">
+      <LogicalName>Make.config</LogicalName>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-    <None Include="..\docs\error.md">
-      <Link>error.md</Link>
+    <None Include="..\docs\errors.md">
+      <Link>errors.md</Link>
     </None>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

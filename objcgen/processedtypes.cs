@@ -120,6 +120,11 @@ namespace Embeddinator {
 		public string ObjCSignature { get; set; }
 		public string MonoSignature { get; set; }
 
+		public ProcessedMemberBase ()
+		{
+			FirstDefaultParameter = -1;
+		}
+
 		public abstract void ComputeSignatures (Processor p);
 	}
 
@@ -154,7 +159,7 @@ namespace Embeddinator {
 			// FIXME this is a quite crude hack waiting for a correct move of the signature code
 			string objcsig;
 			string monosig;
-			(p as ObjCProcessor).GetSignatures (BaseName, Method.Name, Method, Method.GetParameters (), FallBackToTypeName, false, out objcsig, out monosig);
+			(p as ObjCProcessor).GetSignatures (this, BaseName, Method.Name, Method, Method.GetParameters (), false, out objcsig, out monosig);
 			ObjCSignature = objcsig;
 			MonoSignature = monosig;
 		}
@@ -197,7 +202,7 @@ namespace Embeddinator {
 			// FIXME this is a quite crude hack waiting for a correct move of the signature code
 			string objcsig;
 			string monosig;
-			(p as ObjCProcessor).GetSignatures (Constructor.ParameterCount == 0 ? "init" : "initWith", Constructor.Name, Constructor, Constructor.GetParameters (), FallBackToTypeName, false, out objcsig, out monosig);
+			(p as ObjCProcessor).GetSignatures (this, Constructor.ParameterCount == 0 ? "init" : "initWith", Constructor.Name, Constructor, Constructor.GetParameters (), false, out objcsig, out monosig);
 			ObjCSignature = objcsig;
 			MonoSignature = monosig;
 		}

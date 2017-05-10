@@ -10,17 +10,20 @@ namespace Embeddinator
 	{
 		delegate IEnumerable<MethodInfo> CustomOperationAction (OperatorInfo info, IEnumerable<MethodInfo> methods, IEnumerable<MethodInfo> equals);
 
-		struct OperatorInfo
+		class OperatorInfo
 		{
 			public string MetadataName { get; set; }
 			public string FriendlyName { get; set; }
+			public string ObjCName { get; set; }
+
 			public int ArgumentCount { get; set; }
 			public CustomOperationAction CustomAction { get; set; }
 
-			public OperatorInfo (string metadataName, string friendlyName, int argumentCount, CustomOperationAction customAction = null)
+			public OperatorInfo (string metadataName, string friendlyName, string objcName, int argumentCount, CustomOperationAction customAction = null)
 			{
 				MetadataName = metadataName;
 				FriendlyName = friendlyName;
+				ObjCName = objcName;
 				ArgumentCount = argumentCount;
 				CustomAction = customAction;
 			}
@@ -28,25 +31,46 @@ namespace Embeddinator
 			public bool Contains (string name) => MetadataName == name || FriendlyName == name;
 		}
 
+		public static string GetObjCName (string name, int argCount)
+		{
+			OperatorInfo match = OperatorMapping.FirstOrDefault (x => x.MetadataName == name || x.FriendlyName == name);
+			if (match != null && argCount == match.ArgumentCount)
+				return match.ObjCName;
+			return null;
+		}
+
+		public static bool MatchesOperatorFriendlyName (MethodInfo method)
+		{
+			OperatorInfo possibleMatch = OperatorMapping.FirstOrDefault (x => x.FriendlyName == method.Name && x.ArgumentCount == method.ParameterCount);
+			if (possibleMatch != null) {
+				// To be considered a "friendly" operator it must have first argument and return its type
+				// TODO - Is there a better huristic
+				var param = method.GetParameters ();
+				if (method.ReturnType == method.DeclaringType && param[0].ParameterType == method.DeclaringType)
+					return true;
+			}
+			return false;
+		}
+
 		// From https://msdn.microsoft.com/en-us/library/ms229032(v=vs.110).aspx and https://msdn.microsoft.com/en-us/library/8edha89s.aspx
 		// with ambigious elements and non-overridable elements removed
 		static List<OperatorInfo> OperatorMapping = new List<OperatorInfo>() { 
-			new OperatorInfo ("op_Addition", "Add", 2),
-			new OperatorInfo ("op_Subtraction", "Subtract", 2),
-			new OperatorInfo ("op_Multiply", "Multiply", 2),
-			new OperatorInfo ("op_Division", "Divide", 2),
-			new OperatorInfo ("op_ExclusiveOr", "Xor", 2),
-			new OperatorInfo ("op_BitwiseAnd", "BitwiseAnd", 2),
-			new OperatorInfo ("op_BitwiseOr", "BitwiseOr", 2),
-			new OperatorInfo ("op_LeftShift", "LeftShift", 2),
-			new OperatorInfo ("op_RightShift", "RightShift", 2),
-			new OperatorInfo ("op_Decrement", "Decrement", 1),
-			new OperatorInfo ("op_Increment", "Increment", 1),
-			new OperatorInfo ("op_UnaryNegation", "Negate", 1),
-			new OperatorInfo ("op_UnaryPlus", "Plus", 1),
-			new OperatorInfo ("op_OnesComplement", "OnesComplement" , 1),
-			new OperatorInfo ("op_Equality", "Equals" , 2, HandleEquals),
-			new OperatorInfo ("op_Inequality", "" , 2, HandleEquals),
+			new OperatorInfo ("op_Addition", "Add", "add", 2),
+			new OperatorInfo ("op_Subtraction", "Subtract", "subtract", 2),
+			new OperatorInfo ("op_Multiply", "Multiply", "multiply", 2),
+			new OperatorInfo ("op_Division", "Divide", "divide", 2),
+			new OperatorInfo ("op_ExclusiveOr", "Xor", "xor", 2),
+			new OperatorInfo ("op_BitwiseAnd", "BitwiseAnd", "bitwiseAnd", 2),
+			new OperatorInfo ("op_BitwiseOr", "BitwiseOr", "bitwiseOr", 2),
+			new OperatorInfo ("op_LeftShift", "LeftShift", "leftShift", 2),
+			new OperatorInfo ("op_RightShift", "RightShift", "rightShift", 2),
+			new OperatorInfo ("op_Decrement", "Decrement", "decrement", 1),
+			new OperatorInfo ("op_Increment", "Increment", "increment", 1),
+			new OperatorInfo ("op_UnaryNegation", "Negate", "negate", 1),
+			new OperatorInfo ("op_UnaryPlus", "Plus", "plus", 1),
+			new OperatorInfo ("op_OnesComplement", "OnesComplement", "onesComplement", 1),
+			new OperatorInfo ("op_Equality", "Equals", "areEqual", 2, HandleEquals),
+			new OperatorInfo ("op_Inequality", "", "", 2, HandleEquals),
 		};
 
 		// We will be asking if a method is possibly an operator often in a loop, so cache

@@ -2,7 +2,7 @@ all: bin/Debug/objcgen.exe shellcheck
 
 -include Make.config.inc
 
-PACKAGE_VERSION=0.1.0
+PACKAGE_VERSION=0.2.0
 PACKAGE_FULLVERSION=$(PACKAGE_VERSION).$(COMMIT_DISTANCE)
 
 Make.config.inc: Makefile
@@ -26,12 +26,16 @@ else
 	$(SHELLCHECK) $^
 endif
 
-FRAMEWORK_DIR = _build/Library/Frameworks/Xamarin.Embeddinator-4000.framework
+E4K_FRAMEWORK_DIR = /Library/Frameworks/Xamarin.Embeddinator-4000.framework
+FRAMEWORK_DIR = _build/$(E4K_FRAMEWORK_DIR)
+PATHS_DIR = _build/etc/paths.d
 INSTALLER_FILES = Xamarin.Embeddinator-4000-$(PACKAGE_FULLVERSION).pkg
 
 package:: bin/Debug/objcgen.exe Make.config.inc
 	mkdir -p $(FRAMEWORK_DIR)/Commands/
 	mkdir -p $(FRAMEWORK_DIR)/Versions/$(PACKAGE_FULLVERSION)/bin
+	mkdir -p $(PATHS_DIR)
+	echo "${E4K_FRAMEWORK_DIR}/Commands" >> "${PATHS_DIR}/embeddinator-4000-commands"
 	ln -fs $(PACKAGE_FULLVERSION) $(FRAMEWORK_DIR)/Versions/Current
 	cp bin/Debug/objcgen.{exe,pdb} $(FRAMEWORK_DIR)/Versions/Current/bin/
 	cp bin/Debug/Mono.Options.dll $(FRAMEWORK_DIR)/Versions/Current/bin/

@@ -76,6 +76,14 @@ The most likely cause is that an assembly is specified more than once on the com
 
 The tool could not find the assembly 'X', referenced by the assembly 'Y'. Please make sure all referenced assemblies are in the same directory as the assembly to be bound.
 
+<h3><a name="EM0014"/>EM0014: Could not find {product} ({product} {min_version} is required).</h3>
+
+The dependency mentioned in the error message could not be found on the system.
+
+<h3><a name="EM0015"/>EM0015: Could not find a valid version of {product} (found {version}, but at least {min_version} is required).</h3>
+
+The dependency mentioned in the error message was found on the system, but it's too old. Please update to a newer version.
+
 <h3><a name="EM0099"/>EM0099: Internal error *. Please file a bug report with a test case (https://github.com/mono/Embeddinator-4000/issues).</h3>
 
 This error message is reported when an internal consistency check in the Embeddinator-4000 fails.
