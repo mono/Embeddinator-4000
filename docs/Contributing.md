@@ -5,6 +5,36 @@ The **Embeddinator-4000** project is under the Mono umbrella and most of the [co
 * Bug reporting: Issues and enhancement requests are presently tracked in [github](https://github.com/mono/Embeddinator-4000/issues) (not bugzilla).
 * Chat: https://gitter.im/managed-interop
 
+## C/Java
+
+The work on the C and Java generators occurs in the [`master`](https://github.com/mono/Embeddinator-4000/tree/master) branch. Here are the steps to build it from our repository/branch:
+
+```
+> git clone https://github.com/mono/Embeddinator-4000.git
+> cd Embeddinator-4000
+> git branch master
+> git pull && git submodule update --init --recursive
+```
+
+Then, if you prefer the command line, you can either:
+
+`> msbuild build/MonoEmbeddinator4000.sln`
+
+or run the provided compilation shell script:
+
+`> build/Compile.sh`
+
+If you're more GUI oriented, you can open the solution file at `build/MonoEmbeddinator4000.sln` and hit F5 to build it.
+
+Once complete you should be able to run the tool with
+
+```
+$ mono build/lib/Debug/MonoEmbeddinator4000.exe
+```
+
+Tests can be executed by running `make` from the `tests/common` directory.
+
+Or running the `tests/RunTestsuite.sh` shell script.
 
 ## Objective-C
 
