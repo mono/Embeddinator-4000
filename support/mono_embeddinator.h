@@ -86,15 +86,16 @@ MonoImage* mono_embeddinator_load_assembly(mono_embeddinator_context_t* ctx,
 MONO_EMBEDDINATOR_API
 char* mono_embeddinator_search_assembly(const char* assembly);
 
-/** Represents the assembly search hook function type. */
-typedef const char* (*mono_embeddinator_assembly_search_hook_t)(const char*);
+/** Represents the assembly load hook function type */
+typedef MonoAssembly * (*mono_embeddinator_assembly_load_hook_t)(const char *);
 
 /**
- * Installs an hook that returns the path to the given managed assembly.
- * Returns the previous installed hook.
+ * Installs an hook that loads the given managed assembly (or NULL if the assembly can't be found).
+ * Returns the previously installed hook.
  */
 MONO_EMBEDDINATOR_API
-void* mono_embeddinator_install_assembly_search_hook(mono_embeddinator_assembly_search_hook_t hook);
+mono_embeddinator_assembly_load_hook_t mono_embeddinator_install_assembly_load_hook(mono_embeddinator_assembly_load_hook_t hook);
+
 
 /** 
  * Searches and returns for the Mono class in the given assembly.

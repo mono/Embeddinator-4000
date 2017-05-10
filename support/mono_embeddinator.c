@@ -152,16 +152,27 @@ char* mono_embeddinator_search_assembly(const char* assembly)
     return data;
 }
 
+static mono_embeddinator_assembly_load_hook_t g_assembly_load_hook = NULL;
+
 MonoImage* mono_embeddinator_load_assembly(mono_embeddinator_context_t* ctx, const char* assembly)
 {
     char *path = NULL;
+    MonoAssembly *mono_assembly = NULL;
+
+    if (g_assembly_load_hook) {
+        mono_assembly = g_assembly_load_hook (assembly);
+
+        if (mono_assembly)
+            return mono_assembly_get_image (mono_assembly);
+    }
 
 #if defined (XAMARIN_IOS) || defined (XAMARIN_MAC)
-    MonoAssembly *mono_assembly = xamarin_open_assembly (assembly);
+    mono_assembly = xamarin_open_assembly (assembly);
 #else
+
     path = mono_embeddinator_search_assembly(assembly);
 
-    MonoAssembly* mono_assembly = mono_domain_assembly_open(ctx->domain, path);
+    mono_assembly = mono_domain_assembly_open (ctx->domain, path);
 #endif
 
     if (!mono_assembly)
@@ -183,14 +194,12 @@ MonoImage* mono_embeddinator_load_assembly(mono_embeddinator_context_t* ctx, con
     return mono_assembly_get_image(mono_assembly);
 }
 
-static mono_embeddinator_assembly_search_hook_t g_assembly_search_hook = 0;
-
-void* mono_embeddinator_install_assembly_search_hook(mono_embeddinator_assembly_search_hook_t hook)
+mono_embeddinator_assembly_load_hook_t
+mono_embeddinator_install_assembly_load_hook(mono_embeddinator_assembly_load_hook_t hook)
 {
-    mono_embeddinator_assembly_search_hook_t prev = g_assembly_search_hook;
-    g_assembly_search_hook = hook;
-
-    return (void*)prev;
+    mono_embeddinator_assembly_load_hook_t prev = g_assembly_load_hook;
+    g_assembly_load_hook = hook;
+    return prev;
 }
 
 MonoClass* mono_embeddinator_search_class(const char* assembly, const char* _namespace,
