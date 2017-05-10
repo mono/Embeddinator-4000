@@ -567,10 +567,7 @@ namespace ObjC {
 				implementation.Indent++;
 				implementation.WriteLine ($"continue;");
 				implementation.Indent--;
-				implementation.WriteLine ("else");
-				implementation.Indent++;
-				implementation.WriteLine ($"mono_array_set ({pnameArr}, MonoDecimal, {pnameIdx}, mono_embeddinator_get_monodecimal ({pnameRet}, &__mono_context));");
-				implementation.Indent--;
+				implementation.WriteLine ($"mono_array_set ({pnameArr}, MonoDecimal, {pnameIdx}, mono_embeddinator_get_system_decimal ({pnameRet}, &__mono_context));");
 				break;
 			case TypeCode.String:
 				implementation.WriteLine ($"NSString* {pnameRet} = {parameterName}[{pnameIdx}];");
@@ -647,7 +644,7 @@ namespace ObjC {
 					implementation.WriteLine ($"{argumentName} = {paramaterName} ? mono_string_new (__mono_context.domain, [{paramaterName} UTF8String]) : nil;");
 				break;
 			case TypeCode.Decimal:
-				implementation.WriteLine ($"MonoDecimal __mdec = mono_embeddinator_get_monodecimal ({(is_by_ref ? "*" : string.Empty)}{paramaterName}, &__mono_context);");
+				implementation.WriteLine ($"MonoDecimal __mdec = mono_embeddinator_get_system_decimal ({(is_by_ref ? "*" : string.Empty)}{paramaterName}, &__mono_context);");
 				implementation.WriteLine ($"{argumentName} = &__mdec;");
 				if (is_by_ref)
 					post.AppendLine ($"*{paramaterName} = mono_embeddinator_get_nsdecimalnumber (&__mdec);");

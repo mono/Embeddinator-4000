@@ -118,7 +118,7 @@ NSDecimalNumber* mono_embeddinator_get_nsdecimalnumber (void* unboxedresult)
 	return nsdecresult;
 }
 
-MonoDecimal mono_embeddinator_get_monodecimal (NSDecimalNumber* nsdecimalnumber, mono_embeddinator_context_t* context)
+MonoDecimal mono_embeddinator_get_system_decimal (NSDecimalNumber* nsdecimalnumber, mono_embeddinator_context_t* context)
 {
 	static MonoMethod* decimalparsemethod = nil;
 

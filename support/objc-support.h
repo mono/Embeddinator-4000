@@ -49,7 +49,7 @@ MONO_EMBEDDINATOR_API
 NSDecimalNumber* mono_embeddinator_get_nsdecimalnumber (void* __unboxedresult);
 
 MONO_EMBEDDINATOR_API
-MonoDecimal mono_embeddinator_get_monodecimal (NSDecimalNumber* nsdecimalnumber, mono_embeddinator_context_t* context);
+MonoDecimal mono_embeddinator_get_system_decimal (NSDecimalNumber* nsdecimalnumber, mono_embeddinator_context_t* context);
 
 MONO_EMBEDDINATOR_END_DECLS
 	
