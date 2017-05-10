@@ -84,7 +84,7 @@ namespace ExecutionTests
 			if (devices.Count == 0)
 				return string.Empty;
 			
-			devices.Sort (StringComparer.Ordinal); // Sord devices all applicable devices so the same test run always runs on the same device.
+			devices.Sort (StringComparer.Ordinal); // Sort all applicable devices so the same test run always runs on the same device.
 			return devices [0];
 		}
 
