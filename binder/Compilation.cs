@@ -317,19 +317,37 @@ namespace MonoEmbeddinator4000
 
         bool initXamarinAndroidTools = false;
 
+        string GetJavaSdkPath()
+        {
+            if (Options.Compilation.Platform == TargetPlatform.Android)
+                return AndroidSdk.JavaSdkPath;
+
+            if (Platform.IsWindows)
+                return Environment.GetEnvironmentVariable("JAVA_HOME");
+
+            // If we are running on macOS, invoke java_home to figure out Java path.
+            if (Platform.IsMacOS)
+                return Invoke("/usr/libexec/java_home", null, null);
+
+            return Environment.GetEnvironmentVariable("JAVA_HOME");
+        }
+
         void CompileJava(IEnumerable<string> files)
         {
-            if (!initXamarinAndroidTools)
+            if (Options.Compilation.Platform == TargetPlatform.Android)
             {
-                AndroidLogger.Info += AndroidLogger_Info;
-                AndroidLogger.Error += AndroidLogger_Error;
-                initXamarinAndroidTools = true;
+                if (!initXamarinAndroidTools)
+                {
+                    AndroidLogger.Info += AndroidLogger_Info;
+                    AndroidLogger.Error += AndroidLogger_Error;
+                    initXamarinAndroidTools = true;
+                }
+
+                AndroidSdk.Refresh();
             }
 
-            AndroidSdk.Refresh();
-
             var executableSuffix = Platform.IsWindows ? ".exe" : string.Empty;
-            var javac = $"{Path.Combine(AndroidSdk.JavaSdkPath, "bin", "javac" + executableSuffix)}";
+            var javac = $"{Path.Combine(GetJavaSdkPath(), "bin", "javac" + executableSuffix)}";
 
             var args = new List<string> {
                 string.Join(" ", files.Select(file => Path.GetFullPath(file)))
@@ -339,7 +357,6 @@ namespace MonoEmbeddinator4000
                 args.Add("-g");
 
             var invocation = string.Join(" ", args);
-
             Invoke(javac, invocation);
         }
 
