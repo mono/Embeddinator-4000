@@ -429,8 +429,18 @@ namespace Embeddinator {
 					var common_options = new StringBuilder ("clang ");
 					if (Debug)
 						common_options.Append ("-g -O0 ");
-					else
-						common_options.Append ("-O2 -DTOKENLOOKUP ");
+					else {
+						common_options.Append ("-O2 ");
+						if (Platform == Platform.macOS) {
+							// Token lookup only works if the linker isn't involved.
+							// If the linker is enabled, all assemblies are loaded and re-saved
+							// (even if only linking SDK assemblies), which means metadata
+							// tokens may change even for non-linked assemblies. So completely 
+							// disable token lookup for platforms that uses the linker (all platforms
+							// except macOS).
+							common_options.Append ("-DTOKENLOOKUP ");
+						}
+					}
 					common_options.Append ("-fobjc-arc ");
 					common_options.Append ("-ObjC ");
 					common_options.Append ("-Wall ");
