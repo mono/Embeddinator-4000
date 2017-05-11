@@ -32,4 +32,5 @@ More languages will come later.
 To get started, check one of our guides for each of the currently
 supported languages:
 
+* [C](getting-started-c): covers C language on desktop platforms.
 * [Objective-C](getting-started-objective-c): covers macOS and iOS.
