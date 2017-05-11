@@ -9,7 +9,7 @@ In order to use the embeddinator with Objective-C you'll need a Mac running:
 
 * macOS 10.12 (Sierra) or later
 * Xcode 8.3.2 or later
-* [Mono 5.0](http://www.mono-project.com/download/beta/) _presently in beta_
+* [Mono 5.0](http://www.mono-project.com/download/)
 
 Optionally you can install [Xamarin Studio](https://developer.xamarin.com/guides/cross-platform/xamarin-studio/) or the new [Visual Studio for Mac](https://www.visualstudio.com/vs/visual-studio-mac/) to edit and compile your C# code. The rest of the getting started guide assume you'll be using **Visual Studio for Mac**.
 
@@ -24,7 +24,8 @@ Notes:
 
 Your next step is to download and install the embeddinator on your Mac.
 
-**add link**
+* [Package](dl.xamarin.com/embeddinator/Xamarin.Embeddinator-4000-0.1.0.28.pkg)
+* [Release Notes](releases/Embeddinator-4000_0.1.md)
 
 As an alternative it is possible to build it from our [git repository](https://github.com/mono/Embeddinator-4000/tree/objc), see the [contributing](Contributing.md) document for instructions.
 
