@@ -84,6 +84,10 @@ The dependency mentioned in the error message could not be found on the system.
 
 The dependency mentioned in the error message was found on the system, but it's too old. Please update to a newer version.
 
+<h3><a name="EM0016">EM0016: Could not create symlink '{file}' -> '{target}': error {number}</h3>
+
+Could not create the symlink mentioned in the error message.
+
 <h3><a name="EM0099"/>EM0099: Internal error *. Please file a bug report with a test case (https://github.com/mono/Embeddinator-4000/issues).</h3>
 
 This error message is reported when an internal consistency check in the Embeddinator-4000 fails.

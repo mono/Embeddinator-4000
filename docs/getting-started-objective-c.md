@@ -39,7 +39,7 @@ Otherwise you can always run the tool via its absolute path: `/Library/Framework
 
 ## Platforms
 
-Objective-C is a language that is most commonly used to write applications for macOS, iOS, tvOS and watchOS; and the embeddinator supports all of those platforms. Working with each platform implies some key differences and is best explained separately.
+Objective-C is a language that is most commonly used to write applications for macOS, iOS, tvOS and watchOS; and the embeddinator supports all of those platforms. Working with each platform implies some key differences and these are explained [here](objc-platforms.md).
 
 ### macOS
 
@@ -59,3 +59,4 @@ Please make sure you are already set up to develop iOS applications before tryin
 * [Embeddinator Limitations](Limitations.md)
 * [Contributing to the open source project](Contributing.md)
 * [Error codes and descriptions](errors.md)
+* [Target platforms](objc-platforms.md)

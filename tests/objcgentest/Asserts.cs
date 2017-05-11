@@ -33,6 +33,11 @@ namespace DriverTest
 		public static void RunProcess (string filename, string arguments, string message)
 		{
 			string stdout;
+			RunProcess (filename, arguments, out stdout, message);
+		}
+
+		public static void RunProcess (string filename, string arguments, out string stdout, string message)
+		{
 			int exitCode;
 			Console.WriteLine ($"{filename} {arguments}");
 			// We capture stderr too, otherwise it won't show up in the test unit pad's output.
@@ -44,5 +49,12 @@ namespace DriverTest
 			Assert.Fail ($"Executing '{filename} {arguments}' failed with exit code {exitCode}: {message}");
 		}
 
+		public static void Generate (string message, params string [] arguments)
+		{
+			var rv = Driver.Main2 (arguments);
+			if (rv == 0)
+				return;
+			Assert.Fail ($"Generation failed with exit code {rv}: {message}");
+		}
 	}
 }

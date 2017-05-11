@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "7E577A3C1E9E5A4B003FA392"
-               BuildableName = "libmanaged-ios.app"
-               BlueprintName = "libmanaged-ios"
-               ReferencedContainer = "container:libmanaged-ios.xcodeproj">
+               BuildableName = "%PROJECT_NAME%.app"
+               BlueprintName = "%PROJECT_NAME%"
+               ReferencedContainer = "container:%PROJECT_NAME%.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -33,9 +33,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "7E577A551E9E5A4C003FA392"
-               BuildableName = "libmanaged-iosTests.xctest"
-               BlueprintName = "libmanaged-iosTests"
-               ReferencedContainer = "container:libmanaged-ios.xcodeproj">
+               BuildableName = "Tests.xctest"
+               BlueprintName = "Tests"
+               ReferencedContainer = "container:%PROJECT_NAME%.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -43,9 +43,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "7E577A3C1E9E5A4B003FA392"
-            BuildableName = "libmanaged-ios.app"
-            BlueprintName = "libmanaged-ios"
-            ReferencedContainer = "container:libmanaged-ios.xcodeproj">
+            BuildableName = "%PROJECT_NAME%.app"
+            BlueprintName = "%PROJECT_NAME%"
+            ReferencedContainer = "container:%PROJECT_NAME%.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <AdditionalOptions>
@@ -66,9 +66,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "7E577A3C1E9E5A4B003FA392"
-            BuildableName = "libmanaged-ios.app"
-            BlueprintName = "libmanaged-ios"
-            ReferencedContainer = "container:libmanaged-ios.xcodeproj">
+            BuildableName = "%PROJECT_NAME%.app"
+            BlueprintName = "%PROJECT_NAME%"
+            ReferencedContainer = "container:%PROJECT_NAME%.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <AdditionalOptions>
@@ -85,9 +85,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "7E577A3C1E9E5A4B003FA392"
-            BuildableName = "libmanaged-ios.app"
-            BlueprintName = "libmanaged-ios"
-            ReferencedContainer = "container:libmanaged-ios.xcodeproj">
+            BuildableName = "%PROJECT_NAME%.app"
+            BlueprintName = "%PROJECT_NAME%"
+            ReferencedContainer = "container:%PROJECT_NAME%.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>
