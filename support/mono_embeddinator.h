@@ -186,4 +186,16 @@ void mono_embeddinator_init_object(MonoEmbedObject* object, MonoObject* instance
 MONO_EMBEDDINATOR_API
 void mono_embeddinator_destroy_object(MonoEmbedObject *object);
 
+/**
+ * Gets CultureInfo.InvariantCulture MonoObject.
+ */
+MONO_EMBEDDINATOR_API
+MonoObject* mono_embeddinator_get_cultureinfo_invariantculture_object ();
+
+/**
+ * Gets decimal MonoClass.
+ */
+MONO_EMBEDDINATOR_API
+MonoClass* mono_embeddinator_get_decimal_class ();
+
 MONO_EMBEDDINATOR_END_DECLS

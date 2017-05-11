@@ -41,6 +41,9 @@ namespace ObjC {
 		{
 			if (t.IsByRef) {
 				var et = t.GetElementType ();
+				if (Type.GetTypeCode (et) == TypeCode.Decimal) // This is boxed into NSDecimalNumber
+					return GetTypeName (et) + "_Nonnull * _Nullable";
+
 				return GetTypeName (et) + (et.IsValueType ? " " : " _Nonnull ") + "* _Nullable";
 			}
 
@@ -92,6 +95,8 @@ namespace ObjC {
 				return "unsigned long long";
 			case TypeCode.String:
 				return "NSString *";
+			case TypeCode.Decimal:
+				return "NSDecimalNumber *";
 			default:
 				throw new NotImplementedException ($"Converting type {t.Name} to a native type name");
 			}
@@ -147,6 +152,8 @@ namespace ObjC {
 				return "ulong";
 			case TypeCode.String:
 				return "string";
+			case TypeCode.Decimal:
+				return "System.Decimal";
 			default:
 				throw new NotImplementedException ($"Converting type {t.Name} to a mono type name");
 			}
@@ -176,6 +183,8 @@ namespace ObjC {
 					return $"NSArray<id<{GetObjCName (t)}>> *";
 
 				return $"NSArray<{GetObjCName (t)} *> *";
+			case TypeCode.Decimal:
+				return "NSArray <NSDecimalNumber *> *";
 			default:
 				throw new NotImplementedException ($"Converting type {t.Name} to a native type name");
 			}

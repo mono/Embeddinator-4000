@@ -365,6 +365,10 @@
       <Link>support\objc-support.m</Link>
       <LogicalName>objc-support.m</LogicalName>
     </EmbeddedResource>
+    <EmbeddedResource Include="..\support\linker.xml">
+      <Link>support\linker.xml</Link>
+      <LogicalName>linker.xml</LogicalName>
+    </EmbeddedResource>
     <EmbeddedResource Include="Make.config">
       <LogicalName>Make.config</LogicalName>
     </EmbeddedResource>

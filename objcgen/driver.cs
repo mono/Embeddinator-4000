@@ -549,6 +549,9 @@ namespace Embeddinator {
 						mtouch.Append ("--dsym:false ");
 						mtouch.Append ("--msym:false ");
 						mtouch.Append ($"--embeddinator ");
+						// FIXME: we need to generate this XML file, issue #301
+						// https://github.com/mono/Embeddinator-4000/issues/301
+						mtouch.Append ($"--xml={Quote (Path.Combine (OutputDirectory, "linker.xml"))} ");
 						foreach (var asm in Assemblies)
 							mtouch.Append (Quote (Path.GetFullPath (asm.Location))).Append (" ");
 						mtouch.Append ($"-r:{GetPlatformAssembly ()} ");

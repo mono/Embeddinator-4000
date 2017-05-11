@@ -87,3 +87,19 @@ public class MyException : Exception {
 // objc: this type won't be generated (subclassing an unsupported type) but the generation will succeed (with warnings)
 public class MyNextException : MyException {
 }
+
+public static class Type_Decimal {
+	public static decimal Max { get; } = decimal.MaxValue;
+	public static decimal Min { get; } = decimal.MinValue;
+	public static decimal Zero { get; } = decimal.Zero;
+	public static decimal One { get; } = decimal.One;
+	public static decimal MinusOne { get; } = decimal.MinusOne;
+	public static decimal Pi { get; } = 3.14159265358979323846264m;
+	public static decimal MinusTau { get; } = -6.28318530717958647692m;
+	public static decimal FortyTwo { get; } = 42m;
+	public static decimal [] DecArr { get; } = { Max, Min, Zero, One, MinusOne, Pi, MinusTau, FortyTwo };
+
+	public static decimal GetDecimal (decimal dec) => dec;
+	public static void GetRefPi (ref decimal dec) => dec = Pi;
+	public static decimal [] GetDecimalArr (decimal [] dec) => dec;
+}

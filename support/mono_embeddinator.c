@@ -289,3 +289,28 @@ void mono_embeddinator_destroy_object(MonoEmbedObject* object)
     mono_gchandle_free (object->_handle);
     g_free (object);
 }
+
+MonoObject* mono_embeddinator_get_cultureinfo_invariantculture_object ()
+{
+    static MonoObject* invariantculture = nil;
+    if (!invariantculture) {
+        MonoClass* klass = mono_class_from_name (mono_get_corlib (), "System.Globalization", "CultureInfo");
+        const char mname [] = "System.Globalization:get_InvariantCulture()";
+        MonoMethod* method = mono_embeddinator_lookup_method (mname, klass);
+        MonoObject* ex = nil;
+        invariantculture = mono_runtime_invoke (method, nil, nil, &ex);
+        if (ex) {
+            mono_embeddinator_throw_exception (ex);
+        }
+    }
+    return invariantculture;
+}
+
+MonoClass* mono_embeddinator_get_decimal_class ()
+{
+    static MonoClass* decimalclass = nil;
+    if (!decimalclass) {
+        decimalclass = mono_class_from_name (mono_get_corlib (), "System", "Decimal");
+    }
+    return decimalclass;
+}
