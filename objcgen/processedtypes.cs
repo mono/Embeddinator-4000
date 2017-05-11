@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-//using System.Linq;
+using System.Text;
 
 using IKVM.Reflection;
 using Type = IKVM.Reflection.Type;
@@ -58,10 +58,7 @@ namespace Embeddinator {
 			return a?.Assembly != b?.Assembly;
 		}
 
-		public override string ToString ()
-		{
-			return Assembly.ToString ();
-		}
+		public override string ToString () => Assembly.ToString ();
 	}
 
 	public class ProcessedType {
@@ -107,10 +104,7 @@ namespace Embeddinator {
 			return false;
 		}
 
-		public override string ToString ()
-		{
-			return Type.ToString ();
-		}
+		public override string ToString () => Type.ToString ();
 	}
 
 	public abstract class ProcessedMemberBase {
@@ -126,6 +120,28 @@ namespace Embeddinator {
 		}
 
 		public abstract void ComputeSignatures (Processor p);
+
+		// this format can be consumed by the linker xml files
+		// adapted from ikvm reflection and cecil source code
+		// FIXME: double check when we implement generics support
+		public string ToString (MethodBase m)
+		{
+			StringBuilder sb = new StringBuilder ();
+			var mi = m as MethodInfo;
+			if (mi != null)
+				sb.Append (mi.ReturnType.FullName).Append (' ');
+			else
+				sb.Append ("System.Void "); // ConstructorInfo
+			sb.Append (m.Name);
+			sb.Append ('(');
+			var sep = String.Empty;
+			foreach (var p in m.GetParameters ()) {
+				sb.Append (sep).Append (p.ParameterType);
+				sep = ",";
+			}
+			sb.Append (')');
+			return sb.ToString();
+		}
 	}
 
 	public enum MethodType {
@@ -163,6 +179,8 @@ namespace Embeddinator {
 			ObjCSignature = objcsig;
 			MonoSignature = monosig;
 		}
+
+		public override string ToString () => ToString (Method);
 	}
 
 	public class ProcessedProperty: ProcessedMemberBase {
@@ -177,6 +195,8 @@ namespace Embeddinator {
 		{
 			throw new NotImplementedException ();
 		}
+
+		public override string ToString () => Property.ToString ();
 	}
 
 	public enum ConstructorType {
@@ -207,10 +227,7 @@ namespace Embeddinator {
 			MonoSignature = monosig;
 		}
 
-		public override string ToString ()
-		{
-			return Constructor.ToString ();
-		}
+		public override string ToString () => ToString (Constructor);
 	}
 
 	public class ProcessedFieldInfo : ProcessedMemberBase {
@@ -229,5 +246,8 @@ namespace Embeddinator {
 		{
 			throw new NotImplementedException ();
 		}
+
+		// linker compatible signature
+		public override string ToString () => Field.FieldType.FullName + " " + Field.Name;
 	}
 }

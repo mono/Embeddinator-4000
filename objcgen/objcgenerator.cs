@@ -1199,17 +1199,12 @@ namespace ObjC {
 			}
 		}
 
-		void WriteFile (string name, string content)
-		{
-			Console.WriteLine ($"\tGenerated: {name}");
-			File.WriteAllText (name, content);
-		}
-
 		public override void Write (string outputDirectory)
 		{
 			WriteFile (Path.Combine (outputDirectory, "bindings.h"), headers.ToString ());
 			WriteFile (Path.Combine (outputDirectory, "bindings-private.h"), private_headers.ToString ());
 			WriteFile (Path.Combine (outputDirectory, "bindings.m"), implementation.ToString ());
+			base.Write (outputDirectory);
 		}
 
 		public static string FormatRawValue (Type t, object o)

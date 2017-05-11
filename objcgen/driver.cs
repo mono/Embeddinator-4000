@@ -149,6 +149,8 @@ namespace Embeddinator {
 
 		public bool Shared { get { return CompilationTarget == CompilationTarget.SharedLibrary; } }
 
+		public bool EnableLinker { get; set; }
+
 		public string LibraryName { get; set; }
 
 		public List<string> ABIs { get; private set; } = new List<string> ();
@@ -161,27 +163,34 @@ namespace Embeddinator {
 			case "macos":
 			case "mac":
 				Platform = Platform.macOS;
+				EnableLinker = false;
 				break;
 			case "macosmodern":
 			case "macos-modern":
 				Platform = Platform.macOSModern;
+				EnableLinker = true;
 				break;
 			case "macosfull":
 			case "macos-full":
 				Platform = Platform.macOSFull;
+				EnableLinker = false;
 				break;
 			case "macossystem":
 			case "macos-system":
 				Platform = Platform.macOSSystem;
+				EnableLinker = false;
 				break;
 			case "ios":
 				Platform = Platform.iOS;
+				EnableLinker = true;
 				break;
 			case "tvos":
 				Platform = Platform.tvOS;
+				EnableLinker = true;
 				break;
 			case "watchos":
 				Platform = Platform.watchOS;
+				EnableLinker = true;
 				break;
 			default:
 				throw new EmbeddinatorException (3, true, $"The platform `{platform}` is not valid.");
@@ -288,7 +297,10 @@ namespace Embeddinator {
 			p.Process (Assemblies);
 
 			Console.WriteLine ("Generating binding code...");
-			var g = new ObjCGenerator () { Processor = p };
+			var g = new ObjCGenerator () {
+				Processor = p,
+				GenerateLinkerExclusions = EnableLinker,
+			};
 			g.Generate ();
 			g.Write (OutputDirectory);
 
@@ -749,6 +761,7 @@ namespace Embeddinator {
 						mtouch.Append ($"-r:{GetPlatformAssembly ()} ");
 						mtouch.Append ($"--sdk {GetSdkVersion (build_info.Sdk.ToLower ())} ");
 						mtouch.Append ("--linksdkonly ");
+						mtouch.Append ($"--xml={Quote (Path.Combine (OutputDirectory, "bindings.xml"))} ");
 						mtouch.Append ("--registrar:static ");
 						mtouch.Append ($"--cache {Quote (cachedir)} ");
 						if (Debug)
