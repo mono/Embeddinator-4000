@@ -515,7 +515,7 @@ namespace ObjC {
 				Indent = 1
 			};
 			var typecode = Type.GetTypeCode (t);
-			var parrlenght = $"__p{parameterName}length";
+			var parrlength = $"__p{parameterName}length";
 			var presobj = $"__p{parameterName}resobj";
 			var pindex = $"__p{parameterName}residx";
 			var pbuff = $"__p{parameterName}buf";
@@ -526,14 +526,14 @@ namespace ObjC {
 			postwriter.WriteLine ();
 			postwriter.WriteLine ($"if ({presarr}) {{");
 			postwriter.Indent++;
-			postwriter.WriteLine ($"int {parrlenght} = mono_array_length ({presarr});");
+			postwriter.WriteLine ($"int {parrlength} = mono_array_length ({presarr});");
 
 			if (typecode != TypeCode.Byte) {
-				postwriter.WriteLine ($"__strong id * {pbuff} = (id __strong *) calloc ({parrlenght}, sizeof (id));");
+				postwriter.WriteLine ($"__strong id * {pbuff} = (id __strong *) calloc ({parrlength}, sizeof (id));");
 				postwriter.WriteLine ($"id {presobj};");
 				postwriter.WriteLine ($"int {pindex};");
 				postwriter.WriteLine ();
-				postwriter.WriteLine ($"for ({pindex} = 0; {pindex} < {parrlenght}; {pindex}++) {{");
+				postwriter.WriteLine ($"for ({pindex} = 0; {pindex} < {parrlength}; {pindex}++) {{");
 				postwriter.Indent++;
 			}
 
@@ -559,7 +559,7 @@ namespace ObjC {
 				postwriter.WriteLine ($"{presobj} = [NSNumber numberWith{ctypep}:{presarrval}];");
 				break;
 			case TypeCode.Byte:
-				postwriter.WriteLine ($"NSData* {presobj} = [NSData dataWithBytes:mono_array_addr ({presarr}, unsigned char, 0) length:{parrlenght}];");
+				postwriter.WriteLine ($"NSData* {presobj} = [NSData dataWithBytes:mono_array_addr ({presarr}, unsigned char, 0) length:{parrlength}];");
 				break;
 			case TypeCode.String:
 				postwriter.WriteLine ($"MonoString* {presarrval} = mono_array_get ({presarr}, MonoString *, {pindex});");
@@ -598,12 +598,12 @@ namespace ObjC {
 				postwriter.WriteLine ($"{pbuff}[{pindex}] = {presobj};");
 				postwriter.Indent--;
 				postwriter.WriteLine ("}");
-				postwriter.WriteLine ($"*{parameterName} = [[NSArray alloc] initWithObjects: {pbuff} count: {parrlenght}];");
-				postwriter.WriteLine ($"for ({pindex} = 0; {pindex} < {parrlenght}; {pindex}++)");
+				postwriter.WriteLine ($"*{parameterName} = [[NSArray alloc] initWithObjects: {pbuff} count: {parrlength}];");
+				postwriter.WriteLine ($"for ({pindex} = 0; {pindex} < {parrlength}; {pindex}++)");
 				postwriter.Indent++;
 				postwriter.WriteLine ($"{pbuff} [{pindex}] = nil;");
 				postwriter.Indent--;
-				postwriter.WriteLine ($"free({pbuff});");
+				postwriter.WriteLine ($"free ({pbuff});");
 			}
 			postwriter.Indent--;
 			postwriter.WriteLine ("}");
