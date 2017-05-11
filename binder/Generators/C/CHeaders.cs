@@ -137,7 +137,8 @@ namespace MonoEmbeddinator4000.Generators
         {
             PushBlock();
 
-            GenerateMethodSignature(method, isSource: false);
+            Write("MONO_EMBEDDINATOR_API ");
+            GenerateMethodSpecifier(method, method.Namespace as Class);
             WriteLine(";");
 
             PopBlock();

@@ -127,12 +127,11 @@ namespace MonoEmbeddinator4000.Generators
             return $"{@class.QualifiedName}_{method.Name}";
         }
 
-        public virtual void GenerateMethodSignature(Method method, bool isSource = true)
+        public override void GenerateMethodSpecifier(Method method, Class @class)
         {
             var retType = method.ReturnType.Visit(CTypePrinter);
 
-            Write("{0}{1} {2}(", isSource ? string.Empty : "MONO_EMBEDDINATOR_API ",
-                retType, GetMethodIdentifier(method));
+            Write($"{retType} {GetMethodIdentifier(method)}(");
 
             Write(CTypePrinter.VisitParameters(method.Parameters));
 
