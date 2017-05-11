@@ -3,6 +3,7 @@ CONFIG?=Debug
 
 GENERIC_MANAGED_DLL=$(TOP)/tests/managed/generic/bin/$(CONFIG)/managed.dll
 IOS_MANAGED_DLL=$(TOP)/tests/managed/ios/bin/$(CONFIG)/managed-ios.dll
+TVOS_MANAGED_DLL=$(TOP)/tests/managed/tvos/bin/$(CONFIG)/managed-tvos.dll
 MACOS_MODERN_MANAGED_DLL=$(TOP)/tests/managed/macos-modern/bin/$(CONFIG)/managed-macos-modern.dll
 MACOS_FULL_MANAGED_DLL=$(TOP)/tests/managed/macos-full/bin/$(CONFIG)/managed-macos-full.dll
 MACOS_SYSTEM_MANAGED_DLL=$(TOP)/tests/managed/macos-system/bin/$(CONFIG)/managed-macos-system.dll
@@ -10,6 +11,7 @@ MACOS_SYSTEM_MANAGED_DLL=$(TOP)/tests/managed/macos-system/bin/$(CONFIG)/managed
 ALL_MANAGED_DLLS = \
 	$(GENERIC_MANAGED_DLL) \
 	$(IOS_MANAGED_DLL) \
+	$(TVOS_MANAGED_DLL) \
 	$(MACOS_MODERN_MANAGED_DLL) \
 	$(MACOS_FULL_MANAGED_DLL) \
 	$(MACOS_SYSTEM_MANAGED_DLL) \

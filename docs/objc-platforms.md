@@ -5,7 +5,7 @@ The embeddinator can target various platforms when generating Objective-C code:
 
 * macOS
 * iOS
-* tvOS [not implemented yet]
+* tvOS
 * watchOS [not implemented yet]
 
 The platform is selected by passing the `--platform=<platform>` command-line
