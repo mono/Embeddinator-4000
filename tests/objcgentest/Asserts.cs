@@ -25,7 +25,7 @@ namespace DriverTest
 				Assert.Fail ($"Expected EM{code} exception, but no exception was thrown.", message);
 			} catch (EmbeddinatorException ee) {
 				Assert.That (ee.Error, "Error");
-				Assert.That (ee.Code, Is.EqualTo (code), "Code");
+				Assert.That (ee.Code, Is.EqualTo (code), "Code - " + ee.Message);
 				Assert.That (ee.Message, Is.EqualTo (message), "Message");
 			}
 		}
