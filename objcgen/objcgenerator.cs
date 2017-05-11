@@ -509,7 +509,109 @@ namespace ObjC {
 			postInvoke = post.ToString ();
 		}
 
-		void GenerateArgumentArray (string parameterName, string argumentName, Type t, ref StringBuilder post)
+		string GenerateArgumentArrayPost (string parameterName, string argumentName, Type t)
+		{
+			var postwriter = new SourceWriter {
+				Indent = 1
+			};
+			var typecode = Type.GetTypeCode (t);
+			var parrlength = $"__p{parameterName}length";
+			var presobj = $"__p{parameterName}resobj";
+			var pindex = $"__p{parameterName}residx";
+			var pbuff = $"__p{parameterName}buf";
+			var presarrval = $"__p{parameterName}resarrval";
+			var ptemp = $"__p{parameterName}tmpobj";
+			var presarr = $"__{parameterName}arr";
+
+			postwriter.WriteLine ();
+			postwriter.WriteLine ($"if ({presarr}) {{");
+			postwriter.Indent++;
+			postwriter.WriteLine ($"int {parrlength} = mono_array_length ({presarr});");
+
+			if (typecode != TypeCode.Byte) {
+				postwriter.WriteLine ($"__strong id * {pbuff} = (id __strong *) calloc ({parrlength}, sizeof (id));");
+				postwriter.WriteLine ($"id {presobj};");
+				postwriter.WriteLine ($"int {pindex};");
+				postwriter.WriteLine ();
+				postwriter.WriteLine ($"for ({pindex} = 0; {pindex} < {parrlength}; {pindex}++) {{");
+				postwriter.Indent++;
+			}
+
+			switch (typecode) {
+			case TypeCode.Boolean:
+			case TypeCode.Char:
+			case TypeCode.Double:
+			case TypeCode.Single:
+			case TypeCode.SByte:
+			case TypeCode.Int16:
+			case TypeCode.Int32:
+			case TypeCode.Int64:
+			case TypeCode.UInt16:
+			case TypeCode.UInt32:
+			case TypeCode.UInt64:
+				var ctype = NameGenerator.GetTypeName (t);
+				string ctypep;
+				if (typecode == TypeCode.SByte)
+					ctypep = "Char"; // GetTypeName returns signed char
+				else
+					ctypep = ctype.PascalCase (true);
+				postwriter.WriteLine ($"{ctype} {presarrval} = mono_array_get ({presarr}, {ctype}, {pindex});");
+				postwriter.WriteLine ($"{presobj} = [NSNumber numberWith{ctypep}:{presarrval}];");
+				break;
+			case TypeCode.Byte:
+				postwriter.WriteLine ($"NSData* {presobj} = [NSData dataWithBytes:mono_array_addr ({presarr}, unsigned char, 0) length:{parrlength}];");
+				break;
+			case TypeCode.String:
+				postwriter.WriteLine ($"MonoString* {presarrval} = mono_array_get ({presarr}, MonoString *, {pindex});");
+				postwriter.WriteLine ($"if ({presarrval})");
+				postwriter.Indent++;
+				postwriter.WriteLine ($"{presobj} = mono_embeddinator_get_nsstring ({presarrval});");
+				postwriter.Indent--;
+				postwriter.WriteLine ("else");
+				postwriter.Indent++;
+				postwriter.WriteLine ($"{presobj} = [NSNull null];");
+				postwriter.Indent--;
+				break;
+			case TypeCode.Object:
+				var tname = NameGenerator.GetTypeName (t);
+				if (HasProtocol (t))
+					tname = "__" + tname + "Wrapper";
+				postwriter.WriteLine ($"MonoObject* {presarrval} = mono_array_get ({presarr}, MonoObject *, {pindex});");
+				postwriter.WriteLine ($"if ({presarrval}) {{");
+				postwriter.Indent++;
+				postwriter.WriteLine ($"{tname}* {ptemp} = [[{tname} alloc] initForSuper];");
+				postwriter.WriteLine ($"{ptemp}->_object = mono_embeddinator_create_object ({presarrval});");
+				postwriter.WriteLine ($"{presobj} = {ptemp};");
+				postwriter.Indent--;
+				postwriter.WriteLine ("} else");
+				postwriter.Indent++;
+				postwriter.WriteLine ($"{presobj} = [NSNull null];");
+				postwriter.Indent--;
+				break;
+			default:
+				throw new NotImplementedException ($"Converting type {t.Name} to a native type name");
+			}
+
+			if (typecode == TypeCode.Byte)
+				postwriter.WriteLine ($"*{parameterName} = {presobj};");
+			else {
+				postwriter.WriteLine ($"{pbuff}[{pindex}] = {presobj};");
+				postwriter.Indent--;
+				postwriter.WriteLine ("}");
+				postwriter.WriteLine ($"*{parameterName} = [[NSArray alloc] initWithObjects: {pbuff} count: {parrlength}];");
+				postwriter.WriteLine ($"for ({pindex} = 0; {pindex} < {parrlength}; {pindex}++)");
+				postwriter.Indent++;
+				postwriter.WriteLine ($"{pbuff} [{pindex}] = nil;");
+				postwriter.Indent--;
+				postwriter.WriteLine ($"free ({pbuff});");
+			}
+			postwriter.Indent--;
+			postwriter.WriteLine ("}");
+			postwriter.WriteLine ();
+			return postwriter.ToString ();
+		}
+
+		void GenerateArgumentArray (string parameterName, string argumentName, Type t, bool is_by_ref, ref StringBuilder post)
 		{
 			Type type = t.GetElementType ();
 			var typeCode = Type.GetTypeCode (type);
@@ -517,16 +619,19 @@ namespace ObjC {
 			var pnameArr = $"__{parameterName}arr";
 			var pnameRet = $"__{parameterName}ret";
 			var pnameLength = $"__{parameterName}length";
+			string arrayCreator = GetArrayCreator (parameterName, type, is_by_ref);
 
-			implementation.WriteLine ($"if (!{parameterName})");
+			if (is_by_ref)
+				implementation.WriteLine ($"MonoArray* __{parameterName}arr = nil;");
+
+			implementation.WriteLine ($"if (!{(is_by_ref ? "*" : string.Empty)}{parameterName})");
 			implementation.Indent++;
-			implementation.WriteLine ($"{argumentName} = nil;");
+			implementation.WriteLine ($"{argumentName} = {(is_by_ref ? $"&__{parameterName}arr" : "nil")};");
 			implementation.Indent--;
 			implementation.WriteLine ("else {");
 			implementation.Indent++;
-			implementation.WriteLine ($"uintptr_t {pnameLength} = [{parameterName} {(typeCode == TypeCode.Byte ? "length" : "count")}];");
+			implementation.WriteLine ($"uintptr_t {pnameLength} = [{(is_by_ref ? "*" : string.Empty)}{parameterName} {(typeCode == TypeCode.Byte ? "length" : "count")}];");
 
-			string arrayCreator = GetArrayCreator (parameterName, type);
 			implementation.WriteLine (arrayCreator);
 
 			if (typeCode != TypeCode.Byte) {
@@ -554,7 +659,7 @@ namespace ObjC {
 				else
 					returnValue = $"{typeName.CamelCase (true)}Value";
 
-				implementation.WriteLine ($"NSNumber* {pnameRet} = {parameterName}[{pnameIdx}];");
+				implementation.WriteLine ($"NSNumber* {pnameRet} = {(is_by_ref ? $"(*{parameterName})" : parameterName)}[{pnameIdx}];");
 				implementation.WriteLine ($"if (!{pnameRet} || [{pnameRet} isKindOfClass:[NSNull class]])");
 				implementation.Indent++;
 				implementation.WriteLine ($"continue;");
@@ -570,7 +675,7 @@ namespace ObjC {
 				implementation.WriteLine ($"mono_array_set ({pnameArr}, MonoDecimal, {pnameIdx}, mono_embeddinator_get_system_decimal ({pnameRet}, &__mono_context));");
 				break;
 			case TypeCode.String:
-				implementation.WriteLine ($"NSString* {pnameRet} = {parameterName}[{pnameIdx}];");
+				implementation.WriteLine ($"NSString* {pnameRet} = {(is_by_ref ? $"(*{parameterName})" : parameterName)}[{pnameIdx}];");
 				implementation.WriteLine ($"if (!{pnameRet} || [{pnameRet} isKindOfClass:[NSNull class]])");
 				implementation.Indent++;
 				implementation.WriteLine ($"mono_array_set ({pnameArr}, MonoString *, {pnameIdx}, NULL);");
@@ -583,7 +688,7 @@ namespace ObjC {
 			case TypeCode.Byte:
 				implementation.WriteLine ($"int esize = mono_array_element_size (mono_object_get_class ((MonoObject *){pnameArr}));");
 				implementation.WriteLine ($"char* buff = mono_array_addr_with_size ({pnameArr}, esize, 0);");
-				implementation.WriteLine ($"[{parameterName} getBytes:buff length:{pnameLength}];");
+				implementation.WriteLine ($"[{(is_by_ref ? "*" : string.Empty)}{parameterName} getBytes:buff length:{pnameLength}];");
 				break;
 			case TypeCode.Object:
 				var objcName = NameGenerator.GetObjCName (type);
@@ -594,9 +699,9 @@ namespace ObjC {
 					hasClass = HasClass (type);
 
 				if (hasClass)
-					implementation.WriteLine ($"{objcName}* {pnameRet} = {parameterName}[{pnameIdx}];");
+					implementation.WriteLine ($"{objcName}* {pnameRet} = {(is_by_ref ? $"(*{parameterName})" : parameterName)}[{pnameIdx}];");
 				else if (hasProtocol)
-					implementation.WriteLine ($"id<{objcName}> {pnameRet} = {parameterName}[{pnameIdx}];");
+					implementation.WriteLine ($"id<{objcName}> {pnameRet} = {(is_by_ref ? $"(*{parameterName})" : parameterName)}[{pnameIdx}];");
 				else
 					goto default;
 				implementation.WriteLine ($"if (!{pnameRet} || [{pnameRet} isKindOfClass:[NSNull class]])");
@@ -618,21 +723,24 @@ namespace ObjC {
 				implementation.Indent--;
 				implementation.WriteLine ("}");
 			}
-			implementation.WriteLine ($"{argumentName} = {pnameArr};");
+			implementation.WriteLine ($"{argumentName} = {(is_by_ref ? "&" : string.Empty)}{pnameArr};");
 			implementation.Indent--;
 			implementation.WriteLine ("}");
+
+			if (is_by_ref)
+				post.AppendLine (GenerateArgumentArrayPost (parameterName, argumentName, type));
 		}
 
 		void GenerateArgument (string paramaterName, string argumentName, Type t, ref StringBuilder post)
 		{
-			if (t.IsArray) {
-				GenerateArgumentArray (paramaterName, argumentName, t, ref post);
-				return;
-			}
-
 			var is_by_ref = t.IsByRef;
 			if (is_by_ref)
 				t = t.GetElementType ();
+
+			if (t.IsArray) {
+				GenerateArgumentArray (paramaterName, argumentName, t, is_by_ref, ref post);
+				return;
+			}
 			
 			switch (Type.GetTypeCode (t)) {
 			case TypeCode.String:
@@ -1142,9 +1250,9 @@ namespace ObjC {
 			return o.ToString ();
 		}
 
-		public static string GetArrayCreator (string parameterName, Type type)
+		public static string GetArrayCreator (string parameterName, Type type, bool is_by_ref)
 		{
-			string arrayCreator = $"MonoArray* __{parameterName}arr = mono_array_new (__mono_context.domain, {{0}}, __{parameterName}length);";
+			string arrayCreator = $"{(is_by_ref ? string.Empty : "MonoArray * ")}__{parameterName}arr = mono_array_new (__mono_context.domain, {{0}}, __{parameterName}length);";
 
 			switch (Type.GetTypeCode (type)) {
 			case TypeCode.String:
