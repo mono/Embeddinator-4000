@@ -1,6 +1,16 @@
 #import <XCTest/XCTest.h>
 #if defined (TEST_FRAMEWORK)
+#if defined (XAMARIN_MAC_MODERN)
+#include "managed-macos-modern/managed-macos-modern.h"
+#elif defined (XAMARIN_MAC_FULL)
+#include "managed-macos-full/managed-macos-full.h"
+#elif defined (XAMARIN_MAC_SYSTEM)
+#include "managed-macos-system/managed-macos-system.h"
+#elif defined (XAMARIN_IOS)
 #include "managed-ios/managed-ios.h"
+#else
+#include "managed/managed.h"
+#endif
 #else
 #include "bindings.h"
 #endif
@@ -1113,8 +1123,8 @@
 	XCTAssertTrue ([interRefArr[0] conformsToProtocol:@protocol(Interfaces_IMakeItUp)], "interRefArr[0] conformsToProtocol 1");
 	XCTAssertTrue ([interRefArr[0] boolean], "interRefArr[0] true");
 	XCTAssertFalse ([interRefArr[0] boolean], "interRefArr[0] false");
-	XCTAssertEqualObjects (@"0", [interRefArr[0] convertInt32:0], "interRefArr[0] 0");
-	XCTAssertEqualObjects (@"1", [interRefArr[0] convertInt64:1ll], "interRefArr[0] 1");
+	XCTAssertEqualObjects (@"0", [interRefArr[0] convertIntValue:0], "interRefArr[0] 0");
+	XCTAssertEqualObjects (@"1", [interRefArr[0] convertLongValue:1ll], "interRefArr[0] 1");
 
 	NSArray<id<Interfaces_IMakeItUp>> *interRefNilArr = nil;
 	[testClass iMakeItUpArrRefInterArr:&interRefNilArr];

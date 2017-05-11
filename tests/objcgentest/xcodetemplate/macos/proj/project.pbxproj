@@ -1,0 +1,305 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		7E015F2E1EA6845D0039309A /* %FRAMEWORK_REFERENCE_NAME%.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7E577A671E9E5AEA003FA392 /* %FRAMEWORK_REFERENCE_NAME%.framework */; };
+		7E577A5B1E9E5A4C003FA392 /* macTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 7E577A5A1E9E5A4C003FA392 /* macTests.m */; };
+		D1E2B2221E8F4FBB00846AF8 /* Tests.m in Sources */ = {isa = PBXBuildFile; fileRef = D1E2B2211E8F4FBB00846AF8 /* Tests.m */; };
+		7E577A6B1E9E5D9C003FA392 /* %FRAMEWORK_REFERENCE_NAME%.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 7E577A671E9E5AEA003FA392 /* %FRAMEWORK_REFERENCE_NAME%.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		7E577A6A1E9E5D94003FA392 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				7E577A6B1E9E5D9C003FA392 /* %FRAMEWORK_REFERENCE_NAME%.framework in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		D1E2B21F1E8F4FBB00846AF8 /* Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		7E577A5A1E9E5A4C003FA392 /* macTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = macTests.m; sourceTree = "<group>"; };
+		D1E2B2211E8F4FBB00846AF8 /* Tests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = %TESTS_ROOT_DIR%/objc-cli/libmanaged/Tests/Tests.m; sourceTree = "<group>"; };
+		D1E2B2231E8F4FBB00846AF8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		7E577A671E9E5AEA003FA392 /* %FRAMEWORK_REFERENCE_NAME%.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = "%FRAMEWORK_REFERENCE_NAME%.framework"; path = "%FRAMEWORK_REFERENCE_DIR%/%FRAMEWORK_REFERENCE_NAME%.framework"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		7E577A3A1E9E5A4B003FA392 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7E015F2E1EA6845D0039309A /* %FRAMEWORK_REFERENCE_NAME%.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		D1E2B2061E8F4F9100846AF8 = {
+			isa = PBXGroup;
+			children = (
+				7E577A671E9E5AEA003FA392 /* %FRAMEWORK_REFERENCE_NAME%.framework */,
+				D1E2B2201E8F4FBB00846AF8 /* Tests */,
+				D1E2B2101E8F4F9100846AF8 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		D1E2B2101E8F4F9100846AF8 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				D1E2B21F1E8F4FBB00846AF8 /* Tests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		D1E2B2201E8F4FBB00846AF8 /* Tests */ = {
+			isa = PBXGroup;
+			children = (
+				D1E2B2211E8F4FBB00846AF8 /* Tests.m */,
+				7E577A5A1E9E5A4C003FA392 /* macTests.m */,
+				D1E2B2231E8F4FBB00846AF8 /* Info.plist */,
+			);
+			path = Tests;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		D1E2B21E1E8F4FBB00846AF8 /* Tests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D1E2B2271E8F4FBB00846AF8 /* Build configuration list for PBXNativeTarget "Tests" */;
+			buildPhases = (
+				D1E2B21B1E8F4FBB00846AF8 /* Sources */,
+				7E577A3A1E9E5A4B003FA392 /* Frameworks */,
+				D1E2B21D1E8F4FBB00846AF8 /* Resources */,
+				7E577A6A1E9E5D94003FA392 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Tests;
+			productName = Tests;
+			productReference = D1E2B21F1E8F4FBB00846AF8 /* Tests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		D1E2B2071E8F4F9100846AF8 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0830;
+				ORGANIZATIONNAME = "Sebastien Pouliot";
+				TargetAttributes = {
+					D1E2B21E1E8F4FBB00846AF8 = {
+						CreatedOnToolsVersion = 8.3;
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = D1E2B20A1E8F4F9100846AF8 /* Build configuration list for PBXProject "%PROJECT_NAME%" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = D1E2B2061E8F4F9100846AF8;
+			productRefGroup = D1E2B2101E8F4F9100846AF8 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				D1E2B21E1E8F4FBB00846AF8 /* Tests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		D1E2B21D1E8F4FBB00846AF8 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+
+/* Begin PBXSourcesBuildPhase section */
+		D1E2B21B1E8F4FBB00846AF8 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7E577A5B1E9E5A4C003FA392 /* macTests.m in Sources */,
+				D1E2B2221E8F4FBB00846AF8 /* Tests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		D1E2B2161E8F4F9100846AF8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+					%GCC_PREPROCESSOR_DEFINITIONS%
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		D1E2B2171E8F4F9100846AF8 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					%GCC_PREPROCESSOR_DEFINITIONS%
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		D1E2B2281E8F4FBB00846AF8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = "%FRAMEWORK_REFERENCE_DIR%";
+				INFOPLIST_FILE = Tests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(PROJECT_DIR)",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.xamarin.Tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				USER_HEADER_SEARCH_PATHS = "/Library/Frameworks/Mono.framework/Versions/Current/include/mono-2.0/**";
+			};
+			name = Debug;
+		};
+		D1E2B2291E8F4FBB00846AF8 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = "%FRAMEWORK_REFERENCE_DIR%";
+				INFOPLIST_FILE = Tests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(PROJECT_DIR)",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.xamarin.Tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				USER_HEADER_SEARCH_PATHS = "/Library/Frameworks/Mono.framework/Versions/Current/include/mono-2.0/**";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		D1E2B20A1E8F4F9100846AF8 /* Build configuration list for PBXProject "%PROJECT_NAME%" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D1E2B2161E8F4F9100846AF8 /* Debug */,
+				D1E2B2171E8F4F9100846AF8 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D1E2B2271E8F4FBB00846AF8 /* Build configuration list for PBXNativeTarget "Tests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D1E2B2281E8F4FBB00846AF8 /* Debug */,
+				D1E2B2291E8F4FBB00846AF8 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = D1E2B2071E8F4F9100846AF8 /* Project object */;
+}
