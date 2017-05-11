@@ -67,6 +67,25 @@ namespace ExecutionTests
 			RunManagedTests (Platform.iOS, $"-destination 'platform=iOS,id={iOSDeviceIdentifier}'", debug: debug);
 		}
 
+		[Test]
+		[TestCase (true)]
+		[TestCase (false)]
+		public void tvOS_simulator (bool debug)
+		{
+			RunManagedTests (Platform.tvOS, "-destination 'platform=tvOS Simulator,name=Apple TV 1080p,OS=latest'", debug: debug);
+		}
+
+		[Test]
+		[TestCase (true)]
+		[TestCase (false)]
+		public void tvOS_device (bool debug)
+		{
+			if (string.IsNullOrEmpty (tvOSDeviceIdentifier))
+				Assert.Ignore ("No applicable tvOS device connected.");
+
+			RunManagedTests (Platform.tvOS, $"-destination 'platform=tvOS,id={tvOSDeviceIdentifier}'", debug: debug);
+		}
+
 		XmlDocument device_xml;
 		string FindDevice (params string [] valid_classes)
 		{
@@ -98,6 +117,16 @@ namespace ExecutionTests
 			}
 		}
 
+		// A device identifier for a tvOS device. Will be an empty string if no applicable devices are attached.
+		string tvos_device_identifier;
+		string tvOSDeviceIdentifier {
+			get {
+				if (tvos_device_identifier == null)
+					tvos_device_identifier = FindDevice ("AppleTV");
+				return tvos_device_identifier;
+			}
+		}
+
 		int CountTests (string path)
 		{
 			return File.ReadAllLines (path).Count ((v) => System.Text.RegularExpressions.Regex.IsMatch (v, "^\\s*-\\s*[(]\\s*void\\s*[)]\\s*test"));
@@ -112,6 +141,7 @@ namespace ExecutionTests
 			var managedTestCount = CountTests (Path.Combine (XcodeProjectGenerator.TestsRootDirectory, "objc-cli/libmanaged/Tests/Tests.m"));
 			var xamariniOSTestCount = CountTests (Path.Combine (XcodeProjectGenerator.TestsRootDirectory, "objcgentest/xcodetemplate/ios/test/iosTests.m"));
 			var xamarinMacTestCount = CountTests (Path.Combine (XcodeProjectGenerator.TestsRootDirectory, "objcgentest/xcodetemplate/macos/test/macTests.m"));
+			var xamarintvOSTestCount = CountTests (Path.Combine (XcodeProjectGenerator.TestsRootDirectory, "objcgentest/xcodetemplate/tvos/test/tvosTests.m"));
 
 			switch (platform) {
 			case Platform.macOSFull:
@@ -149,6 +179,13 @@ namespace ExecutionTests
 				defines.Add ("XAMARIN_IOS=1");
 				abi = "armv7,arm64,i386,x86_64";
 				managedTestCount += xamariniOSTestCount;
+				break;
+			case Platform.tvOS:
+				dlldir = "tvos";
+				dllname = "managed-tvos.dll";
+				defines.Add ("XAMARIN_TVOS=1");
+				abi = "arm64,x86_64";
+				managedTestCount += xamarintvOSTestCount;
 				break;
 			default:
 				throw new NotImplementedException ();
@@ -198,6 +235,8 @@ namespace ExecutionTests
 				return Generate ("macos", outputDirectory, projectName, framework_reference_path, defines);
 			case Platform.iOS:
 				return Generate ("ios", outputDirectory, projectName, framework_reference_path, defines);
+			case Platform.tvOS:
+				return Generate ("tvos", outputDirectory, projectName, framework_reference_path, defines);
 			default:
 				throw new NotImplementedException ();
 			}

@@ -791,12 +791,21 @@ namespace Embeddinator {
 #error Unknown architecture
 #endif
 ");
-						if (build_info.IsSimulator) {
-							FileCopyIfExists (Path.Combine (cachedir, "32", "registrar.h"), Path.Combine (headers, "registrar-i386.h"));
-							FileCopyIfExists (Path.Combine (cachedir, "64", "registrar.h"), Path.Combine (headers, "registrar-x86_64.h"));
-						} else {
-							FileCopyIfExists (Path.Combine (cachedir, "32", "registrar.h"), Path.Combine (headers, "registrar-arm32.h"));
-							FileCopyIfExists (Path.Combine (cachedir, "64", "registrar.h"), Path.Combine (headers, "registrar-arm64.h"));
+						switch (Platform) {
+						case Platform.iOS:
+							if (build_info.IsSimulator) {
+								FileCopyIfExists (Path.Combine (cachedir, "32", "registrar.h"), Path.Combine (headers, "registrar-i386.h"));
+								FileCopyIfExists (Path.Combine (cachedir, "64", "registrar.h"), Path.Combine (headers, "registrar-x86_64.h"));
+							} else {
+								FileCopyIfExists (Path.Combine (cachedir, "32", "registrar.h"), Path.Combine (headers, "registrar-arm32.h"));
+								FileCopyIfExists (Path.Combine (cachedir, "64", "registrar.h"), Path.Combine (headers, "registrar-arm64.h"));
+							}
+							break;
+						case Platform.tvOS:
+							FileCopyIfExists (Path.Combine (cachedir, "registrar.h"), Path.Combine (headers, build_info.IsSimulator ? "registrar-x86_64.h" : "registrar-arm64.h"));
+							break;
+						default:
+							throw ErrorHelper.CreateError (99, "Internal error: invalid platform {0}. Please file a bug report with a test case (https://github.com/mono/Embeddinator-4000/issues).", Platform);
 						}
 						break;
 					default:

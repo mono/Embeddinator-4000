@@ -8,6 +8,8 @@
 #include "managed-macos-system/managed-macos-system.h"
 #elif defined (XAMARIN_IOS)
 #include "managed-ios/managed-ios.h"
+#elif defined (XAMARIN_TVOS)
+#include "managed-tvos/managed-tvos.h"
 #else
 #include "managed/managed.h"
 #endif
