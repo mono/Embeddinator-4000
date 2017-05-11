@@ -128,7 +128,7 @@ TEST_CASE("Exceptions.C", "[C][Exceptions]") {
     REQUIRE(throwers == 0);
 
     // .cctor that throw - can't be called directly but it makes the type unusable
-    Exceptions_ThrowInStaticCtor* static_thrower = Exceptions_ThrowInStaticCtor_new_1();
+    Exceptions_ThrowInStaticCtor* static_thrower = Exceptions_ThrowInStaticCtor_new();
     REQUIRE(static_thrower == 0);
 
     // .ctor chaining
@@ -140,10 +140,10 @@ TEST_CASE("Exceptions.C", "[C][Exceptions]") {
 }
 
 TEST_CASE("Constructors.C", "[C][Constructors]") {
-    Constructors_Unique* unique = Constructors_Unique_new_1();
+    Constructors_Unique* unique = Constructors_Unique_new();
     REQUIRE(Constructors_Unique_get_Id(unique) == 1);
 
-    Constructors_Unique* unique_init_id = Constructors_Unique_new_2(911);
+    Constructors_Unique* unique_init_id = Constructors_Unique_new_1(911);
     REQUIRE(Constructors_Unique_get_Id(unique_init_id) == 911);
 
     Constructors_SuperUnique* super_unique_default_init = Constructors_SuperUnique_new();

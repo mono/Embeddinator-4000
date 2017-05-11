@@ -62,6 +62,9 @@ namespace MonoEmbeddinator4000.Generators
 
             foreach (var type in assembly.ExportedTypes)
             {
+                if (!type.IsPublic)
+                    continue;
+
                 var typeInfo = type.GetTypeInfo();
                 Visit(typeInfo);
             }
@@ -224,12 +227,21 @@ namespace MonoEmbeddinator4000.Generators
         {
             foreach (var ctor in type.DeclaredConstructors)
             {
+                if (ctor.IsStatic)
+                    continue;
+
+                if (!ctor.IsPublic)
+                    continue;
+
                 var decl = VisitConstructor(ctor, @class);
                 @class.Declarations.Add(decl);
             }
 
             foreach (var method in type.DeclaredMethods)
             {
+                if (!method.IsPublic)
+                    continue;
+
                 if (method.IsGenericMethod)
                     continue;
 
@@ -242,6 +254,9 @@ namespace MonoEmbeddinator4000.Generators
 
             foreach (var field in type.DeclaredFields)
             {
+                if (!field.IsPublic)
+                    continue;
+
                 var decl = VisitField(field);
                 
                 // TODO: Ignore fields until we implement usage of FieldToPropertyPass
