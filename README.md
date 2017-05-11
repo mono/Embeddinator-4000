@@ -23,9 +23,9 @@ This is a work in progress, the initial goals for this project are to
 surface .NET to C, C++, Objective-C (across the various Apple platforms)
 and Java (Android and regular Java).
 
-The project is still under heavy development. Usage under mission-critical
-production scenarios is not advised. Please report any bugs or suggestions
-so we can improve the tool.
+## Getting Started
+
+Check out our [documentation to get started](https://mono.github.io/Embeddinator-4000/)
 
 ## Community
 
