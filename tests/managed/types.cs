@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 public static class Type_SByte
 {
@@ -102,4 +103,5 @@ public static class Type_Decimal {
 	public static decimal GetDecimal (decimal dec) => dec;
 	public static void GetRefPi (ref decimal dec) => dec = Pi;
 	public static decimal [] GetDecimalArr (decimal [] dec) => dec;
+	public static void ReverseDecimalArrRef (ref decimal [] decArr) => decArr = decArr?.Reverse ().ToArray ();
 }
