@@ -45,8 +45,8 @@ Known Issues
 ============
 
 * This release only generates Objective-C code;
-* This release only targets macOS and iOS, the later requires Xamarin.iOS (10.11+) to be installed;
+* This release only targets macOS and iOS, the latter requires Xamarin.iOS (10.11+) to be installed;
 * Some C# features (e.g. generics) are not yet supported;
-* In some cases the generator produce duplicate symbols, which won't compile;
+* In some cases the generator produces duplicate symbols, which won't compile;
 
 A list of issues, including bugs, enhancements and ideas, is being tracked on [github](https://github.com/mono/Embeddinator-4000/issues).
