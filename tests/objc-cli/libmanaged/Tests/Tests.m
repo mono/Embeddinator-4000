@@ -413,6 +413,70 @@
 	XCTAssertEqualObjects ((__bridge NSString *) nil, [Type_String nullString], "null string");
 	XCTAssertEqualObjects (@"", [Type_String emptyString], "empty string");
 	XCTAssertEqualObjects (@"Hello World", [Type_String nonEmptyString], "non-empty string");
+
+	NSDecimalNumber *decimalmax = [Type_Decimal max];
+	NSDecimalNumber *nsdecimalmax = [NSDecimalNumber decimalNumberWithString:@"79228162514264337593543950335"];
+	XCTAssertEqualObjects (nsdecimalmax, decimalmax, "NSDecimalNumber max");
+
+	NSDecimalNumber *decimalmin = [Type_Decimal min];
+	NSDecimalNumber *nsdecimalmin = [NSDecimalNumber decimalNumberWithString:@"-79228162514264337593543950335"];
+	XCTAssertEqualObjects (nsdecimalmin, decimalmin, "NSDecimalNumber min");
+
+	NSDecimalNumber *decimalzero = [Type_Decimal zero];
+	NSDecimalNumber *nsdecimalzero = [NSDecimalNumber zero];
+	XCTAssertEqualObjects (nsdecimalzero, decimalzero, "NSDecimalNumber zero");
+
+	NSDecimalNumber *decimalone = [Type_Decimal one];
+	NSDecimalNumber *nsdecimalone = [NSDecimalNumber one];
+	XCTAssertEqualObjects (nsdecimalone, decimalone, "NSDecimalNumber one");
+
+	NSDecimalNumber *decimalminusone = [Type_Decimal minusOne];
+	NSDecimalNumber *nsdecimalminusone = [NSDecimalNumber decimalNumberWithString:@"-1"];
+	XCTAssertEqualObjects (nsdecimalminusone, decimalminusone, "NSDecimalNumber minusOne");
+
+	NSDecimalNumber *decimalpi = [Type_Decimal pi];
+	NSDecimalNumber *nsdecimalpi = [NSDecimalNumber decimalNumberWithString:@"3.14159265358979323846264"];
+	XCTAssertEqualObjects (nsdecimalpi, decimalpi, "NSDecimalNumber pi");
+
+	NSDecimalNumber *decimalminustau = [Type_Decimal minusTau];
+	NSDecimalNumber *nsdecimalminustau = [NSDecimalNumber decimalNumberWithString:@"-6.28318530717958647692"];
+	XCTAssertEqualObjects (nsdecimalminustau, decimalminustau, "NSDecimalNumber tau");
+
+	NSDecimalNumber *decimalfortytwo = [Type_Decimal fortyTwo];
+	NSDecimalNumber *nsdecimalfortytwo = [NSDecimalNumber decimalNumberWithString:@"42"];
+	XCTAssertEqualObjects (nsdecimalfortytwo, decimalfortytwo, "NSDecimalNumber fortytwo");
+
+	NSArray<NSDecimalNumber *> *decimalarr = [Type_Decimal decArr];
+	XCTAssertEqual([decimalarr count], 8, "decimalarr count");
+	XCTAssertEqualObjects (nsdecimalmax, decimalarr[0], "decimalarr[0] max");
+	XCTAssertEqualObjects (nsdecimalmin, decimalarr[1], "decimalarr[1] min");
+	XCTAssertEqualObjects (nsdecimalzero, decimalarr[2], "decimalarr[2] zero");
+	XCTAssertEqualObjects (nsdecimalone, decimalarr[3], "decimalarr[3] one");
+	XCTAssertEqualObjects (nsdecimalminusone, decimalarr[4], "decimalarr[4] minusOne");
+	XCTAssertEqualObjects (nsdecimalpi, decimalarr[5], "decimalarr[5] pi");
+	XCTAssertEqualObjects (nsdecimalminustau, decimalarr[6], "decimalarr[6] tau");
+	XCTAssertEqualObjects (nsdecimalfortytwo, decimalarr[7], "decimalarr[7] fortytwo");
+
+	for (NSDecimalNumber *dec in decimalarr) {
+		NSDecimalNumber *decimalmeth = [Type_Decimal getDecimalDec:dec];
+		XCTAssertEqualObjects (dec, decimalmeth, "decimal array");
+	}
+
+	NSArray<NSDecimalNumber *> *decimalarr2 = [Type_Decimal getDecimalArrDec:decimalarr];
+	XCTAssertEqual([decimalarr count], 8, "decimalarr count");
+	XCTAssertEqualObjects (decimalarr[0], decimalarr2[0], "decimalarr2[0] max");
+	XCTAssertEqualObjects (decimalarr[1], decimalarr2[1], "decimalarr2[1] min");
+	XCTAssertEqualObjects (decimalarr[2], decimalarr2[2], "decimalarr2[2] zero");
+	XCTAssertEqualObjects (decimalarr[3], decimalarr2[3], "decimalarr2[3] one");
+	XCTAssertEqualObjects (decimalarr[4], decimalarr2[4], "decimalarr2[4] minusOne");
+	XCTAssertEqualObjects (decimalarr[5], decimalarr2[5], "decimalarr2[5] pi");
+	XCTAssertEqualObjects (decimalarr[6], decimalarr2[6], "decimalarr2[6] tau");
+	XCTAssertEqualObjects (decimalarr[7], decimalarr2[7], "decimalarr2[7] fortytwo");
+
+	NSDecimalNumber *refDec = [Type_Decimal minusTau];
+	XCTAssertEqualObjects (nsdecimalminustau, refDec, "NSDecimalNumber refDec tau");
+	[Type_Decimal getRefPiDec:&refDec];
+	XCTAssertEqualObjects (nsdecimalpi, refDec, "NSDecimalNumber refDec pi");
 }
 
 - (void) testObjectIndexedSubscripting {
@@ -634,21 +698,21 @@
 	Methods_DuplicateMethods *m = [[Methods_DuplicateMethods alloc] init];
 
 	XCTAssert ([m doIt] == 42, "doIt 1");
-	XCTAssert ([m doItInt32:0] == 42, "doIt 2");
-	XCTAssert ([m doItString:@""] == 42, "doIt 3");
+	XCTAssert ([m doItIntValue:0] == 42, "doIt 2");
+	XCTAssert ([m doItStringValue:@""] == 42, "doIt 3");
 	XCTAssert ([m doItI:0 j:1] == 84, "doIt 4");
 	XCTAssert ([m findName:@"name"] == YES, "doIt 5");
-	XCTAssert ([m findFirstName:@"name" lastname:@"last"] == YES, "doIt 6");
+	XCTAssert ([m findFirstName:@"name" lastName:@"last"] == YES, "doIt 6");
 
 	Properties_DuplicateIndexedProperties * p = [[Properties_DuplicateIndexedProperties alloc] init];
-	XCTAssert ([p getItemInt32:0] == 42, "getItemInt32");
-	XCTAssert ([p getItemString:@""] == 42, "getItemString");
+	XCTAssert ([p getItemIntValue:0] == 42, "getItemInt32");
+	XCTAssert ([p getItemStringValue:@""] == 42, "getItemString");
 
-	Constructors_Duplicates * c = [[Constructors_Duplicates alloc] initWithByte:1 byte:2 byte:3 byte:4];
+	Constructors_Duplicates * c = [[Constructors_Duplicates alloc] initWithUCharValue:1 uCharValue:2 uCharValue:3 uCharValue:4];
 	XCTAssertNotNil (c, "c");
-	Constructors_Duplicates * c2 = [[Constructors_Duplicates alloc] initWithByte:1 int16:2 int32:3 int64:4];
+	Constructors_Duplicates * c2 = [[Constructors_Duplicates alloc] initWithUCharValue:1 shortValue:2 intValue:3 longValue:4];
 	XCTAssertNotNil (c2, "c2");
-	Constructors_Duplicates * c3 = [[Constructors_Duplicates alloc] initWithInt32:1 int32:2 int32:3 int32:4];
+	Constructors_Duplicates * c3 = [[Constructors_Duplicates alloc] initWithIntValue:1 intValue:2 intValue:3 intValue:4];
 	XCTAssertNotNil (c3, "c3");
 }
 
@@ -696,8 +760,8 @@
 	XCTAssertTrue ([m boolean], "true");
 	XCTAssertFalse ([m boolean], "false");
 
-	XCTAssertEqualObjects (@"0", [m convertInt32:0], "0");
-	XCTAssertEqualObjects (@"1", [m convertInt64:1ll], "1");
+	XCTAssertEqualObjects (@"0", [m convertIntValue:0], "0");
+	XCTAssertEqualObjects (@"1", [m convertLongValue:1ll], "1");
 
 	Interfaces_ManagedAdder *adder = [[Interfaces_ManagedAdder alloc] init];
 	XCTAssertTrue ([adder conformsToProtocol:@protocol(Interfaces_IOperations)], "conformsToProtocol 2");
@@ -725,11 +789,11 @@
 	XCTAssertTrue ([[Overloads_AllOperators add:oneAll c2:twoAll] value] == (1 + 2), "1 + 2 All");
 	XCTAssertTrue ([[Overloads_AllOperators subtract:oneAll c2:twoAll] value] == (1 - 2), "1 - 2 All");
 	XCTAssertTrue ([[Overloads_AllOperators multiply:oneAll c2:twoAll] value] == (1 * 2), "1 * 2 All");
-	XCTAssertTrue ([[Overloads_AllOperators divideAllOperators:twoAll alloperators:oneAll] value] == (2 / 1), "2 / 1 All");
-	XCTAssertTrue ([[Overloads_AllOperators divideAllOperators:twoAll int32:1] value] == (2 / 1), "2 / 1 All int");
+	XCTAssertTrue ([[Overloads_AllOperators divideAllOperators:twoAll allOperators:oneAll] value] == (2 / 1), "2 / 1 All");
+	XCTAssertTrue ([[Overloads_AllOperators divideAllOperators:twoAll intValue:1] value] == (2 / 1), "2 / 1 All int");
 
-	XCTAssertTrue ([[Overloads_AllOperators bitwiseAndAllOperators:oneAll alloperators:twoAll] value] == (1 & 2), "1 & 2 All");
-	XCTAssertTrue ([[Overloads_AllOperators bitwiseAndAllOperators:oneAll int32:2] value] == (1 & 2), "1 & 2 All int");
+	XCTAssertTrue ([[Overloads_AllOperators bitwiseAndAllOperators:oneAll allOperators:twoAll] value] == (1 & 2), "1 & 2 All");
+	XCTAssertTrue ([[Overloads_AllOperators bitwiseAndAllOperators:oneAll intValue:2] value] == (1 & 2), "1 & 2 All int");
 
 	XCTAssertTrue ([[Overloads_AllOperators bitwiseOr:oneAll c2:twoAll] value] == (1 | 2), "1 | 2 All");
 	XCTAssertTrue ([[Overloads_AllOperators xor:oneAll c2:twoAll] value] == (1 ^ 2), "1 ^ 2 All");
@@ -812,6 +876,17 @@
 	XCTAssertEqualObjects (@"Hello", strArr2[1], @"strArr2[1] Hello");
 	XCTAssertEqualObjects (@"Bonjour", strArr2[2], @"strArr2[2] Bonjour");
 
+	NSArray<NSString *> *strRefArr = [testClass stringArrMethod];
+	[testClass stringArrRefStrArr:&strRefArr];
+	XCTAssertEqual ([strRefArr count], 3, @"strArr count");
+	XCTAssertEqualObjects (@"Hola", strRefArr[2], @"strRefArr[2] Hola");
+	XCTAssertEqualObjects (@"Hello", strRefArr[1], @"strRefArr[1] Hello");
+	XCTAssertEqualObjects (@"Bonjour", strRefArr[0], @"strRefArr[0] Bonjour");
+
+	NSArray<NSString *> *strRefNilArr = nil;
+	[testClass stringArrRefStrArr:&strRefNilArr];
+	XCTAssertNil(strRefNilArr, "strRefNilArr");
+
 	NSArray<Arrays_ValueHolder *> *vhArr = [testClass valueHolderArrMethod];
 	XCTAssertEqual ([vhArr count], 3, @"vhArr count");
 	XCTAssertEqual (vhArr[0].intValue, 1, @"vhArr[0] 1");
@@ -823,6 +898,17 @@
 	XCTAssertEqual (vhArr2[0].intValue, 1, @"vhArr2[0] 1");
 	XCTAssertEqual (vhArr2[1].intValue, 2, @"vhArr2[1] 2");
 	XCTAssertEqual (vhArr2[2].intValue, 3, @"vhArr2[2] 3");
+
+	NSArray<Arrays_ValueHolder *> *vhRefArr = [testClass valueHolderArrMethod];
+	[testClass valueHolderArrRefValueArr:&vhRefArr];
+	XCTAssertEqual ([vhRefArr count], 3, @"vhArr count");
+	XCTAssertEqual (vhRefArr[2].intValue, 1, @"vhRefArr[2] 1");
+	XCTAssertEqual (vhRefArr[1].intValue, 2, @"vhRefArr[1] 2");
+	XCTAssertEqual (vhRefArr[0].intValue, 3, @"vhRefArr[0] 3");
+
+	NSArray<Arrays_ValueHolder *> *vhRefNilArr = nil;
+	[testClass valueHolderArrRefValueArr:&vhRefNilArr];
+	XCTAssertNil(vhRefNilArr, "vhRefNilArr");
 
 	NSArray<NSNumber *> *boolArr = [testClass boolArrMethod];
 	XCTAssertEqual ([boolArr count], 3, @"boolArr count");
@@ -920,6 +1006,17 @@
 	XCTAssertEqual (longArr2[1].longLongValue, LONG_MIN, @"longArr2[1] LONG_MIN");
 	XCTAssertEqual (longArr2[2].longLongValue, 0, @"longArr2[2] 0");
 
+	NSArray<NSNumber *> *longRefArr = [testClass longArrMethod];
+	[testClass longArrRefLongArr:&longRefArr];
+	XCTAssertEqual ([longRefArr count], 3, @"longRefArr count");
+	XCTAssertEqual (longRefArr[2].longLongValue, LONG_MAX, @"longRefArr[2] LONG_MAX");
+	XCTAssertEqual (longRefArr[1].longLongValue, LONG_MIN, @"longRefArr[1] LONG_MIN");
+	XCTAssertEqual (longRefArr[0].longLongValue, 0, @"longRefArr[0] 0");
+
+	NSArray<NSNumber *> *longRefNilArr = nil;
+	[testClass longArrRefLongArr:&longRefNilArr];
+	XCTAssertNil(longRefNilArr, "longRefNilArr");
+
 	NSArray<NSNumber *> *ushortArr = [testClass ushortArrMethod];
 	XCTAssertEqual ([ushortArr count], 3, @"ushortArr count");
 	XCTAssertEqual (ushortArr[0].unsignedShortValue, USHRT_MAX, @"ushortArr[0] USHRT_MAX");
@@ -964,41 +1061,64 @@
 	NSData *data2 = [testClass byteArrMethodByteArr:data];
 	XCTAssertEqualObjects (cData, data2, @"data");
 
+	NSData *dataRefArr = [testClass byteArrMethod];
+	[testClass byteArrRefByteArr:&dataRefArr];
+	char rbytes[5] = {0x08, 0x04, 0x02, 0x01, 0x0};
+	NSData *crData = [NSData dataWithBytes:rbytes length:sizeof(rbytes)];
+	XCTAssertEqualObjects (crData, dataRefArr, @"data");
+
+	NSData *dataRefNilArr = nil;
+	[testClass byteArrRefByteArr:&dataRefNilArr];
+	XCTAssertNil(longRefNilArr, "longRefNilArr");
+
 	NSArray<id<Interfaces_IMakeItUp>> *interArr = [testClass interfaceArrMethod];
 	XCTAssertEqual ([interArr count], 3, @"interArr count");
 	XCTAssertTrue ([interArr[0] conformsToProtocol:@protocol(Interfaces_IMakeItUp)], "interArr[0] conformsToProtocol 1");
 	XCTAssertTrue ([interArr[0] boolean], "interArr[0] true");
 	XCTAssertFalse ([interArr[0] boolean], "interArr[0] false");
-	XCTAssertEqualObjects (@"0", [interArr[0] convertInt32:0], "interArr[0] 0");
-	XCTAssertEqualObjects (@"1", [interArr[0] convertInt64:1ll], "interArr[0] 1");
+	XCTAssertEqualObjects (@"0", [interArr[0] convertIntValue:0], "interArr[0] 0");
+	XCTAssertEqualObjects (@"1", [interArr[0] convertLongValue:1ll], "interArr[0] 1");
 	XCTAssertTrue ([interArr[1] conformsToProtocol:@protocol(Interfaces_IMakeItUp)], "interArr[1] conformsToProtocol 1");
 	XCTAssertTrue ([interArr[1] boolean], "interArr[1] true");
 	XCTAssertFalse ([interArr[1] boolean], "interArr[1] false");
-	XCTAssertEqualObjects (@"0", [interArr[1] convertInt32:0], "interArr[1] 0");
-	XCTAssertEqualObjects (@"1", [interArr[1] convertInt64:1ll], "interArr[1] 1");
+	XCTAssertEqualObjects (@"0", [interArr[1] convertIntValue:0], "interArr[1] 0");
+	XCTAssertEqualObjects (@"1", [interArr[1] convertLongValue:1ll], "interArr[1] 1");
 	XCTAssertTrue ([interArr[2] conformsToProtocol:@protocol(Interfaces_IMakeItUp)], "interArr[2] conformsToProtocol 1");
 	XCTAssertTrue ([interArr[2] boolean], "interArr[2] true");
 	XCTAssertFalse ([interArr[2] boolean], "interArr[2] false");
-	XCTAssertEqualObjects (@"0", [interArr[2] convertInt32:0], "interArr[2] 0");
-	XCTAssertEqualObjects (@"1", [interArr[2] convertInt64:1ll], "interArr[2] 1");
+	XCTAssertEqualObjects (@"0", [interArr[2] convertIntValue:0], "interArr[2] 0");
+	XCTAssertEqualObjects (@"1", [interArr[2] convertLongValue:1ll], "interArr[2] 1");
 
 	NSArray<id<Interfaces_IMakeItUp>> *interArr2 = [testClass interfaceArrMethodInterArr:interArr];
 	XCTAssertEqual ([interArr2 count], 3, @"interArr2 count");
 	XCTAssertTrue ([interArr2[0] conformsToProtocol:@protocol(Interfaces_IMakeItUp)], "interArr2[0] conformsToProtocol 1");
 	XCTAssertTrue ([interArr2[0] boolean], "interArr2[0] true");
 	XCTAssertFalse ([interArr2[0] boolean], "interArr2[0] false");
-	XCTAssertEqualObjects (@"0", [interArr2[0] convertInt32:0], "interArr2[0] 0");
-	XCTAssertEqualObjects (@"1", [interArr2[0] convertInt64:1ll], "interArr2[0] 1");
+	XCTAssertEqualObjects (@"0", [interArr2[0] convertIntValue:0], "interArr2[0] 0");
+	XCTAssertEqualObjects (@"1", [interArr2[0] convertLongValue:1ll], "interArr2[0] 1");
 	XCTAssertTrue ([interArr2[1] conformsToProtocol:@protocol(Interfaces_IMakeItUp)], "interArr2[1] conformsToProtocol 1");
 	XCTAssertTrue ([interArr2[1] boolean], "interArr2[1] true");
 	XCTAssertFalse ([interArr2[1] boolean], "interArr2[1] false");
-	XCTAssertEqualObjects (@"0", [interArr2[1] convertInt32:0], "interArr2[1] 0");
-	XCTAssertEqualObjects (@"1", [interArr2[1] convertInt64:1ll], "interArr2[1] 1");
+	XCTAssertEqualObjects (@"0", [interArr2[1] convertIntValue:0], "interArr2[1] 0");
+	XCTAssertEqualObjects (@"1", [interArr2[1] convertLongValue:1ll], "interArr2[1] 1");
 	XCTAssertTrue ([interArr2[2] conformsToProtocol:@protocol(Interfaces_IMakeItUp)], "interArr2[2] conformsToProtocol 1");
 	XCTAssertTrue ([interArr2[2] boolean], "interArr2[2] true");
 	XCTAssertFalse ([interArr2[2] boolean], "interArr2[2] false");
-	XCTAssertEqualObjects (@"0", [interArr2[2] convertInt32:0], "interArr2[2] 0");
-	XCTAssertEqualObjects (@"1", [interArr2[2] convertInt64:1ll], "interArr2[2] 1");
+	XCTAssertEqualObjects (@"0", [interArr2[2] convertIntValue:0], "interArr2[2] 0");
+	XCTAssertEqualObjects (@"1", [interArr2[2] convertLongValue:1ll], "interArr2[2] 1");
+
+	NSArray<id<Interfaces_IMakeItUp>> *interRefArr = [testClass interfaceArrMethod];
+	[testClass iMakeItUpArrRefInterArr:&interRefArr];
+	XCTAssertEqual ([interRefArr count], 1, @"interRefArr count");
+	XCTAssertTrue ([interRefArr[0] conformsToProtocol:@protocol(Interfaces_IMakeItUp)], "interRefArr[0] conformsToProtocol 1");
+	XCTAssertTrue ([interRefArr[0] boolean], "interRefArr[0] true");
+	XCTAssertFalse ([interRefArr[0] boolean], "interRefArr[0] false");
+	XCTAssertEqualObjects (@"0", [interRefArr[0] convertInt32:0], "interRefArr[0] 0");
+	XCTAssertEqualObjects (@"1", [interRefArr[0] convertInt64:1ll], "interRefArr[0] 1");
+
+	NSArray<id<Interfaces_IMakeItUp>> *interRefNilArr = nil;
+	[testClass iMakeItUpArrRefInterArr:&interRefNilArr];
+	XCTAssertNil(interRefNilArr, "interRefNilArr");
 
 	NSArray<NSString *> *nullArr = [testClass getNullMethod];
 	XCTAssertNil (nullArr, @"nullArr");
@@ -1032,18 +1152,18 @@
 	XCTAssertTrue ([interProp[0] conformsToProtocol:@protocol(Interfaces_IMakeItUp)], "interProp[0] conformsToProtocol 1");
 	XCTAssertTrue ([interProp[0] boolean], "interProp[0] true");
 	XCTAssertFalse ([interProp[0] boolean], "interProp[0] false");
-	XCTAssertEqualObjects (@"0", [interProp[0] convertInt32:0], "interProp[0] 0");
-	XCTAssertEqualObjects (@"1", [interProp[0] convertInt64:1ll], "interProp[0] 1");
+	XCTAssertEqualObjects (@"0", [interProp[0] convertIntValue:0], "interProp[0] 0");
+	XCTAssertEqualObjects (@"1", [interProp[0] convertLongValue:1ll], "interProp[0] 1");
 	XCTAssertTrue ([interProp[1] conformsToProtocol:@protocol(Interfaces_IMakeItUp)], "interProp[1] conformsToProtocol 1");
 	XCTAssertTrue ([interProp[1] boolean], "interProp[1] true");
 	XCTAssertFalse ([interProp[1] boolean], "interProp[1] false");
-	XCTAssertEqualObjects (@"0", [interProp[1] convertInt32:0], "interProp[1] 0");
-	XCTAssertEqualObjects (@"1", [interProp[1] convertInt64:1ll], "interProp[1] 1");
+	XCTAssertEqualObjects (@"0", [interProp[1] convertIntValue:0], "interProp[1] 0");
+	XCTAssertEqualObjects (@"1", [interProp[1] convertLongValue:1ll], "interProp[1] 1");
 	XCTAssertTrue ([interProp[2] conformsToProtocol:@protocol(Interfaces_IMakeItUp)], "interProp[2] conformsToProtocol 1");
 	XCTAssertTrue ([interProp[2] boolean], "interProp[2] true");
 	XCTAssertFalse ([interProp[2] boolean], "interProp[2] false");
-	XCTAssertEqualObjects (@"0", [interProp[2] convertInt32:0], "interProp[2] 0");
-	XCTAssertEqualObjects (@"1", [interProp[2] convertInt64:1ll], "interProp[2] 1");
+	XCTAssertEqualObjects (@"0", [interProp[2] convertIntValue:0], "interProp[2] 0");
+	XCTAssertEqualObjects (@"1", [interProp[2] convertLongValue:1ll], "interProp[2] 1");
 
 	NSArray<NSString *> *strNullArr = [testClass stringNullArrMethod];
 	XCTAssertEqual ([strNullArr count], 3, @"strNullArr count");
@@ -1074,28 +1194,28 @@
 	XCTAssertTrue ([interNullArr[0] conformsToProtocol:@protocol(Interfaces_IMakeItUp)], "interNullArr[0] conformsToProtocol 1");
 	XCTAssertTrue ([interNullArr[0] boolean], "interNullArr[0] true");
 	XCTAssertFalse ([interNullArr[0] boolean], "interNullArr[0] false");
-	XCTAssertEqualObjects (@"0", [interNullArr[0] convertInt32:0], "interNullArr[0] 0");
-	XCTAssertEqualObjects (@"1", [interNullArr[0] convertInt64:1ll], "interNullArr[0] 1");
+	XCTAssertEqualObjects (@"0", [interNullArr[0] convertIntValue:0], "interNullArr[0] 0");
+	XCTAssertEqualObjects (@"1", [interNullArr[0] convertLongValue:1ll], "interNullArr[0] 1");
 	XCTAssertEqualObjects (interNullArr[1], [NSNull null], @"interNullArr[1] NSNull");
 	XCTAssertTrue ([interNullArr[2] conformsToProtocol:@protocol(Interfaces_IMakeItUp)], "interNullArr[2] conformsToProtocol 1");
 	XCTAssertTrue ([interNullArr[2] boolean], "interNullArr[2] true");
 	XCTAssertFalse ([interNullArr[2] boolean], "interNullArr[2] false");
-	XCTAssertEqualObjects (@"0", [interNullArr[2] convertInt32:0], "interNullArr[2] 0");
-	XCTAssertEqualObjects (@"1", [interNullArr[2] convertInt64:1ll], "interNullArr[2] 1");
+	XCTAssertEqualObjects (@"0", [interNullArr[2] convertIntValue:0], "interNullArr[2] 0");
+	XCTAssertEqualObjects (@"1", [interNullArr[2] convertLongValue:1ll], "interNullArr[2] 1");
 
 	NSArray<id<Interfaces_IMakeItUp>> *interNullArr2 = [testClass interfaceArrMethodInterArr:interNullArr];
 	XCTAssertEqual ([interNullArr2 count], 3, @"interNullArr2 count");
 	XCTAssertTrue ([interNullArr2[0] conformsToProtocol:@protocol(Interfaces_IMakeItUp)], "interNullArr2[0] conformsToProtocol 1");
 	XCTAssertTrue ([interNullArr2[0] boolean], "interNullArr2[0] true");
 	XCTAssertFalse ([interNullArr2[0] boolean], "interNullArr2[0] false");
-	XCTAssertEqualObjects (@"0", [interNullArr2[0] convertInt32:0], "interNullArr2[0] 0");
-	XCTAssertEqualObjects (@"1", [interNullArr2[0] convertInt64:1ll], "interNullArr2[0] 1");
+	XCTAssertEqualObjects (@"0", [interNullArr2[0] convertIntValue:0], "interNullArr2[0] 0");
+	XCTAssertEqualObjects (@"1", [interNullArr2[0] convertLongValue:1ll], "interNullArr2[0] 1");
 	XCTAssertEqualObjects (interNullArr2[1], [NSNull null], @"interNullArr2[1] NSNull");
 	XCTAssertTrue ([interNullArr2[2] conformsToProtocol:@protocol(Interfaces_IMakeItUp)], "interNullArr2[2] conformsToProtocol 1");
 	XCTAssertTrue ([interNullArr2[2] boolean], "interNullArr2[2] true");
 	XCTAssertFalse ([interNullArr2[2] boolean], "interNullArr2[2] false");
-	XCTAssertEqualObjects (@"0", [interNullArr2[2] convertInt32:0], "interNullArr2[2] 0");
-	XCTAssertEqualObjects (@"1", [interNullArr2[2] convertInt64:1ll], "interNullArr2[2] 1");
+	XCTAssertEqualObjects (@"0", [interNullArr2[2] convertIntValue:0], "interNullArr2[2] 0");
+	XCTAssertEqualObjects (@"1", [interNullArr2[2] convertLongValue:1ll], "interNullArr2[2] 1");
 }
 
 - (void)testIFormatProvider {

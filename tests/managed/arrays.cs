@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Interfaces;
 
 namespace Arrays {
@@ -46,6 +47,12 @@ namespace Arrays {
 		public string [] StringNullArrMethod () => new [] { "Hola", null, "Bonjour" };
 		public ValueHolder [] ValueHolderNullArrMethod () => new [] { new ValueHolder (1), null, new ValueHolder (3) };
 		public IMakeItUp [] InterfaceNullArrMethod () => new [] { Supplier.Create (), null, Supplier.Create () };
+
+		public void StringArrRef (ref string [] strArr) => strArr = strArr?.Reverse ().ToArray ();
+		public void LongArrRef (ref long [] longArr) => longArr = longArr?.Reverse ().ToArray ();
+		public void ByteArrRef (ref byte [] byteArr) => byteArr = byteArr?.Reverse ().ToArray ();
+		public void ValueHolderArrRef (ref ValueHolder [] valueArr) => valueArr = valueArr?.Reverse ().ToArray ();
+		public void IMakeItUpArrRef (ref IMakeItUp [] interArr) => interArr = interArr != null ? new [] { Supplier.Create () } : null;
 	}
 
 	public class ValueHolder {

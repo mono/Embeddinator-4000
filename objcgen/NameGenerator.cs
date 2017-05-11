@@ -30,6 +30,27 @@ namespace ObjC {
 			{ "signed char", "aChar" }
 		};
 
+		public static Dictionary<string, string> ObjCTypeToMethodName = new Dictionary<string, string> {
+			{ "int", "IntValue" },
+			{ "unsigned int", "UIntValue" },
+			{ "double", "DoubleValue" },
+			{ "float", "FloatValue" },
+			{ "NSString *", "StringValue" },
+			{ "NSObject", "ObjectValue" },
+			{ "NSPoint", "PointValue" },
+			{ "NSRect", "RectValue" },
+			{ "NSFont", "FontValue" },
+			{ "SEL", "SelectorValue" },
+			{ "short", "ShortValue" },
+			{ "unsigned short", "UShortValue" },
+			{ "long long", "LongValue" },
+			{ "unsigned long long", "ULongValue" },
+			{ "bool", "BoolValue" },
+			{ "char", "CharValue" },
+			{ "unsigned char", "UCharValue" },
+			{ "signed char", "SCharValue" }
+		};
+
 		public static string GetObjCName (Type t)
 		{
 			return t.FullName.Replace ('.', '_').Replace ("+", "_");
@@ -41,6 +62,9 @@ namespace ObjC {
 		{
 			if (t.IsByRef) {
 				var et = t.GetElementType ();
+				if (Type.GetTypeCode (et) == TypeCode.Decimal) // This is boxed into NSDecimalNumber
+					return GetTypeName (et) + "_Nonnull * _Nullable";
+
 				return GetTypeName (et) + (et.IsValueType ? " " : " _Nonnull ") + "* _Nullable";
 			}
 
@@ -92,6 +116,8 @@ namespace ObjC {
 				return "unsigned long long";
 			case TypeCode.String:
 				return "NSString *";
+			case TypeCode.Decimal:
+				return "NSDecimalNumber *";
 			default:
 				throw new NotImplementedException ($"Converting type {t.Name} to a native type name");
 			}
@@ -147,6 +173,8 @@ namespace ObjC {
 				return "ulong";
 			case TypeCode.String:
 				return "string";
+			case TypeCode.Decimal:
+				return "System.Decimal";
 			default:
 				throw new NotImplementedException ($"Converting type {t.Name} to a mono type name");
 			}
@@ -176,6 +204,8 @@ namespace ObjC {
 					return $"NSArray<id<{GetObjCName (t)}>> *";
 
 				return $"NSArray<{GetObjCName (t)} *> *";
+			case TypeCode.Decimal:
+				return "NSArray <NSDecimalNumber *> *";
 			default:
 				throw new NotImplementedException ($"Converting type {t.Name} to a native type name");
 			}
@@ -183,13 +213,13 @@ namespace ObjC {
 
 		public static string GetParameterTypeName (Type t)
 		{
-			var name = t.Name;
 			if (t.IsArray)
 				return t.GetElementType ().Name + "Array";
-			else if (t.IsByRef)
+			if (t.IsByRef)
 				return t.GetElementType ().Name + "Ref";
-			else
-				return t.Name;
+			if (!ObjCTypeToMethodName.TryGetValue (GetTypeName (t), out string name))
+				name = t.Name;
+			return name;
 		}
 
 		public static string GetExtendedParameterName (ParameterInfo p, ParameterInfo [] parameters)

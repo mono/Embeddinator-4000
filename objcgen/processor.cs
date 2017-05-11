@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections.Generic;
 using IKVM.Reflection;
 using Type = IKVM.Reflection.Type;
@@ -11,7 +11,7 @@ namespace Embeddinator {
 		public List<ProcessedType> Types { get; set; } = new List<ProcessedType> ();
 
 		Queue<ProcessedAssembly> assemblyQueue = new Queue<ProcessedAssembly> ();
-		Queue<ProcessedType> typeQueue;
+		Queue<ProcessedType> typeQueue = new Queue<ProcessedType> ();
 		bool processing_ended;
 
 		protected List<Exception> Delayed = new List<Exception> ();
@@ -56,7 +56,8 @@ namespace Embeddinator {
 			}
 
 			// we can add new types while processing some (e.g. categories)
-			typeQueue = new Queue<ProcessedType> (Types);
+			foreach (var type in Types)
+				typeQueue.Enqueue (type);
 			Types.Clear (); // reuse
 			while (typeQueue.Count > 0) {
 				Process (typeQueue.Dequeue ());

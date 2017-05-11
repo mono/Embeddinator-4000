@@ -65,7 +65,6 @@ namespace ObjC {
 					unsupported.Add (t);
 					return false;
 				case "DateTime": // FIXME: NSDateTime
-				case "Decimal": // FIXME: NSDecimal
 				case "TimeSpan":
 					Delayed.Add (ErrorHelper.CreateWarning (1012, $"Type `{t}` is not generated because it lacks a marshaling code with a native counterpart."));
 					unsupported.Add (t);
