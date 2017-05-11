@@ -67,7 +67,7 @@ namespace Embeddinator {
 
 		protected void AddExtraType (ProcessedType pt)
 		{
-			typeQueue.Enqueue (pt);
+			Types.Add (pt);
 			// extra types are (most likely) outside the input list of assemblies
 			AddIfUnique (pt.Assembly);
 		}
