@@ -163,20 +163,22 @@ namespace Embeddinator {
 			case "macos":
 			case "mac":
 				Platform = Platform.macOS;
-				// FIXME: this is not right when embedding XM.
 				EnableLinker = false;
 				break;
 			case "macosmodern":
 			case "macos-modern":
 				Platform = Platform.macOSModern;
+				EnableLinker = true;
 				break;
 			case "macosfull":
 			case "macos-full":
 				Platform = Platform.macOSFull;
+				EnableLinker = false;
 				break;
 			case "macossystem":
 			case "macos-system":
 				Platform = Platform.macOSSystem;
+				EnableLinker = false;
 				break;
 			case "ios":
 				Platform = Platform.iOS;
