@@ -77,9 +77,12 @@ namespace Embeddinator {
 		public bool HasMethods => Methods != null && Methods.Count > 0;
 		public bool HasProperties => Properties != null && Properties.Count > 0;
 
-		public bool IsClass => !IsEnum && !IsProtocol;
-		public bool IsEnum => Type.IsEnum;
-		public bool IsProtocol => Type.IsInterface;
+		public bool IsClass => !IsEnum && !IsProtocol && !IsNativeReference;
+		public bool IsEnum => Type.IsEnum && !IsNativeReference;
+		public bool IsProtocol => Type.IsInterface && !IsNativeReference;
+
+		// we can track types that we don't need/want to generate (e.g. linker requirements)
+		public bool IsNativeReference { get; set; }
 
 		public bool UserCode => Assembly.UserCode;
 

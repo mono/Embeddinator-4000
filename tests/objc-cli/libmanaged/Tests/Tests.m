@@ -1228,6 +1228,18 @@
 	XCTAssertEqualObjects (@"1", [interNullArr2[2] convertLongValue:1ll], "interNullArr2[2] 1");
 }
 
+- (void)testTimeSpan {
+	// because we have an API that expose TimeSpan we generate the type from mscorlib.dll (because NSTimeInterval is not a very good alternative)
+	System_TimeSpan *ts = [[System_TimeSpan alloc] initWithDays:1 hours:2 minutes:3 seconds:4 milliseconds:5];
+	XCTAssertTrue ([ts days] == 1, "days");
+	XCTAssertTrue ([ts hours] == 2, "hours");
+	XCTAssertTrue ([ts minutes] == 3, "minutes");
+	XCTAssertTrue ([ts seconds] == 4, "seconds");
+	XCTAssertTrue ([ts milliseconds] == 5, "milliseconds");
+
+	XCTAssertTrue ([ts ticks] == 937840050000ll, "ticks");
+}
+
 - (void)testIFormatProvider {
 	id<System_IFormatProvider> enUS = [Interfaces_ExposeIFormatProvider getCultureName:@"en-US"];
 	XCTAssertNotNil (enUS, "en-US");
@@ -1238,6 +1250,12 @@
 	XCTAssertNotNil (frCA, "fr-CA");
 	NSString *s2 = [Interfaces_ExposeIFormatProvider formatValue:1.2 provider:frCA];
 	XCTAssertEqualObjects (@"1,2", s2, "1,2");
+
+	System_TimeSpan *ts = [[System_TimeSpan alloc] initWithTicks:937840050000ll];
+	NSString *s3 = [ts toStringFormat:@"c" formatProvider:nil];
+	NSString *s4 = [ts toStringFormat:@"c"];
+	XCTAssertEqualObjects (s3, @"1.02:03:04.0050000", "toStringFormat");
+	XCTAssertEqualObjects (s3, s4, "toStringFormat:formatprovider");
 }
 
 #pragma clang diagnostic pop

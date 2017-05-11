@@ -27,9 +27,49 @@ namespace ObjC {
 			return IsNSObjectSubclass (t.BaseType);
 		}
 
-		// extras
-		ProcessedAssembly mscorlib;
+		// extras - on demand only
+		ProcessedAssembly mscorlib_assembly;
+		ProcessedType system_decimal;
 		ProcessedType system_iformatprovider;
+		ProcessedType system_timespan;
+		ProcessedType system_globalization_timespanstyles;
+
+		ProcessedAssembly GetMscorlib (Type t)
+		{
+			var a = t.Assembly;
+			if (a.GetName ().Name != "mscorlib")
+				throw ErrorHelper.CreateError (99, "Internal error: incorrect assembly for `{t}`. Please file a bug report with a test case (https://github.com/mono/Embeddinator-4000/issues)");
+
+			if (mscorlib_assembly == null) {
+				mscorlib_assembly = new ProcessedAssembly (a) {
+					UserCode = false,
+				};
+			}
+			return mscorlib_assembly;
+		}
+
+		bool AddDecimalSupport (Type t)
+		{
+			if (system_decimal != null)
+				return true;
+			var corlib = GetMscorlib (t);
+			system_decimal = new ProcessedType (t) {
+				Assembly = corlib,
+				// this is tracked because the linker (if enabled) needs to be aware of the requirement
+				// but we do not want any code to be generated (it's referenced only from native/glue code)
+				IsNativeReference = true,
+				Methods = new List<ProcessedMethod> (),
+			};
+			// we don't want to being everything from System.Decimal, but only the bits the support code can call
+			var string_type = corlib.Assembly.GetType ("System.String");
+			var iformatprovider_type = corlib.Assembly.GetType ("System.IFormatProvider");
+			var parse = t.GetMethod ("Parse", new Type [] { string_type, iformatprovider_type });
+			system_decimal.Methods.Add (new ProcessedMethod (parse));
+			var tostring = t.GetMethod ("ToString", new Type [] { iformatprovider_type });
+			system_decimal.Methods.Add (new ProcessedMethod (tostring));
+			AddExtraType (system_decimal);
+			return true;
+		}
 
 		bool IsSupported (Type t)
 		{
@@ -65,18 +105,39 @@ namespace ObjC {
 					unsupported.Add (t);
 					return false;
 				case "DateTime": // FIXME: NSDateTime
-				case "TimeSpan":
 					Delayed.Add (ErrorHelper.CreateWarning (1012, $"Type `{t}` is not generated because it lacks a marshaling code with a native counterpart."));
 					unsupported.Add (t);
 					return false;
+				case "Decimal":
+					return AddDecimalSupport (t);
+				case "TimeSpan":
+					if (system_timespan == null) {
+						system_timespan = new ProcessedType (t) {
+							Assembly = GetMscorlib (t),
+						};
+						AddExtraType (system_timespan);
+					}
+					return true;
 				case "IFormatProvider":
-					if (mscorlib == null)
-						mscorlib = new ProcessedAssembly (t.Assembly) { UserCode = false };
 					if (system_iformatprovider == null) {
-						system_iformatprovider = new ProcessedType (t) { Assembly = mscorlib };
+						system_iformatprovider = new ProcessedType (t) {
+							Assembly = GetMscorlib (t),
+						};
 						AddExtraType (system_iformatprovider);
 					}
-					break;
+					return true;
+				}
+				break;
+			case "System.Globalization":
+				switch (t.Name) {
+				case "TimeSpanStyles": // enum for TimeSpan support
+					if (system_globalization_timespanstyles == null) {
+						system_globalization_timespanstyles = new ProcessedType (t) {
+							Assembly = GetMscorlib (t),
+						};
+						AddExtraType (system_globalization_timespanstyles);
+					}
+					return true;
 				}
 				break;
 			}
@@ -293,9 +354,11 @@ namespace ObjC {
 
 		public override void Process (ProcessedType pt)
 		{
-			var t = pt.Type;
-
 			Types.Add (pt);
+			if (pt.IsNativeReference)
+				return;
+
+			var t = pt.Type;
 			if (t.IsEnum)
 				return;
 

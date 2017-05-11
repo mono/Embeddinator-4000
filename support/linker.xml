@@ -1,9 +1,0 @@
-﻿<?xml version="1.0" encoding="UTF-8" ?>
-<linker>
-	<assembly fullname="mscorlib">
-		<type fullname="System.Decimal">
-			<method signature="System.String ToString(System.IFormatProvider)" />
-			<method signature="System.Decimal Parse(System.String,System.IFormatProvider)" />
-		</type>
-	</assembly>
-</linker>
