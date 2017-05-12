@@ -18,7 +18,7 @@ iOS.  Other environments do allow JIT compilation, and in those
 enviroments, we opt to JIT compile.
 
 It supports various language consumers, so it surfaces .NET code as
-idiomatic code in the target language.   This is the list of langauge
+idiomatic code in the target language.   This is the list of language
 support that we have been working on:
 
 * *Objective-C*: mapping .NET to idiomatic Objective-C APIs.
