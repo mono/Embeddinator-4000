@@ -64,9 +64,9 @@ namespace ObjC {
 			var string_type = corlib.Assembly.GetType ("System.String");
 			var iformatprovider_type = corlib.Assembly.GetType ("System.IFormatProvider");
 			var parse = t.GetMethod ("Parse", new Type [] { string_type, iformatprovider_type });
-			system_decimal.Methods.Add (new ProcessedMethod (parse));
+			system_decimal.Methods.Add (new ProcessedMethod (parse, this));
 			var tostring = t.GetMethod ("ToString", new Type [] { iformatprovider_type });
-			system_decimal.Methods.Add (new ProcessedMethod (tostring));
+			system_decimal.Methods.Add (new ProcessedMethod (tostring, this));
 			AddExtraType (system_decimal);
 			return true;
 		}
@@ -195,7 +195,7 @@ namespace ObjC {
 		HashSet<MemberInfo> members_with_default_values = new HashSet<MemberInfo> ();
 
 		// defining type / extended type / methods
-		internal Dictionary<Type, Dictionary<Type, List<MethodInfo>>> extensions_methods = new Dictionary<Type, Dictionary<Type, List<MethodInfo>>> ();
+		internal Dictionary<Type, Dictionary<Type, List<ProcessedMethod>>> extensions_methods = new Dictionary<Type, Dictionary<Type, List<ProcessedMethod>>> ();
 
 		protected IEnumerable<MethodInfo> GetMethods (Type t)
 		{
@@ -258,17 +258,17 @@ namespace ObjC {
 					if (extended_type.IsPrimitive) {
 						Delayed.Add (ErrorHelper.CreateWarning (1034, $"Extension method `{mi}` is not generated inside a category because they cannot be created on primitive type `{extended_type}`. A normal, static method was generated."));
 					} else {
-						Dictionary<Type, List<MethodInfo>> extensions;
+						Dictionary<Type, List<ProcessedMethod>> extensions;
 						if (!extensions_methods.TryGetValue (t, out extensions)) {
-							extensions = new Dictionary<Type, List<MethodInfo>> ();
+							extensions = new Dictionary<Type, List<ProcessedMethod>> ();
 							extensions_methods.Add (t, extensions);
 						}
-						List<MethodInfo> extmethods;
+						List<ProcessedMethod> extmethods;
 						if (!extensions.TryGetValue (extended_type, out extmethods)) {
-							extmethods = new List<MethodInfo> ();
+							extmethods = new List<ProcessedMethod> ();
 							extensions.Add (extended_type, extmethods);
 						}
-						extmethods.Add (mi);
+						extmethods.Add (new ProcessedMethod  (mi, this));
 						continue;
 					}
 				}
@@ -322,7 +322,7 @@ namespace ObjC {
 			// proceed with extra adjustments before giving results to the generator
 			foreach (var t in Types) {
 				foreach (var uctor in GetUnavailableParentCtors (t)) {
-					var c = new ProcessedConstructor (uctor.Constructor) { Unavailable = true };
+					var c = new ProcessedConstructor (uctor.Constructor, this) { Unavailable = true };
 					t.Constructors.Add (c);
 				}
 			}
@@ -452,11 +452,11 @@ namespace ObjC {
 			for (int i = parameters.Length - 1; i >= 0; i--) {
 				if (!parameters [i].HasDefaultValue)
 					continue;
-				var pc = new ProcessedConstructor (ci) {
+				var pc = new ProcessedConstructor (ci, this) {
 					ConstructorType = ConstructorType.DefaultValueWrapper,
 					FirstDefaultParameter = i,
 				};
-				pc.ComputeSignatures (this);
+				pc.ComputeSignatures ();
 				yield return pc;
 			}
 		}
@@ -468,11 +468,11 @@ namespace ObjC {
 			for (int i = parameters.Length - 1; i >= 0; i--) {
 				if (!parameters [i].HasDefaultValue)
 					continue;
-				var pm = new ProcessedMethod (mi) {
+				var pm = new ProcessedMethod (mi, this) {
 					MethodType = MethodType.DefaultValueWrapper,
 					FirstDefaultParameter = i,
 				};
-				pm.ComputeSignatures (this);
+				pm.ComputeSignatures ();
 				yield return pm;
 			}
 		}

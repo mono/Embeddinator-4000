@@ -22,7 +22,7 @@ namespace ObjC {
 					continue;
 				}
 
-				ProcessedMethod processedMethod = new ProcessedMethod (method);
+				ProcessedMethod processedMethod = new ProcessedMethod (method, this);
 
 				if (duplicateNames.Contains (CreateStringRep (method)) && method.Name != "CompareTo") // HACK
 					processedMethod.FallBackToTypeName = true;
@@ -32,7 +32,7 @@ namespace ObjC {
 
 				ProcessPotentialNameOverride (processedMethod);
 
-				processedMethod.ComputeSignatures (this);
+				processedMethod.ComputeSignatures ();
 				yield return processedMethod;
 			}
 		}
@@ -55,7 +55,7 @@ namespace ObjC {
 		protected IEnumerable<ProcessedProperty> PostProcessProperties (IEnumerable<PropertyInfo> properties)
 		{
 			foreach (PropertyInfo property in properties) {
-				ProcessedProperty processedProperty = new ProcessedProperty (property);
+				ProcessedProperty processedProperty = new ProcessedProperty (property, this);
 				yield return processedProperty;
 			}
 		}
@@ -63,7 +63,7 @@ namespace ObjC {
 		protected IEnumerable<ProcessedProperty> PostProcessSubscriptProperties (IEnumerable<PropertyInfo> properties)
 		{
 			foreach (PropertyInfo property in properties) {
-				ProcessedProperty processedProperty = new ProcessedProperty (property);
+				ProcessedProperty processedProperty = new ProcessedProperty (property, this);
 				yield return processedProperty;
 			}
 		}
@@ -71,7 +71,7 @@ namespace ObjC {
 		protected IEnumerable<ProcessedFieldInfo> PostProcessFields (IEnumerable<FieldInfo> fields)
 		{
 			foreach (FieldInfo field in fields) {
-				ProcessedFieldInfo processedField = new ProcessedFieldInfo (field);
+				ProcessedFieldInfo processedField = new ProcessedFieldInfo (field, this);
 				yield return processedField;
 			}
 		}
@@ -81,12 +81,12 @@ namespace ObjC {
 			HashSet<string> duplicateNames = FindDuplicateNames (constructors);
 
 			foreach (ConstructorInfo constructor in constructors) {
-				ProcessedConstructor processedConstructor = new ProcessedConstructor (constructor);
+				ProcessedConstructor processedConstructor = new ProcessedConstructor (constructor, this);
 
 				if (duplicateNames.Contains (CreateStringRep(constructor)))
 					processedConstructor.FallBackToTypeName = true;
 
-				processedConstructor.ComputeSignatures (this);
+				processedConstructor.ComputeSignatures ();
 				yield return processedConstructor;
 			}
 		}

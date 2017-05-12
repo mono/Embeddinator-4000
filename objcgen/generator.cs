@@ -108,7 +108,7 @@ namespace Embeddinator {
 		}
 
 		// to be removed / replaced
-		public Dictionary<Type, Dictionary<Type, List<MethodInfo>>> extensions_methods { get; private set; }
+		public Dictionary<Type, Dictionary<Type, List<ProcessedMethod>>> extensions_methods { get; private set; }
 		public Dictionary<Type, List<ProcessedProperty>> subscriptProperties { get; private set; }
 		public Dictionary<Type, MethodInfo> icomparable { get; private set; }
 		public Dictionary<Type, MethodInfo> iequatable { get; private set; }
