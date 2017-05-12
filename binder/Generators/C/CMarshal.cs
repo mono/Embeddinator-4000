@@ -124,7 +124,7 @@ namespace MonoEmbeddinator4000.Generators
         {
             var typeName = @class.Visit(CTypePrinter);
             var objectId = $"{Context.ArgName}_obj";
-            Context.SupportBefore.WriteLine("{1}* {0} = ({1}*) mono_embeddinator_create_object({2});",
+            Context.SupportBefore.WriteLine("{1}* {0} = {2} ? ({1}*) mono_embeddinator_create_object({2}) : 0;",
                 objectId, typeName, Context.ArgName);
             Context.Return.Write("{0}", objectId);
             return true;
