@@ -710,11 +710,14 @@ namespace Embeddinator {
 							mmp.Append (Quote (Path.GetFullPath (asm.Location))).Append (" ");
 						mmp.Append ($"-a:{GetPlatformAssembly ()} ");
 						mmp.Append ($"--sdk {GetSdkVersion (build_info.Sdk.ToLower ())} ");
+						// FIXME: once merged add support for linking the platform (Xamarin.Mac.dll)
 						if (Platform == Platform.macOSModern) {
 							mmp.Append ("--linksdkonly ");
 							mmp.Append ($"--xml={Quote (Path.Combine (OutputDirectory, "bindings.xml"))} ");
+						} else {
+							// mmp default is to link everything
+							mmp.Append ("--nolink ");
 						}
-						// FIXME: once merge add support for linking the platform (Xamarin.Mac.dll)
 						mmp.Append ("--registrar:static ");
 						mmp.Append ($"--cache {Quote (cachedir)} ");
 						if (Debug)
