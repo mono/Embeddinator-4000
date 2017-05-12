@@ -63,23 +63,22 @@ namespace MonoEmbeddinator4000
             foreach (var assembly in Assemblies)
                 astGenerator.Visit(assembly);
 
-            var passes = new List<TranslationUnitPass>
+            Context.TranslationUnitPasses.Passes.AddRange(new List<TranslationUnitPass>
             {
                 new CheckReservedKeywords(),
                 new GenerateObjectTypesPass(),
                 new GenerateArrayTypes(),
-                new CheckIgnoredDeclsPass { CheckDecayedTypes = false }
-            };
+                new CheckIgnoredDeclsPass { CheckDecayedTypes = false },
+                new FieldToGetterSetterPropertyPass()
+            });
 
             Generator.SetupPasses();
 
-            passes.AddRange(new TranslationUnitPass[]
+            Context.TranslationUnitPasses.Passes.AddRange(new TranslationUnitPass[]
             {
                 new RenameDuplicatedDeclsPass(),
                 new CheckDuplicatedNamesPass()
             });
-
-            Context.TranslationUnitPasses.Passes.AddRange(passes);
 
             Context.RunPasses();
         }

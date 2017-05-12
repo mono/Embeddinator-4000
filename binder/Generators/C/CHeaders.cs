@@ -137,10 +137,25 @@ namespace MonoEmbeddinator4000.Generators
         {
             PushBlock();
 
-            GenerateMethodSignature(method, isSource: false);
+            Write("MONO_EMBEDDINATOR_API ");
+            GenerateMethodSpecifier(method, method.Namespace as Class);
             WriteLine(";");
 
             PopBlock();
+
+            return true;
+        }
+
+        public override bool VisitProperty(Property property)
+        {
+            if (property.Field == null)
+                return false;
+
+            var getter = property.GetMethod;
+            VisitMethodDecl(getter);
+
+            var setter = property.SetMethod;
+            VisitMethodDecl(setter);
 
             return true;
         }

@@ -18,8 +18,7 @@ namespace MonoEmbeddinator4000.Generators
             base.Process();
         }
         
-        public override void GenerateMethodSignature(Method method,
-            bool isSource)
+        public override void GenerateMethodSpecifier(Method method, Class @class)
         {
             this.GenerateObjCMethodSignature(method);
         }

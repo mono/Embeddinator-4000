@@ -1,4 +1,4 @@
-﻿﻿﻿using System;
+﻿﻿﻿﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -62,6 +62,9 @@ namespace MonoEmbeddinator4000.Generators
 
             foreach (var type in assembly.ExportedTypes)
             {
+                if (!type.IsPublic)
+                    continue;
+
                 var typeInfo = type.GetTypeInfo();
                 Visit(typeInfo);
             }
@@ -224,12 +227,21 @@ namespace MonoEmbeddinator4000.Generators
         {
             foreach (var ctor in type.DeclaredConstructors)
             {
+                if (ctor.IsStatic)
+                    continue;
+
+                if (!ctor.IsPublic)
+                    continue;
+
                 var decl = VisitConstructor(ctor, @class);
                 @class.Declarations.Add(decl);
             }
 
             foreach (var method in type.DeclaredMethods)
             {
+                if (!method.IsPublic)
+                    continue;
+
                 if (method.IsGenericMethod)
                     continue;
 
@@ -242,10 +254,11 @@ namespace MonoEmbeddinator4000.Generators
 
             foreach (var field in type.DeclaredFields)
             {
+                if (!field.IsPublic)
+                    continue;
+
                 var decl = VisitField(field);
-                
-                // TODO: Ignore fields until we implement usage of FieldToPropertyPass
-                //@class.Declarations.Add(decl);
+                @class.Declarations.Add(decl);
             }
 
             foreach (var @event in type.DeclaredEvents)
@@ -610,10 +623,12 @@ namespace MonoEmbeddinator4000.Generators
 
         public Field VisitField(FieldInfo fieldInfo)
         {
-            var field = new Field()
+            var field = new Field
             {
                 Name = UnmangleTypeName(fieldInfo.Name),
-                QualifiedType = VisitType(fieldInfo.FieldType)
+                Namespace = Visit(fieldInfo.DeclaringType.GetTypeInfo()) as Class,
+                QualifiedType = VisitType(fieldInfo.FieldType),
+                IsStatic = fieldInfo.IsStatic
             };
 
             var accessMask = (fieldInfo.Attributes & FieldAttributes.FieldAccessMask);
@@ -629,17 +644,24 @@ namespace MonoEmbeddinator4000.Generators
 
         public Property VisitProperty(PropertyInfo propertyInfo, Class @class)
         {
-            var property = new Property()
+            var property = new Property
             {
                 Name = UnmangleTypeName(propertyInfo.Name),
+                Namespace = Visit(propertyInfo.DeclaringType.GetTypeInfo()) as Class,
                 QualifiedType = VisitType(propertyInfo.PropertyType),
             };
 
             if (propertyInfo.GetMethod != null)
+            {
                 property.GetMethod = VisitMethod(propertyInfo.GetMethod, @class);
+                property.GetMethod.Namespace = property.Namespace;
+            }
 
             if (propertyInfo.SetMethod != null)
+            {
                 property.SetMethod = VisitMethod(propertyInfo.SetMethod, @class);
+                property.SetMethod.Namespace = property.Namespace;
+            }
 
             return property;
         }

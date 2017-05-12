@@ -9,22 +9,12 @@ namespace MonoEmbeddinator4000.Passes
     /// </summary>
     public class PropertyToGetterSetterPass : TranslationUnitPass
     {
-        public override bool VisitClassDecl(Class @class)
-        {
-            if (@class.CompleteDeclaration != null)
-                return VisitClassDecl(@class.CompleteDeclaration as Class);
-
-            return base.VisitClassDecl(@class);
-        }
-
         public override bool VisitProperty(Property property)
         {
             if (!VisitDeclaration(property))
                 return false;
 
-            var @class = property.Namespace as Class;
-            if (@class == null)
-                return false;
+            return false;
 
             property.GenerationKind = GenerationKind.None;
 
@@ -37,6 +27,7 @@ namespace MonoEmbeddinator4000.Passes
                 IsStatic = property.IsStatic
             };
 
+            var @class = property.Namespace as Class;
             @class.Methods.Add(getter);
 
             var param = new Parameter

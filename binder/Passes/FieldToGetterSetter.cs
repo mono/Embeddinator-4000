@@ -4,76 +4,65 @@ using CppSharp.Passes;
 
 namespace MonoEmbeddinator4000.Passes
 {
-    public class FieldToGetterSetterPass : TranslationUnitPass
+    public class FieldToGetterSetterPropertyPass : TranslationUnitPass
     {
-        public override bool VisitClassDecl(Class @class)
-        {
-            if (@class.CompleteDeclaration != null)
-                return VisitClassDecl(@class.CompleteDeclaration as Class);
-
-            return base.VisitClassDecl(@class);
-        }
-
         public override bool VisitFieldDecl(Field field)
         {
             if (!VisitDeclaration(field))
                 return false;
 
-            var @class = field.Namespace as Class;
-            if (@class == null)
+            if (field.Access == AccessSpecifier.Private)
                 return false;
 
-            if (field.Access == AccessSpecifier.Private)
-                return true;
-
-            // Check if we already have a synthetized getter/setter.
-            //var existing = @class.Methods.FirstOrDefault(
-            //    method => method.Parameters.SingleOrDefault(
-            //        (Parameter p) =>
-            //    {
-            //        Class paramClass;
-            //        if(!p.Type.TryGetClass(out paramClass))
-            //            return false;
-
-            //        return paramClass == @class;
-            //    }));
-
-            //if (existing != null)
-            //    return false;
+            if (field.IsImplicit)
+                return false;
 
             field.GenerationKind = GenerationKind.None;
 
+            var @class = field.Namespace as Class;
+
             var getter = new Method
             {
-                Name = string.Format("get{0}", field.Name),
+                Name = $"get_{field.Name}",
                 Namespace = @class,
                 ReturnType = field.QualifiedType,
-                Access = field.Access
+                Access = field.Access,
+                SynthKind = FunctionSynthKind.FieldAcessor,
+                Field = field
             };
-
-            @class.Methods.Add(getter);
 
             var setter = new Method
             {
-                Name = string.Format("set{0}", field.Name),
+                Name = $"set_{field.Name}",
                 Namespace = @class,
+                ReturnType = new QualifiedType(new BuiltinType(PrimitiveType.Void)),
                 Access = field.Access,
-                
+                SynthKind = FunctionSynthKind.FieldAcessor,
+                Field = field
             };
 
             var param = new Parameter
             {
                 Name = "value",
-                QualifiedType = field.QualifiedType
+                QualifiedType = field.QualifiedType,
             };
             setter.Parameters.Add(param);
 
-            @class.Methods.Add(setter);
+            var property = new Property
+            {
+                Name = field.Name,
+                Namespace = field.Namespace,
+                GetMethod = getter,
+                SetMethod = setter,
+                Field = field,
+                QualifiedType = field.QualifiedType
+            };
 
-            Diagnostics.Debug("Getter/setter created from field: {0}::{1}",
-                @class.QualifiedOriginalName, field.Name);
+            @class.Declarations.Add(property);
 
-            return false;
+            Diagnostics.Debug($"Getter/setter property created from field {field.QualifiedName}");
+
+            return true;
         }
     }
 }
