@@ -106,7 +106,8 @@ namespace MonoEmbeddinator4000.Passes
                 Name = CGenerator.ObjectInstanceId,
                 QualifiedType = new QualifiedType(ptrType),
                 Access = AccessSpecifier.Public,
-                Namespace = @class
+                Namespace = @class,
+                IsImplicit = true
             };
 
             @class.Fields.Add(field);

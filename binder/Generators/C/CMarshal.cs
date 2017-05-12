@@ -393,7 +393,7 @@ namespace MonoEmbeddinator4000.Generators
             var handle = CSources.GetMonoObjectField(Options, CSources.MonoObjectFieldUsage.Parameter,
                 Context.ArgName, "_handle");
 
-            var @object = $"mono_gchandle_get_target({handle})";
+            var @object = $"{Context.ArgName} ? mono_gchandle_get_target({handle}) : 0";
 
             if (@class.IsValueType)
                 @object = $"mono_object_unbox({@object})";

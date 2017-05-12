@@ -377,5 +377,130 @@ namespace MonoEmbeddinator4000.Generators
 
             return true;
         }
+
+        public void GenerateFieldLookup(Field field)
+        {
+            var fieldId = GeneratedIdentifier("field");
+            WriteLine($"static MonoClassField *{fieldId} = 0;");
+
+            WriteLine($"if (!{fieldId})");
+            WriteStartBraceIndent();
+
+            var @class = field.Namespace as Class;
+            var classLookupId = GeneratedIdentifier($"lookup_class_{@class.QualifiedName.Replace('.', '_')}");
+            WriteLine($"{classLookupId}();");
+
+            var fieldNameId = GeneratedIdentifier("field_name");
+            WriteLine($"const char {fieldNameId}[] = \"{field.Name}\";");
+
+            var classId = $"class_{@class.QualifiedName}";
+            WriteLine($"{fieldId} = mono_class_get_field_from_name({classId}, {fieldNameId});");
+
+            WriteCloseBraceIndent();
+        }
+
+        public override bool VisitProperty(Property property)
+        {
+            if (property.Field == null)
+                return false;
+
+            GenerateFieldGetter(property);
+            NewLine();
+
+            GenerateFieldSetter(property);
+            NewLine();
+
+            return true;
+        }
+
+        void GenerateFieldGetter(Property property)
+        {
+            var getter = property.GetMethod;
+
+            GenerateMethodSpecifier(getter, getter.Namespace as Class);
+            NewLine();
+            WriteStartBraceIndent();
+
+            var field = property.Field;
+            GenerateFieldLookup(field);
+
+            var instanceId = field.IsStatic ? "0" : GeneratedIdentifier("instance");
+            var resultId = GeneratedIdentifier("result");
+
+            if (!field.IsStatic)
+            {
+                var handle = GetMonoObjectField(Options, MonoObjectFieldUsage.Instance,
+                    FixMethodParametersPass.ObjectParameterId, "_handle");
+                WriteLine($"MonoObject* {instanceId} = mono_gchandle_get_target({handle});");
+            }
+
+            var fieldId = GeneratedIdentifier("field");
+            var domainId = $"{GeneratedIdentifier("mono_context")}.domain";
+
+            WriteLine($"MonoObject* {resultId} = mono_field_get_value_object({domainId}, {fieldId}, {instanceId});");
+
+            var ctx = new MarshalContext(Context)
+            {
+                ArgName = resultId,
+                ReturnVarName = resultId,
+                ReturnType = property.QualifiedType
+            };
+
+            var marshal = new CMarshalManagedToNative(EmbedOptions, ctx);
+            property.QualifiedType.Visit(marshal);
+
+            if (!string.IsNullOrWhiteSpace(marshal.Context.SupportBefore))
+                Write(marshal.Context.SupportBefore);
+
+            WriteLine($"return {marshal.Context.Return.ToString()};");
+
+            WriteCloseBraceIndent();
+        }
+
+        void GenerateFieldSetter(Property property)
+        {
+            var setter = property.SetMethod;
+            var @class = property.Namespace as Class;
+
+            GenerateMethodSpecifier(setter, setter.Namespace as Class);
+            NewLine();
+            WriteStartBraceIndent();
+
+            var field = property.Field;
+            var fieldId = GeneratedIdentifier("field");
+
+            GenerateFieldLookup(field);
+
+            var ctx = new MarshalContext(Context) { ArgName = "value" };
+            var marshal = new CMarshalNativeToManaged(EmbedOptions, ctx);
+            property.QualifiedType.Visit(marshal);
+
+            if (!string.IsNullOrWhiteSpace(marshal.Context.SupportBefore))
+                Write(marshal.Context.SupportBefore);
+
+            var valueId = GeneratedIdentifier("value");
+            WriteLine($"void* {valueId} = {marshal.Context.Return.ToString()};");
+
+            if (field.IsStatic)
+            {
+                var vtableId = GeneratedIdentifier("vtable");
+                var domainId = $"{GeneratedIdentifier("mono_context")}.domain";
+                var classId = $"class_{@class.QualifiedName}";
+
+                WriteLine ($"MonoVTable* {vtableId} = mono_class_vtable({domainId}, {classId});");
+                WriteLine ($"mono_field_static_set_value({vtableId}, {fieldId}, {valueId});");
+            }
+            else
+            {
+                var instanceId = GeneratedIdentifier("instance");
+                var handle = GetMonoObjectField(Options, MonoObjectFieldUsage.Instance,
+                    FixMethodParametersPass.ObjectParameterId, "_handle");
+
+                WriteLine($"MonoObject* {instanceId} = mono_gchandle_get_target({handle});");
+                WriteLine ($"mono_field_set_value({instanceId}, {fieldId}, {valueId});");
+            }
+
+            WriteCloseBraceIndent();
+        }
     }
 }

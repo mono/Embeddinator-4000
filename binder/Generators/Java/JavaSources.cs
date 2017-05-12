@@ -427,6 +427,12 @@ namespace MonoEmbeddinator4000.Generators
             return true;
         }
 
+        public override bool VisitFieldDecl(Field field)
+        {
+            // Ignore fields since they're converted to getter/setter pais.
+            return true;
+        }
+
         public static string GetAccess(AccessSpecifier accessSpecifier)
         {
             switch (accessSpecifier)

@@ -145,6 +145,20 @@ namespace MonoEmbeddinator4000.Generators
 
             return true;
         }
+
+        public override bool VisitProperty(Property property)
+        {
+            if (property.Field == null)
+                return false;
+
+            var getter = property.GetMethod;
+            VisitMethodDecl(getter);
+
+            var setter = property.SetMethod;
+            VisitMethodDecl(setter);
+
+            return true;
+        }
     }
 
 }

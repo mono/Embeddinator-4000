@@ -66,8 +66,23 @@ namespace MonoEmbeddinator4000.Passes
             if (method.IsConstructor)
                 return false;
 
-            if (Options.GeneratorKind == GeneratorKind.C)
+            var isStaticField = method.Field != null && method.Field.IsStatic;
+            if (Options.GeneratorKind == GeneratorKind.C && !isStaticField)
                 AddObjectParameterToMethod(method, @class);
+
+            return true;
+        }
+
+        public override bool VisitProperty(Property property)
+        {
+            if (!VisitDeclaration(property))
+                return false;
+
+            if (property.GetMethod != null)
+                property.GetMethod.Visit(this);
+
+            if (property.SetMethod != null)
+                property.SetMethod.Visit(this);
 
             return true;
         }

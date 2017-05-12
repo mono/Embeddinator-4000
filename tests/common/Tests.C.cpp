@@ -238,6 +238,10 @@ TEST_CASE("Structs.C", "[C][Structs]") {
 
     Structs_Point* p4 = Structs_Point_op_Subtraction(p3, p2);
     REQUIRE(Structs_Point_op_Equality(p4, p1) == true);
+
+    Structs_Point* z = Structs_Point_get_Zero();
+    REQUIRE(Structs_Point_get_X(z) == 0.0f);
+    REQUIRE(Structs_Point_get_Y(z) == 0.0f); 
 }
 
 TEST_CASE("Enums.C", "[C][Enums]") {
@@ -252,6 +256,72 @@ TEST_CASE("Enums.C", "[C][Enums]") {
     f = Enums_Enumer_Test(Enums_ByteEnum_Zero, &i, &s);
     REQUIRE(i == Enums_IntEnum_Min);
     REQUIRE(s == Enums_ShortEnum_Min);
+}
+
+TEST_CASE("FieldsInReference.C", "[C][Fields]") {
+    REQUIRE(Fields_Class_get_MaxLong() == LONG_MAX);
+
+    REQUIRE(Fields_Class_get_Integer() == 0);
+    Fields_Class_set_Integer(1);
+    REQUIRE(Fields_Class_get_Integer() == 1);
+
+    Fields_Class* scratch = Fields_Class_get_Scratch();
+    REQUIRE(Fields_Class_get_Boolean(scratch) == true);
+
+    scratch = Fields_Class_new(/*enabled=*/false);
+    Fields_Class_set_Scratch(scratch);
+    REQUIRE(Fields_Class_get_Boolean(scratch) == false);
+
+    Fields_Class* ref1 = Fields_Class_new(/*enabled=*/true);
+    REQUIRE(Fields_Class_get_Boolean(ref1) == true);
+    Fields_Class_set_Boolean(ref1, false);
+    REQUIRE(Fields_Class_get_Boolean(ref1) == false);
+
+    Fields_Struct* struct1 = Fields_Class_get_Structure(ref1);
+    REQUIRE(struct1 != NULL);
+    REQUIRE(Fields_Struct_get_Boolean(struct1) == false);
+    struct1 = Fields_Struct_new(/*enabled=*/true);
+    REQUIRE(Fields_Struct_get_Boolean(struct1) == true);
+
+    Fields_Class* ref2 = Fields_Class_new(/*enabled=*/false);
+    Fields_Struct* struct2 = Fields_Class_get_Structure(ref2);
+    REQUIRE(struct2 != NULL);
+    REQUIRE(Fields_Class_get_Boolean(ref2) == false);
+}
+
+TEST_CASE("FieldsInValueType.C", "[C][Fields]") {
+    REQUIRE(Fields_Struct_get_Integer() == 0);
+    Fields_Struct_set_Integer(1);
+    REQUIRE(Fields_Struct_get_Integer() == 1);
+
+    Fields_Struct* scratch = Fields_Struct_get_Scratch();
+    REQUIRE(Fields_Struct_get_Boolean(scratch) == false);
+
+    scratch = Fields_Struct_new(/*enabled=*/true);
+    Fields_Struct_set_Scratch(scratch);
+    REQUIRE(Fields_Struct_get_Boolean(scratch) == true);
+
+    Fields_Struct* empty = Fields_Struct_get_Empty();
+    REQUIRE(empty != NULL);
+    REQUIRE(Fields_Struct_get_Class(empty) == NULL);
+
+    Fields_Struct* struct1 = Fields_Struct_new(/*enabled=*/true);
+    REQUIRE(Fields_Struct_get_Boolean(struct1) == true);
+    Fields_Struct_set_Boolean(struct1, false);
+    REQUIRE(Fields_Struct_get_Boolean(struct1) == false);
+
+    Fields_Class* struct1_class = Fields_Struct_get_Class(struct1);
+    REQUIRE(struct1_class != NULL);
+    REQUIRE(Fields_Class_get_Boolean(struct1_class) == false);
+    Fields_Struct_set_Class(struct1, NULL);
+    REQUIRE(Fields_Struct_get_Class(struct1) == NULL);
+    struct1_class = Fields_Class_new(/*enabled=*/true);
+    REQUIRE(Fields_Class_get_Boolean(struct1_class) == true);
+
+    Fields_Struct* struct2 = Fields_Struct_new(/*enabled=*/false);
+    Fields_Class* struct2_class = Fields_Struct_get_Class(struct2);
+    REQUIRE(struct2_class != NULL);
+    REQUIRE(Fields_Class_get_Boolean(struct2_class) == false);
 }
 
 TEST_CASE("Interfaces.C", "[C][Interfaces]") {
