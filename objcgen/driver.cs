@@ -710,7 +710,14 @@ namespace Embeddinator {
 							mmp.Append (Quote (Path.GetFullPath (asm.Location))).Append (" ");
 						mmp.Append ($"-a:{GetPlatformAssembly ()} ");
 						mmp.Append ($"--sdk {GetSdkVersion (build_info.Sdk.ToLower ())} ");
-						mmp.Append ("--linksdkonly ");
+						// FIXME: once merged add support for linking the platform (Xamarin.Mac.dll)
+						if (Platform == Platform.macOSModern) {
+							mmp.Append ("--linksdkonly ");
+							mmp.Append ($"--xml={Quote (Path.Combine (OutputDirectory, "bindings.xml"))} ");
+						} else {
+							// mmp default is to link everything
+							mmp.Append ("--nolink ");
+						}
 						mmp.Append ("--registrar:static ");
 						mmp.Append ($"--cache {Quote (cachedir)} ");
 						if (Debug)
@@ -753,9 +760,6 @@ namespace Embeddinator {
 						mtouch.Append ("--dsym:false ");
 						mtouch.Append ("--msym:false ");
 						mtouch.Append ($"--embeddinator ");
-						// FIXME: we need to generate this XML file, issue #301
-						// https://github.com/mono/Embeddinator-4000/issues/301
-						mtouch.Append ($"--xml={Quote (Path.Combine (OutputDirectory, "linker.xml"))} ");
 						foreach (var asm in Assemblies)
 							mtouch.Append (Quote (Path.GetFullPath (asm.Location))).Append (" ");
 						mtouch.Append ($"-r:{GetPlatformAssembly ()} ");

@@ -103,3 +103,10 @@ public static class Type_Decimal {
 	public static void GetRefPi (ref decimal dec) => dec = Pi;
 	public static decimal [] GetDecimalArr (decimal [] dec) => dec;
 }
+
+public class ExposeExtraTypes {
+
+	public TimeSpan TimeOfDay {
+		get { return DateTime.Now.TimeOfDay; }
+	}
+}
