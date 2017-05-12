@@ -51,6 +51,11 @@ tvOS Support
 
 * [pr329](https://github.com/mono/Embeddinator-4000/pull/329) - Support for tvOS is now available. It requires Xamarin.iOS to be installed;
 
+Other New Features
+------------------
+
+* [xxx]() - [driver] The command line tool now support `nowarn:` to reduce the number of warnings (e.g. when binding an assembly that cannot be modified);
+* [xxx]() - [driver] The command line tool now support `warnaserror:` to ensure some warnings cannot be overlooked;
 
 Known Issues
 ============

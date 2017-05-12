@@ -25,9 +25,36 @@ namespace ObjCGenErrWarnTests {
 			// true: Does.Contain | false: Does.Not.Contain
 			arg2: new [] {
 				true,
-			}
+			},
+			// additional argument
+			arg3: ""
 		)]
-		public void GenWarningTest (string [] warnsToSearch, bool [] shouldFindWarn)
+		[TestCase (
+			// Warning message to [not] look for.
+			arg1: new [] {
+				"warning EM1011: Type `System.Type` is not generated because it lacks a native counterpart.",
+			},
+			// true: Does.Contain | false: Does.Not.Contain
+			arg2: new [] {
+				false,
+			},
+			// additional argument
+			arg3: "--nowarn:1011"
+		)]
+		// blocked by https://bugzilla.xamarin.com/show_bug.cgi?id=55801
+		//[TestCase (
+		//	// Warning message to [not] look for.
+		//	arg1: new [] {
+		//		"error EM1011: Type `System.Type` is not generated because it lacks a native counterpart.",
+		//	},
+		//	// true: Does.Contain | false: Does.Not.Contain
+		//	arg2: new [] {
+		//		false,
+		//	},
+		//	// additional argument
+		//	arg3: "--warnaserror:1011"
+		//)]
+		public void GenWarningTest (string [] warnsToSearch, bool [] shouldFindWarn, string argument)
 		{
 			Assert.That (warnsToSearch.Length, Is.EqualTo (shouldFindWarn.Length), $"{nameof (warnsToSearch)} array length must match {nameof (shouldFindWarn)}'s");
 			string tmpDir = Xamarin.Cache.CreateTemporaryDirectory ();
@@ -43,7 +70,15 @@ namespace ObjCGenErrWarnTests {
 					Console.SetOut (sw);
 					Console.SetError (sw);
 
-					Driver.Main2 (new string [] { $"-o={tmpDir}", "-c", warnerrAssembly.Location });
+					try {
+						var args = new List<string> { $"-o={tmpDir}", "-c", warnerrAssembly.Location };
+						if (!String.IsNullOrWhiteSpace (argument))
+							args.Add (argument);
+					    Driver.Main2 (args.ToArray ());
+					}
+					catch (Exception) {
+						throw;
+					}
 					sw.Flush ();
 					ms.Position = 0;
 					var sr = new StreamReader (ms);

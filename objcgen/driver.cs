@@ -82,6 +82,30 @@ namespace Embeddinator {
 				{ "v|verbose", "generates diagnostic verbose output", v => ErrorHelper.Verbosity++ },
 				{ "version", "Display the version information.", v => action = Action.Version },
 				{ "target=", "The compilation target (staticlibrary, sharedlibrary, framework).", embedder.SetCompilationTarget },
+				{ "warnaserror:", "An optional comma-separated list of warning codes that should be reported as errors (if no warnings are specified all warnings are reported as errors).", v => {
+					try {
+						if (!string.IsNullOrEmpty (v)) {
+							foreach (var code in v.Split (new char [] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+								ErrorHelper.SetWarningLevel (ErrorHelper.WarningLevel.Error, int.Parse (code));
+						} else {
+							ErrorHelper.SetWarningLevel (ErrorHelper.WarningLevel.Error);
+						}
+					} catch (Exception ex) {
+						ErrorHelper.Error (26, ex, "Could not parse the command line argument '{0}': {1}", "--warnaserror", ex.Message);
+					}
+				}},
+				{ "nowarn:", "An optional comma-separated list of warning codes to ignore (if no warnings are specified all warnings are ignored).", v => {
+					try {
+						if (!string.IsNullOrEmpty (v)) {
+							foreach (var code in v.Split (new char [] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+								ErrorHelper.SetWarningLevel (ErrorHelper.WarningLevel.Disable, int.Parse (code));
+						} else {
+							ErrorHelper.SetWarningLevel (ErrorHelper.WarningLevel.Disable);
+						}
+					} catch (Exception ex) {
+						ErrorHelper.Error (26, ex, "Could not parse the command line argument '{0}': {1}", "--nowarn", ex.Message);
+					}
+				}},
 			};
 
 			var assemblies = os.Parse (args);
