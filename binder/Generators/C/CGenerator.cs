@@ -167,12 +167,6 @@ namespace MonoEmbeddinator4000.Generators
 
         public override bool VisitFieldDecl(Field field)
         {
-            WriteLine("{0} {1};", field.Type, field.Name);
-            return true;
-        }
-
-        public override bool VisitProperty(Property property)
-        {
             return true;
         }
     }

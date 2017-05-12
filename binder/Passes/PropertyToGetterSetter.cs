@@ -9,14 +9,6 @@ namespace MonoEmbeddinator4000.Passes
     /// </summary>
     public class PropertyToGetterSetterPass : TranslationUnitPass
     {
-        public override bool VisitClassDecl(Class @class)
-        {
-            if (@class.CompleteDeclaration != null)
-                return VisitClassDecl(@class.CompleteDeclaration as Class);
-
-            return base.VisitClassDecl(@class);
-        }
-
         public override bool VisitProperty(Property property)
         {
             if (!VisitDeclaration(property))
