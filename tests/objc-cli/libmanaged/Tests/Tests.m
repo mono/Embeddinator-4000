@@ -489,6 +489,22 @@
 	XCTAssertEqualObjects (nsdecimalminustau, refDec, "NSDecimalNumber refDec tau");
 	[Type_Decimal getRefPiDec:&refDec];
 	XCTAssertEqualObjects (nsdecimalpi, refDec, "NSDecimalNumber refDec pi");
+
+	NSArray<NSDecimalNumber *> *decimalrefarr = [Type_Decimal decArr];
+	[Type_Decimal reverseDecimalArrRefDecArr:&decimalrefarr];
+	XCTAssertEqual([decimalrefarr count], 8, "decimalarr count");
+	XCTAssertEqualObjects (nsdecimalmax, decimalrefarr[7], "decimalrefarr[7] max");
+	XCTAssertEqualObjects (nsdecimalmin, decimalrefarr[6], "decimalrefarr[6] min");
+	XCTAssertEqualObjects (nsdecimalzero, decimalrefarr[5], "decimalrefarr[5] zero");
+	XCTAssertEqualObjects (nsdecimalone, decimalrefarr[4], "decimalrefarr[4] one");
+	XCTAssertEqualObjects (nsdecimalminusone, decimalrefarr[3], "decimalrefarr[3] minusOne");
+	XCTAssertEqualObjects (nsdecimalpi, decimalrefarr[2], "decimalrefarr[2] pi");
+	XCTAssertEqualObjects (nsdecimalminustau, decimalrefarr[1], "decimalrefarr[1] tau");
+	XCTAssertEqualObjects (nsdecimalfortytwo, decimalrefarr[0], "decimalrefarr[0] fortytwo");
+
+	NSArray<NSDecimalNumber *> *decimalrefNilarr = nil;
+	[Type_Decimal reverseDecimalArrRefDecArr:&decimalrefNilarr];
+	XCTAssertNil(decimalrefNilarr, "decimalrefNilarr");
 }
 
 - (void) testObjectIndexedSubscripting {

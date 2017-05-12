@@ -558,6 +558,10 @@ namespace ObjC {
 				postwriter.WriteLine ($"{ctype} {presarrval} = mono_array_get ({presarr}, {ctype}, {pindex});");
 				postwriter.WriteLine ($"{presobj} = [NSNumber numberWith{ctypep}:{presarrval}];");
 				break;
+			case TypeCode.Decimal:
+				postwriter.WriteLine ($"MonoDecimal {presarrval} = mono_array_get ({presarr}, MonoDecimal, {pindex});");
+				postwriter.WriteLine ($"{presobj} = mono_embeddinator_get_nsdecimalnumber (&{presarrval});");
+				break;
 			case TypeCode.Byte:
 				postwriter.WriteLine ($"NSData* {presobj} = [NSData dataWithBytes:mono_array_addr ({presarr}, unsigned char, 0) length:{parrlength}];");
 				break;
@@ -667,7 +671,8 @@ namespace ObjC {
 				implementation.WriteLine ($"mono_array_set ({pnameArr}, {typeName}, {pnameIdx}, {pnameRet}.{returnValue});");
 				break;
 			case TypeCode.Decimal:
-				implementation.WriteLine ($"NSDecimalNumber* {pnameRet} = {parameterName}[{pnameIdx}];");
+				var pparname = is_by_ref ? $"(*{parameterName})" : parameterName;
+				implementation.WriteLine ($"NSDecimalNumber* {pnameRet} = {pparname}[{pnameIdx}];");
 				implementation.WriteLine ($"if (!{pnameRet} || [{pnameRet} isKindOfClass:[NSNull class]])");
 				implementation.Indent++;
 				implementation.WriteLine ($"continue;");
