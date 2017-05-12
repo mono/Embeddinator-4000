@@ -671,7 +671,8 @@ namespace ObjC {
 				implementation.WriteLine ($"mono_array_set ({pnameArr}, {typeName}, {pnameIdx}, {pnameRet}.{returnValue});");
 				break;
 			case TypeCode.Decimal:
-				implementation.WriteLine ($"NSDecimalNumber* {pnameRet} = {(is_by_ref ? $"(*{parameterName})" : parameterName)}[{pnameIdx}];");
+				var pparname = is_by_ref ? $"(*{parameterName})" : parameterName;
+				implementation.WriteLine ($"NSDecimalNumber* {pnameRet} = {pparname}[{pnameIdx}];");
 				implementation.WriteLine ($"if (!{pnameRet} || [{pnameRet} isKindOfClass:[NSNull class]])");
 				implementation.Indent++;
 				implementation.WriteLine ($"continue;");
