@@ -35,15 +35,24 @@ namespace MonoEmbeddinator4000.Generators
 
         public override string VisitPrimitiveType(PrimitiveType primitive)
         {
-            if (primitive == PrimitiveType.Char)
-                return "gunichar2";
-
-            if (primitive == PrimitiveType.String)
+            switch (primitive)
             {
-                if (param != null && (param.IsOut || param.IsInOut))
-                    return "GString*";
+                case PrimitiveType.Char: return "gunichar2";
+                case PrimitiveType.SChar: return "int8_t";
+                case PrimitiveType.UChar: return "uint8_t";
+                case PrimitiveType.Short: return "int16_t";
+                case PrimitiveType.UShort: return "uint16_t";
+                case PrimitiveType.Int: return "int32_t";
+                case PrimitiveType.UInt: return "uint32_t";
+                case PrimitiveType.Long: return "int64_t";
+                case PrimitiveType.ULong: return "uint64_t";
+                case PrimitiveType.String:
+                {
+                    if (param != null && (param.IsOut || param.IsInOut))
+                        return "GString*";
 
-                return "const char*";
+                    return "const char*";
+                }
             }
 
             return base.VisitPrimitiveType(primitive);
