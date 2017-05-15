@@ -33,6 +33,7 @@ namespace ObjC {
 		ProcessedType system_iformatprovider;
 		ProcessedType system_timespan;
 		ProcessedType system_globalization_timespanstyles;
+		ProcessedType system_datetime;
 
 		ProcessedAssembly GetMscorlib (Type t)
 		{
@@ -71,6 +72,49 @@ namespace ObjC {
 			return true;
 		}
 
+		bool AddDateTimeSupport (Type t)
+		{
+			if (system_datetime != null)
+				return true;
+
+			var corlib = GetMscorlib (t);
+			system_datetime = new ProcessedType (t) {
+				Assembly = corlib,
+				// this is tracked because the linker (if enabled) needs to be aware of the requirement
+				// but we do not want any code to be generated (it's referenced only from native/glue code)
+				IsNativeReference = true,
+				Methods = new List<ProcessedMethod> (),
+				Properties = new List<ProcessedProperty> (),
+				Constructors = new List<ProcessedConstructor> (),
+				Fields = new List<ProcessedFieldInfo> (),
+			};
+			var ticks = t.GetProperty ("Ticks");
+			system_datetime.Properties.Add (new ProcessedProperty (ticks));
+
+			var kind = t.GetProperty ("Kind");
+			system_datetime.Properties.Add (new ProcessedProperty (kind));
+
+			var intT = corlib.Assembly.GetType ("System.Int32");
+			var dtk = corlib.Assembly.GetType ("System.DateTimeKind");
+			var ctorInt6xKind = t.GetConstructor (new Type [] { intT, intT, intT, intT, intT, intT, dtk });
+			system_datetime.Constructors.Add (new ProcessedConstructor (ctorInt6xKind));
+
+			var longT = corlib.Assembly.GetType ("System.Int64");
+			var ctorLongKind = t.GetConstructor (new Type [] { longT, dtk });
+			system_datetime.Constructors.Add (new ProcessedConstructor (ctorLongKind));
+
+			var toUniversalTime = t.GetMethod ("ToUniversalTime");
+			system_datetime.Methods.Add (new ProcessedMethod (toUniversalTime));
+
+			var maxfield = t.GetField ("MaxValue");
+			system_datetime.Fields.Add (new ProcessedFieldInfo (maxfield));
+
+			var minfield = t.GetField ("MinValue");
+			system_datetime.Fields.Add (new ProcessedFieldInfo (minfield));
+			AddExtraType (system_datetime);
+			return true;
+		}
+
 		bool IsSupported (Type t)
 		{
 			if (t.IsByRef)
@@ -104,12 +148,10 @@ namespace ObjC {
 					Delayed.Add (ErrorHelper.CreateWarning (1011, $"Type `{t}` is not generated because it lacks a native counterpart."));
 					unsupported.Add (t);
 					return false;
-				case "DateTime": // FIXME: NSDateTime
-					Delayed.Add (ErrorHelper.CreateWarning (1012, $"Type `{t}` is not generated because it lacks a marshaling code with a native counterpart."));
-					unsupported.Add (t);
-					return false;
 				case "Decimal":
 					return AddDecimalSupport (t);
+				case "DateTime":
+					return AddDateTimeSupport (t);
 				case "TimeSpan":
 					if (system_timespan == null) {
 						system_timespan = new ProcessedType (t) {

@@ -146,3 +146,129 @@ MonoDecimal mono_embeddinator_get_system_decimal (NSDecimalNumber* nsdecimalnumb
 
 	return mdecimal;
 }
+
+long long mono_embeddinator_get_nsdatereferencensdate_ticks (mono_embeddinator_context_t* context)
+{
+	// NSDate reference date 00:00:00 UTC on 1 January 2001
+	// https://developer.apple.com/reference/foundation/nsdate
+	int year = 2001, month = 1, day = 1, hour = 0, minute = 0, second = 0;
+	MonoClass* datetimeclass = mono_embeddinator_get_datetime_class ();
+	int utc = E4KDateTimeKind_Utc;
+
+	void* datetimeargs [7];
+	datetimeargs[0] = &year;
+	datetimeargs[1] = &month;
+	datetimeargs[2] = &day;
+	datetimeargs[3] = &hour;
+	datetimeargs[4] = &minute;
+	datetimeargs[5] = &second;
+	datetimeargs[6] = &utc;
+
+	MonoMethod* datetimector = mono_embeddinator_lookup_method ("System.DateTime:.ctor(int,int,int,int,int,int,System.DateTimeKind)", datetimeclass);
+	MonoMethod* datetimeticks = mono_embeddinator_lookup_method ("System.DateTime:get_Ticks()", datetimeclass);
+	MonoObject* datetimeshell = mono_object_new (context->domain, datetimeclass);
+	void* datetime = mono_object_unbox (datetimeshell);
+
+	MonoObject* ex = nil;
+	mono_runtime_invoke (datetimector, datetime, datetimeargs, &ex);
+	if (ex)
+		mono_embeddinator_throw_exception (ex);
+
+	MonoObject* ex2 = nil;
+	MonoObject* boxedticks = mono_runtime_invoke (datetimeticks, datetime, NULL, &ex2);
+	if (ex2)
+		mono_embeddinator_throw_exception (ex);
+
+	long long ticks = *(long long *) mono_object_unbox (boxedticks);
+
+	return ticks;
+}
+
+static long long nsdaterefdateticks = 0;
+
+NSDate* mono_embeddinator_get_nsdate (void* datetime, mono_embeddinator_context_t* context)
+{
+	static MonoMethod* dtticksmethod = nil;
+	static MonoMethod* dtkindmethod = nil;
+	static MonoMethod* dttoutcmethod = nil;
+
+	MonoClass* datetimeclass = mono_embeddinator_get_datetime_class ();
+	E4KDateTimeDefaults* datetimeDefs = mono_embeddinator_get_datetime_defaults (context);
+
+	if (nsdaterefdateticks == 0)
+		nsdaterefdateticks = mono_embeddinator_get_nsdatereferencensdate_ticks (context);
+	if (!dtticksmethod)
+		dtticksmethod = mono_embeddinator_lookup_method ("System.DateTime:get_Ticks()", datetimeclass);
+	if (!dtkindmethod)
+		dtkindmethod = mono_embeddinator_lookup_method ("System.DateTimeKind:get_Kind()", datetimeclass);
+
+	MonoObject* kindex = nil;
+	MonoObject* kindboxed = mono_runtime_invoke (dtkindmethod, datetime, NULL, &kindex);
+	if (kindex)
+		mono_embeddinator_throw_exception (kindex);
+	E4KDateTimeKind kind = *(E4KDateTimeKind *) mono_object_unbox (kindboxed);
+
+	if (kind == E4KDateTimeKind_Local) {
+		if (!dttoutcmethod)
+			dttoutcmethod = mono_embeddinator_lookup_method ("System.DateTime:ToUniversalTime()", datetimeclass);
+
+		MonoObject* toutcex = nil;
+		MonoObject* utcdtboxed = mono_runtime_invoke (dttoutcmethod, datetime, NULL, &toutcex);
+		if (toutcex)
+			mono_embeddinator_throw_exception (toutcex);
+		datetime = mono_object_unbox (utcdtboxed);
+	}
+
+	MonoObject* ticks_ex = nil;
+	MonoObject* ticksboxed = mono_runtime_invoke (dtticksmethod, datetime, NULL, &ticks_ex);
+	if (ticks_ex)
+		mono_embeddinator_throw_exception (ticks_ex);
+	long long ticks = *(long long *) mono_object_unbox (ticksboxed);
+
+	NSTimeInterval seconds = (NSTimeInterval) (ticks - nsdaterefdateticks) / datetimeDefs->NetTicksPerSecond;
+	NSDate* nsdate = [NSDate dateWithTimeIntervalSinceReferenceDate:seconds];
+
+	return nsdate;
+}
+
+void* mono_embeddinator_get_system_datetime (NSDate* nsdate, mono_embeddinator_context_t* context)
+{
+	static MonoMethod* datetimector = nil;
+
+	MonoClass* datetimeclass = mono_embeddinator_get_datetime_class ();
+	int utc = E4KDateTimeKind_Utc;
+	E4KDateTimeDefaults* datetimeDefs = mono_embeddinator_get_datetime_defaults (context);
+
+	if (nsdaterefdateticks == 0)
+		nsdaterefdateticks = mono_embeddinator_get_nsdatereferencensdate_ticks (context);
+
+	void* datetimeargs [2];
+	if (!nsdate)
+		datetimeargs [0] = &datetimeDefs->MinValueTicks;
+	else {
+		long long nsdateinterval = [nsdate timeIntervalSinceReferenceDate];
+		long long dateticks = nsdateinterval * datetimeDefs->NetTicksPerSecond + nsdaterefdateticks;
+
+		if (dateticks > datetimeDefs->MaxValueTicks)
+			dateticks = datetimeDefs->MaxValueTicks;
+		if (dateticks < datetimeDefs->MinValueTicks)
+			dateticks = datetimeDefs->MinValueTicks;
+
+		datetimeargs [0] = &dateticks;
+	}
+
+	datetimeargs [1] = &utc;
+
+	if (!datetimector)
+		datetimector = mono_embeddinator_lookup_method ("System.DateTime:.ctor(long,System.DateTimeKind)", datetimeclass);
+
+	MonoObject* datetimeshell = mono_object_new (context->domain, datetimeclass);
+	void* datetime = mono_object_unbox (datetimeshell);
+
+	MonoObject* ex = nil;
+	mono_runtime_invoke (datetimector, datetime, datetimeargs, &ex);
+	if (ex)
+		mono_embeddinator_throw_exception (ex);
+
+	return datetime;
+}

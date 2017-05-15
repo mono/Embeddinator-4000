@@ -112,3 +112,13 @@ public class ExposeExtraTypes {
 		get { return DateTime.Now.TimeOfDay; }
 	}
 }
+
+public static class Type_DateTime {
+	public static DateTime ReturnDate (DateTime datetime) => datetime;
+	public static void RefDate (ref DateTime datetime) => datetime = DateTime.MinValue;
+	public static DateTime [] ReverseDates (DateTime [] dates) => dates?.Reverse ().ToArray ();
+	public static void ReverseRefDates (ref DateTime [] dates) => dates = dates?.Reverse ().ToArray ();
+
+	public static DateTime Max { get; } = DateTime.MaxValue;
+	public static DateTime Min { get; } = DateTime.MinValue;
+}

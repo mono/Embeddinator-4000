@@ -520,6 +520,11 @@ namespace ObjC {
 				postwriter.WriteLine ($"MonoDecimal {presarrval} = mono_array_get ({presarr}, MonoDecimal, {pindex});");
 				postwriter.WriteLine ($"{presobj} = mono_embeddinator_get_nsdecimalnumber (&{presarrval});");
 				break;
+			case TypeCode.DateTime:
+				postwriter.WriteLine ("int __pdatetimesize = mono_class_array_element_size (mono_embeddinator_get_datetime_class ());");
+				postwriter.WriteLine ($"void* __pelementptr = (void *) mono_array_addr_with_size ({presarr}, __pdatetimesize, {pindex});");
+				postwriter.WriteLine ($"{presobj} = mono_embeddinator_get_nsdate (__pelementptr, &__mono_context);");
+				break;
 			case TypeCode.Byte:
 				postwriter.WriteLine ($"NSData* {presobj} = [NSData dataWithBytes:mono_array_addr ({presarr}, unsigned char, 0) length:{parrlength}];");
 				break;
@@ -637,6 +642,18 @@ namespace ObjC {
 				implementation.Indent--;
 				implementation.WriteLine ($"mono_array_set ({pnameArr}, MonoDecimal, {pnameIdx}, mono_embeddinator_get_system_decimal ({pnameRet}, &__mono_context));");
 				break;
+			case TypeCode.DateTime:
+				var dtparname = is_by_ref ? $"(*{parameterName})" : parameterName;
+				implementation.WriteLine ($"NSDate* {pnameRet} = {dtparname}[{pnameIdx}];");
+				implementation.WriteLine ($"if (!{pnameRet} || [{pnameRet} isKindOfClass:[NSNull class]])");
+				implementation.Indent++;
+				implementation.WriteLine ($"continue;");
+				implementation.Indent--;
+				implementation.WriteLine ("int __datetimesize = mono_embeddinator_get_datetime_size ();");
+				implementation.WriteLine ($"void* __elementptr = (void *) mono_array_addr_with_size ({pnameArr}, __datetimesize, {pnameIdx});");
+				implementation.WriteLine ($"void* __datetimeptr = mono_embeddinator_get_system_datetime ({pnameRet}, &__mono_context);");
+				implementation.WriteLine ("memcpy (__elementptr, __datetimeptr, __datetimesize);");
+				break;
 			case TypeCode.String:
 				implementation.WriteLine ($"NSString* {pnameRet} = {(is_by_ref ? $"(*{parameterName})" : parameterName)}[{pnameIdx}];");
 				implementation.WriteLine ($"if (!{pnameRet} || [{pnameRet} isKindOfClass:[NSNull class]])");
@@ -719,6 +736,12 @@ namespace ObjC {
 				implementation.WriteLine ($"{argumentName} = &__mdec;");
 				if (is_by_ref)
 					post.AppendLine ($"*{paramaterName} = mono_embeddinator_get_nsdecimalnumber (&__mdec);");
+				break;
+			case TypeCode.DateTime:
+				implementation.WriteLine ($"void* __mdatetime = mono_embeddinator_get_system_datetime ({(is_by_ref ? "*" : string.Empty)}{paramaterName}, &__mono_context);");
+				implementation.WriteLine ($"{argumentName} = __mdatetime;");
+				if (is_by_ref)
+					post.AppendLine ($"*{paramaterName} = mono_embeddinator_get_nsdate (__mdatetime, &__mono_context);");
 				break;
 			case TypeCode.Boolean:
 			case TypeCode.Char:
@@ -1069,6 +1092,11 @@ namespace ObjC {
 				implementation.WriteLine ($"MonoDecimal __resarrval = mono_array_get (__resarr, MonoDecimal, __residx);");
 				implementation.WriteLine ($"__resobj = mono_embeddinator_get_nsdecimalnumber (&__resarrval);");
 				break;
+			case TypeCode.DateTime:
+				implementation.WriteLine ("int __datetimeelsize = mono_class_array_element_size (mono_embeddinator_get_datetime_class ());");
+				implementation.WriteLine ($"void* __resarrval = (void *) mono_array_addr_with_size (__resarr, __datetimeelsize, __residx);");
+				implementation.WriteLine ($"__resobj = mono_embeddinator_get_nsdate (__resarrval, &__mono_context);");
+				break;
 			case TypeCode.Byte:
 				implementation.WriteLine ("NSData* __resobj = [NSData dataWithBytes:mono_array_addr (__resarr, unsigned char, 0) length:__resarrlength];");
 				break;
@@ -1133,6 +1161,10 @@ namespace ObjC {
 			case TypeCode.Decimal:
 				implementation.WriteLine ("void* __unboxedresult = mono_object_unbox (__result);");
 				implementation.WriteLine ("return mono_embeddinator_get_nsdecimalnumber (__unboxedresult);");
+				break;
+			case TypeCode.DateTime:
+				implementation.WriteLine ("void* __unboxedresult = mono_object_unbox (__result);");
+				implementation.WriteLine ("return mono_embeddinator_get_nsdate (__unboxedresult, &__mono_context);");
 				break;
 			case TypeCode.Boolean:
 			case TypeCode.Char:
@@ -1254,6 +1286,8 @@ namespace ObjC {
 				return string.Format (arrayCreator, $"{NameGenerator.GetObjCName (type)}_class");
 			case TypeCode.Decimal:
 				return string.Format (arrayCreator, "mono_embeddinator_get_decimal_class ()");
+			case TypeCode.DateTime:
+				return string.Format (arrayCreator, "mono_embeddinator_get_datetime_class ()");
 			default:
 				throw new NotImplementedException ($"Converting type {type.FullName} to mono class");
 			}
