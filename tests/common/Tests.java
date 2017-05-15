@@ -21,8 +21,7 @@ public class Tests {
 
     @Test
     public void testProperties() {
-        assertFalse(Platform.getIsWindows());
-
+        
         Platform.setExitCode(255);
         assertEquals(Platform.getExitCode(), 255);
 

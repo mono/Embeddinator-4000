@@ -106,6 +106,11 @@ namespace MonoEmbeddinator4000.Generators
                 HandleRefOutPrimitiveType(type);
                 return true;
             }
+            else if (type == PrimitiveType.Bool)
+            {
+                Context.Return.Write($"(byte)({Context.ArgName}? 1 : 0)");
+                return true;
+            }
 
             Context.Return.Write(Context.ArgName);
             return true;
@@ -153,7 +158,10 @@ namespace MonoEmbeddinator4000.Generators
         public override bool VisitPrimitiveType(PrimitiveType type,
             TypeQualifiers quals)
         {
-            Context.Return.Write(Context.ReturnVarName);
+            if(type == PrimitiveType.Bool)
+                Context.Return.Write($"{Context.ReturnVarName} != 0");
+            else
+                Context.Return.Write(Context.ReturnVarName);
             return true;
         }
     }

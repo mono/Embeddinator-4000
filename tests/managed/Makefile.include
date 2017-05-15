@@ -9,8 +9,16 @@ MANAGED_DEPENDENCIES = \
 	$(wildcard $(TOP)/tests/managed/*.cs) \
 	$(wildcard $(TOP)/tests/managed/*.tt) \
 
-$(GENERIC_MANAGED_DLL): $(MANAGED_DEPENDENCIES)
-	/Library/Frameworks/Mono.framework/Versions/Current/Commands/msbuild $(TOP)/tests/managed/generic/managed-generic.csproj
+ifeq ($(OS),Windows_NT)
+MSBUILD = msbuild.exe
+else
+MSBUILD = /Library/Frameworks/Mono.framework/Versions/Current/Commands/msbuild
 
 $(IOS_MANAGED_DLL): $(MANAGED_DEPENDENCIES)
 	/Library/Frameworks/Mono.framework/Versions/Current/Commands/msbuild $(TOP)/tests/managed/ios/managed-ios.csproj
+endif
+
+$(GENERIC_MANAGED_DLL): $(MANAGED_DEPENDENCIES)	
+	$(MSBUILD) $(TOP)/tests/managed/generic/managed-generic.csproj
+
+

@@ -63,9 +63,9 @@ public final class Runtime {
             public static class ByValue extends GString implements Structure.ByValue { }
             public static class ByReference  extends GString implements Structure.ByReference { }
 
-            public Pointer str;
-            public NativeLong len;
-            public NativeLong allocated_len;
+            public Pointer str = Pointer.NULL;
+            public NativeLong len = new NativeLong();
+            public NativeLong allocated_len = new NativeLong();
 
             @Override
             protected List getFieldOrder() {
@@ -97,10 +97,9 @@ public final class Runtime {
         System.setProperty("jna.encoding", "utf8");
 
         runtimeLibrary = Native.loadLibrary(library, RuntimeLibrary.class);
-
-        String assemblyPath = System.getProperty("user.dir") + "/" + library;
+        
+        String assemblyPath = Utilities.combinePath(System.getProperty("user.dir"), library);
         runtimeLibrary.mono_embeddinator_set_assembly_path(assemblyPath);
-
         error = new RuntimeLibrary.ErrorCallback() {
             public void invoke(RuntimeLibrary.Error.ByValue error) {
                 if (error.type == RuntimeLibrary.ErrorType.MONO_EMBEDDINATOR_OK)

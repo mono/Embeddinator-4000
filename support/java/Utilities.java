@@ -2,9 +2,9 @@
  * Mono Embeddinator-4000 Java support code.
  *
  * Author:
- *   Joao Matos (joao.matos@xamarin.com)
+ *   Victor Peter Rouven Müller (mueller.vpr@gmail.com)
  *
- * (C) 2017 Microsoft, Inc.
+ * (C) 2016 Microsoft, Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
@@ -25,31 +25,17 @@
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-
 package mono.embeddinator;
+import java.io.*;
 
-import com.sun.jna.*;
-import com.sun.jna.ptr.*;
+public class Utilities {
+    public static String combinePath(String... paths) {
+        File file = new File(paths[0]);
 
-public final class GString extends Runtime.RuntimeLibrary.GString {
-	public GString () {
-	}
+        for (int i = 1; i < paths.length ; i++) {
+            file = new File(file, paths[i]);
+        }
 
-	public GString (String string) {
-		if (string == null)
-			return;
-		int len = string.length() + 1;
-		this.str = new Memory(len);
-		this.str.setString(0, string);
-		this.len = new NativeLong((len - 1), true); // Due to end character \0 it's one short
-		this.allocated_len = new NativeLong(len, true);
-	}
-
-	/**
-	* Gets the native string as a Java string.
-	* This is named getValue() for uniformity with com.sun.jna.ptr.*ByReference set of types.
-	*/
-	public String getValue() {
-		return (str == null) ? null : str.getString(0);
-	}
+        return file.getPath();
+    }
 }

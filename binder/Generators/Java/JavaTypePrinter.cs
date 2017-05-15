@@ -115,8 +115,13 @@ namespace MonoEmbeddinator4000.Generators
         public override TypePrinterResult VisitPrimitiveType(PrimitiveType primitive,
             TypeQualifiers quals)
         {
-            if (ContextKind == TypePrinterContextKind.Native && IsByRefParameter)
-                return HandleNativeRefOutPrimitiveType(primitive);
+            if (ContextKind == TypePrinterContextKind.Native)
+            {
+                if (IsByRefParameter)
+                    return HandleNativeRefOutPrimitiveType(primitive);
+                else if (primitive == PrimitiveType.Bool)
+                    return "byte";
+            }
 
             bool useReferencePrimitiveTypes = ContextKind == TypePrinterContextKind.Template;
 

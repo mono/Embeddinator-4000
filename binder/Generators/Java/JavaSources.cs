@@ -372,8 +372,7 @@ namespace MonoEmbeddinator4000.Generators
                 TypePrinter.PushContext(TypePrinterContextKind.Native);
                 var typeName = method.ReturnType.Visit(TypePrinter);
                 TypePrinter.PopContext();
-
-                Write("{0} __ret = ", typeName.Type);
+                Write($"{typeName.Type} __ret = ");
             }
 
             if (method.IsConstructor)
@@ -384,7 +383,6 @@ namespace MonoEmbeddinator4000.Generators
             Write($"{package}.{JavaNative.GetNativeLibClassName(unit)}.INSTANCE.{JavaNative.GetCMethodIdentifier(method)}(");
 
             Write(string.Join(", ", @params));
-
             WriteLine(");");
 
             WriteLine("mono.embeddinator.Runtime.checkExceptions();");
