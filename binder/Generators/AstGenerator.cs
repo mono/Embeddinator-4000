@@ -94,7 +94,7 @@ namespace MonoEmbeddinator4000.Generators
         {
             var @namespace = VisitNamespace(typeInfo);
             var decl = @namespace.Declarations.FirstOrDefault(
-                d => d.Name == typeInfo.Name);
+                d => d.Name == UnmangleTypeName(typeInfo.Name));
 
             // If we have already processed this declaration, return it.
             if (decl != null)
