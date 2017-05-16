@@ -5,6 +5,7 @@ import managed_dll.first.second.*;
 import managed_dll.exceptions.*;
 import managed_dll.constructors.*;
 import managed_dll.enums.*;
+import managed_dll.fields.*;
 import managed_dll.interfaces.*;
 import managed_dll.methods.*;
 import managed_dll.structs.*;
@@ -188,6 +189,10 @@ public class Tests {
 
         Point p4 = Point.opSubtraction(p3, p2);
         assertTrue(Point.opEquality(p4, p1));
+
+        Point z = Point.get_Zero();
+        doublesAreEqual(0.0f, z.getX());
+        doublesAreEqual(0.0f, z.getY());
     }
 
     @Test
@@ -202,6 +207,66 @@ public class Tests {
         f = Enumer.test(ByteEnum.Zero, i, s);
         assertEquals(IntEnum.Min, i.get());
         assertEquals(ShortEnum.Min, s.get());
+    }
+
+    @Test
+    public void testFieldsInReferences() {
+        assertEquals(Long.MAX_VALUE, managed_dll.fields.Class.get_MaxLong());
+
+        assertEquals(0, managed_dll.fields.Class.get_Integer());
+        managed_dll.fields.Class.set_Integer(1);
+        assertEquals(1, managed_dll.fields.Class.get_Integer());
+
+        assertTrue(managed_dll.fields.Class.get_Scratch().get_Boolean());
+
+        managed_dll.fields.Class.set_Scratch(new managed_dll.fields.Class(false));
+        assertFalse(managed_dll.fields.Class.get_Scratch().get_Boolean());
+
+        managed_dll.fields.Class ref1 = new managed_dll.fields.Class(true);
+        assertTrue(ref1.get_Boolean());
+        ref1.set_Boolean(false);
+        assertFalse(ref1.get_Boolean());
+
+        assertNotNull(ref1.get_Structure());
+        assertFalse(ref1.get_Structure().get_Boolean());
+        ref1.set_Structure(new managed_dll.fields.Struct(true));
+        assertTrue(ref1.get_Structure().get_Boolean());
+
+        managed_dll.fields.Class ref2 = new managed_dll.fields.Class(false);
+        assertNotNull(ref2.get_Structure());
+        assertFalse(ref2.get_Structure().get_Boolean());
+    }
+
+    @Test
+    public void testFieldsInValueTypes() {
+        assertEquals(0, managed_dll.fields.Struct.get_Integer());
+        managed_dll.fields.Struct.set_Integer(1);
+        assertEquals(1, managed_dll.fields.Struct.get_Integer());
+
+        assertFalse(managed_dll.fields.Struct.get_Scratch().get_Boolean());
+
+        managed_dll.fields.Struct.set_Scratch(new managed_dll.fields.Struct(true));
+        assertTrue(managed_dll.fields.Struct.get_Scratch().get_Boolean());
+
+        managed_dll.fields.Struct empty = managed_dll.fields.Struct.get_Empty();
+        assertNotNull(empty);
+        assertNull(empty.get_Class());
+
+        managed_dll.fields.Struct struct1 = new managed_dll.fields.Struct(true);
+        assertTrue(struct1.get_Boolean());
+        struct1.set_Boolean(false);
+        assertFalse(struct1.get_Boolean());
+
+        assertNotNull(struct1.get_Class());
+        assertFalse(struct1.get_Class().get_Boolean());
+        struct1.set_Class(null);
+        assertNull(struct1.get_Class());
+        struct1.set_Class(new managed_dll.fields.Class(true));
+        assertTrue(struct1.get_Class().get_Boolean());
+
+        managed_dll.fields.Struct struct2 = new managed_dll.fields.Struct(false);
+        assertNotNull(struct2.get_Class());
+        assertFalse(struct2.get_Boolean());
     }
 
     @Test
