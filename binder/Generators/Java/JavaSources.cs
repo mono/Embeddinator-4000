@@ -421,13 +421,23 @@ namespace MonoEmbeddinator4000.Generators
 
         public override bool VisitProperty(Property property)
         {
-            // Ignore properties since they're converted to getter/setter pais.
+            if (property.Field == null)
+                return false;
+
+            var getter = property.GetMethod;
+            if (getter != null)
+                VisitMethodDecl(getter);
+
+            var setter = property.SetMethod;
+            if (setter != null)
+                VisitMethodDecl(setter);
+
             return true;
         }
 
         public override bool VisitFieldDecl(Field field)
         {
-            // Ignore fields since they're converted to getter/setter pais.
+            // Ignore fields since they're converted to properties (getter/setter pairs).
             return true;
         }
 

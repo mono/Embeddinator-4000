@@ -1,4 +1,4 @@
-﻿using CppSharp.AST;
+﻿﻿using CppSharp.AST;
 using CppSharp.AST.Extensions;
 
 namespace MonoEmbeddinator4000.Generators
@@ -34,7 +34,7 @@ namespace MonoEmbeddinator4000.Generators
         public override bool VisitClassDecl(Class @class)
         {
             var objectRef = @class.IsInterface ? "__getObject()" : "__object";
-            Context.Return.Write($"{Context.ArgName}.{objectRef}");
+            Context.Return.Write($"{Context.ArgName} == null ? null : {Context.ArgName}.{objectRef}");
             return true;
         }
 
@@ -145,7 +145,8 @@ namespace MonoEmbeddinator4000.Generators
             if (@class.IsInterface)
                 typeName = $"{typeName}Impl";
 
-            Context.Return.Write($"new {typeName}({Context.ReturnVarName})");
+            Context.Return.Write("({0} == com.sun.jna.Pointer.NULL ? null : new {1}({0}))",
+                Context.ReturnVarName, typeName);
             return true;
         }
 
