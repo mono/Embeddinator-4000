@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿﻿using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -111,18 +111,22 @@ namespace Embeddinator {
 	}
 
 	public abstract class ProcessedMemberBase {
+
+		protected Processor Processor;
+
 		public bool FallBackToTypeName { get; set; }
 		public int FirstDefaultParameter { get; set; }
 
 		public string ObjCSignature { get; set; }
 		public string MonoSignature { get; set; }
 
-		public ProcessedMemberBase ()
+		public ProcessedMemberBase (Processor processor)
 		{
+			Processor = processor;
 			FirstDefaultParameter = -1;
 		}
 
-		public abstract void ComputeSignatures (Processor p);
+		public abstract void ComputeSignatures ();
 
 		// this format can be consumed by the linker xml files
 		// adapted from ikvm reflection and cecil source code
@@ -144,6 +148,55 @@ namespace Embeddinator {
 			}
 			sb.Append (')');
 			return sb.ToString();
+		}
+
+		// get a name that is safe to use from ObjC code
+
+		// HACK - This should take a ProcessedMemberBase and not much of this stuff - https://github.com/mono/Embeddinator-4000/issues/276
+		public void GetSignatures (string objName, string monoName, MemberInfo info, ParameterInfo[] parameters, bool isExtension, out string objcSignature, out string monoSignature)
+		{
+			// FIXME - GetSignatures likley should be specialized in subclasses
+			bool isOperator = (this is ProcessedMethod) ? ((ProcessedMethod)this).IsOperator : false;
+			var method = (info as MethodBase); // else it's a PropertyInfo
+											   // special case for setter-only - the underscore looks ugly
+			if ((method != null) && method.IsSpecialName)
+				objName = objName.Replace ("_", String.Empty);
+
+			var objc = new StringBuilder (objName);
+			var mono = new StringBuilder (monoName);
+
+			mono.Append ('(');
+
+			var end = FirstDefaultParameter == -1 ? parameters.Length : FirstDefaultParameter;
+			for (int n = 0; n < end; ++n) {
+				ParameterInfo p = parameters[n];
+
+				if (objc.Length > objName.Length) {
+					objc.Append (' ');
+					mono.Append (',');
+				}
+
+				string paramName = FallBackToTypeName ? NameGenerator.GetParameterTypeName (p.ParameterType) : p.Name;
+				if ((method != null) && (n > 0 || !isExtension)) {
+					if (n == 0) {
+						if (FallBackToTypeName || method.IsConstructor || (!method.IsSpecialName && !isOperator))
+							objc.Append (paramName.PascalCase ());
+					}
+					else
+						objc.Append (paramName.CamelCase ());
+				}
+
+				if (n > 0 || !isExtension) {
+					string ptname = NameGenerator.GetObjCParamTypeName (p, Processor.Types);
+					objc.Append (":(").Append (ptname).Append (")").Append (NameGenerator.GetExtendedParameterName (p, parameters));
+				}
+				mono.Append (NameGenerator.GetMonoName (p.ParameterType));
+			}
+
+			mono.Append (')');
+
+			objcSignature = objc.ToString ();
+			monoSignature = mono.ToString ();
 		}
 	}
 
@@ -167,18 +220,18 @@ namespace Embeddinator {
 
 		public MethodType MethodType { get; set; }
 
-		public ProcessedMethod (MethodInfo method)
+		public ProcessedMethod (MethodInfo method, Processor processor) : base (processor)
 		{
 			Method = method;
 			MethodType = MethodType.Normal;
 		}
 
-		public override void ComputeSignatures (Processor p)
+		public override void ComputeSignatures ()
 		{
 			// FIXME this is a quite crude hack waiting for a correct move of the signature code
 			string objcsig;
 			string monosig;
-			(p as ObjCProcessor).GetSignatures (this, BaseName, Method.Name, Method, Method.GetParameters (), false, out objcsig, out monosig);
+			GetSignatures (BaseName, Method.Name, Method, Method.GetParameters (), false, out objcsig, out monosig);
 			ObjCSignature = objcsig;
 			MonoSignature = monosig;
 		}
@@ -189,17 +242,30 @@ namespace Embeddinator {
 	public class ProcessedProperty: ProcessedMemberBase {
 		public PropertyInfo Property { get; private set; }
 
-		public ProcessedProperty (PropertyInfo property)
+		public ProcessedProperty (PropertyInfo property, Processor processor) : base (processor)
 		{
 			Property = property;
+
+			var g = Property.GetGetMethod ();
+			if (g != null)
+				GetMethod = new ProcessedMethod (g, Processor);
+
+			var s = Property.GetSetMethod ();
+			if (s != null)
+				SetMethod = new ProcessedMethod (s, Processor);
 		}
 
-		public override void ComputeSignatures (Processor p)
+		public override void ComputeSignatures ()
 		{
 			throw new NotImplementedException ();
 		}
 
 		public override string ToString () => Property.ToString ();
+
+		public bool HasGetter => GetMethod != null;
+		public bool HasSetter => SetMethod != null;
+		public ProcessedMethod GetMethod { get; private set; }
+		public ProcessedMethod SetMethod { get; private set; }
 	}
 
 	public enum ConstructorType {
@@ -215,17 +281,17 @@ namespace Embeddinator {
 
 		public ConstructorType ConstructorType { get; set; }
 
-		public ProcessedConstructor (ConstructorInfo constructor)
+		public ProcessedConstructor (ConstructorInfo constructor, Processor processor) : base (processor)
 		{
 			Constructor = constructor;
 		}
 
-		public override void ComputeSignatures (Processor p)
+		public override void ComputeSignatures ()
 		{
 			// FIXME this is a quite crude hack waiting for a correct move of the signature code
 			string objcsig;
 			string monosig;
-			(p as ObjCProcessor).GetSignatures (this, Constructor.ParameterCount == 0 ? "init" : "initWith", Constructor.Name, Constructor, Constructor.GetParameters (), false, out objcsig, out monosig);
+			GetSignatures (Constructor.ParameterCount == 0 ? "init" : "initWith", Constructor.Name, Constructor, Constructor.GetParameters (), false, out objcsig, out monosig);
 			ObjCSignature = objcsig;
 			MonoSignature = monosig;
 		}
@@ -238,14 +304,14 @@ namespace Embeddinator {
 		public string TypeName { get; private set; }
 		public string ObjCName { get; private set; }
 
-		public ProcessedFieldInfo (FieldInfo field)
+		public ProcessedFieldInfo (FieldInfo field, Processor processor) : base (processor)
 		{
 			Field = field;
 			TypeName = ObjC.NameGenerator.GetTypeName (Field.DeclaringType);
 			ObjCName = ObjC.NameGenerator.GetObjCName (Field.DeclaringType);
 		}
 
-		public override void ComputeSignatures (Processor p)
+		public override void ComputeSignatures ()
 		{
 			throw new NotImplementedException ();
 		}

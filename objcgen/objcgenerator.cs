@@ -152,7 +152,7 @@ namespace ObjC {
 			}
 		}
 
-		void GenerateCategory (Type definedType, Type extendedType, List<MethodInfo> methods)
+		void GenerateCategory (Type definedType, Type extendedType, List<ProcessedMethod> methods)
 		{
 			var etn = NameGenerator.GetTypeName (extendedType).Replace (" *", String.Empty);
 			var name = $"{etn} ({NameGenerator.GetTypeName (definedType)})";
@@ -166,7 +166,7 @@ namespace ObjC {
 			implementation.WriteLine ();
 
 			foreach (var mi in methods) {
-				ImplementMethod (mi, mi.Name.CamelCase (), null, isExtension: true);
+				ImplementMethod (mi.Method, mi.Method.Name.CamelCase (), mi, isExtension: true);
 			}
 
 			headers.WriteLine ("@end");
@@ -309,7 +309,7 @@ namespace ObjC {
 					string name = "init";
 					string signature = ".ctor()";
 					if (parameters.Length > 0)
-						(Processor as ObjCProcessor).GetSignatures (ctor, "initWith", ctor.Constructor.Name, ctor.Constructor, parameters, false, out name, out signature);
+						ctor.GetSignatures ("initWith", ctor.Constructor.Name, ctor.Constructor, parameters, false, out name, out signature);
 
 					if (ctor.Unavailable) {
 						headers.WriteLine ("/** This initializer is not available as it was not re-exposed from the base type");
@@ -322,7 +322,7 @@ namespace ObjC {
 
 					if (ctor.ConstructorType == ConstructorType.DefaultValueWrapper) {
 						default_init |= ctor.FirstDefaultParameter == 0;
-						GenerateDefaultValuesWrapper (name, ctor.Constructor, parameters, ctor.FirstDefaultParameter);
+						GenerateDefaultValuesWrapper (ctor);
 						continue;
 					}
 
@@ -817,11 +817,11 @@ namespace ObjC {
 			var spacing = property_type [property_type.Length - 1] == '*' ? string.Empty : " ";
 			headers.WriteLine ($") {property_type}{spacing}{name};");
 
-			ImplementMethod (getter, name, null, pi: pi);
+			ImplementMethod (getter, name, property.GetMethod, pi: pi);
 			if (setter == null)
 				return;
 
-			ImplementMethod (setter, "set" + pi.Name, null, pi: pi);
+			ImplementMethod (setter, "set" + pi.Name, property.SetMethod, pi: pi);
 		}
 
 		protected void Generate (ProcessedFieldInfo field)
@@ -943,7 +943,7 @@ namespace ObjC {
 			var managed_name = info.Name;
 			var parametersInfo = info.GetParameters ();
 
-			(Processor as ObjCProcessor).GetSignatures (method, name, managed_name, (MemberInfo)pi ?? info, parametersInfo, isExtension, out objcsig, out monosig);
+			method.GetSignatures (name, managed_name, (MemberInfo)pi ?? info, parametersInfo, isExtension, out objcsig, out monosig);
 
 			var builder = new MethodHelper (headers, implementation) {
 				AssemblySafeName = type.Assembly.GetName ().Name.Sanitize (),
@@ -981,12 +981,19 @@ namespace ObjC {
 			return objcsig;
 		}
 
-		void GenerateDefaultValuesWrapper (string name, MethodBase mb, ParameterInfo[] parameters, int start)
+		void GenerateDefaultValuesWrapper (ProcessedMemberBase member)
 		{
+			ProcessedMethod method = member as ProcessedMethod;
+			ProcessedConstructor ctor = member as ProcessedConstructor;
+			if (method == null && ctor == null)
+				throw new NotSupportedException ("GenerateDefaultValuesWrapper did not get ctor or method?");
+
+			MethodBase mb = method != null ? (MethodBase)method.Method : ctor.Constructor;
 			MethodInfo mi = mb as MethodInfo;
 			string objcsig;
 			string monosig;
-			var parametersInfo = parameters;
+			var parameters = method != null ? method.Method.GetParameters () : ctor.Constructor.GetParameters ();
+
 			var plist = new List<ParameterInfo> ();
 			StringBuilder arguments = new StringBuilder ();
 			headers.WriteLine ("/** This is an helper method that inlines the following default values:");
@@ -996,7 +1003,7 @@ namespace ObjC {
 					arguments.Append (p.Name.PascalCase ()).Append (':');
 				} else
 					arguments.Append (' ').Append (p.Name.CamelCase ()).Append (':');
-				if (p.Position >= start && p.HasDefaultValue) {
+				if (p.Position >= member.FirstDefaultParameter && p.HasDefaultValue) {
 					var raw = FormatRawValue (p.ParameterType, p.RawDefaultValue);
 					headers.WriteLine ($" *     ({NameGenerator.GetTypeName (p.ParameterType)}) {pName} = {raw};");
 					arguments.Append (raw);
@@ -1005,17 +1012,20 @@ namespace ObjC {
 					plist.Add (p);
 				}
 			}
-			headers.WriteLine (" *");
-			headers.WriteLine ($" *  @see {name}");
-			headers.WriteLine (" */");
 
-			if (mi == null)
-				name = start == 0 ? "init" : "initWith";
+			string name;
+			if (method == null)
+				name = member.FirstDefaultParameter == 0 ? "init" : "initWith";
 			else
-				name = mb.Name.CamelCase ();
-			
-			(Processor as ObjCProcessor).GetSignatures (null, name, mb.Name, mb, plist.ToArray (), false, out objcsig, out monosig);
+				name = method.BaseName;
+
+			member.GetSignatures (name, mb.Name, mb, plist.ToArray (), false, out objcsig, out monosig);
 			var type = mb.DeclaringType;
+
+			headers.WriteLine (" *");
+			headers.WriteLine ($" *  @see {objcsig}");
+			headers.WriteLine (" */");
+				
 			var builder = new MethodHelper (headers, implementation) {
 				IsStatic = mb.IsStatic,
 				ReturnType = mi == null ? "nullable instancetype" : GetReturnType (type, mi.ReturnType),
@@ -1047,8 +1057,8 @@ namespace ObjC {
 				string monosig;
 				var managed_name = method.Method.Name;
 				var parametersInfo = method.Method.GetParameters ();
-				(Processor as ObjCProcessor).GetSignatures (method, method.BaseName, managed_name, method.Method, parametersInfo, false, out objcsig, out monosig);
-				GenerateDefaultValuesWrapper (objcsig, method.Method, parametersInfo, method.FirstDefaultParameter);
+				method.GetSignatures (method.BaseName, managed_name, method.Method, parametersInfo, false, out objcsig, out monosig);
+				GenerateDefaultValuesWrapper (method);
 				break;
 			default:
 				ImplementMethod (method.Method, method.BaseName, method);
