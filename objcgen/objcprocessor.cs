@@ -456,7 +456,6 @@ namespace ObjC {
 					ConstructorType = ConstructorType.DefaultValueWrapper,
 					FirstDefaultParameter = i,
 				};
-				pc.ComputeSignatures ();
 				yield return pc;
 			}
 		}
@@ -472,7 +471,6 @@ namespace ObjC {
 					MethodType = MethodType.DefaultValueWrapper,
 					FirstDefaultParameter = i,
 				};
-				pm.ComputeSignatures ();
 				yield return pm;
 			}
 		}

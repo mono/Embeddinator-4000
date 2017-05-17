@@ -32,7 +32,6 @@ namespace ObjC {
 
 				ProcessPotentialNameOverride (processedMethod);
 
-				processedMethod.ComputeSignatures ();
 				yield return processedMethod;
 			}
 		}
@@ -86,7 +85,6 @@ namespace ObjC {
 				if (duplicateNames.Contains (CreateStringRep(constructor)))
 					processedConstructor.FallBackToTypeName = true;
 
-				processedConstructor.ComputeSignatures ();
 				yield return processedConstructor;
 			}
 		}

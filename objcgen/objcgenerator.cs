@@ -988,7 +988,7 @@ namespace ObjC {
 
 			MethodBase mb = method != null ? (MethodBase)method.Method : ctor.Constructor;
 			MethodInfo mi = mb as MethodInfo;
-
+			int firstDefaultParameter = method != null ? method.FirstDefaultParameter : ctor.FirstDefaultParameter;
 			var parameters = method != null ? method.Parameters : ctor.Parameters;
 
 			var plist = new List<ParameterInfo> ();
@@ -1000,7 +1000,7 @@ namespace ObjC {
 					arguments.Append (p.Name.PascalCase ()).Append (':');
 				} else
 					arguments.Append (' ').Append (p.Name.CamelCase ()).Append (':');
-				if (p.Position >= member.FirstDefaultParameter && p.HasDefaultValue) {
+				if (p.Position >= firstDefaultParameter && p.HasDefaultValue) {
 					var raw = FormatRawValue (p.ParameterType, p.RawDefaultValue);
 					headers.WriteLine ($" *     ({NameGenerator.GetTypeName (p.ParameterType)}) {pName} = {raw};");
 					arguments.Append (raw);
