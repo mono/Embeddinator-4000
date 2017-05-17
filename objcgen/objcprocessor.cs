@@ -432,9 +432,9 @@ namespace ObjC {
 
 			var finalList = new List<ProcessedConstructor> ();
 			foreach (var pctor in parentCtors) {
-				var pctorParams = pctor.Constructor.GetParameters ();
+				var pctorParams = pctor.Parameters;
 				foreach (var ctor in typeCtors) {
-					var ctorParams = ctor.Constructor.GetParameters ();
+					var ctorParams = ctor.Parameters;
 					if (pctorParams.Any (pc => !ctorParams.Any (p => p.Position == pc.Position && pc.ParameterType == p.ParameterType))) {
 						finalList.Add (pctor);
 						break;
