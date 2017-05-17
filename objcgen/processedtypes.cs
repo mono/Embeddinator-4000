@@ -228,8 +228,7 @@ namespace Embeddinator {
 					if (n == 0) {
 						if (FallBackToTypeName || Method.IsConstructor || (!Method.IsSpecialName && !IsOperator))
 							objc.Append (paramName.PascalCase ());
-					}
-					else
+					} else
 						objc.Append (paramName.CamelCase ());
 				}
 
@@ -277,10 +276,8 @@ namespace Embeddinator {
 		public ConstructorInfo Constructor { get; private set; }
 
 		public bool Unavailable { get; set; }
-		public string ObjCName
-		{
-			get
-			{
+		public string ObjCName {
+			get {
 				if (Parameters.Length == 0 || FirstDefaultParameter == 0)
 					return "init";
 				return "initWith";
