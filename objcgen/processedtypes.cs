@@ -245,10 +245,14 @@ namespace Embeddinator {
 		public ProcessedProperty (PropertyInfo property, Processor processor) : base (processor)
 		{
 			Property = property;
-			if (HasGetter)
-				GetMethod = new ProcessedMethod (Property.GetGetMethod (), Processor);
-			if (HasSetter)
-				SetMethod = new ProcessedMethod (Property.GetSetMethod (), Processor);
+
+			var g = Property.GetGetMethod ();
+			if (g != null)
+				GetMethod = new ProcessedMethod (g, Processor);
+
+			var s = Property.GetSetMethod ();
+			if (s != null)
+				SetMethod = new ProcessedMethod (s, Processor);
 		}
 
 		public override void ComputeSignatures ()
@@ -258,8 +262,8 @@ namespace Embeddinator {
 
 		public override string ToString () => Property.ToString ();
 
-		public bool HasGetter => Property.GetGetMethod () != null;
-		public bool HasSetter => Property.GetSetMethod () != null;
+		public bool HasGetter => GetMethod != null;
+		public bool HasSetter => SetMethod != null;
 		public ProcessedMethod GetMethod { get; private set; }
 		public ProcessedMethod SetMethod { get; private set; }
 	}
