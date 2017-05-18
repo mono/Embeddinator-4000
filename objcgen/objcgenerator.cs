@@ -302,11 +302,11 @@ namespace ObjC {
 			var default_init = false;
 			if (type.HasConstructors) {
 				foreach (var ctor in type.Constructors) {
-					var pcount = ctor.Constructor.ParameterCount;
+					var pcount = ctor.Parameters.Length;
 					default_init |= pcount == 0;
 
-					var parameters = ctor.Constructor.GetParameters ();
-					string name = "init";
+					var parameters = ctor.Parameters;
+					string name = ctor.ObjCName;
 					string signature = ".ctor()";
 					if (parameters.Length > 0) {
 						name = ctor.GetObjcSignature ();
@@ -939,14 +939,9 @@ namespace ObjC {
 		{
 			var type = info.DeclaringType;
 			var managed_type_name = NameGenerator.GetObjCName (type);
-
-			string objcsig;
-			string monosig;
-			var managed_name = info.Name;
-			var parametersInfo = info.GetParameters ();
-
-			objcsig = method.GetObjcSignature (name, isExtension);
-			monosig = method.GetMonoSignature (managed_name);
+			
+			string objcsig = method.GetObjcSignature (name, isExtension);
+			string monosig = method.GetMonoSignature (info.Name);
 
 			var builder = new MethodHelper (headers, implementation) {
 				AssemblySafeName = type.Assembly.GetName ().Name.Sanitize (),
@@ -968,6 +963,7 @@ namespace ObjC {
 			builder.BeginImplementation ();
 			builder.WriteMethodLookup ();
 
+			var parametersInfo = method.Parameters;
 			string postInvoke = String.Empty;
 			var args = "nil";
 			if (parametersInfo.Length > 0) {
@@ -984,7 +980,7 @@ namespace ObjC {
 			return objcsig;
 		}
 
-		void GenerateDefaultValuesWrapper (ProcessedMemberBase member)
+		void GenerateDefaultValuesWrapper (ProcessedMemberWithParameters member)
 		{
 			ProcessedMethod method = member as ProcessedMethod;
 			ProcessedConstructor ctor = member as ProcessedConstructor;
@@ -993,15 +989,12 @@ namespace ObjC {
 
 			MethodBase mb = method != null ? (MethodBase)method.Method : ctor.Constructor;
 			MethodInfo mi = mb as MethodInfo;
-			string objcsig;
-			string monosig;
-			var parameters = method != null ? method.Method.GetParameters () : ctor.Constructor.GetParameters ();
 
 			var plist = new List<ParameterInfo> ();
 			StringBuilder arguments = new StringBuilder ();
 			headers.WriteLine ("/** This is an helper method that inlines the following default values:");
-			foreach (var p in parameters) {
-				string pName = NameGenerator.GetExtendedParameterName (p, parameters);
+			foreach (var p in member.Parameters) {
+				string pName = NameGenerator.GetExtendedParameterName (p, member.Parameters);
 				if (arguments.Length == 0) {
 					arguments.Append (p.Name.PascalCase ()).Append (':');
 				} else
@@ -1016,14 +1009,9 @@ namespace ObjC {
 				}
 			}
 
-			string name;
-			if (method == null)
-				name = member.FirstDefaultParameter == 0 ? "init" : "initWith";
-			else
-				name = method.BaseName;
-
-			objcsig = method != null ? method.GetObjcSignature () : ctor.GetObjcSignature ();
-			monosig = method != null ? method.GetMonoSignature () : ctor.GetMonoSignature ();
+			string name = method != null ? method.BaseName : ctor.ObjCName;
+			string objcsig = method != null ? method.GetObjcSignature () : ctor.GetObjcSignature ();
+			string monosig = method != null ? method.GetMonoSignature () : ctor.GetMonoSignature ();
 
 			var type = mb.DeclaringType;
 

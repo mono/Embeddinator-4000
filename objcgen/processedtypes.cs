@@ -93,7 +93,7 @@ namespace Embeddinator {
 			ObjCName = ObjC.NameGenerator.GetObjCName (Type);
 		}
 
-		public bool SignatureExists (ProcessedMemberBase p)
+		public bool SignatureExists (ProcessedMemberWithParameters p)
 		{
 			foreach (var pc in Constructors) {
 				if (p.ObjCSignature == pc.ObjCSignature)
@@ -113,17 +113,11 @@ namespace Embeddinator {
 	public abstract class ProcessedMemberBase {
 
 		protected Processor Processor;
-
 		public bool FallBackToTypeName { get; set; }
-		public int FirstDefaultParameter { get; set; }
-
-		public string ObjCSignature { get; set; }
-		public string MonoSignature { get; set; }
 
 		public ProcessedMemberBase (Processor processor)
 		{
 			Processor = processor;
-			FirstDefaultParameter = -1;
 		}
 
 		// this format can be consumed by the linker xml files
@@ -154,11 +148,33 @@ namespace Embeddinator {
 		DefaultValueWrapper,
 	}
 
-	public class ProcessedMethod : ProcessedMemberBase {
+	public abstract class ProcessedMemberWithParameters : ProcessedMemberBase {
+		public ProcessedMemberWithParameters (Processor processor) : base (processor)
+		{
+		}
+
+		public ParameterInfo[] Parameters { get; protected set; }
+
+		public string ObjCSignature { get; set; }
+		public string MonoSignature { get; set; }
+		protected abstract void ComputeSignatures ();
+
+		int firstDefaultParameter;
+		public int FirstDefaultParameter {
+			get {
+				return firstDefaultParameter;
+			}
+			set {
+				firstDefaultParameter = value;
+				ComputeSignatures ();
+			}
+		}
+	}
+
+	public class ProcessedMethod : ProcessedMemberWithParameters {
 		public MethodInfo Method { get; private set; }
 		public bool IsOperator { get; set; }
 		public string NameOverride { get; set; }
-		public ParameterInfo[] Parameters { get; private set; }
 
 		public string BaseName {
 			get {
@@ -175,11 +191,11 @@ namespace Embeddinator {
 			Method = method;
 			MethodType = MethodType.Normal;
 			Parameters = method.GetParameters ();
+			FirstDefaultParameter = -1;
 		}
 
-		public void ComputeSignatures ()
+		protected override void ComputeSignatures ()
 		{
-			// FIXME this is a quite crude hack waiting for a correct move of the signature code
 			ObjCSignature = GetObjcSignature ();
 			MonoSignature = GetMonoSignature ();
 		}
@@ -272,7 +288,7 @@ namespace Embeddinator {
 		DefaultValueWrapper,
 	}
 
-	public class ProcessedConstructor : ProcessedMemberBase {
+	public class ProcessedConstructor : ProcessedMemberWithParameters {
 		public ConstructorInfo Constructor { get; private set; }
 
 		public bool Unavailable { get; set; }
@@ -284,17 +300,16 @@ namespace Embeddinator {
 			}
 		}
 		public ConstructorType ConstructorType { get; set; }
-		public ParameterInfo[] Parameters { get; private set; }
 
 		public ProcessedConstructor (ConstructorInfo constructor, Processor processor) : base (processor)
 		{
 			Constructor = constructor;
 			Parameters = Constructor.GetParameters ();
+			FirstDefaultParameter = -1;
 		}
 
-		public void ComputeSignatures ()
+		protected override void ComputeSignatures ()
 		{
-			// FIXME this is a quite crude hack waiting for a correct move of the signature code
 			ObjCSignature = GetObjcSignature ();
 			MonoSignature = GetMonoSignature ();
 		}
