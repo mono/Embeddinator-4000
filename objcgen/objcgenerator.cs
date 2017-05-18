@@ -980,7 +980,7 @@ namespace ObjC {
 			return objcsig;
 		}
 
-		void GenerateDefaultValuesWrapper (ProcessedMemberBase member)
+		void GenerateDefaultValuesWrapper (ProcessedMemberWithParameters member)
 		{
 			ProcessedMethod method = member as ProcessedMethod;
 			ProcessedConstructor ctor = member as ProcessedConstructor;
@@ -989,19 +989,17 @@ namespace ObjC {
 
 			MethodBase mb = method != null ? (MethodBase)method.Method : ctor.Constructor;
 			MethodInfo mi = mb as MethodInfo;
-			int firstDefaultParameter = method != null ? method.FirstDefaultParameter : ctor.FirstDefaultParameter;
-			var parameters = method != null ? method.Parameters : ctor.Parameters;
 
 			var plist = new List<ParameterInfo> ();
 			StringBuilder arguments = new StringBuilder ();
 			headers.WriteLine ("/** This is an helper method that inlines the following default values:");
-			foreach (var p in parameters) {
-				string pName = NameGenerator.GetExtendedParameterName (p, parameters);
+			foreach (var p in member.Parameters) {
+				string pName = NameGenerator.GetExtendedParameterName (p, member.Parameters);
 				if (arguments.Length == 0) {
 					arguments.Append (p.Name.PascalCase ()).Append (':');
 				} else
 					arguments.Append (' ').Append (p.Name.CamelCase ()).Append (':');
-				if (p.Position >= firstDefaultParameter && p.HasDefaultValue) {
+				if (p.Position >= member.FirstDefaultParameter && p.HasDefaultValue) {
 					var raw = FormatRawValue (p.ParameterType, p.RawDefaultValue);
 					headers.WriteLine ($" *     ({NameGenerator.GetTypeName (p.ParameterType)}) {pName} = {raw};");
 					arguments.Append (raw);

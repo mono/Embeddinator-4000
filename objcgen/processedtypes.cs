@@ -93,7 +93,7 @@ namespace Embeddinator {
 			ObjCName = ObjC.NameGenerator.GetObjCName (Type);
 		}
 
-		public bool SignatureExists (ProcessedMemberWithParams p)
+		public bool SignatureExists (ProcessedMemberWithParameters p)
 		{
 			foreach (var pc in Constructors) {
 				if (p.ObjCSignature == pc.ObjCSignature)
@@ -148,8 +148,8 @@ namespace Embeddinator {
 		DefaultValueWrapper,
 	}
 
-	public abstract class ProcessedMemberWithParams : ProcessedMemberBase {
-		public ProcessedMemberWithParams (Processor processor) : base (processor)
+	public abstract class ProcessedMemberWithParameters : ProcessedMemberBase {
+		public ProcessedMemberWithParameters (Processor processor) : base (processor)
 		{
 		}
 
@@ -162,19 +162,17 @@ namespace Embeddinator {
 		int firstDefaultParameter;
 		public int FirstDefaultParameter
 		{
-			get
-			{
+			get {
 				return firstDefaultParameter;
 			}
-			set
-			{
+			set {
 				firstDefaultParameter = value;
 				ComputeSignatures ();
 			}
 		}
 	}
 
-	public class ProcessedMethod : ProcessedMemberWithParams {
+	public class ProcessedMethod : ProcessedMemberWithParameters {
 		public MethodInfo Method { get; private set; }
 		public bool IsOperator { get; set; }
 		public string NameOverride { get; set; }
@@ -291,7 +289,7 @@ namespace Embeddinator {
 		DefaultValueWrapper,
 	}
 
-	public class ProcessedConstructor : ProcessedMemberWithParams {
+	public class ProcessedConstructor : ProcessedMemberWithParameters {
 		public ConstructorInfo Constructor { get; private set; }
 
 		public bool Unavailable { get; set; }
