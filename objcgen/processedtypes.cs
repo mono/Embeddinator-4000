@@ -178,6 +178,7 @@ namespace Embeddinator {
 		public MethodInfo Method { get; private set; }
 		public bool IsOperator { get; set; }
 		public string NameOverride { get; set; }
+		public ParameterInfo[] Parameters { get; private set; }
 
 		public string BaseName {
 			get {
@@ -247,8 +248,7 @@ namespace Embeddinator {
 					if (n == 0) {
 						if (FallBackToTypeName || Method.IsConstructor || (!Method.IsSpecialName && !IsOperator))
 							objc.Append (paramName.PascalCase ());
-					}
-					else
+					} else
 						objc.Append (paramName.CamelCase ());
 				}
 
@@ -296,16 +296,15 @@ namespace Embeddinator {
 		public ConstructorInfo Constructor { get; private set; }
 
 		public bool Unavailable { get; set; }
-		public string ObjCName
-		{
-			get
-			{
+		public string ObjCName {
+			get {
 				if (Parameters.Length == 0 || FirstDefaultParameter == 0)
 					return "init";
 				return "initWith";
 			}
 		}
 		public ConstructorType ConstructorType { get; set; }
+		public ParameterInfo[] Parameters { get; private set; }
 
 		public ProcessedConstructor (ConstructorInfo constructor, Processor processor) : base (processor)
 		{

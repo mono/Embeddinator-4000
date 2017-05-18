@@ -939,6 +939,7 @@ namespace ObjC {
 		{
 			var type = info.DeclaringType;
 			var managed_type_name = NameGenerator.GetObjCName (type);
+			
 			string objcsig = method.GetObjcSignature (name, isExtension);
 			string monosig = method.GetMonoSignature (info.Name);
 
