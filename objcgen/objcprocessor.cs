@@ -191,14 +191,14 @@ namespace ObjC {
 		internal Dictionary<Type,MethodInfo> icomparable = new Dictionary<Type, MethodInfo> ();
 		internal Dictionary<Type, MethodInfo> iequatable = new Dictionary<Type, MethodInfo> ();
 		internal Dictionary<Type, MethodInfo> equals = new Dictionary<Type, MethodInfo> ();
-		internal Dictionary<Type, MethodInfo> hashes = new Dictionary<Type, MethodInfo> ();
 		HashSet<MemberInfo> members_with_default_values = new HashSet<MemberInfo> ();
 
 		// defining type / extended type / methods
 		internal Dictionary<Type, Dictionary<Type, List<ProcessedMethod>>> extensions_methods = new Dictionary<Type, Dictionary<Type, List<ProcessedMethod>>> ();
 
-		protected IEnumerable<MethodInfo> GetMethods (Type t)
+		protected IEnumerable<ProcessedMethod> GetMethods (ProcessedType type)
 		{
+			var t = type.Type;
 			foreach (var mi in t.GetMethods (BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static | BindingFlags.DeclaredOnly)) {
 				if (!mi.IsPublic)
 					continue;
@@ -229,7 +229,10 @@ namespace ObjC {
 				}
 
 				if (mi.Match ("System.Int32", "GetHashCode")) {
-					hashes.Add (t, mi);
+					yield return new ProcessedMethod (mi, this) {
+						DeclaringType = type,
+						MethodType = MethodType.NSObjectProcotolHash,
+					};
 					continue;
 				}
 
@@ -273,7 +276,7 @@ namespace ObjC {
 					}
 				}
 
-				yield return mi;
+				yield return new ProcessedMethod (mi, this);
 			}
 		}
 
@@ -373,7 +376,7 @@ namespace ObjC {
 			pt.Constructors = processedConstructors;
 
 			var typeEquals = equals.Where (x => x.Key == t).Select (x => x.Value);
-			var meths = GetMethods (t).OrderBy ((arg) => arg.Name).ToList ();
+			var meths = GetMethods (pt).OrderBy ((arg) => arg.Method.Name).ToList ();
 			var processedMethods = PostProcessMethods (meths, typeEquals).ToList ();
 			pt.Methods = processedMethods;
 

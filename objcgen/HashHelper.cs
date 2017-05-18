@@ -5,8 +5,12 @@ using Embeddinator;
 
 namespace ObjC {
 	public class HashHelper : MethodHelper {
-		public HashHelper (SourceWriter headers, SourceWriter implementation) : base (headers, implementation)
+		public HashHelper (ProcessedMethod method, SourceWriter headers, SourceWriter implementation) : base (headers, implementation)
 		{
+			AssemblySafeName = method.DeclaringType.Assembly.SafeName;
+			MetadataToken = method.Method.MetadataToken;
+			ObjCTypeName = method.DeclaringType.ObjCName;
+			ManagedTypeName = method.DeclaringType.TypeName;
 			MonoSignature = "GetHashCode()";
 			ObjCSignature = "hash";
 			ReturnType = "NSUInteger";

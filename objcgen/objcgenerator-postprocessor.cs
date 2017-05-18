@@ -11,18 +11,17 @@ namespace ObjC {
 	// A set of post-processing steps needed to add hints
 	// to the input of the generation step
 	public partial class ObjCProcessor {
-		protected IEnumerable<ProcessedMethod> PostProcessMethods (IEnumerable<MethodInfo> methods, IEnumerable <MethodInfo> equals)
+		protected IEnumerable<ProcessedMethod> PostProcessMethods (IEnumerable<ProcessedMethod> methods, IEnumerable <MethodInfo> equals)
 		{
 			HashSet<string> duplicateNames = FindDuplicateNames (methods);
 			HashSet<MethodInfo> operatorToIgnore = new HashSet<MethodInfo> (OperatorOverloads.FindOperatorPairToIgnore (methods, equals));
 
-			foreach (MethodInfo method in methods) {
+			foreach (var processedMethod in methods) {
+				var method = processedMethod.Method;
 				if (operatorToIgnore.Contains (method)) {
 					Delayed.Add (ErrorHelper.CreateWarning (1033, $"Method {method.Name} is not generated because another method exposes the operator with a friendly name"));
 					continue;
 				}
-
-				ProcessedMethod processedMethod = new ProcessedMethod (method, this);
 
 				if (duplicateNames.Contains (CreateStringRep (method)) && method.Name != "CompareTo") // HACK
 					processedMethod.FallBackToTypeName = true;
@@ -112,6 +111,15 @@ namespace ObjC {
 			if (i is MethodInfo)
 				return CreateStringRep ((MethodInfo)i);
 			return i.Name;
+		}
+
+		// temporary quasi-duplicate
+		static HashSet<string> FindDuplicateNames (IEnumerable<ProcessedMethod> members)
+		{
+			Dictionary<string, int> methodNames = new Dictionary<string, int> ();
+			foreach (var member in members)
+				methodNames.IncrementValue (CreateStringRep (member.Method));
+			return new HashSet<string> (methodNames.Where (x => x.Value > 1).Select (x => x.Key));
 		}
 
 		static HashSet<string> FindDuplicateNames (IEnumerable<MemberInfo> members)
