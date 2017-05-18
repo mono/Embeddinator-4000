@@ -110,6 +110,8 @@ namespace Embeddinator {
 
 			var assemblies = os.Parse (args);
 
+			CheckForInvalidOptions ();
+
 			if (action == Action.None && assemblies.Count > 0)
 				action = Action.Generate;
 
@@ -139,6 +141,23 @@ namespace Embeddinator {
 			default:
 				throw ErrorHelper.CreateError (99, "Internal error: invalid action {0}. Please file a bug report with a test case (https://github.com/mono/Embeddinator-4000/issues)", action);
 			}
+		}
+
+		private static void CheckForInvalidOptions ()
+		{
+			switch (CurrentEmbedder.Platform) {
+			case Platform.iOS:
+			case Platform.tvOS:
+			case Platform.watchOS:
+			case Platform.macOSFull:
+			case Platform.macOSModern:
+			case Platform.macOSSystem: {
+				if (CurrentEmbedder.CompilationTarget != CompilationTarget.Framework)
+					throw ErrorHelper.CreateError (27, "Embedded Xamarin.Mac/Xamarin.iOS only supports the Framework compilation option.");
+				}
+				break;
+			}
+
 		}
 	}
 
@@ -258,7 +277,7 @@ namespace Embeddinator {
 		public List<Assembly> Assemblies { get; private set; } = new List<Assembly> ();
 		public Platform Platform { get; set; } = Platform.macOS;
 		public TargetLanguage TargetLanguage { get; private set; } = TargetLanguage.ObjectiveC;
-		public CompilationTarget CompilationTarget { get; set; } = CompilationTarget.SharedLibrary;
+		public CompilationTarget CompilationTarget { get; set; } = CompilationTarget.Framework;
 
 		public string PlatformSdkDirectory {
 			get {

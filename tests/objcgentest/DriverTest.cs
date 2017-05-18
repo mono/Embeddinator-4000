@@ -196,5 +196,15 @@ namespace DriverTest {
 			Asserts.RunProcess ("/Library/Frameworks/Mono.framework/Commands/csc", $"/target:library /out:{Embedder.Quote (dllfile)} {Embedder.Quote (csfile)} -r:/Library/Frameworks/Xamarin.iOS.framework/Versions/Current/lib/mono/Xamarin.iOS/Xamarin.iOS.dll", "compile dll");
 			Asserts.ThrowsEmbeddinatorException (13, "Can't find the assembly 'Xamarin.iOS, Version=0.0.0.0, Culture=neutral, PublicKeyToken=84e04ff9cfb79065', referenced by 'foo, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null'.", () => Driver.Main2 (dllfile, "--platform=tvOS", "--outdir=" + tmpdir));
 		}
+
+		[Test]
+		public void EM0027 ()
+		{
+			foreach (var platform in new string[] { "iOS", "tvOS", "watchOS", "macOSFull", "macOSModern", "macOSSystem" })
+			{
+				Asserts.ThrowsEmbeddinatorException (27, "Embedded Xamarin.Mac/Xamarin.iOS only supports the Framework compilation option.", () => Driver.Main2 (new[] { "--target=library", $"--platform={platform}" }));
+				Asserts.ThrowsEmbeddinatorException (27, "Embedded Xamarin.Mac/Xamarin.iOS only supports the Framework compilation option.", () => Driver.Main2 (new[] { "--target=static", $"--platform={platform}" }));
+			}
+		}
 	}
 }

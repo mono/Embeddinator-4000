@@ -92,6 +92,10 @@ Could not create the symlink mentioned in the error message.
 
 The syntax given for the command line option `A` could not be parsed by the tool. It is likely incorrect, please check with the documentation or help for the correct syntax.
 
+<h3><a name="EM0027"/>EM0027 Embedded Xamarin.Mac/Xamarin.iOS only supports the Framework compilation option.</h3>
+
+Xamarin.Mac/Xamarin.iOS only supports the Framework compilation option. --target=framework
+
 <h3><a name="EM0099"/>EM0099: Internal error *. Please file a bug report with a test case (https://github.com/mono/Embeddinator-4000/issues).</h3>
 
 This error message is reported when an internal consistency check in the Embeddinator-4000 fails.
