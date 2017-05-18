@@ -160,8 +160,7 @@ namespace Embeddinator {
 		protected abstract void ComputeSignatures ();
 
 		int firstDefaultParameter;
-		public int FirstDefaultParameter
-		{
+		public int FirstDefaultParameter {
 			get {
 				return firstDefaultParameter;
 			}
