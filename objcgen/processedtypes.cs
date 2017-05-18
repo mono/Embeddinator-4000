@@ -178,7 +178,6 @@ namespace Embeddinator {
 		public MethodInfo Method { get; private set; }
 		public bool IsOperator { get; set; }
 		public string NameOverride { get; set; }
-		public ParameterInfo[] Parameters { get; private set; }
 
 		public string BaseName {
 			get {
@@ -304,7 +303,6 @@ namespace Embeddinator {
 			}
 		}
 		public ConstructorType ConstructorType { get; set; }
-		public ParameterInfo[] Parameters { get; private set; }
 
 		public ProcessedConstructor (ConstructorInfo constructor, Processor processor) : base (processor)
 		{
