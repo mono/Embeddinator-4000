@@ -308,8 +308,10 @@ namespace ObjC {
 					var parameters = ctor.Constructor.GetParameters ();
 					string name = "init";
 					string signature = ".ctor()";
-					if (parameters.Length > 0)
-						ctor.GetSignatures ("initWith", ctor.Constructor.Name, ctor.Constructor, parameters, false, out name, out signature);
+					if (parameters.Length > 0) {
+						name = ctor.GetObjcSignature ();
+						signature = ctor.GetMonoSignature ();
+					}
 
 					if (ctor.Unavailable) {
 						headers.WriteLine ("/** This initializer is not available as it was not re-exposed from the base type");
@@ -943,7 +945,8 @@ namespace ObjC {
 			var managed_name = info.Name;
 			var parametersInfo = info.GetParameters ();
 
-			method.GetSignatures (name, managed_name, (MemberInfo)pi ?? info, parametersInfo, isExtension, out objcsig, out monosig);
+			objcsig = method.GetObjcSignature (name, isExtension);
+			monosig = method.GetMonoSignature (managed_name);
 
 			var builder = new MethodHelper (headers, implementation) {
 				AssemblySafeName = type.Assembly.GetName ().Name.Sanitize (),
@@ -1019,7 +1022,9 @@ namespace ObjC {
 			else
 				name = method.BaseName;
 
-			member.GetSignatures (name, mb.Name, mb, plist.ToArray (), false, out objcsig, out monosig);
+			objcsig = method != null ? method.GetObjcSignature () : ctor.GetObjcSignature ();
+			monosig = method != null ? method.GetMonoSignature () : ctor.GetMonoSignature ();
+
 			var type = mb.DeclaringType;
 
 			headers.WriteLine (" *");
@@ -1051,13 +1056,8 @@ namespace ObjC {
 
 		protected override void Generate (ProcessedMethod method)
 		{
-			string objcsig;
 			switch (method.MethodType) {
 			case MethodType.DefaultValueWrapper:
-				string monosig;
-				var managed_name = method.Method.Name;
-				var parametersInfo = method.Method.GetParameters ();
-				method.GetSignatures (method.BaseName, managed_name, method.Method, parametersInfo, false, out objcsig, out monosig);
 				GenerateDefaultValuesWrapper (method);
 				break;
 			default:
