@@ -864,6 +864,8 @@ namespace Embeddinator {
 					if (!MergeFrameworks (fwpath, dev_fwpath, sim_fwpath, out exitCode))
 						return exitCode;
 				} else {
+					if (Directory.Exists (fwpath))
+						Directory.Delete (fwpath, true);
 					var fwsdkpath = Path.Combine (OutputDirectory, build_infos [0].Sdk, $"{LibraryName}.framework");
 					Directory.Move (fwsdkpath, fwpath);
 				}
