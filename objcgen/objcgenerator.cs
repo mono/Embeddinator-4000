@@ -482,18 +482,6 @@ namespace ObjC {
 				builder.WriteImplementation ();
 			}
 
-			if (hashes.TryGetValue (t, out m)) {
-				var builder = new HashHelper (headers, implementation) {
-					AssemblySafeName = aname,
-					MetadataToken = m.MetadataToken,
-					ObjCTypeName = managed_name,
-					ManagedTypeName = t.FullName,
-				};
-
-				builder.WriteHeaders ();
-				builder.WriteImplementation ();
-			}
-
 			tbuilder.EndHeaders ();
 			tbuilder.EndImplementation ();
 		}
@@ -1047,6 +1035,11 @@ namespace ObjC {
 			switch (method.MethodType) {
 			case MethodType.DefaultValueWrapper:
 				GenerateDefaultValuesWrapper (method);
+				break;
+			case MethodType.NSObjectProcotolHash:
+				var builder = new HashHelper (method, headers, implementation);
+				builder.WriteHeaders ();
+				builder.WriteImplementation ();
 				break;
 			default:
 				ImplementMethod (method.Method, method.BaseName, method);

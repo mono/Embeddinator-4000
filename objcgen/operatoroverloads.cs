@@ -85,13 +85,13 @@ namespace Embeddinator
 			}
 		}
 
-		public static IEnumerable <MethodInfo> FindOperatorPairToIgnore (IEnumerable<MethodInfo> methods, IEnumerable <MethodInfo> equals)
+		public static IEnumerable <MethodInfo> FindOperatorPairToIgnore (IEnumerable<ProcessedMethod> methods, IEnumerable <MethodInfo> equals)
 		{
 			var matches = new Dictionary<OperatorInfo, List<MethodInfo>> ();
 			foreach (var method in methods) {
 				OperatorInfo info;
-				if (OperatorMappingNames.TryGetValue (method.Name, out info) && method.ParameterCount == info.ArgumentCount)
-					matches.AddValue (info, method);			
+				if (OperatorMappingNames.TryGetValue (method.Method.Name, out info) && method.Method.ParameterCount == info.ArgumentCount)
+					matches.AddValue (info, method.Method);
 			}
 
 			foreach (var match in matches) {

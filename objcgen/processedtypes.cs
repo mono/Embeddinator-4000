@@ -146,6 +146,7 @@ namespace Embeddinator {
 	public enum MethodType {
 		Normal,
 		DefaultValueWrapper,
+		NSObjectProcotolHash,
 	}
 
 	public abstract class ProcessedMemberWithParameters : ProcessedMemberBase {
@@ -185,6 +186,7 @@ namespace Embeddinator {
 		}
 
 		public MethodType MethodType { get; set; }
+		public ProcessedType DeclaringType { get; set; }
 
 		public ProcessedMethod (MethodInfo method, Processor processor) : base (processor)
 		{
