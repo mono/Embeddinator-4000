@@ -6,6 +6,7 @@ workspace "mk"
   symbols "On"
   location "mk"
   SetupTestProjectC("common")
+  SetupTestProjectCpp("common")
   if os.is("macosx") then
   SetupTestProjectObjC("common")
   end

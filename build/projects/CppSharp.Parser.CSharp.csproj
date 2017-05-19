@@ -41,15 +41,15 @@
   <ItemGroup>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="../../external/CppSharp/src/CppParser/Bindings/CSharp/i686-apple-darwin12.4.0/CppSharp.CppParser.cs">
+      <Link>i686-apple-darwin12.4.0/CppSharp.CppParser.cs</Link>
+    </Compile>
+    <Compile Include="../../external/CppSharp/src/CppParser/Bindings/CSharp/i686-apple-darwin12.4.0/Std.cs">
+      <Link>i686-apple-darwin12.4.0/Std.cs</Link>
+    </Compile>
     <None Include="../../external/CppSharp/src/CppParser/Bindings/CSharp/premake5.lua">
       <Link>premake5.lua</Link>
     </None>
-    <Compile Include="../../external/CppSharp/src/CppParser/Bindings/CSharp/x86_64-apple-darwin12.4.0/CppSharp.CppParser.cs">
-      <Link>x86_64-apple-darwin12.4.0/CppSharp.CppParser.cs</Link>
-    </Compile>
-    <Compile Include="../../external/CppSharp/src/CppParser/Bindings/CSharp/x86_64-apple-darwin12.4.0/Std.cs">
-      <Link>x86_64-apple-darwin12.4.0/Std.cs</Link>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="CppSharp.Runtime.csproj">

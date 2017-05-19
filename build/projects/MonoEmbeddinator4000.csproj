@@ -11,7 +11,6 @@
     <AssemblyName>MonoEmbeddinator4000</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <BaseIntermediateOutputPath>..\obj\Debug\MonoEmbeddinator4000</BaseIntermediateOutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -68,6 +67,21 @@
     </Compile>
     <Compile Include="../../binder/Generators/C/CTypes.cs">
       <Link>binder/Generators/C/CTypes.cs</Link>
+    </Compile>
+    <Compile Include="../../binder/Generators/C++/CppGenerator.cs">
+      <Link>binder/Generators/C++/CppGenerator.cs</Link>
+    </Compile>
+    <Compile Include="../../binder/Generators/C++/CppHeaders.cs">
+      <Link>binder/Generators/C++/CppHeaders.cs</Link>
+    </Compile>
+    <Compile Include="../../binder/Generators/C++/CppMarshal.cs">
+      <Link>binder/Generators/C++/CppMarshal.cs</Link>
+    </Compile>
+    <Compile Include="../../binder/Generators/C++/CppSources.cs">
+      <Link>binder/Generators/C++/CppSources.cs</Link>
+    </Compile>
+    <Compile Include="../../binder/Generators/C++/CppTypes.cs">
+      <Link>binder/Generators/C++/CppTypes.cs</Link>
     </Compile>
     <Compile Include="../../binder/Generators/Java/JavaGenerator.cs">
       <Link>binder/Generators/Java/JavaGenerator.cs</Link>
@@ -128,6 +142,9 @@
     </Compile>
     <Compile Include="../../binder/Passes/RenameDuplicatedDecls.cs">
       <Link>binder/Passes/RenameDuplicatedDecls.cs</Link>
+    </Compile>
+    <Compile Include="../../binder/Passes/RenameEnumItemsPass.cs">
+      <Link>binder/Passes/RenameEnumItemsPass.cs</Link>
     </Compile>
     <Compile Include="../../binder/Project.cs">
       <Link>binder/Project.cs</Link>

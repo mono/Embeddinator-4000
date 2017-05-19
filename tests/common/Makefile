@@ -40,15 +40,18 @@ endif
 binder:
 	$(MSBUILD) /nologo /v:minimal $(PROJECT)
 
-c: gen_c compile_c_objc
+c: gen_c gen_cpp compile_c_objc_cpp
 
 gen_c:
 	$(EMBEDDINATOR_CMD) -gen=c -out=c $(PLATFORM_FLAG) -compile -target=shared $(MANAGED_DLL)
 
+gen_cpp:
+	$(EMBEDDINATOR_CMD) -gen=cpp -out=cpp $(PLATFORM_FLAG) -compile -target=shared $(MANAGED_DLL)
+
 gen_objc:
 	$(EMBEDDINATOR_CMD) -gen=objc -out=objc -p=macos -compile -target=shared $(MANAGED_DLL)
 
-compile_c_objc:
+compile_c_objc_cpp:
 	$(PREMAKE_GENERATE)
 	$(BUILD_COMMON)
 

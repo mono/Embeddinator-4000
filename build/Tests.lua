@@ -155,6 +155,43 @@ function SetupTestProjectC(name, depends)
     SetupMono()
 end
 
+function SetupTestProjectCpp(name, depends)
+  -- if string.starts(action, "vs") and not os.is("windows") then
+    -- return
+  -- end
+
+  project(name .. ".Cpp")
+
+    kind "SharedLib"
+    language "C++"
+
+    defines { "MONO_EMBEDDINATOR_DLL_EXPORT", "MONO_DLL_IMPORT"}
+
+    flags { common_flags }
+    files
+    {
+      path.join("c", "*.h"),
+      path.join("c", "*.c"),
+      path.join("cpp", "*.hpp"),
+      path.join("cpp", "*.cpp"),
+    }
+
+    includedirs { supportdir }
+
+    dependson { name .. ".Gen" }
+
+    if depends ~= nil then
+      links { depends .. ".C" }
+    end
+
+    filter { "action:vs*" }
+      buildoptions { "/wd4018" } -- eglib signed/unsigned warnings
+
+    filter {}
+
+    SetupMono()
+end
+
 function SetupTestProjectObjC(name, depends)
   if string.starts(action, "vs") and not os.is("windows") then
     return

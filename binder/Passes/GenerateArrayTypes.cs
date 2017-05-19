@@ -15,16 +15,20 @@ namespace MonoEmbeddinator4000.Passes
         TranslationUnit TranslationUnit;
 
         Dictionary<string, QualifiedType> Arrays;
-        List<TypedefDecl> Declarations;
+        List<Declaration> Declarations;
 
         static CArrayTypePrinter ArrayPrinter => new CArrayTypePrinter {
             PrintScopeKind = TypePrintScopeKind.Qualified,
         };
 
+        static CppArrayTypePrinter ArrayPrinterCpp => new CppArrayTypePrinter {
+            PrintScopeKind = TypePrintScopeKind.Local
+        };
+
         public GenerateArrayTypes()
         {
             Arrays = new Dictionary<string, QualifiedType>();
-            Declarations = new List<TypedefDecl>();
+            Declarations = new List<Declaration>();
         }
 
         public override bool VisitTranslationUnit(TranslationUnit unit)
@@ -44,8 +48,32 @@ namespace MonoEmbeddinator4000.Passes
 
         public static Class MonoEmbedArray = new Class { Name = "MonoEmbedArray" };
 
+        QualifiedType GenerateArrayTypeCpp(ArrayType array, Declaration decl)
+        {
+            System.Console.WriteLine($"{Context.Options.GeneratorKind}");
+            var typeName = array.Visit(ArrayPrinterCpp);
+
+            var @namespace = TranslationUnit;
+
+            var typedef = new TypedefDecl
+            {
+                Name = string.Format("_{0}", typeName),
+                Namespace = @namespace,
+                QualifiedType = new QualifiedType(new TagType(MonoEmbedArray))
+            };
+
+            Declarations.Add(typedef);
+
+            var typedefType = new TypedefType(typedef);
+            var arrayType = new ManagedArrayType(array, typedefType);
+
+            return new QualifiedType { Type = arrayType };
+        }
+
         QualifiedType GenerateArrayType(ArrayType array, Declaration decl)
         {
+            if (Context.Options.GeneratorKind == CppSharp.Generators.GeneratorKind.CPlusPlus)
+                return GenerateArrayTypeCpp(array, decl);
             var typeName = array.Visit(ArrayPrinter);
 
             var @namespace = TranslationUnit;
