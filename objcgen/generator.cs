@@ -23,7 +23,6 @@ namespace Embeddinator {
 			subscriptProperties = op.subscriptProperties;
 			icomparable = op.icomparable;
 			iequatable = op.iequatable;
-			equals = op.equals;
 
 			foreach (var a in Processor.Assemblies) {
 				Generate (a);
@@ -111,6 +110,5 @@ namespace Embeddinator {
 		public Dictionary<Type, List<ProcessedProperty>> subscriptProperties { get; private set; }
 		public Dictionary<Type, MethodInfo> icomparable { get; private set; }
 		public Dictionary<Type, MethodInfo> iequatable { get; private set; }
-		public Dictionary<Type, MethodInfo> equals { get; private set; }
 	}
 }

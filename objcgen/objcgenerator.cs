@@ -454,24 +454,10 @@ namespace ObjC {
 				var pt = m.GetParameters () [0].ParameterType;
 				var objc = NameGenerator.GetTypeName (pt);
 				var nullable = !pt.IsPrimitive ? " * _Nullable" : "";
-				var builder = new EqualsHelper (headers, implementation) {
+				var builder = new EquatableHelper (headers, implementation) {
 					ParameterType = pt,
 					ObjCSignature = $"isEqualTo{objc.PascalCase ()}:({objc}{nullable})other",
 					MonoSignature = $"Equals({NameGenerator.GetMonoName (pt)})",
-					AssemblySafeName = aname,
-					MetadataToken = m.MetadataToken,
-					ObjCTypeName = managed_name,
-					ManagedTypeName = t.FullName,
-				};
-
-				builder.WriteHeaders ();
-				builder.WriteImplementation ();
-			}
-
-			if (equals.TryGetValue (t, out m)) {
-				var builder = new EqualsHelper (headers, implementation) {
-					ObjCSignature = "isEqual:(id _Nullable)other",
-					MonoSignature = "Equals(object)",
 					AssemblySafeName = aname,
 					MetadataToken = m.MetadataToken,
 					ObjCTypeName = managed_name,
@@ -1040,6 +1026,11 @@ namespace ObjC {
 				var builder = new HashHelper (method, headers, implementation);
 				builder.WriteHeaders ();
 				builder.WriteImplementation ();
+				break;
+			case MethodType.NSObjectProcotolIsEqual:
+				var equals = new EqualsHelper (method, headers, implementation);
+				equals.WriteHeaders ();
+				equals.WriteImplementation ();
 				break;
 			default:
 				ImplementMethod (method.Method, method.BaseName, method);

@@ -11,9 +11,15 @@ namespace ObjC {
 	// A set of post-processing steps needed to add hints
 	// to the input of the generation step
 	public partial class ObjCProcessor {
-		protected IEnumerable<ProcessedMethod> PostProcessMethods (IEnumerable<ProcessedMethod> methods, IEnumerable <MethodInfo> equals)
+		protected IEnumerable<ProcessedMethod> PostProcessMethods (IEnumerable<ProcessedMethod> methods)
 		{
 			HashSet<string> duplicateNames = FindDuplicateNames (methods);
+
+			var equals = new HashSet<MethodInfo> ();
+			foreach (var m in methods) {
+				if (m.MethodType == MethodType.NSObjectProcotolIsEqual)
+					equals.Add (m.Method);
+			}
 			HashSet<MethodInfo> operatorToIgnore = new HashSet<MethodInfo> (OperatorOverloads.FindOperatorPairToIgnore (methods, equals));
 
 			foreach (var processedMethod in methods) {

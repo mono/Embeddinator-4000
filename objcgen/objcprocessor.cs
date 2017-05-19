@@ -190,7 +190,6 @@ namespace ObjC {
 
 		internal Dictionary<Type,MethodInfo> icomparable = new Dictionary<Type, MethodInfo> ();
 		internal Dictionary<Type, MethodInfo> iequatable = new Dictionary<Type, MethodInfo> ();
-		internal Dictionary<Type, MethodInfo> equals = new Dictionary<Type, MethodInfo> ();
 		HashSet<MemberInfo> members_with_default_values = new HashSet<MemberInfo> ();
 
 		// defining type / extended type / methods
@@ -219,7 +218,10 @@ namespace ObjC {
 				}
 
 				if (mi.Match ("System.Boolean", "Equals", "System.Object")) {
-					equals.Add (t, mi);
+					yield return new ProcessedMethod (mi, this) {
+						DeclaringType = type,
+						MethodType = MethodType.NSObjectProcotolIsEqual,
+					};
 					continue;
 				} 
 
@@ -375,9 +377,8 @@ namespace ObjC {
 			var processedConstructors = PostProcessConstructors (constructors).ToList ();
 			pt.Constructors = processedConstructors;
 
-			var typeEquals = equals.Where (x => x.Key == t).Select (x => x.Value);
 			var meths = GetMethods (pt).OrderBy ((arg) => arg.Method.Name).ToList ();
-			var processedMethods = PostProcessMethods (meths, typeEquals).ToList ();
+			var processedMethods = PostProcessMethods (meths).ToList ();
 			pt.Methods = processedMethods;
 
 			var props = new List<PropertyInfo> ();
