@@ -125,5 +125,10 @@ namespace ObjC {
 			implementation.WriteLine ("}");
 			implementation.WriteLine ();
 		}
+
+		public virtual void WriteImplementation ()
+		{
+			throw new NotImplementedException ();
+		}
 	}
 }

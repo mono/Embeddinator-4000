@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 
 using Embeddinator;
 
@@ -22,7 +21,7 @@ namespace ObjC {
 			base.WriteHeaders ();
 		}
 
-		public void WriteImplementation ()
+		public override void WriteImplementation ()
 		{
 			BeginImplementation ();
 			WriteMethodLookup ();

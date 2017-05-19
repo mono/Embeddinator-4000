@@ -450,24 +450,6 @@ namespace ObjC {
 				builder.WriteImplementation ();
 			}
 
-			if (iequatable.TryGetValue (t, out m)) {
-				var pt = m.GetParameters () [0].ParameterType;
-				var objc = NameGenerator.GetTypeName (pt);
-				var nullable = !pt.IsPrimitive ? " * _Nullable" : "";
-				var builder = new EquatableHelper (headers, implementation) {
-					ParameterType = pt,
-					ObjCSignature = $"isEqualTo{objc.PascalCase ()}:({objc}{nullable})other",
-					MonoSignature = $"Equals({NameGenerator.GetMonoName (pt)})",
-					AssemblySafeName = aname,
-					MetadataToken = m.MetadataToken,
-					ObjCTypeName = managed_name,
-					ManagedTypeName = t.FullName,
-				};
-
-				builder.WriteHeaders ();
-				builder.WriteImplementation ();
-			}
-
 			tbuilder.EndHeaders ();
 			tbuilder.EndImplementation ();
 		}
@@ -1018,24 +1000,26 @@ namespace ObjC {
 
 		protected override void Generate (ProcessedMethod method)
 		{
+			MethodHelper builder;
 			switch (method.MethodType) {
 			case MethodType.DefaultValueWrapper:
 				GenerateDefaultValuesWrapper (method);
-				break;
+				return;
 			case MethodType.NSObjectProcotolHash:
-				var builder = new HashHelper (method, headers, implementation);
-				builder.WriteHeaders ();
-				builder.WriteImplementation ();
+				builder = new HashHelper (method, headers, implementation);
 				break;
 			case MethodType.NSObjectProcotolIsEqual:
-				var equals = new EqualsHelper (method, headers, implementation);
-				equals.WriteHeaders ();
-				equals.WriteImplementation ();
+				builder = new EqualsHelper (method, headers, implementation);
+				break;
+			case MethodType.IEquatable:
+				builder = new EquatableHelper (method, headers, implementation);
 				break;
 			default:
 				ImplementMethod (method.Method, method.BaseName, method);
-				break;
+				return;
 			}
+			builder.WriteHeaders ();
+			builder.WriteImplementation ();
 		}
 
 		void ReturnArrayValue (Type t)

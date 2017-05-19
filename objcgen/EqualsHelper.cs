@@ -14,11 +14,6 @@ namespace ObjC {
 			ReturnType = "bool";
 		}
 
-		[Obsolete]
-		public EqualsHelper (SourceWriter headers, SourceWriter implementation) : base (headers, implementation)
-		{
-		}
-
 		protected virtual void WriteHeadersComment ()
 		{
 			headers.WriteLine ("/** This override the default equality check (defined in NSObject Protocol)");
@@ -33,7 +28,7 @@ namespace ObjC {
 			base.WriteHeaders ();
 		}
 
-		public void WriteImplementation ()
+		public override void WriteImplementation ()
 		{
 			BeginImplementation ();
 			if (ParameterType == null || !ParameterType.IsPrimitive) {
@@ -64,10 +59,16 @@ namespace ObjC {
 
 	public class EquatableHelper : EqualsHelper {
 
-		public EquatableHelper (SourceWriter headers, SourceWriter implementation) :
-			base (headers, implementation)
+		public EquatableHelper (ProcessedMethod method, SourceWriter headers, SourceWriter implementation) :
+			base (method, headers, implementation)
 		{
 			ReturnType = "bool";
+			var pt = method.Method.GetParameters () [0].ParameterType;
+			var objc = NameGenerator.GetTypeName (pt);
+			var nullable = !pt.IsPrimitive ? " * _Nullable" : "";
+			ParameterType = pt;
+			ObjCSignature = $"isEqualTo{objc.PascalCase ()}:({objc}{nullable})other";
+			MonoSignature = $"Equals({NameGenerator.GetMonoName (pt)})";
 		}
 
 		// we do not want EqualsHelper comment on IEquatable<T> support, it's not applicable
