@@ -147,6 +147,7 @@ namespace Embeddinator {
 		Normal,
 		DefaultValueWrapper,
 		NSObjectProcotolHash,
+		NSObjectProcotolIsEqual,
 	}
 
 	public abstract class ProcessedMemberWithParameters : ProcessedMemberBase {

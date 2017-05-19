@@ -6,17 +6,30 @@ namespace ObjC {
 	public class EqualsHelper : MethodHelper{
 		public Type ParameterType { get; set; }
 
+		public EqualsHelper (ProcessedMethod method, SourceWriter headers, SourceWriter implementation) :
+			base (method, headers, implementation)
+		{
+			ObjCSignature = "isEqual:(id _Nullable)other";
+			MonoSignature = "Equals(object)";
+			ReturnType = "bool";
+		}
+
+		[Obsolete]
 		public EqualsHelper (SourceWriter headers, SourceWriter implementation) : base (headers, implementation)
 		{
-			ReturnType = "bool";
+		}
+
+		protected virtual void WriteHeadersComment ()
+		{
+			headers.WriteLine ("/** This override the default equality check (defined in NSObject Protocol)");
+			headers.WriteLine (" * https://developer.apple.com/reference/objectivec/1418956-nsobject/1418795-isequal?language=objc");
+			headers.WriteLine (" */");
 		}
 
 		public override void WriteHeaders ()
 		{
 			headers.WriteLine ();
-			headers.WriteLine ("/** This override the default equality check (defined in NSObject Protocol)");
-			headers.WriteLine (" * https://developer.apple.com/reference/objectivec/1418956-nsobject/1418795-isequal?language=objc");
-			headers.WriteLine (" */");
+			WriteHeadersComment ();
 			base.WriteHeaders ();
 		}
 
@@ -46,6 +59,20 @@ namespace ObjC {
 			implementation.WriteLine ("return *((bool*)__unbox);");
 
 			EndImplementation ();
+		}
+	}
+
+	public class EquatableHelper : EqualsHelper {
+
+		public EquatableHelper (SourceWriter headers, SourceWriter implementation) :
+			base (headers, implementation)
+		{
+			ReturnType = "bool";
+		}
+
+		// we do not want EqualsHelper comment on IEquatable<T> support, it's not applicable
+		protected override void WriteHeadersComment ()
+		{
 		}
 	}
 }
