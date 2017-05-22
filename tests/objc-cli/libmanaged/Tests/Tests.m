@@ -1313,6 +1313,12 @@
 	}
 }
 
+- (void)testRestrictedNames {
+	Duplicates_WithRestrictedNamed * d = [[Duplicates_WithRestrictedNamed alloc] init];
+	Class c = [d class];
+	XCTAssertNotEqual(42, [d hash], "Must not call instance Hash ()");
+}
+
 #pragma clang diagnostic pop
 
 @end

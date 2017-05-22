@@ -35,13 +35,14 @@ namespace ObjC {
 				if (IsOperatorOrFriendlyVersion (method))
 					processedMethod.IsOperator = true;
 
-				ProcessPotentialNameOverride (processedMethod);
+				if (!ProcessPotentialName (processedMethod))
+					continue;
 
 				yield return processedMethod;
 			}
 		}
 
-		void ProcessPotentialNameOverride (ProcessedMethod processedMethod)
+		bool ProcessPotentialName (ProcessedMethod processedMethod)
 		{
 			MethodInfo method = processedMethod.Method;
 			if (IsOperatorOrFriendlyVersion (method)) {
@@ -49,6 +50,14 @@ namespace ObjC {
 				if (nameOverride != null)
 					processedMethod.NameOverride = nameOverride;
 			}
+
+			string objCSignature = processedMethod.GetObjcSignature ();
+			switch (objCSignature) {
+			case "hash":
+				Delayed.Add (ErrorHelper.CreateWarning (1051, $"Element '{processedMethod.Method.Name}' is not generated because its name conflicts with important objective-c selector '{objCSignature}'"));
+				return false;
+			}
+			return true;
 		}
 
 		public bool IsOperatorOrFriendlyVersion (MethodInfo method)
@@ -60,8 +69,23 @@ namespace ObjC {
 		{
 			foreach (PropertyInfo property in properties) {
 				ProcessedProperty processedProperty = new ProcessedProperty (property, this);
+
+				if (!ProcessPotentialName (processedProperty))
+					continue;
+
 				yield return processedProperty;
 			}
+		}
+
+		bool ProcessPotentialName (ProcessedProperty processedProperty)
+		{
+			switch (processedProperty.Name) {
+				case "setClass":
+				case "class":
+					Delayed.Add (ErrorHelper.CreateWarning (1051, $"Element '{processedProperty.Property.Name}' is not generated because its name conflicts with important objective-c selector '{processedProperty.Name}'"));
+					return false;
+			}
+			return true;
 		}
 
 		protected IEnumerable<ProcessedProperty> PostProcessSubscriptProperties (IEnumerable<PropertyInfo> properties)

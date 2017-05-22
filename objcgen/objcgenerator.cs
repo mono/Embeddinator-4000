@@ -760,8 +760,6 @@ namespace ObjC {
 			if (getter == null && setter != null)
 				throw new EmbeddinatorException (99, "Internal error `setter only`. Please file a bug report with a test case (https://github.com/mono/Embeddinator-4000/issues");
 
-			var name = pi.Name.CamelCase ();
-
 			headers.Write ("@property (nonatomic");
 			if (getter.IsStatic)
 				headers.Write (", class");
@@ -773,9 +771,9 @@ namespace ObjC {
 				property_type += " *";
 
 			var spacing = property_type [property_type.Length - 1] == '*' ? string.Empty : " ";
-			headers.WriteLine ($") {property_type}{spacing}{name};");
+			headers.WriteLine ($") {property_type}{spacing}{property.Name};");
 
-			ImplementMethod (getter, name, property.GetMethod, pi: pi);
+			ImplementMethod (getter, property.Name, property.GetMethod, pi: pi);
 			if (setter == null)
 				return;
 
