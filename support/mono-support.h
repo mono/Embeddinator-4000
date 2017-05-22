@@ -25,6 +25,7 @@
 
 #if defined (XAMARIN_IOS) || defined (XAMARIN_MAC)
 #include <xamarin/xamarin.h>
+typedef void * gpointer;
 typedef uint16_t    mono_unichar2;
 
 typedef struct _MonoMethodDesc MonoMethodDesc;
@@ -70,6 +71,7 @@ MONO_EMBEDDINATOR_END_DECLS
 #include <mono/metadata/debug-helpers.h>
 #include <mono/metadata/object.h>
 
+typedef void * gpointer;
 typedef uint16_t gunichar2;
 
 typedef struct _GArray GArray;
@@ -81,6 +83,22 @@ typedef struct _MonoClass MonoClass;
 typedef struct _MonoObject MonoObject;
 typedef struct _MonoImage MonoImage;
 typedef struct _MonoMethod MonoMethod;
+
+gpointer
+mono_threads_attach_coop (MonoDomain *domain, gpointer *dummy);
+
+void
+mono_threads_detach_coop (gpointer cookie, gpointer *dummy);
+
+#define MONO_THREAD_ATTACH \
+	do { \
+		gpointer __thread_dummy; \
+		gpointer __thread_cookie = mono_threads_attach_coop (NULL, &__thread_dummy) \
+
+#define MONO_THREAD_DETACH \
+		mono_threads_detach_coop (__thread_cookie, &__thread_dummy); \
+	} while (0)
+
 #endif
 
 #ifndef MONODECIMAL
