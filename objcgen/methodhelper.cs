@@ -65,6 +65,7 @@ namespace ObjC {
 			implementation.WriteLine ();
 			implementation.WriteLine ("{");
 			implementation.Indent++;
+			implementation.WriteLine ("MONO_THREAD_ATTACH;");
 		}
 
 		public void WriteMethodLookup ()
@@ -121,6 +122,7 @@ namespace ObjC {
 
 		public void EndImplementation ()
 		{
+			implementation.WriteLine ("MONO_THREAD_DETACH;");
 			implementation.Indent--;
 			implementation.WriteLine ("}");
 			implementation.WriteLine ();

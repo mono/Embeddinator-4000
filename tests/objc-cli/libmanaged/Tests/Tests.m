@@ -50,6 +50,7 @@
 
 	Platform.exitCode = 255;
 	XCTAssert ([Platform exitCode] == 255, "static class property setter check");
+	Platform.exitCode = 0; // set back to original value
 
 	XCTAssert ([Properties_Query universalAnswer] == 42, "static property getter only");
 
@@ -59,11 +60,13 @@
 	XCTAssert ([query answer] == 42, "instance property getter");
 	query.answer = 911;
 	XCTAssert ([query answer] == 911, "instance property setter check");
+	query.answer = 42; // set back to original value
 
 	XCTAssertFalse ([query isSecret], "instance property getter only 3");
 	// setter only property turned into method, so different syntax
 	[query setSecret: 1];
 	XCTAssertTrue ([query isSecret], "instance property getter only 4");
+	[query setSecret: 0]; // set back to original value
 }
 
 - (void)testNamespaces {
@@ -1274,6 +1277,40 @@
 	NSString *s4 = [ts toStringFormat:@"c"];
 	XCTAssertEqualObjects (s3, @"1.02:03:04.0050000", "toStringFormat");
 	XCTAssertEqualObjects (s3, s4, "toStringFormat:formatprovider");
+}
+
+-(void)testOtherThreads {
+	// Test a variety of things, constructors, static methods, instance methods
+	// We first run using GCD, then manually creating new threads.
+
+	dispatch_sync (dispatch_get_global_queue (QOS_CLASS_USER_INITIATED, 0), ^{
+		[self testExceptions];
+	});
+	dispatch_sync (dispatch_get_global_queue (QOS_CLASS_USER_INITIATED, 0), ^{
+		[self testMethods];
+	});
+	dispatch_sync (dispatch_get_global_queue (QOS_CLASS_USER_INITIATED, 0), ^{
+		[self testProperties];
+	});
+
+	NSThread *thread;
+	thread = [[NSThread alloc] initWithTarget: self selector:@selector(testExceptions) object:nil];
+	[thread start];
+	while ([thread isFinished] == NO) {
+		usleep (1000); // there's no [NSThread join]...
+	}
+
+	thread = [[NSThread alloc] initWithTarget: self selector:@selector(testMethods) object:nil];
+	[thread start];
+	while ([thread isFinished] == NO) {
+		usleep (1000); // there's no [NSThread join]...
+	}
+
+	thread = [[NSThread alloc] initWithTarget: self selector:@selector(testProperties) object:nil];
+	[thread start];
+	while ([thread isFinished] == NO) {
+		usleep (1000); // there's no [NSThread join]...
+	}
 }
 
 #pragma clang diagnostic pop
