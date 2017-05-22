@@ -1007,10 +1007,10 @@ namespace Embeddinator {
 			switch (Platform) {
 			case Platform.macOS:
 				throw new NotImplementedException ("platform assembly for macOS"); // We need to know full/mobile
+			case Platform.macOSSystem:
 			case Platform.macOSFull:
 				return "/Library/Frameworks/Xamarin.Mac.framework/Versions/Current/lib/mono/4.5/Xamarin.Mac.dll";
 			case Platform.macOSModern:
-			case Platform.macOSSystem:
 				return "/Library/Frameworks/Xamarin.Mac.framework/Versions/Current/lib/mono/Xamarin.Mac/Xamarin.Mac.dll";
 			case Platform.iOS:
 				return "/Library/Frameworks/Xamarin.iOS.framework/Versions/Current/lib/mono/Xamarin.iOS/Xamarin.iOS.dll";
