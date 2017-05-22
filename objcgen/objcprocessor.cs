@@ -189,7 +189,6 @@ namespace ObjC {
 		}
 
 		internal Dictionary<Type,MethodInfo> icomparable = new Dictionary<Type, MethodInfo> ();
-		internal Dictionary<Type, MethodInfo> iequatable = new Dictionary<Type, MethodInfo> ();
 		HashSet<MemberInfo> members_with_default_values = new HashSet<MemberInfo> ();
 
 		// defining type / extended type / methods
@@ -226,7 +225,10 @@ namespace ObjC {
 				} 
 
 				if (implement_system_iequatable_t && mi.Match ("System.Boolean", "Equals", new string [] { null })) {
-					iequatable [t] = mi;
+					yield return new ProcessedMethod (mi, this) {
+						DeclaringType = type,
+						MethodType = MethodType.IEquatable,
+					};
 					continue;
 				}
 
