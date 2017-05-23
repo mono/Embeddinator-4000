@@ -105,6 +105,11 @@ namespace Embeddinator {
 		{
 			return self.StartsWith (value, StringComparison.Ordinal);
 		}
+
+		public static string ToLowerCaseFirstCharacter (this string self)
+		{
+			return char.ToLower (self[0], System.Globalization.CultureInfo.InvariantCulture) + self.Substring (1);
+		}
 	}
 
 	public static class TypeExtensions {

@@ -13,30 +13,6 @@ namespace ObjC {
 	// to the input of the generation step
 	public partial class ObjCProcessor {
 
-		readonly HashSet<string> ImportantObjcSelectors = new HashSet<string> { "hash", "class", "superclass", "isEqual:", "self", "isKindOfClass:",
-			"isMemberOfClass:", "respondsToSelector:", "conformsToProtocol:", "description", "debugDescription", "performSelector:", "performSelector:withObject:",
-			"performSelector:withObject:withObject:", "isProxy", "retain", "release", "autorelease", "retainCount", "zone" };
-
-		string LowerCaseFirstCharacter (string s)
-		{
-			return char.ToLower (s[0], CultureInfo.InvariantCulture) + s.Substring (1);
-		}
-
-		bool IsImportantSelector (string selector)
-		{
-			if (selector.StartsWith ("get", StringComparison.Ordinal))
-				selector = LowerCaseFirstCharacter (selector.Substring (3));
-
-			if (selector.StartsWith ("set", StringComparison.Ordinal)) {
-				selector = LowerCaseFirstCharacter (selector.Substring (3));
-				int colonLocation = selector.IndexOf (':');
-				if (colonLocation > 0)
-					selector = selector.Substring (0, colonLocation);
-			}
-
-			return ImportantObjcSelectors.Contains (selector);
-		}
-
 		protected IEnumerable<ProcessedMethod> PostProcessMethods (IEnumerable<ProcessedMethod> methods)
 		{
 			HashSet<string> duplicateNames = FindDuplicateNames (methods);
@@ -78,7 +54,7 @@ namespace ObjC {
 			}
 
 			string objCSignature = processedMethod.GetObjcSignature ();
-			if (IsImportantSelector (objCSignature)) {
+			if (RestrictedObjSelectors.IsImportantSelector (objCSignature)) {
 				Delayed.Add (ErrorHelper.CreateWarning (1051, $"Element '{processedMethod.Method.Name}' is not generated because its name conflicts with important objective-c selector '{objCSignature}'"));
 				return false;
 			}
@@ -107,8 +83,12 @@ namespace ObjC {
 			string getSignature = processedProperty.HasGetter ? processedProperty.GetMethod.ObjCSignature : "";
 			string setSignature = processedProperty.HasSetter ? processedProperty.SetMethod.ObjCSignature : "";
 
-			if (IsImportantSelector (getSignature) || IsImportantSelector (setSignature)) {
-				Delayed.Add (ErrorHelper.CreateWarning (1051, $"Element '{processedProperty.Property.Name}' is not generated because its name conflicts with important objective-c selector '{processedProperty.Name}'"));
+			if (RestrictedObjSelectors.IsImportantSelector (getSignature)) {
+			    Delayed.Add (ErrorHelper.CreateWarning (1051, $"Element '{processedProperty.Property.Name}' is not generated because its name conflicts with important objective-c selector '{processedProperty.GetterName}'"));
+				return false;
+			}
+			if (RestrictedObjSelectors.IsImportantSelector (setSignature)) {
+				Delayed.Add (ErrorHelper.CreateWarning (1051, $"Element '{processedProperty.Property.Name}' is not generated because its name conflicts with important objective-c selector '{processedProperty.SetterName}'"));
 				return false;
 			}
 			return true;
@@ -186,4 +166,27 @@ namespace ObjC {
 			return new HashSet<string> (methodNames.Where (x => x.Value > 1).Select (x => x.Key));
 		}
 	}
+
+	static class RestrictedObjSelectors
+	{
+		static readonly HashSet<string> ImportantObjcSelectors = new HashSet<string> { "hash", "class", "superclass", "isEqual:", "self", "isKindOfClass:",
+			"isMemberOfClass:", "respondsToSelector:", "conformsToProtocol:", "description", "debugDescription", "performSelector:", "performSelector:withObject:",
+			"performSelector:withObject:withObject:", "isProxy", "retain", "release", "autorelease", "retainCount", "zone" };
+
+		static public bool IsImportantSelector (string selector)
+		{
+			if (selector.StartsWith ("get", StringComparison.Ordinal))
+				selector = selector.Substring (3).ToLowerCaseFirstCharacter ();
+
+			if (selector.StartsWith ("set", StringComparison.Ordinal)) {
+				selector = selector.Substring (3).ToLowerCaseFirstCharacter ();
+				int colonLocation = selector.IndexOf (':');
+				if (colonLocation > 0)
+					selector = selector.Substring (0, colonLocation);
+			}
+
+			return ImportantObjcSelectors.Contains (selector);
+		}
+	}
+
 }
