@@ -9,7 +9,7 @@ namespace MonoEmbeddinator4000
 {
     public class CLI
     {
-        static string Generator;
+        static List<GeneratorKind> Generators;
         static string Platform;
         static string OutputDir;
         static string VsVersion;
@@ -28,7 +28,7 @@ namespace MonoEmbeddinator4000
                 .Select(s => s.StartsWith("VS", StringComparison.InvariantCulture) ? s.Substring(2) : s));
 
             var optionSet = new Mono.Options.OptionSet() {
-                { "gen=", "target generator (C, C++, Obj-C, Java)", v => Generator = v },
+                { "gen=", "target generator (C, C++, Obj-C, Java)", v => Generators.Add(ConvertToGeneratorKind(v)) },
                 { "p|platform=", "target platform (iOS, macOS, Android, Windows)", v => Platform = v },
                 { "o|out|outdir=", "output directory", v => OutputDir = v },
                 { "c|compile", "compiles the generated output", v => CompileCode = true },
@@ -41,7 +41,7 @@ namespace MonoEmbeddinator4000
                 { "h|help",  "show this message and exit",  v => showHelp = v != null },
             };
 
-            Generator = "C";
+            Generators = new List<GeneratorKind>();
             VsVersion = "latest";
 
             try
@@ -155,19 +155,22 @@ namespace MonoEmbeddinator4000
             if (options.OutputDir == null)
                 options.OutputDir = Directory.GetCurrentDirectory();
 
-            if (string.IsNullOrEmpty(Generator))
+            if (Generators.Count == 0)
             {
                 Console.Error.WriteLine("Please specify a target generator.");
                 return false;
             }
 
-            var generator = ConvertToGeneratorKind(Generator);
-            options.GeneratorKind = generator;
-
             if (string.IsNullOrEmpty(Platform))
             {
                 Console.Error.WriteLine("Please specify a target platform.");
                 return false;
+            }
+
+            //NOTE: Choosing Java generator, needs to imply the C generator
+            if (Generators.Contains(GeneratorKind.Java) && !Generators.Contains(GeneratorKind.C))
+            {
+                Generators.Insert(0, GeneratorKind.C);
             }
 
             var targetPlatform = ConvertToTargetPlatform(Platform);
@@ -195,9 +198,14 @@ namespace MonoEmbeddinator4000
             foreach (var assembly in Assemblies)
                 project.Assemblies.Add(assembly);
 
-            var driver = new Driver(project, options);
+            foreach (var generator in Generators)
+            {
+                options.GeneratorKind = generator;
 
-            driver.Run();
+                var driver = new Driver(project, options);
+
+                driver.Run();
+            }
         }
     }
 }
