@@ -281,6 +281,9 @@ namespace Embeddinator {
 		public override string ToString () => Property.ToString ();
 		public string Name => Property.Name.CamelCase ();
 
+		public string GetterName => HasGetter ? Property.Name.CamelCase () : null;
+		public string SetterName => HasSetter ? "set" + Property.Name : null;
+
 		public bool HasGetter => GetMethod != null;
 		public bool HasSetter => SetMethod != null;
 		public ProcessedMethod GetMethod { get; private set; }
