@@ -44,11 +44,30 @@ namespace ObjC {
 		void ProcessPotentialNameOverride (ProcessedMethod processedMethod)
 		{
 			MethodInfo method = processedMethod.Method;
-			if (IsOperatorOrFriendlyVersion (method)) {
+
+			string attributedName = FindBindingNameAttribute (method);
+			if (attributedName != null) {
+				processedMethod.NameOverride = attributedName;
+			}
+			else if (IsOperatorOrFriendlyVersion (method)) {
 				string nameOverride = OperatorOverloads.GetObjCName (processedMethod.Method.Name, processedMethod.Method.ParameterCount);
 				if (nameOverride != null)
 					processedMethod.NameOverride = nameOverride;
 			}
+		}
+
+		private static string FindBindingNameAttribute (MemberInfo method)
+		{
+			CustomAttributeData bindingName = method.CustomAttributes.FirstOrDefault (x => x.AttributeType.Name == "BindingNameAttribute");
+			if (bindingName != null) {
+				PropertyInfo property = bindingName.AttributeType.GetProperty ("Name");
+				if (bindingName.ConstructorArguments.Count == 1) {
+					object attrValue = bindingName.ConstructorArguments[0].Value;
+					if (attrValue is string)
+						return (string)attrValue;
+				}
+			}
+			return null;
 		}
 
 		public bool IsOperatorOrFriendlyVersion (MethodInfo method)
@@ -60,6 +79,11 @@ namespace ObjC {
 		{
 			foreach (PropertyInfo property in properties) {
 				ProcessedProperty processedProperty = new ProcessedProperty (property, this);
+
+				string attributedName = FindBindingNameAttribute (property);
+				if (attributedName != null)
+					processedProperty.NameOverride = attributedName;
+
 				yield return processedProperty;
 			}
 		}

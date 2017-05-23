@@ -177,13 +177,21 @@ namespace Embeddinator {
 	public class ProcessedMethod : ProcessedMemberWithParameters {
 		public MethodInfo Method { get; private set; }
 		public bool IsOperator { get; set; }
-		public string NameOverride { get; set; }
+
+		string nameOverride;
+		public string NameOverride {
+			get { return nameOverride; }
+			set {
+				nameOverride = value;
+				ComputeSignatures ();
+			}
+		}
 
 		public string BaseName {
 			get {
 				if (NameOverride != null)
 					return NameOverride;
-				return IsOperator? Method.Name.Substring (3).CamelCase () : Method.Name.CamelCase ();
+				return IsOperator ? Method.Name.Substring (3).CamelCase () : Method.Name.CamelCase ();
 			}
 		}
 
@@ -280,8 +288,28 @@ namespace Embeddinator {
 
 		public override string ToString () => Property.ToString ();
 
+		public string Name => NameOverride != null ? NameOverride : Property.Name.CamelCase ();
+		public string NameOverride { get; set; }
+
 		public bool HasGetter => GetMethod != null;
 		public bool HasSetter => SetMethod != null;
+
+		public string GetterName {
+			get {
+				if (!HasGetter)
+					return null;
+				return NameOverride != null ? NameOverride : Property.Name.CamelCase ();
+			}
+		}
+
+		public string SetterName {
+			get {
+				if (!HasSetter)
+					return null;
+				return NameOverride != null ? NameOverride : "set" + Property.Name;
+			}
+		}
+
 		public ProcessedMethod GetMethod { get; private set; }
 		public ProcessedMethod SetMethod { get; private set; }
 	}
