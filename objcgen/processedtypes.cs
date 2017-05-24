@@ -298,7 +298,7 @@ namespace Embeddinator {
 			get {
 				if (!HasGetter)
 					return null;
-				return NameOverride != null ? NameOverride : Property.Name.CamelCase ();
+				return (NameOverride ?? Property.Name).CamelCase ();
 			}
 		}
 
@@ -306,9 +306,10 @@ namespace Embeddinator {
 			get {
 				if (!HasSetter)
 					return null;
-				return NameOverride != null ? NameOverride : "set" + Property.Name;
+				return "set" + (NameOverride ?? Property.Name).PascalCase ();
 			}
 		}
+
 
 		public ProcessedMethod GetMethod { get; private set; }
 		public ProcessedMethod SetMethod { get; private set; }
