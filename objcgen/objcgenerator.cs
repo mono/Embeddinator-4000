@@ -309,8 +309,8 @@ namespace ObjC {
 					string name = ctor.ObjCName;
 					string signature = ".ctor()";
 					if (parameters.Length > 0) {
-						name = ctor.GetObjcSignature ();
-						signature = ctor.GetMonoSignature ();
+						name = ctor.ObjCSignature;
+						signature = ctor.MonoSignature;
 					}
 
 					if (ctor.Unavailable) {
@@ -895,8 +895,13 @@ namespace ObjC {
 		{
 			var type = info.DeclaringType;
 			var managed_type_name = NameGenerator.GetObjCName (type);
+
+			if (method.NameOverride == null)
+				method.NameOverride = name;
 			
-			string objcsig = method.GetObjcSignature (name, isExtension);
+			method.IsExtension = isExtension;
+
+			string objcsig = method.ObjCSignature;
 			string monosig = method.GetMonoSignature (info.Name);
 
 			var builder = new MethodHelper (headers, implementation) {
@@ -966,8 +971,8 @@ namespace ObjC {
 			}
 
 			string name = method != null ? method.BaseName : ctor.ObjCName;
-			string objcsig = method != null ? method.GetObjcSignature () : ctor.GetObjcSignature ();
-			string monosig = method != null ? method.GetMonoSignature () : ctor.GetMonoSignature ();
+			string objcsig = method != null ? method.ObjCSignature : ctor.ObjCSignature;
+			string monosig = method != null ? method.MonoSignature : ctor.MonoSignature;
 
 			var type = mb.DeclaringType;
 

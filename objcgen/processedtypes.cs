@@ -158,26 +158,40 @@ namespace Embeddinator {
 
 		public ParameterInfo[] Parameters { get; protected set; }
 
-		public string ObjCSignature { get; set; }
-		public string MonoSignature { get; set; }
-		protected abstract void ComputeSignatures ();
-
-		int firstDefaultParameter;
-		public int FirstDefaultParameter {
+		string objCSignature;
+		public string ObjCSignature {
 			get {
-				return firstDefaultParameter;
+				if (objCSignature == null)
+					ComputeSignatures ();
+				return objCSignature;
 			}
-			set {
-				firstDefaultParameter = value;
-				ComputeSignatures ();
+			protected set {
+				objCSignature = value;
 			}
 		}
+
+		string monoSignature;
+		public string MonoSignature {
+			get {
+				if (monoSignature == null)
+					ComputeSignatures ();
+				return monoSignature;
+			}
+			protected set {
+				monoSignature = value;
+			}
+		}
+
+		protected abstract void ComputeSignatures ();
+
+		public int FirstDefaultParameter { get; set; }
 	}
 
 	public class ProcessedMethod : ProcessedMemberWithParameters {
 		public MethodInfo Method { get; private set; }
 		public bool IsOperator { get; set; }
 		public string NameOverride { get; set; }
+		public string ManagedName { get; set; }
 
 		public string BaseName {
 			get {
@@ -189,6 +203,7 @@ namespace Embeddinator {
 
 		public MethodType MethodType { get; set; }
 		public ProcessedType DeclaringType { get; set; }
+		public bool IsExtension { get; set; }
 
 		public ProcessedMethod (MethodInfo method, Processor processor) : base (processor)
 		{
@@ -227,12 +242,13 @@ namespace Embeddinator {
 			return mono.ToString ();
 		}
 
-		public string GetObjcSignature (string objName = null, bool isExtension = false)
+		string GetObjcSignature ()
 		{
-			if (objName == null)
-				objName = BaseName;
-			if (Method.IsSpecialName)
+			string objName = BaseName;
+
+			if (Method.IsSpecialName) {
 				objName = objName.Replace ("_", String.Empty);
+			}
 
 			var objc = new StringBuilder (objName);
 
@@ -244,7 +260,7 @@ namespace Embeddinator {
 					objc.Append (' ');
 
 				string paramName = FallBackToTypeName ? NameGenerator.GetParameterTypeName (p.ParameterType) : p.Name;
-				if (n > 0 || !isExtension) {
+				if (n > 0 || !IsExtension) {
 					if (n == 0) {
 						if (FallBackToTypeName || Method.IsConstructor || (!Method.IsSpecialName && !IsOperator))
 							objc.Append (paramName.PascalCase ());
@@ -252,7 +268,7 @@ namespace Embeddinator {
 						objc.Append (paramName.CamelCase ());
 				}
 
-				if (n > 0 || !isExtension) {
+				if (n > 0 || !IsExtension) {
 					string ptname = NameGenerator.GetObjCParamTypeName (p, Processor.Types);
 					objc.Append (":(").Append (ptname).Append (")").Append (NameGenerator.GetExtendedParameterName (p, Parameters));
 				}
@@ -338,7 +354,7 @@ namespace Embeddinator {
 			return mono.ToString ();
 		}
 
-		public string GetObjcSignature ()
+		string GetObjcSignature ()
 		{
 			var objc = new StringBuilder (ObjCName);
 
