@@ -170,10 +170,10 @@ namespace ObjC {
 		static public bool IsImportantSelector (string selector)
 		{
 			if (selector.StartsWith ("get", StringComparison.Ordinal))
-				selector = selector.Substring (3).ToLowerCaseFirstCharacter ();
+				selector = selector.Substring (3).CamelCase ();
 
 			if (selector.StartsWith ("set", StringComparison.Ordinal)) {
-				selector = selector.Substring (3).ToLowerCaseFirstCharacter ();
+				selector = selector.Substring (3).CamelCase ();
 				int colonLocation = selector.IndexOf (':');
 				if (colonLocation > 0)
 					selector = selector.Substring (0, colonLocation);
