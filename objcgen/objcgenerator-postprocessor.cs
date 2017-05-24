@@ -52,7 +52,7 @@ namespace ObjC {
 					processedMethod.NameOverride = nameOverride;
 			}
 
-			string objCSignature = processedMethod.GetObjcSignature ();
+			string objCSignature = processedMethod.ObjCSignature;
 			if (RestrictedObjSelectors.IsImportantSelector (objCSignature)) {
 				string newName = "managed" + method.Name.PascalCase ();
 				processedMethod.NameOverride = newName;
