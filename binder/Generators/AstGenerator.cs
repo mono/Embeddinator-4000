@@ -416,6 +416,9 @@ namespace MonoEmbeddinator4000.Generators
                 }
                 else if (managedType.IsArray)
                 {
+                    if (elementType.Type.IsClass())
+                        return new QualifiedType(new UnsupportedType { Description = managedType.FullName });
+
                     var array = new ArrayType
                     {
                         SizeType = ArrayType.ArraySize.Variable,

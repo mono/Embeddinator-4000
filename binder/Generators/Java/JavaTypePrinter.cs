@@ -19,6 +19,9 @@ namespace MonoEmbeddinator4000.Generators
         public override TypePrinterResult VisitArrayType(ArrayType array,
             TypeQualifiers quals)
         {
+            if (ContextKind == TypePrinterContextKind.Native)
+                return JavaGenerator.IntPtrType;
+
             return string.Format("{0}[]", array.Type.Visit(this));
         }
 

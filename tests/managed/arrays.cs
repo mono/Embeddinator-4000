@@ -53,6 +53,21 @@ namespace Arrays {
 		public void ByteArrRef (ref byte [] byteArr) => byteArr = byteArr?.Reverse ().ToArray ();
 		public void ValueHolderArrRef (ref ValueHolder [] valueArr) => valueArr = valueArr?.Reverse ().ToArray ();
 		public void IMakeItUpArrRef (ref IMakeItUp [] interArr) => interArr = interArr != null ? new [] { Supplier.Create () } : null;
+
+		public static int SumByteArray (byte[] array)
+		{
+			return array.Sum(n => n); 
+		}
+		
+		public static int[] ReturnsIntArray ()
+		{
+			return new int[] { 1, 2, 3 }; 
+		}
+
+		public static string[] ReturnsStringArray ()
+		{
+			return new string[] { "1", "2", "3" };
+		}
 	}
 
 	public class ValueHolder {
