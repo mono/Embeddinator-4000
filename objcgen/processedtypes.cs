@@ -245,9 +245,8 @@ namespace Embeddinator {
 		{
 			string objName = BaseName;
 
-			if (Method.IsSpecialName) {
+			if (Method.IsSpecialName)
 				objName = objName.Replace ("_", String.Empty);
-			}
 
 			var objc = new StringBuilder (objName);
 

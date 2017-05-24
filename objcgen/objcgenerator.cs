@@ -971,7 +971,6 @@ namespace ObjC {
 
 			string name = member.BaseName;
 			string objcsig = member.ObjCSignature;
-			string monosig = member.MonoSignature;
 
 			var type = mb.DeclaringType;
 
