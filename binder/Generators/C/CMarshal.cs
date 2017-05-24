@@ -216,9 +216,9 @@ namespace MonoEmbeddinator4000.Generators
                     return "mono_get_void_class()";
                 case PrimitiveType.Bool:
                     return "mono_get_boolean_class()";
-                case PrimitiveType.WideChar:
-                    return "mono_get_char_class()";
                 case PrimitiveType.Char:
+                    return "mono_get_char_class()";
+                case PrimitiveType.SChar:
                     return "mono_get_sbyte_class()";
                 case PrimitiveType.UChar:
                     return "mono_get_byte_class()";
