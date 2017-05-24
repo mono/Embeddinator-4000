@@ -326,18 +326,6 @@ void mono_embeddinator_destroy_object(MonoEmbedObject* object)
     g_free (object);
 }
 
-void mono_embeddinator_marshal_string_to_gstring(GString* g_string, MonoString* mono_string)
-{
-    if (!mono_string)
-    {
-        g_string_null(g_string);
-        return;
-    }
-    
-    g_string_truncate(g_string, 0);
-    g_string_append(g_string, mono_string_to_utf8((MonoString*) mono_string));
-}
-
 MonoObject* mono_embeddinator_get_cultureinfo_invariantculture_object ()
 {
     static MonoObject* invariantculture = NULL;

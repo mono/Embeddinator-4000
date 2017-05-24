@@ -195,12 +195,6 @@ MONO_EMBEDDINATOR_API
 void mono_embeddinator_destroy_object(MonoEmbedObject *object);
 
 /**
- * Performs marshaling of a given MonoString to a GLib string.
- */
-MONO_EMBEDDINATOR_API
-void mono_embeddinator_marshal_string_to_gstring(GString* g_string, MonoString* mono_string);
-
-/**
  * Gets CultureInfo.InvariantCulture MonoObject.
  */
 MONO_EMBEDDINATOR_API
