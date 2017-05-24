@@ -48,8 +48,7 @@ namespace ObjC {
 			string attributedName = FindBindingNameAttribute (method);
 			if (attributedName != null) {
 				processedMethod.NameOverride = attributedName;
-			}
-			else if (IsOperatorOrFriendlyVersion (method)) {
+			} else if (IsOperatorOrFriendlyVersion (method)) {
 				string nameOverride = OperatorOverloads.GetObjCName (processedMethod.Method.Name, processedMethod.Method.ParameterCount);
 				if (nameOverride != null)
 					processedMethod.NameOverride = nameOverride;
@@ -58,13 +57,14 @@ namespace ObjC {
 
 		private static string FindBindingNameAttribute (MemberInfo method)
 		{
-			CustomAttributeData bindingName = method.CustomAttributes.FirstOrDefault (x => x.AttributeType.Name == "BindingNameAttribute");
+			CustomAttributeData bindingName = method.CustomAttributes.FirstOrDefault (x => x.AttributeType.Name == "EmbeddinatorNameAttribute");
 			if (bindingName != null) {
 				PropertyInfo property = bindingName.AttributeType.GetProperty ("Name");
-				if (bindingName.ConstructorArguments.Count == 1) {
-					object attrValue = bindingName.ConstructorArguments[0].Value;
-					if (attrValue is string)
-						return (string)attrValue;
+				if (bindingName.ConstructorArguments.Count == 2) {
+					object nameValue = bindingName.ConstructorArguments[0].Value;
+					object languageValue = bindingName.ConstructorArguments[1].Value;
+					if (nameValue is string && languageValue is string && ((string)languageValue).Equals ("ObjC", StringComparison.OrdinalIgnoreCase))
+						return (string)nameValue;
 				}
 			}
 			return null;

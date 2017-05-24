@@ -143,7 +143,7 @@ namespace ObjC {
 			}
 
 			switch (t.Name) {
-				case "BindingNameAttribute": // This is used to override naming during binding
+				case "EmbeddinatorNameAttribute": // This is used to override naming during binding
 					return false;
 			}
 
