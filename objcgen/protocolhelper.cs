@@ -5,8 +5,8 @@ namespace ObjC {
 
 	public class ProtocolHelper : ClassHelper {
 
-		public ProtocolHelper (SourceWriter headers, SourceWriter implementation) :
-			base (headers, implementation)
+		public ProtocolHelper (SourceWriter headers, SourceWriter implementation, SourceWriter privateHeaders) :
+			base (headers, implementation, privateHeaders)
 		{
 		}
 
@@ -27,6 +27,9 @@ namespace ObjC {
 			headers.WriteLine ();
 			headers.WriteLine ($"/** Protocol {ProtocolName}");
 			headers.WriteLine ($" *  Corresponding .NET Qualified Name: `{AssemblyQualifiedName}`");
+			headers.WriteLine (" *");
+			headers.WriteLine (" * @warning This expose a managed (.net) interface. Conforming to this protocol from Objective-C code");
+			headers.WriteLine (" * does not allow interop with managed code. https://mono.github.io/Embeddinator-4000/Limitations#Subclassing");
 			headers.WriteLine (" */");
 			headers.WriteLine ($"@protocol {ProtocolName} <NSObject>");
 			headers.WriteLine ();
@@ -40,14 +43,14 @@ namespace ObjC {
 
 		public override void BeginImplementation (string implementationName = null)
 		{
-			implementation.WriteLine ($"@interface {WrapperName} : NSObject <{ProtocolName}> {{");
-			implementation.Indent++;
-			implementation.WriteLine ("@public MonoEmbedObject* _object;");
-			implementation.Indent--;
-			implementation.WriteLine ("}");
-			implementation.WriteLine ("- (nullable instancetype)initForSuper;");
-			implementation.WriteLine ("@end");
-			implementation.WriteLine ();
+			private_headers.WriteLine ($"@interface {WrapperName} : NSObject <{ProtocolName}> {{");
+			private_headers.Indent++;
+			private_headers.WriteLine ("@public MonoEmbedObject* _object;");
+			private_headers.Indent--;
+			private_headers.WriteLine ("}");
+			private_headers.WriteLine ("- (nullable instancetype)initForSuper;");
+			private_headers.WriteLine ("@end");
+			private_headers.WriteLine ();
 			implementation.WriteLine ($"static MonoClass* {ProtocolName}_class = nil;");
 			implementation.WriteLine ();
 			base.BeginImplementation (WrapperName);

@@ -150,12 +150,12 @@ ObjC does not support operator overloading as C# does, so operators are converte
 to
 
 ```
-+ (instancetype)addition:(Overloads_AllOperators *)anObjectC1 c2:(Overloads_AllOperators *)anObjectC2;
++ (instancetype)add:(Overloads_AllOperators *)anObjectC1 c2:(Overloads_AllOperators *)anObjectC2;
 ```
 
 However, some .NET languages do not support operator overloading, so it is common to also include a ["friendly"](https://msdn.microsoft.com/en-us/library/ms229032(v=vs.110).aspx) named method in addition to the operator overload.
 
-If both the operator version and the "friendly" version are found, only the friendly version will be generated.
+If both the operator version and the "friendly" version are found, only the friendly version will be generated, as they will generate to the same objective-c name.
 
 ```
 	public static AllOperatorsWithFriendly operator + (AllOperatorsWithFriendly c1, AllOperatorsWithFriendly c2)
@@ -172,7 +172,7 @@ If both the operator version and the "friendly" version are found, only the frie
 becomes:
 
 ```
-+ (instancetype)addC1:(Overloads_AllOperatorsWithFriendly *)anObjectC1 c2:(Overloads_AllOperatorsWithFriendly *)anObjectC2;
++ (instancetype)add:(Overloads_AllOperatorsWithFriendly *)anObjectC1 c2:(Overloads_AllOperatorsWithFriendly *)anObjectC2;
 ```
 
 ### Equality operator

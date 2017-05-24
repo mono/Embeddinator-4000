@@ -11,7 +11,6 @@
   <ItemGroup>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)arrays.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)builtins.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)constructors.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)enums.cs" />
@@ -31,6 +30,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)types.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)shortParameters.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)overloads.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)nestedClasses.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)arrays.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="$(MSBuildThisFileDirectory)subscripts.tt">

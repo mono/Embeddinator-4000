@@ -25,6 +25,7 @@
 
 #if defined (XAMARIN_IOS) || defined (XAMARIN_MAC)
 #include <xamarin/xamarin.h>
+typedef void * gpointer;
 typedef uint16_t    mono_unichar2;
 
 typedef struct _MonoMethodDesc MonoMethodDesc;
@@ -44,6 +45,23 @@ void            mono_field_set_value (MonoObject *obj, MonoClassField *field, vo
 MonoVTable *    mono_class_vtable          (MonoDomain *domain, MonoClass *klass);
 void            mono_field_static_set_value (MonoVTable *vt, MonoClassField *field, void *value);
 MonoString *    mono_object_to_string (MonoObject *obj, MonoObject **exc);
+MonoClass *     mono_class_get (MonoImage *image, uint32_t type_token);
+MonoMethod *    mono_get_method (MonoImage *image, uint32_t token, MonoClass *klass);
+MonoClassField* mono_class_get_field (MonoClass *klass, uint32_t field_token);
+MonoClass*      mono_get_string_class (void);
+MonoClass*      mono_get_boolean_class (void);
+MonoClass*      mono_get_char_class (void);
+MonoClass*      mono_get_sbyte_class (void);
+MonoClass*      mono_get_int16_class (void);
+MonoClass*      mono_get_int32_class (void);
+MonoClass*      mono_get_int64_class (void);
+MonoClass*      mono_get_byte_class (void);
+MonoClass*      mono_get_uint16_class (void);
+MonoClass*      mono_get_uint32_class (void);
+MonoClass*      mono_get_uint64_class (void);
+MonoClass*      mono_get_single_class (void);
+MonoClass*      mono_get_double_class (void);
+int             mono_array_element_size (MonoClass *ac);
 
 MONO_EMBEDDINATOR_END_DECLS
 #else
@@ -53,6 +71,7 @@ MONO_EMBEDDINATOR_END_DECLS
 #include <mono/metadata/debug-helpers.h>
 #include <mono/metadata/object.h>
 
+typedef void * gpointer;
 typedef uint16_t gunichar2;
 
 typedef struct _GArray GArray;
@@ -64,4 +83,60 @@ typedef struct _MonoClass MonoClass;
 typedef struct _MonoObject MonoObject;
 typedef struct _MonoImage MonoImage;
 typedef struct _MonoMethod MonoMethod;
+
+gpointer
+mono_threads_attach_coop (MonoDomain *domain, gpointer *dummy);
+
+void
+mono_threads_detach_coop (gpointer cookie, gpointer *dummy);
+
+#define MONO_THREAD_ATTACH \
+	do { \
+		gpointer __thread_dummy; \
+		gpointer __thread_cookie = mono_threads_attach_coop (NULL, &__thread_dummy) \
+
+#define MONO_THREAD_DETACH \
+		mono_threads_detach_coop (__thread_cookie, &__thread_dummy); \
+	} while (0)
+
+#endif
+
+#ifndef MONODECIMAL
+#define MONODECIMAL
+
+// from: https://github.com/mono/mono/blob/master/mono/metadata/decimal-ms.h
+typedef struct {
+	// Decimal.cs treats the first two shorts as one long
+	// And they seriable the data so we need to little endian
+	// seriliazation
+	// The wReserved overlaps with Variant's vt member
+#if G_BYTE_ORDER != G_LITTLE_ENDIAN
+	union {
+		struct {
+			uint8_t sign;
+			uint8_t scale;
+		} u;
+		uint16_t signscale;
+	} u;
+	uint16_t reserved;
+#else
+	uint16_t reserved;
+	union {
+		struct {
+			uint8_t scale;
+			uint8_t sign;
+		} u;
+		uint16_t signscale;
+	} u;
+#endif
+	uint32_t Hi32;
+	union {
+		struct {
+			uint32_t Lo32;
+			uint32_t Mid32;
+		} v;
+		uint64_t Lo64;
+	} v;
+} MonoDecimal;
+
 #endif

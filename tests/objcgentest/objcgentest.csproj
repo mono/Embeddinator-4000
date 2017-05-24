@@ -2,14 +2,14 @@
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <ProjectGuid>{076A871B-0C13-47D8-8923-B9242995BFF8}</ProjectGuid>
     <OutputType>Library</OutputType>
     <RootNamespace>objcgentest</RootNamespace>
     <AssemblyName>objcgentest</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -18,7 +18,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <Optimize>true</Optimize>
     <OutputPath>bin\Release</OutputPath>
     <ErrorReport>prompt</ErrorReport>
@@ -29,6 +29,7 @@
     <Reference Include="nunit.framework">
       <HintPath>..\..\packages\NUnit.3.6.1\lib\net45\nunit.framework.dll</HintPath>
     </Reference>
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ObjCGeneratorTest.cs" />
@@ -38,6 +39,8 @@
     <Compile Include="Cache.cs" />
     <Compile Include="TypeExtensionsTest.cs" />
     <Compile Include="StringExtensionsTest.cs" />
+    <Compile Include="ObjCGenErrWarnTests.cs" />
+    <Compile Include="ManagedTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -47,6 +50,111 @@
       <Project>{C166803B-011F-4EAF-B8C2-D7DBBA3CF1EC}</Project>
       <Name>objcgen</Name>
     </ProjectReference>
+    <ProjectReference Include="..\managedwarn\managedwarn.csproj">
+      <Project>{73C4FAF0-C37A-4CEE-A3F3-B1F80748D5B2}</Project>
+      <Name>managedwarn</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="xcodetemplate\ios\src\ViewController.m" />
+    <EmbeddedResource Include="xcodetemplate\ios\src\ViewController.h" />
+    <EmbeddedResource Include="xcodetemplate\ios\src\main.m" />
+    <EmbeddedResource Include="xcodetemplate\ios\src\Info.plist" />
+    <EmbeddedResource Include="xcodetemplate\ios\src\AppDelegate.m" />
+    <EmbeddedResource Include="xcodetemplate\ios\src\AppDelegate.h" />
+    <EmbeddedResource Include="xcodetemplate\ios\src\Base.lproj\LaunchScreen.storyboard">
+      <LogicalName>objcgentest.xcodetemplate.ios.src.Base.lproj/LaunchScreen.storyboard</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="xcodetemplate\ios\src\Base.lproj\Main.storyboard">
+      <LogicalName>objcgentest.xcodetemplate.ios.src.Base.lproj/Main.storyboard</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="xcodetemplate\ios\src\Assets.xcassets\AppIcon.appiconset\Contents.json">
+      <LogicalName>objcgentest.xcodetemplate.ios.src.Assets.xcassets/AppIcon.appiconset/Contents.json</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="xcodetemplate\ios\proj\project.pbxproj" />
+    <EmbeddedResource Include="xcodetemplate\ios\proj\xcshareddata\xcschemes\Tests.xcscheme">
+      <LogicalName>objcgentest.xcodetemplate.ios.proj.xcshareddata/xcschemes/Tests.xcscheme</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="xcodetemplate\ios\test\Info.plist" />
+    <EmbeddedResource Include="xcodetemplate\ios\test\iosTests.m" />
+    <EmbeddedResource Include="xcodetemplate\macos\proj\xcshareddata\xcschemes\Tests.xcscheme">
+      <LogicalName>objcgentest.xcodetemplate.macos.proj.xcshareddata/xcschemes/Tests.xcscheme</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="xcodetemplate\macos\proj\project.pbxproj" />
+    <EmbeddedResource Include="xcodetemplate\macos\test\Info.plist" />
+    <EmbeddedResource Include="xcodetemplate\macos\test\macTests.m" />
+    <EmbeddedResource Include="xcodetemplate\tvos\proj\xcshareddata\xcschemes\Tests.xcscheme">
+      <LogicalName>objcgentest.xcodetemplate.tvos.proj.xcshareddata/xcschemes/Tests.xcscheme</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="xcodetemplate\tvos\proj\project.pbxproj" />
+    <EmbeddedResource Include="xcodetemplate\tvos\src\Assets.xcassets\App Icon &amp; Top Shelf Image.brandassets\App Icon - Large.imagestack\Back.imagestacklayer\Content.imageset\Contents.json">
+      <LogicalName>objcgentest.xcodetemplate.tvos.src.Assets.xcassets/App_Icon_&amp;_Top_Shelf_Image.brandassets/App_Icon_-_Large.imagestack/Back.imagestacklayer/Content.imageset/Contents.json</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="xcodetemplate\tvos\src\Assets.xcassets\App Icon &amp; Top Shelf Image.brandassets\App Icon - Large.imagestack\Back.imagestacklayer\Contents.json">
+      <LogicalName>objcgentest.xcodetemplate.tvos.src.Assets.xcassets/App_Icon_&amp;_Top_Shelf_Image.brandassets/App_Icon_-_Large.imagestack/Back.imagestacklayer/Contents.json</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="xcodetemplate\tvos\src\Assets.xcassets\App Icon &amp; Top Shelf Image.brandassets\App Icon - Large.imagestack\Front.imagestacklayer\Content.imageset\Contents.json">
+      <LogicalName>objcgentest.xcodetemplate.tvos.src.Assets.xcassets/App_Icon_&amp;_Top_Shelf_Image.brandassets/App_Icon_-_Large.imagestack/Front.imagestacklayer/Content.imageset/Contents.json</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="xcodetemplate\tvos\src\Assets.xcassets\App Icon &amp; Top Shelf Image.brandassets\App Icon - Large.imagestack\Front.imagestacklayer\Contents.json">
+      <LogicalName>objcgentest.xcodetemplate.tvos.src.Assets.xcassets/App_Icon_&amp;_Top_Shelf_Image.brandassets/App_Icon_-_Large.imagestack/Front.imagestacklayer/Contents.json</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="xcodetemplate\tvos\src\Assets.xcassets\App Icon &amp; Top Shelf Image.brandassets\App Icon - Large.imagestack\Middle.imagestacklayer\Content.imageset\Contents.json">
+      <LogicalName>objcgentest.xcodetemplate.tvos.src.Assets.xcassets/App_Icon_&amp;_Top_Shelf_Image.brandassets/App_Icon_-_Large.imagestack/Middle.imagestacklayer/Content.imageset/Contents.json</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="xcodetemplate\tvos\src\Assets.xcassets\App Icon &amp; Top Shelf Image.brandassets\App Icon - Large.imagestack\Middle.imagestacklayer\Contents.json">
+      <LogicalName>objcgentest.xcodetemplate.tvos.src.Assets.xcassets/App_Icon_&amp;_Top_Shelf_Image.brandassets/App_Icon_-_Large.imagestack/Middle.imagestacklayer/Contents.json</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="xcodetemplate\tvos\src\Assets.xcassets\App Icon &amp; Top Shelf Image.brandassets\App Icon - Large.imagestack\Contents.json">
+      <LogicalName>objcgentest.xcodetemplate.tvos.src.Assets.xcassets/App_Icon_&amp;_Top_Shelf_Image.brandassets/App_Icon_-_Large.imagestack/Contents.json</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="xcodetemplate\tvos\src\Assets.xcassets\App Icon &amp; Top Shelf Image.brandassets\App Icon - Small.imagestack\Back.imagestacklayer\Content.imageset\Contents.json">
+      <LogicalName>objcgentest.xcodetemplate.tvos.src.Assets.xcassets/App_Icon_&amp;_Top_Shelf_Image.brandassets/App_Icon_-_Small.imagestack/Back.imagestacklayer/Content.imageset/Contents.json</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="xcodetemplate\tvos\src\Assets.xcassets\App Icon &amp; Top Shelf Image.brandassets\App Icon - Small.imagestack\Back.imagestacklayer\Contents.json">
+      <LogicalName>objcgentest.xcodetemplate.tvos.src.Assets.xcassets/App_Icon_&amp;_Top_Shelf_Image.brandassets/App_Icon_-_Small.imagestack/Back.imagestacklayer/Contents.json</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="xcodetemplate\tvos\src\Assets.xcassets\App Icon &amp; Top Shelf Image.brandassets\App Icon - Small.imagestack\Front.imagestacklayer\Content.imageset\Contents.json">
+      <LogicalName>objcgentest.xcodetemplate.tvos.src.Assets.xcassets/App_Icon_&amp;_Top_Shelf_Image.brandassets/App_Icon_-_Small.imagestack/Front.imagestacklayer/Content.imageset/Contents.json</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="xcodetemplate\tvos\src\Assets.xcassets\App Icon &amp; Top Shelf Image.brandassets\App Icon - Small.imagestack\Front.imagestacklayer\Contents.json">
+      <LogicalName>objcgentest.xcodetemplate.tvos.src.Assets.xcassets/App_Icon_&amp;_Top_Shelf_Image.brandassets/App_Icon_-_Small.imagestack/Front.imagestacklayer/Contents.json</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="xcodetemplate\tvos\src\Assets.xcassets\App Icon &amp; Top Shelf Image.brandassets\App Icon - Small.imagestack\Middle.imagestacklayer\Content.imageset\Contents.json">
+      <LogicalName>objcgentest.xcodetemplate.tvos.src.Assets.xcassets/App_Icon_&amp;_Top_Shelf_Image.brandassets/App_Icon_-_Small.imagestack/Middle.imagestacklayer/Content.imageset/Contents.json</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="xcodetemplate\tvos\src\Assets.xcassets\App Icon &amp; Top Shelf Image.brandassets\App Icon - Small.imagestack\Middle.imagestacklayer\Contents.json">
+      <LogicalName>objcgentest.xcodetemplate.tvos.src.Assets.xcassets/App_Icon_&amp;_Top_Shelf_Image.brandassets/App_Icon_-_Small.imagestack/Middle.imagestacklayer/Contents.json</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="xcodetemplate\tvos\src\Assets.xcassets\App Icon &amp; Top Shelf Image.brandassets\App Icon - Small.imagestack\Contents.json">
+      <LogicalName>objcgentest.xcodetemplate.tvos.src.Assets.xcassets/App_Icon_&amp;_Top_Shelf_Image.brandassets/App_Icon_-_Small.imagestack/Contents.json</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="xcodetemplate\tvos\src\Assets.xcassets\App Icon &amp; Top Shelf Image.brandassets\Top Shelf Image Wide.imageset\Contents.json">
+      <LogicalName>objcgentest.xcodetemplate.tvos.src.Assets.xcassets/App_Icon_&amp;_Top_Shelf_Image.brandassets/Top_Shelf_Image_Wide.imageset/Contents.json</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="xcodetemplate\tvos\src\Assets.xcassets\App Icon &amp; Top Shelf Image.brandassets\Top Shelf Image.imageset\Contents.json">
+      <LogicalName>objcgentest.xcodetemplate.tvos.src.Assets.xcassets/App_Icon_&amp;_Top_Shelf_Image.brandassets/Top_Shelf_Image.imageset/Contents.json</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="xcodetemplate\tvos\src\Assets.xcassets\App Icon &amp; Top Shelf Image.brandassets\Contents.json">
+      <LogicalName>objcgentest.xcodetemplate.tvos.src.Assets.xcassets/App_Icon_&amp;_Top_Shelf_Image.brandassets/Contents.json</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="xcodetemplate\tvos\src\Assets.xcassets\Contents.json">
+      <LogicalName>objcgentest.xcodetemplate.tvos.src.Assets.xcassets/Contents.json</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="xcodetemplate\tvos\src\Assets.xcassets\LaunchImage.launchimage\Contents.json">
+      <LogicalName>objcgentest.xcodetemplate.tvos.src.Assets.xcassets/LaunchImage.launchimage/Contents.json</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="xcodetemplate\tvos\src\Base.lproj\Main.storyboard">
+      <LogicalName>objcgentest.xcodetemplate.tvos.src.Base.lproj/Main.storyboard</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="xcodetemplate\tvos\src\AppDelegate.h" />
+    <EmbeddedResource Include="xcodetemplate\tvos\src\AppDelegate.m" />
+    <EmbeddedResource Include="xcodetemplate\tvos\src\Info.plist" />
+    <EmbeddedResource Include="xcodetemplate\tvos\src\main.m" />
+    <EmbeddedResource Include="xcodetemplate\tvos\src\ViewController.h" />
+    <EmbeddedResource Include="xcodetemplate\tvos\src\ViewController.m" />
+    <EmbeddedResource Include="xcodetemplate\tvos\test\Info.plist" />
+    <EmbeddedResource Include="xcodetemplate\tvos\test\tvosTests.m" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

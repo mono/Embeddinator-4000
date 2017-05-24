@@ -1,47 +1,65 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 using IKVM.Reflection;
 using Type = IKVM.Reflection.Type;
-
 using Embeddinator;
-using System.Text;
 
 namespace ObjC {
 	// A set of post-processing steps needed to add hints
 	// to the input of the generation step
-	public partial class ObjCGenerator {
-		protected IEnumerable<ProcessedMethod> PostProcessMethods (IEnumerable<MethodInfo> methods, IEnumerable <MethodInfo> equals)
+	public partial class ObjCProcessor {
+		protected IEnumerable<ProcessedMethod> PostProcessMethods (IEnumerable<ProcessedMethod> methods)
 		{
 			HashSet<string> duplicateNames = FindDuplicateNames (methods);
+
+			var equals = new HashSet<MethodInfo> ();
+			foreach (var m in methods) {
+				if (m.MethodType == MethodType.NSObjectProcotolIsEqual)
+					equals.Add (m.Method);
+			}
 			HashSet<MethodInfo> operatorToIgnore = new HashSet<MethodInfo> (OperatorOverloads.FindOperatorPairToIgnore (methods, equals));
 
-			foreach (MethodInfo method in methods) {
-				ProcessedMethod processedMethod = new ProcessedMethod (method);
+			foreach (var processedMethod in methods) {
+				var method = processedMethod.Method;
+				if (operatorToIgnore.Contains (method)) {
+					Delayed.Add (ErrorHelper.CreateWarning (1033, $"Method {method.Name} is not generated because another method exposes the operator with a friendly name"));
+					continue;
+				}
 
 				if (duplicateNames.Contains (CreateStringRep (method)) && method.Name != "CompareTo") // HACK
 					processedMethod.FallBackToTypeName = true;
 
-				if (method.IsSpecialName && method.IsStatic && method.Name.StartsWith ("op_", StringComparison.Ordinal))
+				if (IsOperatorOrFriendlyVersion (method))
 					processedMethod.IsOperator = true;
 
-				if (method.IsSpecialName && method.IsStatic && method.Name == "op_Equality")
-					processedMethod.NameOverride = "areEqual";
-				
-				if (operatorToIgnore.Contains (method)) {
-					delayed.Add (ErrorHelper.CreateWarning (1033, $"Method {processedMethod.Method.Name} is not generated because another method exposes the operator with a friendly name"));
-					continue;
-				}
+				ProcessPotentialNameOverride (processedMethod);
 
 				yield return processedMethod;
 			}
 		}
 
+		void ProcessPotentialNameOverride (ProcessedMethod processedMethod)
+		{
+			MethodInfo method = processedMethod.Method;
+			if (IsOperatorOrFriendlyVersion (method)) {
+				string nameOverride = OperatorOverloads.GetObjCName (processedMethod.Method.Name, processedMethod.Method.ParameterCount);
+				if (nameOverride != null)
+					processedMethod.NameOverride = nameOverride;
+			}
+		}
+
+		public bool IsOperatorOrFriendlyVersion (MethodInfo method)
+		{
+			return method.IsOperatorMethod () || OperatorOverloads.MatchesOperatorFriendlyName (method);
+		}
+
 		protected IEnumerable<ProcessedProperty> PostProcessProperties (IEnumerable<PropertyInfo> properties)
 		{
 			foreach (PropertyInfo property in properties) {
-				ProcessedProperty processedProperty = new ProcessedProperty (property);
+				ProcessedProperty processedProperty = new ProcessedProperty (property, this);
 				yield return processedProperty;
 			}
 		}
@@ -49,7 +67,7 @@ namespace ObjC {
 		protected IEnumerable<ProcessedProperty> PostProcessSubscriptProperties (IEnumerable<PropertyInfo> properties)
 		{
 			foreach (PropertyInfo property in properties) {
-				ProcessedProperty processedProperty = new ProcessedProperty (property);
+				ProcessedProperty processedProperty = new ProcessedProperty (property, this);
 				yield return processedProperty;
 			}
 		}
@@ -57,7 +75,7 @@ namespace ObjC {
 		protected IEnumerable<ProcessedFieldInfo> PostProcessFields (IEnumerable<FieldInfo> fields)
 		{
 			foreach (FieldInfo field in fields) {
-				ProcessedFieldInfo processedField = new ProcessedFieldInfo (field);
+				ProcessedFieldInfo processedField = new ProcessedFieldInfo (field, this);
 				yield return processedField;
 			}
 		}
@@ -67,7 +85,7 @@ namespace ObjC {
 			HashSet<string> duplicateNames = FindDuplicateNames (constructors);
 
 			foreach (ConstructorInfo constructor in constructors) {
-				ProcessedConstructor processedConstructor = new ProcessedConstructor (constructor);
+				ProcessedConstructor processedConstructor = new ProcessedConstructor (constructor, this);
 
 				if (duplicateNames.Contains (CreateStringRep(constructor)))
 					processedConstructor.FallBackToTypeName = true;
@@ -99,6 +117,15 @@ namespace ObjC {
 			if (i is MethodInfo)
 				return CreateStringRep ((MethodInfo)i);
 			return i.Name;
+		}
+
+		// temporary quasi-duplicate
+		static HashSet<string> FindDuplicateNames (IEnumerable<ProcessedMethod> members)
+		{
+			Dictionary<string, int> methodNames = new Dictionary<string, int> ();
+			foreach (var member in members)
+				methodNames.IncrementValue (CreateStringRep (member.Method));
+			return new HashSet<string> (methodNames.Where (x => x.Value > 1).Select (x => x.Key));
 		}
 
 		static HashSet<string> FindDuplicateNames (IEnumerable<MemberInfo> members)

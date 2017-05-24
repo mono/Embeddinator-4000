@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 
 using Embeddinator;
 
@@ -10,6 +9,17 @@ namespace ObjC {
 		protected SourceWriter headers;
 		protected SourceWriter implementation;
 
+		public MethodHelper (ProcessedMethod method, SourceWriter headers, SourceWriter implementation)
+		{
+			AssemblySafeName = method.DeclaringType.Assembly.SafeName;
+			MetadataToken = method.Method.MetadataToken;
+			ObjCTypeName = method.DeclaringType.ObjCName;
+			ManagedTypeName = method.DeclaringType.TypeName;
+			this.headers = headers;
+			this.implementation = implementation;
+		}
+
+		[Obsolete]
 		public MethodHelper (SourceWriter headers, SourceWriter implementation)
 		{
 			this.headers = headers;
@@ -43,7 +53,7 @@ namespace ObjC {
 			writer.Write ($" ({ReturnType}){ObjCSignature}");
 		}
 
-		public void WriteHeaders ()
+		public virtual void WriteHeaders ()
 		{
 			WriteSignature (headers);
 			headers.WriteLine (';');
@@ -55,6 +65,7 @@ namespace ObjC {
 			implementation.WriteLine ();
 			implementation.WriteLine ("{");
 			implementation.Indent++;
+			implementation.WriteLine ("MONO_THREAD_ATTACH;");
 		}
 
 		public void WriteMethodLookup ()
@@ -111,9 +122,15 @@ namespace ObjC {
 
 		public void EndImplementation ()
 		{
+			implementation.WriteLine ("MONO_THREAD_DETACH;");
 			implementation.Indent--;
 			implementation.WriteLine ("}");
 			implementation.WriteLine ();
+		}
+
+		public virtual void WriteImplementation ()
+		{
+			throw new NotImplementedException ();
 		}
 	}
 }

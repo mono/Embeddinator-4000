@@ -1,5 +1,36 @@
-GENERIC_MANAGED_DLL=$(TOP)/tests/managed/generic/bin/Debug/managed.dll
-IOS_MANAGED_DLL=$(TOP)/tests/managed/ios/bin/Debug/managed-ios.dll
+ifeq ($(OS),Windows_NT)
+    detected_OS := Windows
+else
+    detected_OS := $(shell uname -s)
+endif
+
+ifeq ($(detected_OS),Windows)
+MSBUILD = msbuild.exe
+else
+MSBUILD = /Library/Frameworks/Mono.framework/Versions/Current/Commands/msbuild
+endif
+
+CONFIG?=Debug
+
+GENERIC_MANAGED_DLL=$(TOP)/tests/managed/generic/bin/$(CONFIG)/managed.dll
+IOS_MANAGED_DLL=$(TOP)/tests/managed/ios/bin/$(CONFIG)/managed-ios.dll
+TVOS_MANAGED_DLL=$(TOP)/tests/managed/tvos/bin/$(CONFIG)/managed-tvos.dll
+MACOS_MODERN_MANAGED_DLL=$(TOP)/tests/managed/macos-modern/bin/$(CONFIG)/managed-macos-modern.dll
+MACOS_FULL_MANAGED_DLL=$(TOP)/tests/managed/macos-full/bin/$(CONFIG)/managed-macos-full.dll
+MACOS_SYSTEM_MANAGED_DLL=$(TOP)/tests/managed/macos-system/bin/$(CONFIG)/managed-macos-system.dll
+
+ifeq ($(detected_OS),Darwin)
+ALL_MANAGED_DLLS = \
+	$(GENERIC_MANAGED_DLL) \
+	$(IOS_MANAGED_DLL) \
+	$(TVOS_MANAGED_DLL) \
+	$(MACOS_MODERN_MANAGED_DLL) \
+	$(MACOS_FULL_MANAGED_DLL) \
+	$(MACOS_SYSTEM_MANAGED_DLL) \
+else
+ALL_MANAGED_DLLS = \
+	$(GENERIC_MANAGED_DLL)
+endif
 
 MANAGED_DEPENDENCIES = \
 	$(wildcard $(TOP)/tests/managed/*.projitems) \
@@ -9,16 +40,8 @@ MANAGED_DEPENDENCIES = \
 	$(wildcard $(TOP)/tests/managed/*.cs) \
 	$(wildcard $(TOP)/tests/managed/*.tt) \
 
-ifeq ($(OS),Windows_NT)
-MSBUILD = msbuild.exe
-else
-MSBUILD = /Library/Frameworks/Mono.framework/Versions/Current/Commands/msbuild
+$(ALL_MANAGED_DLLS): $(MANAGED_DEPENDENCIES)
+	$(MSBUILD) $(wildcard $(abspath $(dir $@)../../*.csproj)) /p:Configuration=$(CONFIG)
 
-$(IOS_MANAGED_DLL): $(MANAGED_DEPENDENCIES)
-	/Library/Frameworks/Mono.framework/Versions/Current/Commands/msbuild $(TOP)/tests/managed/ios/managed-ios.csproj
-endif
-
-$(GENERIC_MANAGED_DLL): $(MANAGED_DEPENDENCIES)	
-	$(MSBUILD) $(TOP)/tests/managed/generic/managed-generic.csproj
-
-
+# each project file wants to generate subscripts.cs, and running in parallel breaks badly.
+.NOTPARALLEL:

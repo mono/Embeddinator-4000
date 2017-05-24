@@ -25,7 +25,7 @@ namespace DriverTest
 				Assert.Fail ($"Expected EM{code} exception, but no exception was thrown.", message);
 			} catch (EmbeddinatorException ee) {
 				Assert.That (ee.Error, "Error");
-				Assert.That (ee.Code, Is.EqualTo (code), "Code");
+				Assert.That (ee.Code, Is.EqualTo (code), "Code - " + ee.Message);
 				Assert.That (ee.Message, Is.EqualTo (message), "Message");
 			}
 		}
@@ -33,6 +33,11 @@ namespace DriverTest
 		public static void RunProcess (string filename, string arguments, string message)
 		{
 			string stdout;
+			RunProcess (filename, arguments, out stdout, message);
+		}
+
+		public static void RunProcess (string filename, string arguments, out string stdout, string message)
+		{
 			int exitCode;
 			Console.WriteLine ($"{filename} {arguments}");
 			// We capture stderr too, otherwise it won't show up in the test unit pad's output.
@@ -44,5 +49,12 @@ namespace DriverTest
 			Assert.Fail ($"Executing '{filename} {arguments}' failed with exit code {exitCode}: {message}");
 		}
 
+		public static void Generate (string message, params string [] arguments)
+		{
+			var rv = Driver.Main2 (arguments);
+			if (rv == 0)
+				return;
+			Assert.Fail ($"Generation failed with exit code {rv}: {message}");
+		}
 	}
 }
