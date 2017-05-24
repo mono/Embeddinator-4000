@@ -156,6 +156,8 @@ namespace Embeddinator {
 		{
 		}
 
+		public abstract string BaseName { get; }
+
 		public ParameterInfo[] Parameters { get; protected set; }
 
 		string objCSignature;
@@ -193,7 +195,7 @@ namespace Embeddinator {
 		public string NameOverride { get; set; }
 		public string ManagedName { get; set; }
 
-		public string BaseName {
+		public override string BaseName {
 			get {
 				if (NameOverride != null)
 					return NameOverride;
@@ -221,12 +223,9 @@ namespace Embeddinator {
 
 		public override string ToString () => ToString (Method);
 
-		public string GetMonoSignature (string name = null)
+		string GetMonoSignature ()
 		{
-			if (name == null)
-				name = BaseName;
-
-			var mono = new StringBuilder (name);
+			var mono = new StringBuilder (Method.Name);
 
 			mono.Append ('(');
 
@@ -312,7 +311,7 @@ namespace Embeddinator {
 		public ConstructorInfo Constructor { get; private set; }
 
 		public bool Unavailable { get; set; }
-		public string ObjCName {
+		public override string BaseName {
 			get {
 				if (Parameters.Length == 0 || FirstDefaultParameter == 0)
 					return "init";
@@ -336,7 +335,7 @@ namespace Embeddinator {
 
 		public override string ToString () => ToString (Constructor);
 
-		public string GetMonoSignature ()
+		string GetMonoSignature ()
 		{
 			var mono = new StringBuilder (Constructor.Name);
 
@@ -356,13 +355,13 @@ namespace Embeddinator {
 
 		string GetObjcSignature ()
 		{
-			var objc = new StringBuilder (ObjCName);
+			var objc = new StringBuilder (BaseName);
 
 			var end = FirstDefaultParameter == -1 ? Parameters.Length : FirstDefaultParameter;
 			for (int n = 0; n < end; ++n) {
 				ParameterInfo p = Parameters[n];
 
-				if (objc.Length > ObjCName.Length)
+				if (objc.Length > BaseName.Length)
 					objc.Append (' ');
 
 				string paramName = FallBackToTypeName ? NameGenerator.GetParameterTypeName (p.ParameterType) : p.Name;

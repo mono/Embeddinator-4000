@@ -306,7 +306,7 @@ namespace ObjC {
 					default_init |= pcount == 0;
 
 					var parameters = ctor.Parameters;
-					string name = ctor.ObjCName;
+					string name = ctor.BaseName;
 					string signature = ".ctor()";
 					if (parameters.Length > 0) {
 						name = ctor.ObjCSignature;
@@ -902,7 +902,6 @@ namespace ObjC {
 			method.IsExtension = isExtension;
 
 			string objcsig = method.ObjCSignature;
-			string monosig = method.GetMonoSignature (info.Name);
 
 			var builder = new MethodHelper (headers, implementation) {
 				AssemblySafeName = type.Assembly.GetName ().Name.Sanitize (),
@@ -911,7 +910,7 @@ namespace ObjC {
 				ReturnType = GetReturnType (type, info.ReturnType),
 				ManagedTypeName = type.FullName,
 				MetadataToken = info.MetadataToken,
-				MonoSignature = monosig,
+				MonoSignature = method.MonoSignature,
 				ObjCSignature = objcsig,
 				ObjCTypeName = managed_type_name,
 				IsValueType = type.IsValueType,
@@ -970,9 +969,9 @@ namespace ObjC {
 				}
 			}
 
-			string name = method != null ? method.BaseName : ctor.ObjCName;
-			string objcsig = method != null ? method.ObjCSignature : ctor.ObjCSignature;
-			string monosig = method != null ? method.MonoSignature : ctor.MonoSignature;
+			string name = member.BaseName;
+			string objcsig = member.ObjCSignature;
+			string monosig = member.MonoSignature;
 
 			var type = mb.DeclaringType;
 
