@@ -23,6 +23,10 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+#include "embeddinator.h"
+#include "glib.h"
+#include "mono-support.h"
+
 /**
  * Performs marshaling of a given MonoString to a GLib string.
  */

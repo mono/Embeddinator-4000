@@ -23,6 +23,8 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+#include "c-support.h"
+
 void mono_embeddinator_marshal_string_to_gstring(GString* g_string, MonoString* mono_string)
 {
     if (!mono_string)

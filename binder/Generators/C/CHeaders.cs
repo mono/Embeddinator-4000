@@ -1,4 +1,4 @@
-﻿using CppSharp;
+﻿﻿using CppSharp;
 using CppSharp.AST;
 using CppSharp.Generators;
 using System.Linq;
@@ -27,6 +27,7 @@ namespace MonoEmbeddinator4000.Generators
             WriteLine("#pragma once");
             NewLine();
 
+            WriteInclude("glib.h");
             WriteInclude("mono_embeddinator.h");
         }
 

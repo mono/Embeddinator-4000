@@ -1,4 +1,4 @@
-﻿﻿﻿using System.Collections.Generic;
+﻿﻿﻿﻿using System.Collections.Generic;
 using System.Linq;
 using CppSharp;
 using CppSharp.AST;
@@ -24,11 +24,9 @@ namespace MonoEmbeddinator4000.Generators
         public override void WriteHeaders()
         {
             WriteLine("#include \"{0}.h\"", Unit.FileNameWithoutExtension);
-            WriteLine("#include \"glib.h\"");
-            WriteLine("#include <mono/jit/jit.h>");
-            WriteLine("#include <mono/metadata/assembly.h>");
-            WriteLine("#include <mono/metadata/object.h>");
-            WriteLine("#include <mono/metadata/mono-config.h>");
+            WriteInclude("glib.h");
+            WriteInclude("mono_embeddinator.h");
+            WriteInclude("c-support.h");
         }
 
         void RemoveTypedefNodes()
