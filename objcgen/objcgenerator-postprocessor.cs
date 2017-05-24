@@ -37,14 +37,13 @@ namespace ObjC {
 				if (IsOperatorOrFriendlyVersion (method))
 					processedMethod.IsOperator = true;
 
-				if (!ProcessPotentialName (processedMethod))
-					continue;
+				ProcessPotentialName (processedMethod);
 
 				yield return processedMethod;
 			}
 		}
 
-		bool ProcessPotentialName (ProcessedMethod processedMethod)
+		void ProcessPotentialName (ProcessedMethod processedMethod)
 		{
 			MethodInfo method = processedMethod.Method;
 			if (IsOperatorOrFriendlyVersion (method)) {
@@ -55,10 +54,10 @@ namespace ObjC {
 
 			string objCSignature = processedMethod.GetObjcSignature ();
 			if (RestrictedObjSelectors.IsImportantSelector (objCSignature)) {
-				Delayed.Add (ErrorHelper.CreateWarning (1051, $"Element '{processedMethod.Method.Name}' is not generated because its name conflicts with important objective-c selector '{objCSignature}'"));
-				return false;
+				string newName = "managed" + method.Name.PascalCase ();
+				processedMethod.NameOverride = newName;
+				Delayed.Add (ErrorHelper.CreateWarning (1051, $"Element {method.Name} is generated instead as {newName} because its name conflicts with important objective-c selector."));
 			}
-			return true;
 		}
 
 		public bool IsOperatorOrFriendlyVersion (MethodInfo method)
@@ -71,27 +70,22 @@ namespace ObjC {
 			foreach (PropertyInfo property in properties) {
 				ProcessedProperty processedProperty = new ProcessedProperty (property, this);
 
-				if (!ProcessPotentialName (processedProperty))
-					continue;
+				ProcessPotentialName (processedProperty);
 
 				yield return processedProperty;
 			}
 		}
 
-		bool ProcessPotentialName (ProcessedProperty processedProperty)
+		void ProcessPotentialName (ProcessedProperty processedProperty)
 		{
 			string getSignature = processedProperty.HasGetter ? processedProperty.GetMethod.ObjCSignature : "";
 			string setSignature = processedProperty.HasSetter ? processedProperty.SetMethod.ObjCSignature : "";
 
-			if (RestrictedObjSelectors.IsImportantSelector (getSignature)) {
-			    Delayed.Add (ErrorHelper.CreateWarning (1051, $"Element '{processedProperty.Property.Name}' is not generated because its name conflicts with important objective-c selector '{processedProperty.GetterName}'"));
-				return false;
+			if (RestrictedObjSelectors.IsImportantSelector (getSignature) || RestrictedObjSelectors.IsImportantSelector (setSignature)) {
+				string newName = "managed" + processedProperty.Name.PascalCase ();
+				Delayed.Add (ErrorHelper.CreateWarning (1051, $"Element {processedProperty.Name} is generated instead as {newName} because its name conflicts with important objective-c selector."));
+				processedProperty.NameOverride = newName;
 			}
-			if (RestrictedObjSelectors.IsImportantSelector (setSignature)) {
-				Delayed.Add (ErrorHelper.CreateWarning (1051, $"Element '{processedProperty.Property.Name}' is not generated because its name conflicts with important objective-c selector '{processedProperty.SetterName}'"));
-				return false;
-			}
-			return true;
 		}
 
 		protected IEnumerable<ProcessedProperty> PostProcessSubscriptProperties (IEnumerable<PropertyInfo> properties)
