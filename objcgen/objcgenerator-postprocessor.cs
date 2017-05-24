@@ -56,7 +56,7 @@ namespace ObjC {
 			if (RestrictedObjSelectors.IsImportantSelector (objCSignature)) {
 				string newName = "managed" + method.Name.PascalCase ();
 				processedMethod.NameOverride = newName;
-				Delayed.Add (ErrorHelper.CreateWarning (1051, $"Element {method.Name} is generated instead as {newName} because its name conflicts with important objective-c selector."));
+				Delayed.Add (ErrorHelper.CreateWarning (1051, $"Element {method.Name} is generated instead as {newName} because its name conflicts with an important objective-c selector."));
 			}
 		}
 
@@ -83,7 +83,7 @@ namespace ObjC {
 
 			if (RestrictedObjSelectors.IsImportantSelector (getSignature) || RestrictedObjSelectors.IsImportantSelector (setSignature)) {
 				string newName = "managed" + processedProperty.Name.PascalCase ();
-				Delayed.Add (ErrorHelper.CreateWarning (1051, $"Element {processedProperty.Name} is generated instead as {newName} because its name conflicts with important objective-c selector."));
+				Delayed.Add (ErrorHelper.CreateWarning (1051, $"Element {processedProperty.Name} is generated instead as {newName} because its name conflicts with an important objective-c selector."));
 				processedProperty.NameOverride = newName;
 			}
 		}
