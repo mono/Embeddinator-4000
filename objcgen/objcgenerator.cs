@@ -898,6 +898,7 @@ namespace ObjC {
 			
 			method.IsExtension = isExtension;
 
+			method.Invalidate ();
 			string objcsig = method.ObjCSignature;
 
 			var builder = new MethodHelper (headers, implementation) {

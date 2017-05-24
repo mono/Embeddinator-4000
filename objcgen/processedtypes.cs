@@ -160,6 +160,13 @@ namespace Embeddinator {
 
 		public ParameterInfo[] Parameters { get; protected set; }
 
+		[Obsolete] // https://github.com/mono/Embeddinator-4000/issues/370
+		public void Invalidate ()
+		{
+			objCSignature = null;
+			monoSignature = null;
+		}
+
 		string objCSignature;
 		public string ObjCSignature {
 			get {
