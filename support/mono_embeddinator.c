@@ -340,13 +340,13 @@ void mono_embeddinator_marshal_string_to_gstring(GString* g_string, MonoString* 
 
 MonoObject* mono_embeddinator_get_cultureinfo_invariantculture_object ()
 {
-    static MonoObject* invariantculture = nil;
+    static MonoObject* invariantculture = NULL;
     if (!invariantculture) {
         MonoClass* klass = mono_class_from_name (mono_get_corlib (), "System.Globalization", "CultureInfo");
         const char mname [] = "System.Globalization:get_InvariantCulture()";
         MonoMethod* method = mono_embeddinator_lookup_method (mname, klass);
-        MonoObject* ex = nil;
-        invariantculture = mono_runtime_invoke (method, nil, nil, &ex);
+        MonoObject* ex = NULL;
+        invariantculture = mono_runtime_invoke (method, NULL, NULL, &ex);
         if (ex) {
             mono_embeddinator_throw_exception (ex);
         }
@@ -356,7 +356,7 @@ MonoObject* mono_embeddinator_get_cultureinfo_invariantculture_object ()
 
 MonoClass* mono_embeddinator_get_decimal_class ()
 {
-    static MonoClass* decimalclass = nil;
+    static MonoClass* decimalclass = NULL;
     if (!decimalclass) {
         decimalclass = mono_class_from_name (mono_get_corlib (), "System", "Decimal");
     }
