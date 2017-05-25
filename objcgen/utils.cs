@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Embeddinator
 {
-	static class Utils
+	public static class Utils
 	{
 		public static bool RunProcess (string filename, string arguments, out int exitCode, out string stdout, bool capture_stderr = false)
 		{

@@ -193,7 +193,7 @@ namespace DriverTest {
 			var csfile = Path.Combine (tmpdir, "foo.cs");
 			var dllfile = Path.Combine (tmpdir, "foo.dll");
 			File.WriteAllText (csfile, @"public class C { public Foundation.NSObject F () {  throw new System.NotImplementedException (); } }");
-			Asserts.RunProcess ("/Library/Frameworks/Mono.framework/Commands/csc", $"/target:library /out:{Embedder.Quote (dllfile)} {Embedder.Quote (csfile)} -r:/Library/Frameworks/Xamarin.iOS.framework/Versions/Current/lib/mono/Xamarin.iOS/Xamarin.iOS.dll", "compile dll");
+			Asserts.RunProcess ("/Library/Frameworks/Mono.framework/Commands/csc", $"/target:library /out:{Utils.Quote (dllfile)} {Utils.Quote (csfile)} -r:/Library/Frameworks/Xamarin.iOS.framework/Versions/Current/lib/mono/Xamarin.iOS/Xamarin.iOS.dll", "compile dll");
 			Asserts.ThrowsEmbeddinatorException (13, "Can't find the assembly 'Xamarin.iOS, Version=0.0.0.0, Culture=neutral, PublicKeyToken=84e04ff9cfb79065', referenced by 'foo, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null'.", () => Driver.Main2 (dllfile, "--platform=tvOS", "--outdir=" + tmpdir));
 		}
 	}
