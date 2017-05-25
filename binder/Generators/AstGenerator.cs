@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿using System;
+﻿﻿﻿﻿﻿﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -416,7 +416,7 @@ namespace MonoEmbeddinator4000.Generators
                 }
                 else if (managedType.IsArray)
                 {
-                    if (elementType.Type.IsClass())
+                    if (elementType.Type.IsClass() || Options.GeneratorKind == GeneratorKind.Java)
                         return new QualifiedType(new UnsupportedType { Description = managedType.FullName });
 
                     var array = new ArrayType
