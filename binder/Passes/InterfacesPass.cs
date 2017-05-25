@@ -19,7 +19,8 @@ namespace MonoEmbeddinator4000.Passes
 
             var interfaces = Classes.Where(c => c.IsInterface);
             foreach (var @interface in interfaces)
-                HandleInterface(@interface);
+                if (@interface.IsGenerated)
+                    HandleInterface(@interface);
 
             unit.Declarations.InsertRange(0, InterfaceImplementations);
             InterfaceImplementations.Clear();
