@@ -63,8 +63,10 @@ namespace MonoEmbeddinator4000.Passes
                     IsPure = false,
                     IsImplicit = true,
                     IsOverride = true,
-                    SynthKind= FunctionSynthKind.InterfaceInstance,
-                    ExplicitInterfaceImpl = @interface
+                    SynthKind = FunctionSynthKind.InterfaceInstance,
+                    ExplicitInterfaceImpl = @interface,
+                    Namespace = impl,
+                    CompleteDeclaration = method
                 };
 
                 impl.Declarations.Add(methodImpl);
