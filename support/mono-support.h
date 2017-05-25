@@ -62,10 +62,6 @@ MonoClass*      mono_get_uint64_class (void);
 MonoClass*      mono_get_single_class (void);
 MonoClass*      mono_get_double_class (void);
 int             mono_array_element_size (MonoClass *ac);
-void			mono_field_static_get_value (MonoVTable *vt, MonoClassField *field, void *value);
-void			mono_runtime_class_init (MonoVTable *vtable);
-int				mono_class_instance_size (MonoClass *klass);
-int				mono_class_array_element_size (MonoClass *klass);
 
 MONO_EMBEDDINATOR_END_DECLS
 #else
@@ -150,9 +146,7 @@ typedef enum {
 } E4KDateTimeKind;
 
 typedef struct {
-	long long MaxValueTicks;
-	long long MinValueTicks;
-	long long NetTicksPerSecond;
-} E4KDateTimeDefaults;
+	unsigned long long DateData;
+} E4KDateTime;
 
 #endif

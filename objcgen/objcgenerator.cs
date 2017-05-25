@@ -521,9 +521,8 @@ namespace ObjC {
 				postwriter.WriteLine ($"{presobj} = mono_embeddinator_get_nsdecimalnumber (&{presarrval});");
 				break;
 			case TypeCode.DateTime:
-				postwriter.WriteLine ("int __pdatetimesize = mono_class_array_element_size (mono_embeddinator_get_datetime_class ());");
-				postwriter.WriteLine ($"void* __pelementptr = (void *) mono_array_addr_with_size ({presarr}, __pdatetimesize, {pindex});");
-				postwriter.WriteLine ($"{presobj} = mono_embeddinator_get_nsdate (__pelementptr, &__mono_context);");
+				postwriter.WriteLine ($"E4KDateTime {presarrval} = mono_array_get ({presarr}, E4KDateTime, {pindex});");
+				postwriter.WriteLine ($"{presobj} = mono_embeddinator_get_nsdate (&{presarrval});");
 				break;
 			case TypeCode.Byte:
 				postwriter.WriteLine ($"NSData* {presobj} = [NSData dataWithBytes:mono_array_addr ({presarr}, unsigned char, 0) length:{parrlength}];");
@@ -649,10 +648,7 @@ namespace ObjC {
 				implementation.Indent++;
 				implementation.WriteLine ($"continue;");
 				implementation.Indent--;
-				implementation.WriteLine ("int __datetimesize = mono_embeddinator_get_datetime_size ();");
-				implementation.WriteLine ($"void* __elementptr = (void *) mono_array_addr_with_size ({pnameArr}, __datetimesize, {pnameIdx});");
-				implementation.WriteLine ($"void* __datetimeptr = mono_embeddinator_get_system_datetime ({pnameRet}, &__mono_context);");
-				implementation.WriteLine ("memcpy (__elementptr, __datetimeptr, __datetimesize);");
+				implementation.WriteLine ($"mono_array_set ({pnameArr}, E4KDateTime, {pnameIdx}, mono_embeddinator_get_system_datetime ({pnameRet}, &__mono_context));");
 				break;
 			case TypeCode.String:
 				implementation.WriteLine ($"NSString* {pnameRet} = {(is_by_ref ? $"(*{parameterName})" : parameterName)}[{pnameIdx}];");
@@ -738,10 +734,10 @@ namespace ObjC {
 					post.AppendLine ($"*{paramaterName} = mono_embeddinator_get_nsdecimalnumber (&__mdec);");
 				break;
 			case TypeCode.DateTime:
-				implementation.WriteLine ($"void* __mdatetime = mono_embeddinator_get_system_datetime ({(is_by_ref ? "*" : string.Empty)}{paramaterName}, &__mono_context);");
-				implementation.WriteLine ($"{argumentName} = __mdatetime;");
+				implementation.WriteLine ($"E4KDateTime __mdatetime = mono_embeddinator_get_system_datetime ({(is_by_ref ? "*" : string.Empty)}{paramaterName}, &__mono_context);");
+				implementation.WriteLine ($"{argumentName} = &__mdatetime;");
 				if (is_by_ref)
-					post.AppendLine ($"*{paramaterName} = mono_embeddinator_get_nsdate (__mdatetime, &__mono_context);");
+					post.AppendLine ($"*{paramaterName} = mono_embeddinator_get_nsdate (&__mdatetime);");
 				break;
 			case TypeCode.Boolean:
 			case TypeCode.Char:
@@ -1093,9 +1089,8 @@ namespace ObjC {
 				implementation.WriteLine ($"__resobj = mono_embeddinator_get_nsdecimalnumber (&__resarrval);");
 				break;
 			case TypeCode.DateTime:
-				implementation.WriteLine ("int __datetimeelsize = mono_class_array_element_size (mono_embeddinator_get_datetime_class ());");
-				implementation.WriteLine ($"void* __resarrval = (void *) mono_array_addr_with_size (__resarr, __datetimeelsize, __residx);");
-				implementation.WriteLine ($"__resobj = mono_embeddinator_get_nsdate (__resarrval, &__mono_context);");
+				implementation.WriteLine ($"E4KDateTime __resarrval = mono_array_get (__resarr, E4KDateTime, __residx);");
+				implementation.WriteLine ($"__resobj = mono_embeddinator_get_nsdate (&__resarrval);");
 				break;
 			case TypeCode.Byte:
 				implementation.WriteLine ("NSData* __resobj = [NSData dataWithBytes:mono_array_addr (__resarr, unsigned char, 0) length:__resarrlength];");
@@ -1164,7 +1159,7 @@ namespace ObjC {
 				break;
 			case TypeCode.DateTime:
 				implementation.WriteLine ("void* __unboxedresult = mono_object_unbox (__result);");
-				implementation.WriteLine ("return mono_embeddinator_get_nsdate (__unboxedresult, &__mono_context);");
+				implementation.WriteLine ("return mono_embeddinator_get_nsdate (__unboxedresult);");
 				break;
 			case TypeCode.Boolean:
 			case TypeCode.Char:

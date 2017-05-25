@@ -204,16 +204,4 @@ MonoClass* mono_embeddinator_get_decimal_class ();
 MONO_EMBEDDINATOR_API
 MonoClass* mono_embeddinator_get_datetime_class ();
 
-/**
- * Gets DateTime Defaults.
- */
-MONO_EMBEDDINATOR_API
-E4KDateTimeDefaults* mono_embeddinator_get_datetime_defaults (mono_embeddinator_context_t* context);
-
-/**
- * Gets DateTime size.
- */
-MONO_EMBEDDINATOR_API
-int mono_embeddinator_get_datetime_size ();
-
 MONO_EMBEDDINATOR_END_DECLS

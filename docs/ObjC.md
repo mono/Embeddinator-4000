@@ -95,7 +95,7 @@ This [article](http://nshipster.com/object-subscripting/) is a great introductio
 
 ## Main differences with .NET
 
-### Constructors v.s. Initializers
+### Constructors vs Initializers
 
 In Objective-C, you can call any of the initializer prototypes of any of the parent classes in the inheritance chain unless it is marked as unavailable (NS_UNAVAILABLE).
 
@@ -181,13 +181,13 @@ In general operator == in C# is handled as a general operator as noted above.
 
 However, if the "friendly" Equals operator is found, both operator == and operator != will be skipped in generation.
 
-### DateTime v.s. NSDate
+### DateTime vs NSDate
 
 From [NSDate's](https://developer.apple.com/reference/foundation/nsdate?language=objc) documentation:
 
 > NSDate objects encapsulate a single point in time, independent of any particular calendrical system or time zone. Date objects are immutable, representing an invariant time interval relative to an absolute reference date (00:00:00 UTC on 1 January 2001).
 
-Due to NSDate reference date, all conversions between it and DateTime must be done in UTC.
+Due to `NSDate` reference date, all conversions between it and `DateTime` must be done in UTC.
 
 #### DateTime to NSDate
 
