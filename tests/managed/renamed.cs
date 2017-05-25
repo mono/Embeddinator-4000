@@ -1,21 +1,23 @@
 ﻿using System;
 namespace Renamed
 {
-	public sealed class BindingNameAttribute : System.Attribute {
-	    public string Name;
+	public sealed class EmbeddinatorNameAttribute : System.Attribute {
+		public string Name;
+		public string Language;
 
-	    public BindingNameAttribute (string name)
-	    {
-		    Name = name;
-	    }
+		public EmbeddinatorNameAttribute (string name, string language = "ObjC")
+		{
+			Name = name;
+			Language = language;
+		}
 	}
 
 	public class WithItemsRenamed
 	{
-		[BindingName ("MyCustomClass")]
+		[EmbeddinatorName ("MyCustomClass")]
 		public bool Class { get; set; }
 		
-		[BindingName ("MyCustomHash")]
+		[EmbeddinatorName ("MyCustomHash")]
 		public int Hash () => 42;
 	}
 
