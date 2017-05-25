@@ -86,31 +86,21 @@ namespace ObjC {
 				Methods = new List<ProcessedMethod> (),
 				Properties = new List<ProcessedProperty> (),
 				Constructors = new List<ProcessedConstructor> (),
-				Fields = new List<ProcessedFieldInfo> (),
 			};
 			var ticks = t.GetProperty ("Ticks");
-			system_datetime.Properties.Add (new ProcessedProperty (ticks));
+			system_datetime.Properties.Add (new ProcessedProperty (ticks, this));
 
 			var kind = t.GetProperty ("Kind");
-			system_datetime.Properties.Add (new ProcessedProperty (kind));
+			system_datetime.Properties.Add (new ProcessedProperty (kind, this));
 
-			var intT = corlib.Assembly.GetType ("System.Int32");
 			var dtk = corlib.Assembly.GetType ("System.DateTimeKind");
-			var ctorInt6xKind = t.GetConstructor (new Type [] { intT, intT, intT, intT, intT, intT, dtk });
-			system_datetime.Constructors.Add (new ProcessedConstructor (ctorInt6xKind));
-
 			var longT = corlib.Assembly.GetType ("System.Int64");
 			var ctorLongKind = t.GetConstructor (new Type [] { longT, dtk });
-			system_datetime.Constructors.Add (new ProcessedConstructor (ctorLongKind));
+			system_datetime.Constructors.Add (new ProcessedConstructor (ctorLongKind, this));
 
 			var toUniversalTime = t.GetMethod ("ToUniversalTime");
-			system_datetime.Methods.Add (new ProcessedMethod (toUniversalTime));
+			system_datetime.Methods.Add (new ProcessedMethod (toUniversalTime, this));
 
-			var maxfield = t.GetField ("MaxValue");
-			system_datetime.Fields.Add (new ProcessedFieldInfo (maxfield));
-
-			var minfield = t.GetField ("MinValue");
-			system_datetime.Fields.Add (new ProcessedFieldInfo (minfield));
 			AddExtraType (system_datetime);
 			return true;
 		}
