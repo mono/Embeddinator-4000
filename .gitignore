@@ -38,10 +38,9 @@ bindings.m
 /external/jna
 /external/ikvm
 packages
-*.dSYM
-*.class
 
 ### Xcode ###
+build/
 DerivedData/
 *.pbxuser
 !default.pbxuser
@@ -64,3 +63,4 @@ xcuserdata/
 *.ipa
 *.dSYM.zip
 *.dSYM
+

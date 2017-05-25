@@ -1,4 +1,4 @@
-﻿﻿﻿﻿using System;
+﻿﻿﻿﻿﻿﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -155,6 +155,8 @@ namespace MonoEmbeddinator4000.Generators
 
             foreach (var @interface in type.ImplementedInterfaces)
                 HandleBaseType(@interface, @class);
+
+            ManagedNames[@class] = type.FullName;
 
             return @class;
         }
@@ -414,6 +416,9 @@ namespace MonoEmbeddinator4000.Generators
                 }
                 else if (managedType.IsArray)
                 {
+                    if (elementType.Type.IsClass() || Options.GeneratorKind == GeneratorKind.Java)
+                        return new QualifiedType(new UnsupportedType { Description = managedType.FullName });
+
                     var array = new ArrayType
                     {
                         SizeType = ArrayType.ArraySize.Variable,

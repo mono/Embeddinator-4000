@@ -1,0 +1,6 @@
+UnitsNet.3.57.0/
+Debug/
+*.h
+*.c
+*.m
+*.nupkg

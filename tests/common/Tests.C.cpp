@@ -343,16 +343,16 @@ TEST_CASE("Arrays.C", "[C][Arrays]") {
         /*clear=*/true, sizeof(char), G_N_ELEMENTS(_byte_arr));
     g_array_append_vals (_byte.array, _byte_arr, G_N_ELEMENTS(_byte_arr));
 
-    int _sum = Arrays_ArrayTypes_SumByteArray(_byte);
+    int _sum = Arrays_Arr_SumByteArray(_byte);
     REQUIRE(_sum == 6);
 
-    _IntArray _int = Arrays_ArrayTypes_ReturnsIntArray();
+    _IntArray _int = Arrays_Arr_ReturnsIntArray();
     REQUIRE(_int.array->len == 3);
     REQUIRE(g_array_index(_int.array, int, 0) == 1);
     REQUIRE(g_array_index(_int.array, int, 1) == 2);
     REQUIRE(g_array_index(_int.array, int, 2) == 3);
 
-    _StringArray _string = Arrays_ArrayTypes_ReturnsStringArray();
+    _StringArray _string = Arrays_Arr_ReturnsStringArray();
     REQUIRE(_string.array->len == 3);
     REQUIRE(strcmp(g_array_index(_string.array, gchar*, 0), "1") == 0);
     REQUIRE(strcmp(g_array_index(_string.array, gchar*, 1), "2") == 0);

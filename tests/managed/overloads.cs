@@ -315,4 +315,18 @@ namespace Overloads {
 			return Value.GetHashCode ();
 		}
 	}
+
+	public class ConflictingNamingOverload {
+
+		// objc: no need to call it (from xcode), the fact it compiles is fine
+		public static string Format (string [] values)
+		{
+			return String.Join (" ", values);
+		}
+
+		public static string Format (int [] values)
+		{
+			return String.Join (" ", values);
+		}
+	}
 }

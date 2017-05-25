@@ -66,4 +66,17 @@ namespace Interfaces {
 			return DoAddition (new ManagedAdder (), a, b) == (a + b);
 		}
 	}
+
+	public class ExposeIFormatProvider {
+
+		public static IFormatProvider GetCulture (string name)
+		{
+			return System.Globalization.CultureInfo.GetCultureInfo (name);
+		}
+
+		public static string Format (double value, IFormatProvider provider)
+		{
+			return String.Format (provider, "{0}", value);
+		}
+	}
 }

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using CppSharp;
 using CppSharp.AST;
 using CppSharp.Generators;
@@ -49,7 +50,7 @@ namespace MonoEmbeddinator4000.Generators
             TranslationUnit.Visit(this);
         }
 
-        public override bool  VisitTranslationUnit(TranslationUnit unit)
+        public override bool VisitTranslationUnit(TranslationUnit unit)
         {
             WriteLine($"public interface {ClassName} extends com.sun.jna.Library");
             WriteStartBraceIndent();
@@ -65,11 +66,33 @@ namespace MonoEmbeddinator4000.Generators
             return ret;
         }
 
+        public static IEnumerable<Declaration> GetOverloadedDeclarations(Declaration decl)
+        {
+            var @class = decl.Namespace as Class;
+            return @class.Declarations.Where(d => d.OriginalName == decl.OriginalName);
+        }
+
         public static string GetCMethodIdentifier(Method method)
         {
+            if (method.CompleteDeclaration != null)
+                method = method.CompleteDeclaration as Method;
+
+            var methodName = (method.IsConstructor) ? "new" : method.OriginalName;
+
             var @class = method.Namespace as Class;
-            var name = (method.IsConstructor) ? method.Name : method.OriginalName;
-            return $"{@class.QualifiedOriginalName}_{name}";
+            var name = $"{@class.QualifiedOriginalName}_{methodName}";
+
+            // Deal with naming overloads conflicts.
+            var overloads = GetOverloadedDeclarations(method).ToList();
+
+            if (overloads.Count > 1)
+            {
+                var overloadIndex = overloads.FindIndex(m => ReferenceEquals(m, method));
+                if (overloadIndex > 0)
+                    name = $"{name}_{overloadIndex}";
+            }
+
+            return name;
         }
 
         public override bool VisitMethodDecl(Method method)

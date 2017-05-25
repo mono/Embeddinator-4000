@@ -18,6 +18,27 @@ namespace Embeddinator {
 			return Char.ToLowerInvariant (self [0]) + self.Substring (1, self.Length - 1);
 		}
 
+		public static string CamelCase (this string self, bool containsWhitespaces)
+		{
+			if (self == null)
+				return null;
+			if (self.Length == 0)
+				return String.Empty;
+
+			var strings = self.Trim ().Split (' ');
+			var count = strings.Length;
+			string res = string.Empty;
+
+			for (int i = 0; i < count; i++) {
+				if (i == 0)
+					res += strings [i].CamelCase ();
+				else
+					res += strings [i].PascalCase ();
+			}
+
+			return res;
+		}
+
 		public static string PascalCase (this string self)
 		{
 			if (self == null)
@@ -25,6 +46,23 @@ namespace Embeddinator {
 			if (self.Length == 0)
 				return String.Empty;
 			return Char.ToUpperInvariant (self [0]) + self.Substring (1, self.Length - 1);
+		}
+
+		public static string PascalCase (this string self, bool containsWhitespaces)
+		{
+			if (self == null)
+				return null;
+			if (self.Length == 0)
+				return String.Empty;
+
+			var strings = self.Trim ().Split (' ');
+			var count = strings.Length;
+			string res = string.Empty;
+
+			for (int i = 0; i < count; i++)
+				res += strings [i].PascalCase ();
+
+			return res;
 		}
 
 		public static string Sanitize (this string self)
@@ -144,10 +182,19 @@ namespace Embeddinator {
 	}
 
 	public static class ListExtensions {
-		public static bool Contains (this List<ProcessedType> list, Type type)
+		public static bool HasClass (this List<ProcessedType> list, Type type)
 		{
 			foreach (ProcessedType t in list) {
-				if (t.Type == type)
+				if (t.IsClass && (type == t.Type))
+					return true;
+			}
+			return false;
+		}
+
+		public static bool HasProtocol (this List<ProcessedType> list, Type type)
+		{
+			foreach (ProcessedType t in list) {
+				if (t.IsProtocol && (type == t.Type))
 					return true;
 			}
 			return false;
