@@ -213,9 +213,9 @@ Note: Supported features will evolve with new versions of the tool.
 
 This is a **warning** that the element `E` will be generated instead as `F` because its name conflicts with an important objective-c selector.
 
-Selectors such as "hash" and "class" have important meaning in objective-c and must be overridden carefully.
+Selectors on the [NSObjectProtocol](https://developer.apple.com/reference/objectivec/1418956-nsobject?language=objc) have important meaning in objective-c and must be overridden carefully.
 
-Note: Supported features will evolve with new versions of the tool.
+Note: The list of reserved selectors will evolve with new versions of the tool.
 
 
 <!-- 2xxx: code generation -->
