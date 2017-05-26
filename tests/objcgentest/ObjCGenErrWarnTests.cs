@@ -161,7 +161,7 @@ namespace ObjCGenErrWarnTests {
 			clangArgs.Append ($"-o {Path.Combine (tempWorkingDir, "foo.o")} ");
 
 			// Embedder.RunProcess returns false if exitcode != 0
-			Assert.IsFalse (Embedder.RunProcess ("xcrun", clangArgs.ToString (), out int exitCode, out string output, capture_stderr: true), "clangbuild");
+			Assert.IsFalse (Utils.RunProcess ("xcrun", clangArgs.ToString (), out int exitCode, out string output, capture_stderr: true), "clangbuild");
 			Assert.That (output, Does.Contain (errorToSearch), $"Not found: {errorToSearch}");
 		}
 	}

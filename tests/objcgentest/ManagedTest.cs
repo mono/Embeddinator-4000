@@ -92,7 +92,7 @@ namespace ExecutionTests
 			if (device_xml == null) {
 				var cachedir = Cache.CreateTemporaryDirectory ();
 				var xmlpath = Path.Combine (cachedir, "devices.xml");
-				Asserts.RunProcess ("/Library/Frameworks/Xamarin.iOS.framework/Versions/Current/bin/mlaunch", $"--listdev={Embedder.Quote (xmlpath)} --output-format=xml", "mlaunch --listdev");
+				Asserts.RunProcess ("/Library/Frameworks/Xamarin.iOS.framework/Versions/Current/bin/mlaunch", $"--listdev={Utils.Quote (xmlpath)} --output-format=xml", "mlaunch --listdev");
 				device_xml = new XmlDocument ();
 				device_xml.Load (xmlpath);
 			}
@@ -197,7 +197,7 @@ namespace ExecutionTests
 			var dll_path = Path.Combine (XcodeProjectGenerator.TestsRootDirectory, "managed", dlldir, "bin", configuration, dllname);
 
 			// This will build all the managed.dll variants, which is easier than calculating the relative path _as the makefile sees it_ to pass as the target.
-			Asserts.RunProcess ("make", $"all CONFIG={configuration} -C {Embedder.Quote (Path.Combine (XcodeProjectGenerator.TestsRootDirectory, "managed"))}", "build " + Path.GetFileName (dll_path));
+			Asserts.RunProcess ("make", $"all CONFIG={configuration} -C {Utils.Quote (Path.Combine (XcodeProjectGenerator.TestsRootDirectory, "managed"))}", "build " + Path.GetFileName (dll_path));
 
 			var outdir = tmpdir + "/out";
 			var projectName = "foo";
@@ -217,7 +217,7 @@ namespace ExecutionTests
 
 			string output;
 			var builddir = Path.Combine (tmpdir, "xcode-build-dir");
-			Asserts.RunProcess ("xcodebuild", $"test -project {Embedder.Quote (projectDirectory)} -scheme Tests {test_destination} CONFIGURATION_BUILD_DIR={Embedder.Quote (builddir)}", out output, "run xcode tests");
+			Asserts.RunProcess ("xcodebuild", $"test -project {Utils.Quote (projectDirectory)} -scheme Tests {test_destination} CONFIGURATION_BUILD_DIR={Utils.Quote (builddir)}", out output, "run xcode tests");
 			// assert the number of tests passed, so that we can be sure we actually ran all the tests. Otherwise it's very easy to ignore when a bug is causing tests to not be built.
 			Assert.That (output, Does.Match ($"Test Suite 'All tests' passed at .*\n\t Executed {managedTestCount} tests, with 0 failures"), "test count");
 		}
