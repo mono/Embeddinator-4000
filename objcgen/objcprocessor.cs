@@ -142,6 +142,11 @@ namespace ObjC {
 				break;
 			}
 
+			switch (t.Name) {
+				case "EmbeddinatorNameAttribute": // This is used to override naming during binding
+					return false;
+			}
+
 			var base_type = t.BaseType;
 			return (base_type == null) || base_type.Is ("System", "Object") ? true : IsSupported (base_type);
 		}

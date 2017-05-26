@@ -1313,6 +1313,12 @@
 	}
 }
 
+-(void)testRenamedViaAttributes {
+    Renamed_WithItemsRenamed * item = [[Renamed_WithItemsRenamed alloc] init];
+    XCTAssertEqual(42, [item MyCustomHash], "Renamed hash");
+    XCTAssertEqual(false, [item MyCustomClass], "Renamed class");
+}
+
 #pragma clang diagnostic pop
 
 @end

@@ -753,33 +753,30 @@ namespace ObjC {
 
 		protected override void Generate (ProcessedProperty property)
 		{
-			PropertyInfo pi = property.Property;
-			var getter = pi.GetGetMethod ();
-			var setter = pi.GetSetMethod ();
+			var getter = property.GetMethod;
+			var setter = property.SetMethod;
 			// setter-only properties are handled as methods (and should not reach this code)
 			if (getter == null && setter != null)
 				throw new EmbeddinatorException (99, "Internal error `setter only`. Please file a bug report with a test case (https://github.com/mono/Embeddinator-4000/issues");
 
-			var name = pi.Name.CamelCase ();
-
 			headers.Write ("@property (nonatomic");
-			if (getter.IsStatic)
+			if (getter.Method.IsStatic)
 				headers.Write (", class");
 			if (setter == null)
 				headers.Write (", readonly");
-			var pt = pi.PropertyType;
+			var pt = property.Property.PropertyType;
 			var property_type = NameGenerator.GetTypeName (pt);
 			if (HasClass (pt))
 				property_type += " *";
 
 			var spacing = property_type [property_type.Length - 1] == '*' ? string.Empty : " ";
-			headers.WriteLine ($") {property_type}{spacing}{name};");
+			headers.WriteLine ($") {property_type}{spacing}{property.Name};");
 
-			ImplementMethod (getter, name, property.GetMethod, pi: pi);
+			ImplementMethod (getter.Method, property.GetterName, property.GetMethod, pi: property.Property);
 			if (setter == null)
 				return;
 
-			ImplementMethod (setter, "set" + pi.Name, property.SetMethod, pi: pi);
+			ImplementMethod (setter.Method, property.SetterName, property.SetMethod, pi: property.Property);
 		}
 
 		protected void Generate (ProcessedFieldInfo field)
