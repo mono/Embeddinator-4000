@@ -798,10 +798,9 @@ namespace ObjC {
 			if (bound)
 				field_type += " *";
 
-			var name = fi.Name.CamelCase ();
 
 			var spacing = field_type [field_type.Length - 1] == '*' ? string.Empty : " ";
-			headers.WriteLine ($") {field_type}{spacing}{name};");
+			headers.WriteLine ($") {field_type}{spacing}{field.Name};");
 
 			// it's similar, but different from implementing a method
 
@@ -810,7 +809,7 @@ namespace ObjC {
 			var return_type = GetReturnType (type, fi.FieldType);
 
 			implementation.Write (fi.IsStatic ? '+' : '-');
-			implementation.WriteLine ($" ({return_type}) {name}");
+			implementation.WriteLine ($" ({return_type}) {field.GetterName}");
 			implementation.WriteLine ("{");
 			implementation.Indent++;
 			implementation.WriteLine ("static MonoClassField* __field = nil;");
@@ -844,7 +843,7 @@ namespace ObjC {
 			if (read_only)
 				return;
 			implementation.Write (fi.IsStatic ? '+' : '-');
-			implementation.WriteLine ($" (void) set{fi.Name}:({field_type})value");
+			implementation.WriteLine ($" (void) {field.SetterName}:({field_type})value");
 			implementation.WriteLine ("{");
 			implementation.Indent++;
 			implementation.WriteLine ("static MonoClassField* __field = nil;");

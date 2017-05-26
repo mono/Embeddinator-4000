@@ -410,6 +410,9 @@ namespace Embeddinator {
 		public string TypeName { get; private set; }
 		public string ObjCName { get; private set; }
 
+		public string Name => (NameOverride ?? Field.Name).CamelCase ();
+		public string NameOverride { get; set; }
+
 		public ProcessedFieldInfo (FieldInfo field, Processor processor) : base (processor)
 		{
 			Field = field;
@@ -419,5 +422,8 @@ namespace Embeddinator {
 
 		// linker compatible signature
 		public override string ToString () => Field.FieldType.FullName + " " + Field.Name;
+
+		public string GetterName => (NameOverride ?? Field.Name).CamelCase ();
+		public string SetterName => "set" + (NameOverride ?? Field.Name).PascalCase ();
 	}
 }

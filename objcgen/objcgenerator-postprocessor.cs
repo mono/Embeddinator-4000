@@ -96,10 +96,22 @@ namespace ObjC {
 			}
 		}
 
+		void ProcessPotentialName (ProcessedFieldInfo processedField)
+		{
+			if (RestrictedObjSelectors.IsImportantSelector (processedField.GetterName) || RestrictedObjSelectors.IsImportantSelector (processedField.SetterName)) {
+				string newName = "managed" + processedField.Name.PascalCase ();
+				Delayed.Add (ErrorHelper.CreateWarning (1051, $"Element {processedField.Name} is generated instead as {newName} because its name conflicts with an important objective-c selector."));
+				processedField.NameOverride = newName;
+			}
+		}
+
 		protected IEnumerable<ProcessedFieldInfo> PostProcessFields (IEnumerable<FieldInfo> fields)
 		{
 			foreach (FieldInfo field in fields) {
 				ProcessedFieldInfo processedField = new ProcessedFieldInfo (field, this);
+
+				ProcessPotentialName (processedField);
+
 				yield return processedField;
 			}
 		}
