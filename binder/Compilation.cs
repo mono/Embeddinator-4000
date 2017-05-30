@@ -1,4 +1,4 @@
-﻿﻿using System;
+﻿﻿﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -312,7 +312,10 @@ namespace MonoEmbeddinator4000
                 CompileNativeCode(files);
 
             if (Options.GeneratorKind == GeneratorKind.Java)
+            {
                 CompileJava(files);
+                CreateJar(files);
+            }
         }
 
         bool initXamarinAndroidTools = false;
@@ -348,16 +351,56 @@ namespace MonoEmbeddinator4000
 
             var executableSuffix = Platform.IsWindows ? ".exe" : string.Empty;
             var javac = $"{Path.Combine(GetJavaSdkPath(), "bin", "javac" + executableSuffix)}";
+            var classesDir = "classes";
 
             var args = new List<string> {
-                string.Join(" ", files.Select(file => Path.GetFullPath(file)))
+                string.Join(" ", files.Select(file => Path.GetFullPath(file))),
+                string.Join(" ", Directory.GetFiles(FindDirectory("support"), "*.java", SearchOption.AllDirectories)),
+                "-d",
+                classesDir
             };
 
             if (Options.Compilation.DebugMode)
                 args.Add("-g");
 
+            //JNA library
+            args.Add("-cp");
+            args.Add(Path.Combine(FindDirectory("deps/java"), "jna-4.4.0.jar"));
+
+            //If "classes" directory doesn't exists, javac fails
+            if (!Directory.Exists(classesDir))
+                Directory.CreateDirectory(classesDir);
+
             var invocation = string.Join(" ", args);
             Invoke(javac, invocation);
+        }
+
+        void CreateJar(IEnumerable<string> files)
+        {
+            var supportFiles = Directory.GetFiles(FindDirectory("support"), "*.class", SearchOption.AllDirectories);
+            files = files.Select(f => f.Replace(".java", ".class"));
+
+            var executableSuffix = Platform.IsWindows ? ".exe" : string.Empty;
+            var jar = $"{Path.Combine(GetJavaSdkPath(), "bin", "jar" + executableSuffix)}";
+
+            var args = new List<string> {
+                "cvf",
+                "classes.jar",
+                "-C classes ."
+            };
+
+            var invocation = string.Join(" ", args);
+            Invoke(jar, invocation);
+        }
+
+        string FindDirectory(string dir, int depth = 0)
+        {
+            if (Directory.Exists(dir))
+                return Path.GetFullPath(dir);
+            if (depth > 3)
+                throw new Exception($"Cannot find {Path.GetFileName(dir)}!");
+
+            return FindDirectory(Path.Combine("..", dir), depth + 1);
         }
 
         private void AndroidLogger_Info(string task, string message)
