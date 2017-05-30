@@ -205,11 +205,14 @@ E4KDateTime mono_embeddinator_get_system_datetime (NSDate* nsdate, mono_embeddin
 	long long minvalueticks = DateTimeMinValueTicks;
 
 	void* datetimeargs [2];
+	long long nsdateinterval;
+	long long dateticks;
+
 	if (!nsdate)
 		datetimeargs [0] = &minvalueticks;
 	else {
-		long long nsdateinterval = [nsdate timeIntervalSinceReferenceDate];
-		long long dateticks = nsdateinterval * NetTicksPerSecond + NSDateRefDateTicks;
+		nsdateinterval = [nsdate timeIntervalSinceReferenceDate];
+		dateticks = nsdateinterval * NetTicksPerSecond + NSDateRefDateTicks;
 
 		if (dateticks > DateTimeMaxValueTicks)
 			dateticks = DateTimeMaxValueTicks;
@@ -224,8 +227,7 @@ E4KDateTime mono_embeddinator_get_system_datetime (NSDate* nsdate, mono_embeddin
 	if (!datetimector)
 		datetimector = mono_embeddinator_lookup_method ("System.DateTime:.ctor(long,System.DateTimeKind)", datetimeclass);
 
-	MonoObject* datetimeshell = mono_object_new (context->domain, datetimeclass);
-	E4KDateTime datetime = *(E4KDateTime *) mono_object_unbox (datetimeshell);
+	E4KDateTime datetime = { 0 };
 
 	MonoObject* ex = nil;
 	mono_runtime_invoke (datetimector, &datetime, datetimeargs, &ex);
