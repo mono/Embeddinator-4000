@@ -166,7 +166,7 @@ namespace ObjC {
 			implementation.WriteLine ();
 
 			foreach (var mi in methods) {
-				ImplementMethod (mi.Method, mi.Method.Name.CamelCase (), mi, isExtension: true);
+				ImplementMethod (mi);
 			}
 
 			headers.WriteLine ("@end");
@@ -772,11 +772,11 @@ namespace ObjC {
 			var spacing = property_type [property_type.Length - 1] == '*' ? string.Empty : " ";
 			headers.WriteLine ($") {property_type}{spacing}{property.Name};");
 
-			ImplementMethod (getter.Method, property.GetterName, property.GetMethod, pi: property.Property);
+			ImplementMethod (property.GetMethod);
 			if (setter == null)
 				return;
 
-			ImplementMethod (setter.Method, property.SetterName, property.SetMethod, pi: property.Property);
+			ImplementMethod (property.SetMethod);
 		}
 
 		protected void Generate (ProcessedFieldInfo field)
@@ -886,24 +886,19 @@ namespace ObjC {
 		}
 
 		// TODO override with attribute ? e.g. [ObjC.Selector ("foo")]
-		// HACK - This should take a ProcessedMethod and not much of this stuff - https://github.com/mono/Embeddinator-4000/issues/276
-		string ImplementMethod (MethodInfo info, string name, ProcessedMethod method, bool isExtension = false, PropertyInfo pi = null)
+		string ImplementMethod (ProcessedMethod method)
 		{
+			MethodInfo info = method.Method;
+
 			var type = info.DeclaringType;
 			var managed_type_name = NameGenerator.GetObjCName (type);
 
-			if (method.NameOverride == null)
-				method.NameOverride = name;
-			
-			method.IsExtension = isExtension;
-
-			method.Invalidate ();
 			string objcsig = method.ObjCSignature;
 
 			var builder = new MethodHelper (headers, implementation) {
 				AssemblySafeName = type.Assembly.GetName ().Name.Sanitize (),
 				IsStatic = info.IsStatic,
-				IsExtension = isExtension,
+				IsExtension = method.IsExtension,
 				ReturnType = GetReturnType (type, info.ReturnType),
 				ManagedTypeName = type.FullName,
 				MetadataToken = info.MetadataToken,
@@ -914,7 +909,7 @@ namespace ObjC {
 				IsVirtual = info.IsVirtual && !info.IsFinal,
 			};
 
-			if (pi == null)
+			if (!method.IsPropertyImplementation)
 				builder.WriteHeaders ();
 			
 			builder.BeginImplementation ();
@@ -924,7 +919,7 @@ namespace ObjC {
 			string postInvoke = String.Empty;
 			var args = "nil";
 			if (parametersInfo.Length > 0) {
-				Generate (parametersInfo, isExtension, out postInvoke);
+				Generate (parametersInfo, method.IsExtension, out postInvoke);
 				args = "__args";
 			}
 
@@ -1015,7 +1010,7 @@ namespace ObjC {
 				builder = new EquatableHelper (method, headers, implementation);
 				break;
 			default:
-				ImplementMethod (method.Method, method.BaseName, method);
+				ImplementMethod (method);
 				return;
 			}
 			builder.WriteHeaders ();

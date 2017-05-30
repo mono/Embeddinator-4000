@@ -154,51 +154,34 @@ namespace Embeddinator {
 	public abstract class ProcessedMemberWithParameters : ProcessedMemberBase {
 		public ProcessedMemberWithParameters (Processor processor) : base (processor)
 		{
+			objCSignature = new CachedValue<string> (GetObjcSignature);
+			monoSignature = new CachedValue<string> (GetMonoSignature);
 		}
 
 		public abstract string BaseName { get; }
 
 		public ParameterInfo[] Parameters { get; protected set; }
-
-		[Obsolete] // https://github.com/mono/Embeddinator-4000/issues/370
-		public void Invalidate ()
-		{
-			objCSignature = null;
-			monoSignature = null;
-		}
-
-		string objCSignature;
-		public string ObjCSignature {
-			get {
-				if (objCSignature == null)
-					ComputeSignatures ();
-				return objCSignature;
-			}
-			protected set {
-				objCSignature = value;
-			}
-		}
-
-		string monoSignature;
-		public string MonoSignature {
-			get {
-				if (monoSignature == null)
-					ComputeSignatures ();
-				return monoSignature;
-			}
-			protected set {
-				monoSignature = value;
-			}
-		}
-
-		protected abstract void ComputeSignatures ();
-
 		public int FirstDefaultParameter { get; set; }
+
+		protected abstract string GetObjcSignature ();
+		CachedValue<string> objCSignature;
+		public string ObjCSignature => objCSignature.Value;
+
+		protected abstract string GetMonoSignature ();
+		CachedValue<string> monoSignature;
+		public string MonoSignature => monoSignature.Value;
+
+		public void Freeze ()
+		{
+			objCSignature.Freeze ();
+			monoSignature.Freeze ();
+		}
 	}
 
 	public class ProcessedMethod : ProcessedMemberWithParameters {
 		public MethodInfo Method { get; private set; }
 		public bool IsOperator { get; set; }
+		public bool IsPropertyImplementation { get; set; }
 
 		public string NameOverride { get; set; }
 		public string ManagedName { get; set; }
@@ -223,15 +206,9 @@ namespace Embeddinator {
 			FirstDefaultParameter = -1;
 		}
 
-		protected override void ComputeSignatures ()
-		{
-			ObjCSignature = GetObjcSignature ();
-			MonoSignature = GetMonoSignature ();
-		}
-
 		public override string ToString () => ToString (Method);
 
-		string GetMonoSignature ()
+		protected override string GetMonoSignature ()
 		{
 			var mono = new StringBuilder (Method.Name);
 
@@ -249,7 +226,7 @@ namespace Embeddinator {
 			return mono.ToString ();
 		}
 
-		string GetObjcSignature ()
+		protected override string GetObjcSignature ()
 		{
 			string objName = BaseName;
 
@@ -290,14 +267,20 @@ namespace Embeddinator {
 		public ProcessedProperty (PropertyInfo property, Processor processor) : base (processor)
 		{
 			Property = property;
-
-			var g = Property.GetGetMethod ();
-			if (g != null)
-				GetMethod = new ProcessedMethod (g, Processor);
-
-			var s = Property.GetSetMethod ();
-			if (s != null)
-				SetMethod = new ProcessedMethod (s, Processor);
+			getMethod = new CachedValue<ProcessedMethod> (() => {
+				var getter = Property.GetGetMethod ();
+				if (getter != null) {
+					return new ProcessedMethod (getter, Processor) { NameOverride = GetterName, IsPropertyImplementation = true };
+				}
+				return null;
+			});
+			setMethod = new CachedValue<ProcessedMethod> (() => {
+				var setter = Property.GetSetMethod ();
+				if (setter != null) {
+					return new ProcessedMethod (setter, Processor) { NameOverride = SetterName, IsPropertyImplementation = true };
+				}
+				return null;
+			});
 		}
 
 		public override string ToString () => Property.ToString ();
@@ -305,8 +288,8 @@ namespace Embeddinator {
 		public string Name => NameOverride != null ? NameOverride : Property.Name.CamelCase ();
 		public string NameOverride { get; set; }
 
-		public bool HasGetter => GetMethod != null;
-		public bool HasSetter => SetMethod != null;
+		public bool HasGetter => Property.GetGetMethod () != null;
+		public bool HasSetter => Property.GetSetMethod () != null;
 
 		public string GetterName {
 			get {
@@ -324,8 +307,17 @@ namespace Embeddinator {
 			}
 		}
 
-		public ProcessedMethod GetMethod { get; private set; }
-		public ProcessedMethod SetMethod { get; private set; }
+		CachedValue<ProcessedMethod> getMethod;
+		public ProcessedMethod GetMethod => getMethod.Value;
+
+		CachedValue<ProcessedMethod> setMethod;
+		public ProcessedMethod SetMethod => setMethod.Value;
+
+		public void Freeze ()
+		{
+			getMethod.Freeze ();
+			setMethod.Freeze ();
+		}
 	}
 
 	public enum ConstructorType {
@@ -354,15 +346,9 @@ namespace Embeddinator {
 			FirstDefaultParameter = -1;
 		}
 
-		protected override void ComputeSignatures ()
-		{
-			ObjCSignature = GetObjcSignature ();
-			MonoSignature = GetMonoSignature ();
-		}
-
 		public override string ToString () => ToString (Constructor);
 
-		string GetMonoSignature ()
+		protected override string GetMonoSignature ()
 		{
 			var mono = new StringBuilder (Constructor.Name);
 
@@ -380,7 +366,7 @@ namespace Embeddinator {
 			return mono.ToString ();
 		}
 
-		string GetObjcSignature ()
+		protected override string GetObjcSignature ()
 		{
 			var objc = new StringBuilder (BaseName);
 
