@@ -209,6 +209,14 @@ There should be an earlier warning giving more information why type `T` is not s
 
 Note: Supported features will evolve with new versions of the tool.
 
+<h3><a name="EM1051"/>Element `E` is generated instead as `F` because its name conflicts with an important objective-c selector.</h3>
+
+This is a **warning** that the element `E` will be generated instead as `F` because its name conflicts with an important objective-c selector.
+
+Selectors on the [NSObjectProtocol](https://developer.apple.com/reference/objectivec/1418956-nsobject?language=objc) have important meaning in objective-c and must be overridden carefully.
+
+Note: The list of reserved selectors will evolve with new versions of the tool.
+
 
 <!-- 2xxx: code generation -->
 

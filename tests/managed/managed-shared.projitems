@@ -31,6 +31,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)overloads.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)nestedClasses.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)arrays.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)duplicates.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="$(MSBuildThisFileDirectory)subscripts.tt">

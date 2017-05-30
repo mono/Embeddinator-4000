@@ -320,19 +320,19 @@
 
 	Fields_Struct *empty = [Fields_Struct empty];
 	XCTAssertNotNil (empty, "empty / struct static readonly");
-	XCTAssertNil ([empty class], "empty / class uninitialized");
+	XCTAssertNil ([empty managedClass], "empty / class uninitialized");
 
 	Fields_Struct *struct1 = [[Fields_Struct alloc] initWithEnabled:true];
 	XCTAssertTrue (struct1.boolean, "init / boolean / true");
 	struct1.boolean = false;
 	XCTAssertFalse (struct1.boolean, "init / boolean / set 1");
 
-	XCTAssertNotNil (struct1.class, "init / class initialized 1");
-	XCTAssertFalse (struct1.class.boolean, "init / class / boolean / default");
-	struct1.class = nil;
-	XCTAssertNil (struct1.class, "init / class set 1");
-	struct1.class = [[Fields_Class alloc] initWithEnabled:true];
-	XCTAssertTrue (struct1.class.boolean, "init / class / boolean / true");
+	XCTAssertNotNil (struct1.managedClass, "init / class initialized 1");
+	XCTAssertFalse (struct1.managedClass.boolean, "init / class / boolean / default");
+	struct1.managedClass = nil;
+	XCTAssertNil (struct1.managedClass, "init / class set 1");
+	struct1.managedClass = [[Fields_Class alloc] initWithEnabled:true];
+	XCTAssertTrue (struct1.managedClass.boolean, "init / class / boolean / true");
 
 	Fields_Struct *struct2 = [[Fields_Struct alloc] initWithEnabled:false];
 	XCTAssertNotNil ([struct2 class], "init / class initialized 2");
@@ -1311,6 +1311,12 @@
 	while ([thread isFinished] == NO) {
 		usleep (1000); // there's no [NSThread join]...
 	}
+}
+
+- (void)testRestrictedNames {
+	Duplicates_WithRestrictedNamed * d = [[Duplicates_WithRestrictedNamed alloc] init];
+	Class c = [d class];
+	XCTAssertNotEqual(42, [d hash], "Must not call instance Hash ()");
 }
 
 #pragma clang diagnostic pop

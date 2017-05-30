@@ -160,6 +160,13 @@ namespace Embeddinator {
 
 		public ParameterInfo[] Parameters { get; protected set; }
 
+		[Obsolete] // https://github.com/mono/Embeddinator-4000/issues/370
+		public void Invalidate ()
+		{
+			objCSignature = null;
+			monoSignature = null;
+		}
+
 		string objCSignature;
 		public string ObjCSignature {
 			get {
@@ -192,6 +199,7 @@ namespace Embeddinator {
 	public class ProcessedMethod : ProcessedMemberWithParameters {
 		public MethodInfo Method { get; private set; }
 		public bool IsOperator { get; set; }
+
 		public string NameOverride { get; set; }
 		public string ManagedName { get; set; }
 
@@ -199,7 +207,7 @@ namespace Embeddinator {
 			get {
 				if (NameOverride != null)
 					return NameOverride;
-				return IsOperator? Method.Name.Substring (3).CamelCase () : Method.Name.CamelCase ();
+				return IsOperator ? Method.Name.Substring (3).CamelCase () : Method.Name.CamelCase ();
 			}
 		}
 
@@ -294,8 +302,28 @@ namespace Embeddinator {
 
 		public override string ToString () => Property.ToString ();
 
+		public string Name => NameOverride != null ? NameOverride : Property.Name.CamelCase ();
+		public string NameOverride { get; set; }
+
 		public bool HasGetter => GetMethod != null;
 		public bool HasSetter => SetMethod != null;
+
+		public string GetterName {
+			get {
+				if (!HasGetter)
+					return null;
+				return (NameOverride ?? Property.Name).CamelCase ();
+			}
+		}
+
+		public string SetterName {
+			get {
+				if (!HasSetter)
+					return null;
+				return "set" + (NameOverride ?? Property.Name).PascalCase ();
+			}
+		}
+
 		public ProcessedMethod GetMethod { get; private set; }
 		public ProcessedMethod SetMethod { get; private set; }
 	}
@@ -382,6 +410,9 @@ namespace Embeddinator {
 		public string TypeName { get; private set; }
 		public string ObjCName { get; private set; }
 
+		public string Name => (NameOverride ?? Field.Name).CamelCase ();
+		public string NameOverride { get; set; }
+
 		public ProcessedFieldInfo (FieldInfo field, Processor processor) : base (processor)
 		{
 			Field = field;
@@ -391,5 +422,8 @@ namespace Embeddinator {
 
 		// linker compatible signature
 		public override string ToString () => Field.FieldType.FullName + " " + Field.Name;
+
+		public string GetterName => (NameOverride ?? Field.Name).CamelCase ();
+		public string SetterName => "set" + (NameOverride ?? Field.Name).PascalCase ();
 	}
 }
