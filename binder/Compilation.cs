@@ -1,4 +1,4 @@
-﻿﻿﻿using System;
+﻿﻿﻿﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -351,7 +351,7 @@ namespace MonoEmbeddinator4000
 
             var executableSuffix = Platform.IsWindows ? ".exe" : string.Empty;
             var javac = $"{Path.Combine(GetJavaSdkPath(), "bin", "javac" + executableSuffix)}";
-            var classesDir = "classes";
+            var classesDir = Path.Combine(Options.OutputDir, "classes");
 
             var args = new List<string> {
                 string.Join(" ", files.Select(file => Path.GetFullPath(file))),
@@ -382,11 +382,12 @@ namespace MonoEmbeddinator4000
 
             var executableSuffix = Platform.IsWindows ? ".exe" : string.Empty;
             var jar = $"{Path.Combine(GetJavaSdkPath(), "bin", "jar" + executableSuffix)}";
+            var classesDir = Path.Combine(Options.OutputDir, "classes");
 
             var args = new List<string> {
                 "cvf",
-                "classes.jar",
-                "-C classes ."
+                Path.Combine(Options.OutputDir, "classes.jar"),
+                $"-C {classesDir} ."
             };
 
             var invocation = string.Join(" ", args);
