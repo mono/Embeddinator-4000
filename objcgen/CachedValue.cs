@@ -15,16 +15,13 @@ namespace Embeddinator
 			CalculateProc = calculateProc;
 		}
 
-		public T Value
-		{
-			get
-			{
+		public T Value {
+			get {
 				if (IsFrozen) {
 					if (LastCalculatedValue == null)
 						LastCalculatedValue = CalculateProc ();
 					return LastCalculatedValue;
-				}
-				else {
+				} else {
 					return CalculateProc ();
 				}
 			}
