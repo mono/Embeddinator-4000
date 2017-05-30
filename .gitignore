@@ -63,4 +63,4 @@ xcuserdata/
 *.ipa
 *.dSYM.zip
 *.dSYM
-
+*.nupkg
