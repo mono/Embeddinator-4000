@@ -395,14 +395,17 @@ namespace MonoEmbeddinator4000
             Invoke(jar, invocation);
         }
 
-        string FindDirectory(string dir, int depth = 0)
+        string FindDirectory(string dir)
         {
-            if (Directory.Exists(dir))
-                return Path.GetFullPath(dir);
-            if (depth > 3)
-                throw new Exception($"Cannot find {Path.GetFileName(dir)}!");
+            for (int i = 0; i <= 3; i++)
+            {
+                if (Directory.Exists(dir))
+                    return Path.GetFullPath(dir);
 
-            return FindDirectory(Path.Combine("..", dir), depth + 1);
+                dir = Path.Combine("..", dir);
+            }
+
+            throw new Exception($"Cannot find {Path.GetFileName(dir)}!");
         }
 
         private void AndroidLogger_Info(string task, string message)
