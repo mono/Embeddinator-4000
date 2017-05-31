@@ -401,9 +401,13 @@ namespace MonoEmbeddinator4000
                 File.Copy(output, Path.Combine(platformDir, libName), true);
 
                 //Copy .NET assemblies
+                var assembliesDir = Path.Combine(classesDir, "assemblies");
+                if (!Directory.Exists(assembliesDir))
+                    Directory.CreateDirectory(assembliesDir);
+
                 foreach (var assembly in Project.Assemblies)
                 {
-                    File.Copy(assembly, Path.Combine(classesDir, Path.GetFileName(assembly)), true);
+                    File.Copy(assembly, Path.Combine(assembliesDir, Path.GetFileName(assembly)), true);
                 }
             }
 

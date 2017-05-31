@@ -104,9 +104,10 @@ public final class Runtime {
         File assemblyFile = new File(assemblyPath + ".dll");
 
         if (!assemblyFile.exists()) {
-            InputStream stream = Runtime.class.getResourceAsStream("/" + library + ".dll");
+            String resourcePath = "/assemblies/" + library + ".dll";
+            InputStream stream = Runtime.class.getResourceAsStream(resourcePath);
             if (stream == null) {
-                pendingException.set(new RuntimeException("Unable to locate " + library + ".dll within jar file!"));
+                pendingException.set(new RuntimeException("Unable to locate " + resourcePath + " within jar file!"));
                 return;
             }
 
