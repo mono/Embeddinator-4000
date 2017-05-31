@@ -1,4 +1,4 @@
-﻿﻿﻿﻿using System;
+﻿﻿﻿﻿﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -387,6 +387,25 @@ namespace MonoEmbeddinator4000
                 Path.Combine(Options.OutputDir, name + ".jar"),
                 $"-C {classesDir} ."
             };
+
+            // On desktop Java, we need a few more files included
+            if (Options.Compilation.Platform == TargetPlatform.MacOS)
+            {
+                //Copy native libs
+                var platformDir = Path.Combine(classesDir, "darwin");
+                if (!Directory.Exists(platformDir))
+                    Directory.CreateDirectory(platformDir);
+
+                var libName = $"lib{name}.dylib";
+                var output = Path.Combine(Options.OutputDir, libName);
+                File.Copy(output, Path.Combine(platformDir, libName), true);
+
+                //Copy .NET assemblies
+                foreach (var assembly in Project.Assemblies)
+                {
+                    File.Copy(assembly, Path.Combine(classesDir, Path.GetFileName(assembly)), true);
+                }
+            }
 
             var invocation = string.Join(" ", args);
             Invoke(jar, invocation);
