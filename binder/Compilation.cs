@@ -314,7 +314,7 @@ namespace MonoEmbeddinator4000
             if (Options.GeneratorKind == GeneratorKind.Java)
             {
                 CompileJava(files);
-                CreateJar(files);
+                CreateJar();
             }
         }
 
@@ -375,11 +375,8 @@ namespace MonoEmbeddinator4000
             Invoke(javac, invocation);
         }
 
-        void CreateJar(IEnumerable<string> files)
+        void CreateJar()
         {
-            var supportFiles = Directory.GetFiles(FindDirectory("support"), "*.class", SearchOption.AllDirectories);
-            files = files.Select(f => f.Replace(".java", ".class"));
-
             var executableSuffix = Platform.IsWindows ? ".exe" : string.Empty;
             var jar = $"{Path.Combine(GetJavaSdkPath(), "bin", "jar" + executableSuffix)}";
             var classesDir = Path.Combine(Options.OutputDir, "classes");
