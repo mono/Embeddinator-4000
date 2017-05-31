@@ -39,6 +39,7 @@ namespace ObjC {
 
 				ProcessPotentialName (processedMethod);
 
+				processedMethod.Freeze ();
 				yield return processedMethod;
 			}
 		}
@@ -72,6 +73,7 @@ namespace ObjC {
 
 				ProcessPotentialName (processedProperty);
 
+				processedProperty.Freeze ();
 				yield return processedProperty;
 			}
 		}
@@ -126,6 +128,7 @@ namespace ObjC {
 				if (duplicateNames.Contains (CreateStringRep(constructor)))
 					processedConstructor.FallBackToTypeName = true;
 
+				processedConstructor.Freeze ();
 				yield return processedConstructor;
 			}
 		}

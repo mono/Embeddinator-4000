@@ -326,6 +326,7 @@
     <Compile Include="system-check.cs" />
     <Compile Include="embedder.cs" />
     <Compile Include="utils.cs" />
+    <Compile Include="CachedValue.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="support\" />

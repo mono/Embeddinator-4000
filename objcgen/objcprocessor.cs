@@ -307,7 +307,7 @@ namespace ObjC {
 							extmethods = new List<ProcessedMethod> ();
 							extensions.Add (extended_type, extmethods);
 						}
-						extmethods.Add (new ProcessedMethod  (mi, this));
+						extmethods.Add (new ProcessedMethod  (mi, this) { IsExtension = true } );
 						continue;
 					}
 				}
