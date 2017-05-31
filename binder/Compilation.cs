@@ -365,7 +365,7 @@ namespace MonoEmbeddinator4000
 
             //JNA library
             args.Add("-cp");
-            args.Add(Path.Combine(FindDirectory("deps/java"), "jna-4.4.0.jar"));
+            args.Add(Path.Combine(FindDirectory("external"), "jna", "jna-4.4.0.jar"));
 
             //If "classes" directory doesn't exists, javac fails
             if (!Directory.Exists(classesDir))
