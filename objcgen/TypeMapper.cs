@@ -10,7 +10,7 @@ namespace Embeddinator
 		IEnumerable<string> GetNames (ProcessedMemberBase member)
 		{
 			if (member is ProcessedMemberWithParameters) {
-				yield return StripFullSignature (((ProcessedMemberWithParameters)member).ObjRawCSignature);
+				yield return ((ProcessedMemberWithParameters)member).ObjRawCSignature;
 			} else if (member is ProcessedProperty) {
 				ProcessedProperty property = (ProcessedProperty)member;
 				if (property.HasGetter)
@@ -24,12 +24,6 @@ namespace Embeddinator
 			} else {
 				throw new NotImplementedException ();
 			}
-		}
-
-		string StripFullSignature (string s)
-		{
-			System.Console.WriteLine (s);
-			return s;
 		}
 
 		Dictionary <string, ProcessedMemberBase> GetRegistrationForType (ProcessedType t)

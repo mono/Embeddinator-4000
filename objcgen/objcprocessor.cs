@@ -88,18 +88,18 @@ namespace ObjC {
 				Constructors = new List<ProcessedConstructor> (),
 			};
 			var ticks = t.GetProperty ("Ticks");
-			system_datetime.Properties.Add (new ProcessedProperty (ticks, this));
+			system_datetime.Properties.Add (new ProcessedProperty (ticks, this, system_datetime));
 
 			var kind = t.GetProperty ("Kind");
-			system_datetime.Properties.Add (new ProcessedProperty (kind, this));
+			system_datetime.Properties.Add (new ProcessedProperty (kind, this, system_datetime));
 
 			var dtk = corlib.Assembly.GetType ("System.DateTimeKind");
 			var longT = corlib.Assembly.GetType ("System.Int64");
 			var ctorLongKind = t.GetConstructor (new Type [] { longT, dtk });
-			system_datetime.Constructors.Add (new ProcessedConstructor (ctorLongKind, this));
+			system_datetime.Constructors.Add (new ProcessedConstructor (ctorLongKind, this, system_datetime));
 
 			var toUniversalTime = t.GetMethod ("ToUniversalTime");
-			system_datetime.Methods.Add (new ProcessedMethod (toUniversalTime, this));
+			system_datetime.Methods.Add (new ProcessedMethod (toUniversalTime, this, system_datetime));
 
 			AddExtraType (system_datetime);
 			return true;
