@@ -29,7 +29,10 @@
 package mono.embeddinator;
 
 import com.sun.jna.*;
-import com.sun.jna.ptr.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.*;
 
 public final class Runtime {
@@ -96,9 +99,27 @@ public final class Runtime {
     public static void initialize(String library) {
         System.setProperty("jna.encoding", "utf8");
 
+        String tmp = System.getProperty("java.io.tmpdir");
+        String assemblyPath = Utilities.combinePath(tmp, library);
+        File assemblyFile = new File(assemblyPath + ".dll");
+
+        if (!assemblyFile.exists()) {
+            InputStream stream = Runtime.class.getResourceAsStream("/" + library + ".dll");
+            if (stream == null) {
+                pendingException.set(new RuntimeException("Unable to locate " + library + ".dll within jar file!"));
+                return;
+            }
+
+            try {
+                Files.copy(stream, assemblyFile.toPath());
+            } catch (IOException e) {
+                pendingException.set(new RuntimeException(e));
+                return;
+            }
+        }
+
         runtimeLibrary = Native.loadLibrary(library, RuntimeLibrary.class);
-        
-        String assemblyPath = Utilities.combinePath(System.getProperty("user.dir"), library);
+
         runtimeLibrary.mono_embeddinator_set_assembly_path(assemblyPath);
         error = new RuntimeLibrary.ErrorCallback() {
             public void invoke(RuntimeLibrary.Error.ByValue error) {
