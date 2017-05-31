@@ -114,8 +114,9 @@ namespace Embeddinator {
 
 		protected Processor Processor;
 		public bool FallBackToTypeName { get; set; }
+		public ProcessedType DeclaringType { get; set; }
 
-		public ProcessedMemberBase (Processor processor)
+		public ProcessedMemberBase (Processor processor, ProcessedType declaringType)
 		{
 			Processor = processor;
 		}
@@ -152,7 +153,7 @@ namespace Embeddinator {
 	}
 
 	public abstract class ProcessedMemberWithParameters : ProcessedMemberBase {
-		public ProcessedMemberWithParameters (Processor processor) : base (processor)
+		public ProcessedMemberWithParameters (Processor processor, ProcessedType declaringType) : base (processor, declaringType)
 		{
 			objCSignature = new CachedValue<string> (GetObjcSignature);
 			monoSignature = new CachedValue<string> (GetMonoSignature);
@@ -195,10 +196,9 @@ namespace Embeddinator {
 		}
 
 		public MethodType MethodType { get; set; }
-		public ProcessedType DeclaringType { get; set; }
 		public bool IsExtension { get; set; }
 
-		public ProcessedMethod (MethodInfo method, Processor processor) : base (processor)
+		public ProcessedMethod (MethodInfo method, Processor processor, ProcessedType declaringType) : base (processor, declaringType)
 		{
 			Method = method;
 			MethodType = MethodType.Normal;
@@ -264,20 +264,20 @@ namespace Embeddinator {
 	public class ProcessedProperty: ProcessedMemberBase {
 		public PropertyInfo Property { get; private set; }
 
-		public ProcessedProperty (PropertyInfo property, Processor processor) : base (processor)
+		public ProcessedProperty (PropertyInfo property, Processor processor, ProcessedType declaringType) : base (processor, declaringType)
 		{
 			Property = property;
 			getMethod = new CachedValue<ProcessedMethod> (() => {
 				var getter = Property.GetGetMethod ();
 				if (getter != null) {
-					return new ProcessedMethod (getter, Processor) { NameOverride = GetterName, IsPropertyImplementation = true };
+					return new ProcessedMethod (getter, Processor, declaringType) { NameOverride = GetterName, IsPropertyImplementation = true };
 				}
 				return null;
 			});
 			setMethod = new CachedValue<ProcessedMethod> (() => {
 				var setter = Property.GetSetMethod ();
 				if (setter != null) {
-					return new ProcessedMethod (setter, Processor) { NameOverride = SetterName, IsPropertyImplementation = true };
+					return new ProcessedMethod (setter, Processor, declaringType) { NameOverride = SetterName, IsPropertyImplementation = true };
 				}
 				return null;
 			});
@@ -339,7 +339,7 @@ namespace Embeddinator {
 		}
 		public ConstructorType ConstructorType { get; set; }
 
-		public ProcessedConstructor (ConstructorInfo constructor, Processor processor) : base (processor)
+		public ProcessedConstructor (ConstructorInfo constructor, Processor processor, ProcessedType declaringType) : base (processor, declaringType)
 		{
 			Constructor = constructor;
 			Parameters = Constructor.GetParameters ();
@@ -399,7 +399,7 @@ namespace Embeddinator {
 		public string Name => (NameOverride ?? Field.Name).CamelCase ();
 		public string NameOverride { get; set; }
 
-		public ProcessedFieldInfo (FieldInfo field, Processor processor) : base (processor)
+		public ProcessedFieldInfo (FieldInfo field, Processor processor, ProcessedType declaringType) : base (processor, declaringType)
 		{
 			Field = field;
 			TypeName = ObjC.NameGenerator.GetTypeName (Field.DeclaringType);

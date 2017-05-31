@@ -66,10 +66,9 @@ namespace ObjC {
 			return method.IsOperatorMethod () || OperatorOverloads.MatchesOperatorFriendlyName (method);
 		}
 
-		protected IEnumerable<ProcessedProperty> PostProcessProperties (IEnumerable<PropertyInfo> properties)
+		protected IEnumerable<ProcessedProperty> PostProcessProperties (IEnumerable<ProcessedProperty> properties)
 		{
-			foreach (PropertyInfo property in properties) {
-				ProcessedProperty processedProperty = new ProcessedProperty (property, this);
+			foreach (ProcessedProperty processedProperty in properties) {
 
 				ProcessPotentialName (processedProperty);
 
@@ -90,10 +89,9 @@ namespace ObjC {
 			}
 		}
 
-		protected IEnumerable<ProcessedProperty> PostProcessSubscriptProperties (IEnumerable<PropertyInfo> properties)
+		protected IEnumerable<ProcessedProperty> PostProcessSubscriptProperties (IEnumerable<ProcessedProperty> properties)
 		{
-			foreach (PropertyInfo property in properties) {
-				ProcessedProperty processedProperty = new ProcessedProperty (property, this);
+			foreach (ProcessedProperty processedProperty in properties) {
 				yield return processedProperty;
 			}
 		}
@@ -107,25 +105,21 @@ namespace ObjC {
 			}
 		}
 
-		protected IEnumerable<ProcessedFieldInfo> PostProcessFields (IEnumerable<FieldInfo> fields)
+		protected IEnumerable<ProcessedFieldInfo> PostProcessFields (IEnumerable<ProcessedFieldInfo> fields)
 		{
-			foreach (FieldInfo field in fields) {
-				ProcessedFieldInfo processedField = new ProcessedFieldInfo (field, this);
-
+			foreach (ProcessedFieldInfo processedField in fields) {
 				ProcessPotentialName (processedField);
 
 				yield return processedField;
 			}
 		}
 
-		protected IEnumerable<ProcessedConstructor> PostProcessConstructors (IEnumerable<ConstructorInfo> constructors)
+		protected IEnumerable<ProcessedConstructor> PostProcessConstructors (IEnumerable<ProcessedConstructor> constructors)
 		{
 			HashSet<string> duplicateNames = FindDuplicateNames (constructors);
 
-			foreach (ConstructorInfo constructor in constructors) {
-				ProcessedConstructor processedConstructor = new ProcessedConstructor (constructor, this);
-
-				if (duplicateNames.Contains (CreateStringRep(constructor)))
+			foreach (ProcessedConstructor processedConstructor in constructors) {
+				if (duplicateNames.Contains (CreateStringRep (processedConstructor.Constructor)))
 					processedConstructor.FallBackToTypeName = true;
 
 				processedConstructor.Freeze ();
@@ -167,11 +161,11 @@ namespace ObjC {
 			return new HashSet<string> (methodNames.Where (x => x.Value > 1).Select (x => x.Key));
 		}
 
-		static HashSet<string> FindDuplicateNames (IEnumerable<MemberInfo> members)
+		static HashSet<string> FindDuplicateNames (IEnumerable<ProcessedConstructor> members)
 		{
 			Dictionary<string, int> methodNames = new Dictionary<string, int> ();
-			foreach (MemberInfo member in members)
-				methodNames.IncrementValue (CreateStringRep (member));
+			foreach (var member in members)
+				methodNames.IncrementValue (CreateStringRep (member.Constructor));
 			return new HashSet<string> (methodNames.Where (x => x.Value > 1).Select (x => x.Key));
 		}
 	}

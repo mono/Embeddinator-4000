@@ -192,7 +192,7 @@ namespace Embeddinator
 
 			Console.WriteLine ("Processing assemblies...");
 			var p = new ObjCProcessor ();
-			p.Process (Assemblies);
+			p.Process (Assemblies.Select (x => new ProcessedAssembly (x) { UserCode = true}));
 
 			Console.WriteLine ("Generating binding code...");
 			var g = new ObjCGenerator () {
