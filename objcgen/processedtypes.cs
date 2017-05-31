@@ -174,7 +174,6 @@ namespace Embeddinator {
 		CachedValue<string> objRawCSignature;
 		public string ObjRawCSignature => objRawCSignature.Value;
 
-
 		protected abstract string GetMonoSignature ();
 		CachedValue<string> monoSignature;
 		public string MonoSignature => monoSignature.Value;

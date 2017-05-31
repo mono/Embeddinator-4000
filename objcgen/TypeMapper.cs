@@ -38,7 +38,6 @@ namespace Embeddinator
 		{
 			var typeRegistration = GetRegistrationForType (member.DeclaringType);
 			if (typeRegistration != null) {
-
 				foreach (var name in GetNames (member)) {
 					if (typeRegistration.ContainsKey (name))
 						return true;
