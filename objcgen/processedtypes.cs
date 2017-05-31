@@ -119,6 +119,7 @@ namespace Embeddinator {
 		public ProcessedMemberBase (Processor processor, ProcessedType declaringType)
 		{
 			Processor = processor;
+			DeclaringType = declaringType;
 		}
 
 		// this format can be consumed by the linker xml files
@@ -155,7 +156,8 @@ namespace Embeddinator {
 	public abstract class ProcessedMemberWithParameters : ProcessedMemberBase {
 		public ProcessedMemberWithParameters (Processor processor, ProcessedType declaringType) : base (processor, declaringType)
 		{
-			objCSignature = new CachedValue<string> (GetObjcSignature);
+			objCSignature = new CachedValue<string> (() => GetObjcSignature (true));
+			objRawCSignature = new CachedValue<string> (() => GetObjcSignature (false));
 			monoSignature = new CachedValue<string> (GetMonoSignature);
 		}
 
@@ -164,9 +166,14 @@ namespace Embeddinator {
 		public ParameterInfo[] Parameters { get; protected set; }
 		public int FirstDefaultParameter { get; set; }
 
-		protected abstract string GetObjcSignature ();
+		protected abstract string GetObjcSignature (bool includeParamNames);
+
 		CachedValue<string> objCSignature;
 		public string ObjCSignature => objCSignature.Value;
+
+		CachedValue<string> objRawCSignature;
+		public string ObjRawCSignature => objRawCSignature.Value;
+
 
 		protected abstract string GetMonoSignature ();
 		CachedValue<string> monoSignature;
@@ -175,6 +182,7 @@ namespace Embeddinator {
 		public void Freeze ()
 		{
 			objCSignature.Freeze ();
+			objRawCSignature.Freeze ();
 			monoSignature.Freeze ();
 		}
 	}
@@ -226,7 +234,7 @@ namespace Embeddinator {
 			return mono.ToString ();
 		}
 
-		protected override string GetObjcSignature ()
+		protected override string GetObjcSignature (bool includeParamNames)
 		{
 			string objName = BaseName;
 
@@ -239,8 +247,10 @@ namespace Embeddinator {
 			for (int n = 0; n < end; ++n) {
 				ParameterInfo p = Parameters[n];
 
-				if (objc.Length > objName.Length)
-					objc.Append (' ');
+				if (includeParamNames) {
+					if (objc.Length > objName.Length)
+						objc.Append (' ');
+				}
 
 				string paramName = FallBackToTypeName ? NameGenerator.GetParameterTypeName (p.ParameterType) : p.Name;
 				if (n > 0 || !IsExtension) {
@@ -251,9 +261,13 @@ namespace Embeddinator {
 						objc.Append (paramName.CamelCase ());
 				}
 
-				if (n > 0 || !IsExtension) {
-					string ptname = NameGenerator.GetObjCParamTypeName (p, Processor.Types);
-					objc.Append (":(").Append (ptname).Append (")").Append (NameGenerator.GetExtendedParameterName (p, Parameters));
+				if (includeParamNames) {
+					if (n > 0 || !IsExtension) {
+						string ptname = NameGenerator.GetObjCParamTypeName (p, Processor.Types);
+						objc.Append (":(").Append (ptname).Append (")").Append (NameGenerator.GetExtendedParameterName (p, Parameters));
+					}
+				} else {
+					objc.Append (":");
 				}
 			}
 
@@ -366,7 +380,7 @@ namespace Embeddinator {
 			return mono.ToString ();
 		}
 
-		protected override string GetObjcSignature ()
+		protected override string GetObjcSignature (bool includeParamNames)
 		{
 			var objc = new StringBuilder (BaseName);
 
@@ -374,8 +388,10 @@ namespace Embeddinator {
 			for (int n = 0; n < end; ++n) {
 				ParameterInfo p = Parameters[n];
 
-				if (objc.Length > BaseName.Length)
-					objc.Append (' ');
+				if (includeParamNames) {
+					if (objc.Length > BaseName.Length)
+						objc.Append (' ');
+				}
 
 				string paramName = FallBackToTypeName ? NameGenerator.GetParameterTypeName (p.ParameterType) : p.Name;
 				if (n == 0)
@@ -383,8 +399,12 @@ namespace Embeddinator {
 				else
 					objc.Append (paramName.CamelCase ());
 
-				string ptname = NameGenerator.GetObjCParamTypeName (p, Processor.Types);
-				objc.Append (":(").Append (ptname).Append (")").Append (NameGenerator.GetExtendedParameterName (p, Parameters));
+				if (includeParamNames) {
+					string ptname = NameGenerator.GetObjCParamTypeName (p, Processor.Types);
+					objc.Append (":(").Append (ptname).Append (")").Append (NameGenerator.GetExtendedParameterName (p, Parameters));
+				} else {
+					objc.Append (":");
+				}
 			}
 
 			return objc.ToString ();

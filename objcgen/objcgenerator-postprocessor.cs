@@ -13,10 +13,10 @@ namespace ObjC {
 	// to the input of the generation step
 	public partial class ObjCProcessor {
 
+		TypeMapper Mapper = new TypeMapper ();
+
 		protected IEnumerable<ProcessedMethod> PostProcessMethods (IEnumerable<ProcessedMethod> methods)
 		{
-			HashSet<string> duplicateNames = FindDuplicateNames (methods);
-
 			var equals = new HashSet<MethodInfo> ();
 			foreach (var m in methods) {
 				if (m.MethodType == MethodType.NSObjectProcotolIsEqual)
@@ -31,13 +31,14 @@ namespace ObjC {
 					continue;
 				}
 
-				if (duplicateNames.Contains (CreateStringRep (method)) && method.Name != "CompareTo") // HACK
-					processedMethod.FallBackToTypeName = true;
-
 				if (IsOperatorOrFriendlyVersion (method))
 					processedMethod.IsOperator = true;
 
 				ProcessPotentialName (processedMethod);
+
+				Mapper.CheckForDuplicateSelectors (processedMethod);
+
+				Mapper.Register (processedMethod);
 
 				processedMethod.Freeze ();
 				yield return processedMethod;
@@ -72,6 +73,10 @@ namespace ObjC {
 
 				ProcessPotentialName (processedProperty);
 
+				Mapper.CheckForDuplicateSelectors (processedProperty);
+
+				Mapper.Register (processedProperty);
+
 				processedProperty.Freeze ();
 				yield return processedProperty;
 			}
@@ -92,6 +97,11 @@ namespace ObjC {
 		protected IEnumerable<ProcessedProperty> PostProcessSubscriptProperties (IEnumerable<ProcessedProperty> properties)
 		{
 			foreach (ProcessedProperty processedProperty in properties) {
+
+				Mapper.CheckForDuplicateSelectors (processedProperty);
+
+				Mapper.Register (processedProperty);
+
 				yield return processedProperty;
 			}
 		}
@@ -110,63 +120,24 @@ namespace ObjC {
 			foreach (ProcessedFieldInfo processedField in fields) {
 				ProcessPotentialName (processedField);
 
+				Mapper.CheckForDuplicateSelectors (processedField);
+
+				Mapper.Register (processedField);
+
 				yield return processedField;
 			}
 		}
 
 		protected IEnumerable<ProcessedConstructor> PostProcessConstructors (IEnumerable<ProcessedConstructor> constructors)
 		{
-			HashSet<string> duplicateNames = FindDuplicateNames (constructors);
+			foreach (ProcessedConstructor processedConstructor in constructors) {				
+				Mapper.CheckForDuplicateSelectors (processedConstructor);
 
-			foreach (ProcessedConstructor processedConstructor in constructors) {
-				if (duplicateNames.Contains (CreateStringRep (processedConstructor.Constructor)))
-					processedConstructor.FallBackToTypeName = true;
+				Mapper.Register (processedConstructor);
 
 				processedConstructor.Freeze ();
 				yield return processedConstructor;
 			}
-		}
-
-		static string CreateStringRep (ConstructorInfo constructor)
-		{
-			StringBuilder str = new StringBuilder ();
-			foreach (var arg in constructor.GetParameters ())
-				str.Append (arg.Name + ":"); // This format is arbitrary
-			return str.ToString ();
-		}
-
-		static string CreateStringRep (MethodInfo method)
-		{
-			StringBuilder str = new StringBuilder (method.Name);
-			foreach (var arg in method.GetParameters ())
-				str.Append (":"); // This format is arbitrary
-			return str.ToString ();
-		}
-
-		static string CreateStringRep (MemberInfo i)
-		{
-			if (i is ConstructorInfo)
-				return CreateStringRep ((ConstructorInfo)i);
-			if (i is MethodInfo)
-				return CreateStringRep ((MethodInfo)i);
-			return i.Name;
-		}
-
-		// temporary quasi-duplicate
-		static HashSet<string> FindDuplicateNames (IEnumerable<ProcessedMethod> members)
-		{
-			Dictionary<string, int> methodNames = new Dictionary<string, int> ();
-			foreach (var member in members)
-				methodNames.IncrementValue (CreateStringRep (member.Method));
-			return new HashSet<string> (methodNames.Where (x => x.Value > 1).Select (x => x.Key));
-		}
-
-		static HashSet<string> FindDuplicateNames (IEnumerable<ProcessedConstructor> members)
-		{
-			Dictionary<string, int> methodNames = new Dictionary<string, int> ();
-			foreach (var member in members)
-				methodNames.IncrementValue (CreateStringRep (member.Constructor));
-			return new HashSet<string> (methodNames.Where (x => x.Value > 1).Select (x => x.Key));
 		}
 	}
 
