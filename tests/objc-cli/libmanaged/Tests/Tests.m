@@ -507,7 +507,48 @@
 
 	NSArray<NSDecimalNumber *> *decimalrefNilarr = nil;
 	[Type_Decimal reverseDecimalArrRefDecArr:&decimalrefNilarr];
-	XCTAssertNil(decimalrefNilarr, "decimalrefNilarr");
+	XCTAssertNil (decimalrefNilarr, "decimalrefNilarr");
+
+	NSDate *distantFuture = [Type_DateTime returnDateDatetime:[NSDate distantFuture]];
+	XCTAssertNotNil (distantFuture, "distantFuture");
+
+	NSDate *verydistantFuture = [NSDate dateWithTimeIntervalSinceReferenceDate:[distantFuture timeIntervalSinceReferenceDate] * 8];
+	NSDate *netmaxverydistantFuture = [Type_DateTime returnDateDatetime:verydistantFuture];
+	NSDate *nsnetmax = [NSDate dateWithTimeIntervalSinceReferenceDate:(NSTimeInterval) 252423993600];
+	XCTAssertEqualWithAccuracy ([nsnetmax timeIntervalSinceReferenceDate], [netmaxverydistantFuture timeIntervalSinceReferenceDate], 0.001, "netmaxverydistantFuture");
+
+	NSDate *distantPast = [Type_DateTime returnDateDatetime:[NSDate distantPast]];
+	NSDate *nsnetmin = [NSDate dateWithTimeIntervalSinceReferenceDate:(NSTimeInterval) -63113904000];
+	XCTAssertEqualWithAccuracy ([nsnetmin timeIntervalSinceReferenceDate], [distantPast timeIntervalSinceReferenceDate], 0.001, "DateTime distantPast");
+
+	NSDate *netmax = Type_DateTime.max;
+	XCTAssertEqualWithAccuracy ([nsnetmax timeIntervalSinceReferenceDate], [netmax timeIntervalSinceReferenceDate], 0.001, "DateTime Max");
+
+	NSDate *netmin = Type_DateTime.min;
+	XCTAssertEqualWithAccuracy ([nsnetmin timeIntervalSinceReferenceDate], [netmin timeIntervalSinceReferenceDate], 0.001, "DateTime Min");
+
+	NSDate *refdate = nil;
+	[Type_DateTime refDateDatetime:&refdate];
+	XCTAssertEqualWithAccuracy ([nsnetmin timeIntervalSinceReferenceDate], [refdate timeIntervalSinceReferenceDate], 0.001, "DateTime refdate");
+
+	NSDate *nilTest = [Type_DateTime returnDateDatetime:nil];
+	XCTAssertEqualWithAccuracy ([nsnetmin timeIntervalSinceReferenceDate], [nilTest timeIntervalSinceReferenceDate], 0.001, "DateTime nilTest");
+
+	NSArray<NSDate *> *datesArr = @[netmax, netmin];
+	[Type_DateTime reverseRefDatesDates:&datesArr];
+	XCTAssertEqualWithAccuracy ([nsnetmin timeIntervalSinceReferenceDate], [datesArr[0] timeIntervalSinceReferenceDate], 0.001, "DateTime reverseRefDatesDates Min");
+	XCTAssertEqualWithAccuracy ([nsnetmax timeIntervalSinceReferenceDate], [datesArr[1] timeIntervalSinceReferenceDate], 0.001, "DateTime reverseRefDatesDates Max");
+
+	NSArray<NSDate *> *revdatesArr = [Type_DateTime reverseDatesDates:@[netmax, netmin]];
+	XCTAssertEqualWithAccuracy ([nsnetmin timeIntervalSinceReferenceDate], [revdatesArr[0] timeIntervalSinceReferenceDate], 0.001, "DateTime reverseDatesDates Min");
+	XCTAssertEqualWithAccuracy ([nsnetmax timeIntervalSinceReferenceDate], [revdatesArr[1] timeIntervalSinceReferenceDate], 0.001, "DateTime reverseDatesDates Max");
+
+	NSArray<NSDate *> *refnilarrdate = nil;
+	[Type_DateTime reverseRefDatesDates:&refnilarrdate];
+	XCTAssertNil (refnilarrdate, "DateTime refnilarrdate");
+
+	NSArray<NSDate *> *revdatesnillArr = [Type_DateTime reverseDatesDates:nil];
+	XCTAssertNil (revdatesnillArr, "DateTime revdatesnillArr");
 }
 
 - (void) testObjectIndexedSubscripting {

@@ -101,8 +101,8 @@ mono_threads_detach_coop (gpointer cookie, gpointer *dummy);
 
 #endif
 
-#ifndef MONODECIMAL
-#define MONODECIMAL
+#ifndef E4KDEFS
+#define E4KDEFS
 
 // from: https://github.com/mono/mono/blob/master/mono/metadata/decimal-ms.h
 typedef struct {
@@ -138,5 +138,15 @@ typedef struct {
 		uint64_t Lo64;
 	} v;
 } MonoDecimal;
+
+typedef enum {
+	E4KDateTimeKind_Unspecified,
+	E4KDateTimeKind_Utc,
+	E4KDateTimeKind_Local
+} E4KDateTimeKind;
+
+typedef struct {
+	unsigned long long DateData;
+} E4KDateTime;
 
 #endif

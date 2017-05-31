@@ -37,7 +37,7 @@ namespace ObjCGeneratorTest {
 		[Test]
 		public void TypeMatchFailure ()
 		{
-			Assert.Throws<NotImplementedException> (() => NameGenerator.GetTypeName (mscorlib.GetType ("System.DateTime")), "DateTime");
+			Assert.Throws<NotImplementedException> (() => NameGenerator.GetTypeName (mscorlib.GetType ("System.DBNull")), "DBNull");
 		}
 
 		[Test]

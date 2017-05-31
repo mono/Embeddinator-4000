@@ -314,3 +314,12 @@ MonoClass* mono_embeddinator_get_decimal_class ()
     }
     return decimalclass;
 }
+
+MonoClass* mono_embeddinator_get_datetime_class ()
+{
+    static MonoClass* datetimeclass = nil;
+    if (!datetimeclass) {
+        datetimeclass = mono_class_from_name (mono_get_corlib (), "System", "DateTime");
+    }
+    return datetimeclass;
+}

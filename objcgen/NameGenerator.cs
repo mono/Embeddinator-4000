@@ -62,7 +62,8 @@ namespace ObjC {
 		{
 			if (t.IsByRef) {
 				var et = t.GetElementType ();
-				if (Type.GetTypeCode (et) == TypeCode.Decimal) // This is boxed into NSDecimalNumber
+				var typecode = Type.GetTypeCode (et);
+				if (typecode == TypeCode.Decimal || typecode == TypeCode.DateTime) // This is boxed into NSDecimalNumber/NSDate
 					return GetTypeName (et) + "_Nonnull * _Nullable";
 
 				return GetTypeName (et) + (et.IsValueType ? " " : " _Nonnull ") + "* _Nullable";
@@ -118,6 +119,8 @@ namespace ObjC {
 				return "NSString *";
 			case TypeCode.Decimal:
 				return "NSDecimalNumber *";
+			case TypeCode.DateTime:
+				return "NSDate *";
 			default:
 				throw new NotImplementedException ($"Converting type {t.Name} to a native type name");
 			}
@@ -175,6 +178,8 @@ namespace ObjC {
 				return "string";
 			case TypeCode.Decimal:
 				return "System.Decimal";
+			case TypeCode.DateTime:
+				return "System.DateTime";
 			default:
 				throw new NotImplementedException ($"Converting type {t.Name} to a mono type name");
 			}
@@ -206,6 +211,8 @@ namespace ObjC {
 				return $"NSArray<{GetObjCName (t)} *> *";
 			case TypeCode.Decimal:
 				return "NSArray <NSDecimalNumber *> *";
+			case TypeCode.DateTime:
+				return "NSArray <NSDate *> *";
 			default:
 				throw new NotImplementedException ($"Converting type {t.Name} to a native type name");
 			}
