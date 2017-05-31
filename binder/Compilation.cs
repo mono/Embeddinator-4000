@@ -383,10 +383,11 @@ namespace MonoEmbeddinator4000
             var executableSuffix = Platform.IsWindows ? ".exe" : string.Empty;
             var jar = $"{Path.Combine(GetJavaSdkPath(), "bin", "jar" + executableSuffix)}";
             var classesDir = Path.Combine(Options.OutputDir, "classes");
+            var name = Path.GetFileNameWithoutExtension(Project.Assemblies[0]);
 
             var args = new List<string> {
                 "cvf",
-                Path.Combine(Options.OutputDir, "classes.jar"),
+                Path.Combine(Options.OutputDir, name + ".jar"),
                 $"-C {classesDir} ."
             };
 
