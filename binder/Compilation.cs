@@ -625,8 +625,6 @@ namespace MonoEmbeddinator4000
 
             var makeToolChain = Path.Combine(AndroidSdk.AndroidNdkPath, "build", "tools", "make_standalone_toolchain.py");
             var externalDir = Path.Combine(FindDirectory("external"), "android");
-            if (!Directory.Exists(externalDir))
-                Directory.CreateDirectory(externalDir);
 
             foreach (var arch in new[] { "arm", "arm64", "x86", "x86_64" })
             {
