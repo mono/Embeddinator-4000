@@ -58,14 +58,12 @@ JNA_CLASSPATH=../../external/jna/jna-4.4.0.jar
 JAVAC_FLAGS=-d mk/java -Xdiags:verbose -Xlint:deprecation
 
 java: compile_java
-	java -cp "$(subst :,$(PATH_SEPERATOR),mk/java:common.jar:$(JNA_CLASSPATH):$(JUNIT_CLASSPATH):.)" -D -Djna.dump_memory=true -Djna.library.path=c/ org.junit.runner.JUnitCore Tests
+	java -cp "$(subst :,$(PATH_SEPERATOR),mk/java:mk/java/managed.jar:$(JNA_CLASSPATH):$(JUNIT_CLASSPATH):.)" -D -Djna.dump_memory=true -Djna.library.path=c/ org.junit.runner.JUnitCore Tests
 
 compile_java:
-	$(EMBEDDINATOR_CMD) -gen=java -out=java $(PLATFORM_FLAG) -target=shared $(MANAGED_DLL)
 	mkdir -p mk/java
-	javac -cp "$(subst :,$(PATH_SEPERATOR),$(JNA_CLASSPATH):.)" $(JAVAC_FLAGS) $(JAVA_FILES)
-	jar cf common.jar -C mk/java .
-	javac -cp "$(subst :,$(PATH_SEPERATOR),$(JNA_CLASSPATH):$(JUNIT_CLASSPATH):common.jar)" $(JAVAC_FLAGS) Tests.java
+	$(EMBEDDINATOR_CMD) -gen=java -out=mk/java $(PLATFORM_FLAG) -target=shared $(MANAGED_DLL) -c
+	javac -cp "$(subst :,$(PATH_SEPERATOR),$(JNA_CLASSPATH):$(JUNIT_CLASSPATH):mk/java/managed.jar)" $(JAVAC_FLAGS) Tests.java
 
 run:
 	mk/bin/Debug/common.Tests
