@@ -116,6 +116,9 @@ static GString* get_current_executable_path()
     DWORD ret = GetModuleFileNameA(hModule, pathbuf, MAX_PATH);
 
     return (ret > 0) ? g_string_new(pathbuf) : 0;
+#elif __ANDROID__
+    char pathbuf [1] = "/";
+    return g_string_new(pathbuf);
 #else
     g_assert_not_reached();
 #endif

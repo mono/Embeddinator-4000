@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿using System;
+﻿﻿﻿﻿﻿﻿﻿﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -360,7 +360,7 @@ namespace MonoEmbeddinator4000
             return Environment.GetEnvironmentVariable("JAVA_HOME");
         }
 
-        bool CompileJava(IEnumerable<string> files)
+        void RefreshAndroidSdk()
         {
             if (Options.Compilation.Platform == TargetPlatform.Android)
             {
@@ -373,6 +373,11 @@ namespace MonoEmbeddinator4000
 
                 AndroidSdk.Refresh();
             }
+        }
+
+        bool CompileJava(IEnumerable<string> files)
+        {
+            RefreshAndroidSdk();
 
             var executableSuffix = Platform.IsWindows ? ".exe" : string.Empty;
             var javac = $"{Path.Combine(GetJavaSdkPath(), "bin", "javac" + executableSuffix)}";
@@ -614,6 +619,80 @@ namespace MonoEmbeddinator4000
             Invoke(clangBin, invocation);
         }
 
+        void MakeNDKToolChains()
+        {
+            RefreshAndroidSdk();
+
+            var makeToolChain = Path.Combine(AndroidSdk.AndroidNdkPath, "build", "tools", "make_standalone_toolchain.py");
+            var externalDir = Path.Combine(FindDirectory("external"), "android");
+            if (!Directory.Exists(externalDir))
+                Directory.CreateDirectory(externalDir);
+
+            foreach (var arch in new[] { "arm", "arm64", "x86", "x86_64" })
+            {
+                var toolChainPath = Path.Combine(externalDir, arch);
+                if (!Directory.Exists(toolChainPath))
+                {
+                    var args = new List<string> {
+                        $"--arch {arch}",
+                        //"--api 25", //TODO: is this an option?
+                        $"--install-dir {toolChainPath}"
+	                };
+
+                    var invocation = string.Join(" ", args);
+                    Invoke(makeToolChain, invocation);
+                }
+            }
+        }
+
+        void CompileNDK(IEnumerable<string> files)
+        {
+            MakeNDKToolChains();
+
+            var monoPath = ManagedToolchain.FindMonoPath();
+            var name = Path.GetFileNameWithoutExtension(Project.Assemblies[0]);
+            var libName = $"lib{name}.so";
+
+            //NOTE: "arm64-v8a" doesn't compile at the moment
+            foreach (var abi in new[] { "armeabi", "armeabi-v7a", "x86", "x86_64" })
+            {
+                string toolChain;
+                switch (abi)
+                {
+                case "armeabi":
+                case "armeabi-v7a":
+                    toolChain = "arm";
+                    break;
+                case "arm64-v8a":
+                    toolChain = "arm64";
+                    break;
+                default:
+                    toolChain = abi;
+                    break;
+                }
+
+                var clangBin = Path.Combine(FindDirectory("external"), "android", toolChain, "bin", "clang");
+                var monoDroidPath = Path.Combine(MonoDroidSdk.BinPath, "..", "lib", "xbuild", "Xamarin", "Android", "lib", abi);
+                var abiDir = Path.Combine(Options.OutputDir, abi);
+                var output = Path.Combine(abiDir, libName);
+
+                if (!Directory.Exists(abiDir))
+                    Directory.CreateDirectory(abiDir);
+
+                var args = new List<string> {
+                    "-pie",
+                    $"-D{DLLExportDefine}",
+                    $"-I\"{monoPath}/include/mono-2.0\"",
+                    $"-L\"{monoDroidPath}\" -lmonosgen-2.0",
+                    string.Join(" ", files.ToList()),
+                    $"-o {output}",
+                };
+
+                var invocation = string.Join(" ", args);
+                Invoke(clangBin, invocation);
+            }
+        }
+
         void CompileNativeCode(IEnumerable<string> files)
         {
             if (Platform.IsWindows)
@@ -629,11 +708,13 @@ namespace MonoEmbeddinator4000
                 case TargetPlatform.TVOS:
                 case TargetPlatform.WatchOS:
                 case TargetPlatform.Windows:
-                case TargetPlatform.Android:
                     throw new NotSupportedException(
                         $"Cross compilation to target platform '{Options.Compilation.Platform}' is not supported.");
                 case TargetPlatform.MacOS:
                     CompileClang(files);
+                    break;
+                case TargetPlatform.Android:
+                    CompileNDK(files);
                     break;
                 }
                 return;
