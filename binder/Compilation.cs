@@ -391,8 +391,8 @@ namespace MonoEmbeddinator4000
             var args = new List<string> {
                 string.Join(" ", files.Select(file => Path.GetFullPath(file))),
                 string.Join(" ", Directory.GetFiles(FindDirectory("support"), "*.java", SearchOption.AllDirectories)),
-                "-d",
-                classesDir
+                "-source 1.7 -target 1.7",
+                $"-d {classesDir}",
             };
 
             if (Options.Compilation.DebugMode)
