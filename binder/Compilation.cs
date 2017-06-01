@@ -494,6 +494,20 @@ namespace MonoEmbeddinator4000
                 $"-C {androidDir} ."
             };
 
+            //Create an AndroidManifest.xml
+            File.WriteAllText(Path.Combine(androidDir, "AndroidManifest.xml"),
+$@"<?xml version=""1.0"" encoding=""utf-8""?>
+<manifest xmlns:android=""http://schemas.android.com/apk/res/android""
+    package=""com.{name}""
+    android:versionCode=""1""
+    android:versionName=""1.0"" >
+
+    <uses-sdk
+        android:minSdkVersion=""9""
+        android:targetSdkVersion=""25"" />
+
+</manifest>");
+
             //Copy jar to android/classes.jar
             File.Copy(Path.Combine(Options.OutputDir, name + ".jar"), Path.Combine(androidDir, "classes.jar"), true);
 
