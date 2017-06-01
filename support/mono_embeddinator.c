@@ -277,6 +277,8 @@ char* mono_embeddinator_error_to_string(mono_embeddinator_error_t error)
         return "Mono failed to lookup class";
     case MONO_EMBEDDINATOR_METHOD_LOOKUP_FAILED:
         return "Mono failed to lookup method";
+    case MONO_EMBEDDINATOR_MONO_RUNTIME_MISSING_SYMBOLS:
+        return "Failed to load Mono runtime shared libary symbols";
     }
 
     g_assert_not_reached();

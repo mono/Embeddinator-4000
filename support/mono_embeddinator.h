@@ -129,7 +129,9 @@ typedef enum
     // Mono failed to lookup class
     MONO_EMBEDDINATOR_CLASS_LOOKUP_FAILED,
     // Mono failed to lookup method
-    MONO_EMBEDDINATOR_METHOD_LOOKUP_FAILED
+    MONO_EMBEDDINATOR_METHOD_LOOKUP_FAILED,
+    // Failed to load Mono runtime shared library symbols
+    MONO_EMBEDDINATOR_MONO_RUNTIME_MISSING_SYMBOLS
 } mono_embeddinator_error_type_t;
 
 /**
