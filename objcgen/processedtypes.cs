@@ -157,7 +157,7 @@ namespace Embeddinator {
 		public ProcessedMemberWithParameters (Processor processor, ProcessedType declaringType) : base (processor, declaringType)
 		{
 			objCSignature = new CachedValue<string> (() => GetObjcSignature (true));
-			objRawCSignature = new CachedValue<string> (() => GetObjcSignature (false));
+			objCSelector = new CachedValue<string> (() => GetObjcSignature (false));
 			monoSignature = new CachedValue<string> (GetMonoSignature);
 		}
 
@@ -171,8 +171,8 @@ namespace Embeddinator {
 		CachedValue<string> objCSignature;
 		public string ObjCSignature => objCSignature.Value;
 
-		CachedValue<string> objRawCSignature;
-		public string ObjRawCSignature => objRawCSignature.Value;
+		CachedValue<string> objCSelector;
+		public string ObjCSelector => objCSelector.Value;
 
 		protected abstract string GetMonoSignature ();
 		CachedValue<string> monoSignature;
@@ -181,7 +181,7 @@ namespace Embeddinator {
 		public void Freeze ()
 		{
 			objCSignature.Freeze ();
-			objRawCSignature.Freeze ();
+			objCSelector.Freeze ();
 			monoSignature.Freeze ();
 		}
 	}

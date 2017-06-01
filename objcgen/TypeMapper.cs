@@ -9,16 +9,14 @@ namespace Embeddinator
 		
 		IEnumerable<string> GetNames (ProcessedMemberBase member)
 		{
-			if (member is ProcessedMemberWithParameters) {
-				yield return ((ProcessedMemberWithParameters)member).ObjRawCSignature;
-			} else if (member is ProcessedProperty) {
-				ProcessedProperty property = (ProcessedProperty)member;
+			if (member is ProcessedMemberWithParameters memberWithParams) {
+				yield return memberWithParams.ObjCSelector;
+			} else if (member is ProcessedProperty property) {
 				if (property.HasGetter)
 					yield return property.GetterName;
 				if (property.HasSetter)
 					yield return property.SetterName;
-			} else if (member is ProcessedFieldInfo) {
-				ProcessedFieldInfo field = (ProcessedFieldInfo)member;
+			} else if (member is ProcessedFieldInfo field) {
 				yield return field.GetterName;
 				yield return field.SetterName;
 			} else {
