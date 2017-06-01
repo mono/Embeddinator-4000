@@ -338,6 +338,11 @@ namespace MonoEmbeddinator4000
                     return false;
 
                 CreateJar();
+
+                if (Options.Compilation.Platform == TargetPlatform.Android)
+                {
+                    CreateAar();
+                }
             }
 
             return true;
@@ -469,6 +474,37 @@ namespace MonoEmbeddinator4000
                         }
                     }
                 }
+            }
+
+            var invocation = string.Join(" ", args);
+            Invoke(jar, invocation);
+        }
+
+        void CreateAar()
+        {
+            var executableSuffix = Platform.IsWindows ? ".exe" : string.Empty;
+            var jar = $"{Path.Combine(GetJavaSdkPath(), "bin", "jar" + executableSuffix)}";
+            var classesDir = Path.Combine(Options.OutputDir, "classes");
+            var androidDir = Path.Combine(Options.OutputDir, "android");
+            var name = Path.GetFileNameWithoutExtension(Project.Assemblies[0]);
+
+            var args = new List<string> {
+                "cvf",
+                Path.Combine(Options.OutputDir, name + ".aar"),
+                $"-C {androidDir} ."
+            };
+
+            //Copy jar to android/classes.jar
+            File.Copy(Path.Combine(Options.OutputDir, name + ".jar"), Path.Combine(androidDir, "classes.jar"), true);
+
+            //Copy .NET assemblies
+            var assembliesDir = Path.Combine(androidDir, "assemblies");
+            if (!Directory.Exists(assembliesDir))
+                Directory.CreateDirectory(assembliesDir);
+
+            foreach (var assembly in Project.Assemblies)
+            {
+                File.Copy(assembly, Path.Combine(assembliesDir, Path.GetFileName(assembly)), true);
             }
 
             var invocation = string.Join(" ", args);
