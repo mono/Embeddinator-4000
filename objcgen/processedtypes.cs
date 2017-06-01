@@ -122,6 +122,8 @@ namespace Embeddinator {
 			DeclaringType = declaringType;
 		}
 
+		public abstract IEnumerable<string> Selectors { get; }
+
 		// this format can be consumed by the linker xml files
 		// adapted from ikvm reflection and cecil source code
 		// FIXME: double check when we implement generics support
@@ -167,6 +169,8 @@ namespace Embeddinator {
 		public int FirstDefaultParameter { get; set; }
 
 		protected abstract string GetObjcSignature (bool includeParamNames);
+
+		public override IEnumerable<string> Selectors => ObjCSelector.Yield ();
 
 		CachedValue<string> objCSignature;
 		public string ObjCSignature => objCSignature.Value;
@@ -276,6 +280,16 @@ namespace Embeddinator {
 
 	public class ProcessedProperty: ProcessedMemberBase {
 		public PropertyInfo Property { get; private set; }
+
+		public override IEnumerable<string> Selectors 
+		{
+			get {
+				if (HasGetter)
+					yield return GetterName;
+				if (HasSetter)
+					yield return SetterName;
+			}
+		}
 
 		public ProcessedProperty (PropertyInfo property, Processor processor, ProcessedType declaringType) : base (processor, declaringType)
 		{
@@ -417,6 +431,13 @@ namespace Embeddinator {
 
 		public string Name => (NameOverride ?? Field.Name).CamelCase ();
 		public string NameOverride { get; set; }
+
+		public override IEnumerable<string> Selectors {
+			get {
+				yield return GetterName;
+				yield return SetterName;
+			}
+		}
 
 		public ProcessedFieldInfo (FieldInfo field, Processor processor, ProcessedType declaringType) : base (processor, declaringType)
 		{

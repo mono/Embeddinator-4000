@@ -6,23 +6,6 @@ namespace Embeddinator
 	public class TypeMapper
 	{
 		Dictionary<ProcessedType, Dictionary<string, ProcessedMemberBase>> MappedTypes = new Dictionary<ProcessedType, Dictionary<string, ProcessedMemberBase>> ();
-		
-		IEnumerable<string> GetNames (ProcessedMemberBase member)
-		{
-			if (member is ProcessedMemberWithParameters memberWithParams) {
-				yield return memberWithParams.ObjCSelector;
-			} else if (member is ProcessedProperty property) {
-				if (property.HasGetter)
-					yield return property.GetterName;
-				if (property.HasSetter)
-					yield return property.SetterName;
-			} else if (member is ProcessedFieldInfo field) {
-				yield return field.GetterName;
-				yield return field.SetterName;
-			} else {
-				throw new NotImplementedException ();
-			}
-		}
 
 		Dictionary <string, ProcessedMemberBase> GetRegistrationForType (ProcessedType t)
 		{
@@ -36,8 +19,8 @@ namespace Embeddinator
 		{
 			var typeRegistration = GetRegistrationForType (member.DeclaringType);
 			if (typeRegistration != null) {
-				foreach (var name in GetNames (member)) {
-					if (typeRegistration.ContainsKey (name))
+				foreach (var selector in member.Selectors) {
+					if (typeRegistration.ContainsKey (selector))
 						return true;
 				}
 			}
@@ -49,9 +32,9 @@ namespace Embeddinator
 		{
 			var typeRegistration = GetRegistrationForType (member.DeclaringType);
 			if (typeRegistration != null) {
-				foreach (var name in GetNames (member)) {
+				foreach (var selector in member.Selectors) {
 					ProcessedMemberBase registeredMember = null;
-					if (typeRegistration.TryGetValue (name, out registeredMember))
+					if (typeRegistration.TryGetValue (selector, out registeredMember))
 						yield return registeredMember;
 				}
 			}
@@ -64,8 +47,8 @@ namespace Embeddinator
 				typeRegistration = new Dictionary<string, ProcessedMemberBase> ();
 				MappedTypes.Add (member.DeclaringType, typeRegistration);
 			}
-			foreach (var name in GetNames (member)) {
-				typeRegistration.Add (name, member);
+			foreach (var selector in member.Selectors) {
+				typeRegistration.Add (selector, member);
 			}
 		}
 
