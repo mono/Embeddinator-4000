@@ -107,15 +107,13 @@ public final class Runtime {
             String resourcePath = "/assemblies/" + library + ".dll";
             InputStream stream = Runtime.class.getResourceAsStream(resourcePath);
             if (stream == null) {
-                pendingException.set(new RuntimeException("Unable to locate " + resourcePath + " within jar file!"));
-                return;
+                throw new RuntimeException("Unable to locate " + resourcePath + " within jar file!");
             }
 
             try {
                 Files.copy(stream, assemblyFile.toPath());
             } catch (IOException e) {
-                pendingException.set(new RuntimeException(e));
-                return;
+                throw new RuntimeException(e);
             }
         }
 
