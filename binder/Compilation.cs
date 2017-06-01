@@ -673,7 +673,7 @@ namespace MonoEmbeddinator4000
 
                 var clangBin = Path.Combine(FindDirectory("external"), "android", toolChain, "bin", "clang");
                 var monoDroidPath = Path.Combine(MonoDroidSdk.BinPath, "..", "lib", "xbuild", "Xamarin", "Android", "lib", abi);
-                var abiDir = Path.Combine(Options.OutputDir, abi);
+                var abiDir = Path.Combine(Options.OutputDir, "android", "jni", abi);
                 var output = Path.Combine(abiDir, libName);
 
                 if (!Directory.Exists(abiDir))
