@@ -1,7 +1,8 @@
-﻿﻿﻿﻿﻿using System;
+﻿﻿﻿﻿﻿﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using CppSharp;
@@ -408,6 +409,34 @@ namespace MonoEmbeddinator4000
                 foreach (var assembly in Project.Assemblies)
                 {
                     File.Copy(assembly, Path.Combine(assembliesDir, Path.GetFileName(assembly)), true);
+                }
+            }
+
+            //Embed JNA into our jar file
+            using (var stream = File.OpenRead(Path.Combine(FindDirectory("external"), "jna", "jna-4.4.0.jar")))
+            using (var zip = new ZipArchive(stream))
+            {
+                foreach (var entry in zip.Entries)
+                {
+                    //Skip META-INF
+                    if (entry.FullName.StartsWith("META-INF", StringComparison.Ordinal))
+                        continue;
+
+                    var entryPath = Path.Combine(classesDir, entry.FullName);
+
+                    if (string.IsNullOrEmpty(entry.Name))
+                    {
+                        if (!Directory.Exists(entryPath))
+                            Directory.CreateDirectory(entryPath);
+                    }
+                    else
+                    {
+                        using (var zipEntryStream = entry.Open())
+                        using (var fileStream = File.Create(entryPath))
+                        {
+                            zipEntryStream.CopyTo(fileStream);
+                        }
+                    }
                 }
             }
 
