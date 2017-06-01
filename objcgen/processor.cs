@@ -16,16 +16,13 @@ namespace Embeddinator {
 
 		protected List<Exception> Delayed = new List<Exception> ();
 
-		public virtual void Process (IEnumerable<Assembly> input)
+		public virtual void Process (IEnumerable<ProcessedAssembly> input)
 		{
 			foreach (var a in input) {
-				var pa = new ProcessedAssembly (a) {
-					UserCode = true,
-				};
 				// ignoring/warning one is not an option as they could be different (e.g. different builds/versions)
-				if (!AddIfUnique (pa))
-					throw ErrorHelper.CreateError (12, $"The assembly name `{pa.Name}` is not unique");
-				assemblyQueue.Enqueue (pa);
+				if (!AddIfUnique (a))
+					throw ErrorHelper.CreateError (12, $"The assembly name `{a.Name}` is not unique");
+				assemblyQueue.Enqueue (a);
 			}
 
 			while (assemblyQueue.Count > 0) {

@@ -91,7 +91,7 @@ namespace Methods {
 	public class DuplicateMethods {
 		public int DoIt () { return 42; }
 		public int DoIt (int i) { return 42; }
-		public int DoIt (string s) { return 42; }
+		public int DoIt (string i) { return 42; }
 		public int DoIt (int i, int j) { return 84; }
 
 		public bool Find (string name) { return true; }

@@ -114,11 +114,15 @@ namespace Embeddinator {
 
 		protected Processor Processor;
 		public bool FallBackToTypeName { get; set; }
+		public ProcessedType DeclaringType { get; set; }
 
-		public ProcessedMemberBase (Processor processor)
+		public ProcessedMemberBase (Processor processor, ProcessedType declaringType)
 		{
 			Processor = processor;
+			DeclaringType = declaringType;
 		}
+
+		public abstract IEnumerable<string> Selectors { get; }
 
 		// this format can be consumed by the linker xml files
 		// adapted from ikvm reflection and cecil source code
@@ -152,9 +156,10 @@ namespace Embeddinator {
 	}
 
 	public abstract class ProcessedMemberWithParameters : ProcessedMemberBase {
-		public ProcessedMemberWithParameters (Processor processor) : base (processor)
+		public ProcessedMemberWithParameters (Processor processor, ProcessedType declaringType) : base (processor, declaringType)
 		{
-			objCSignature = new CachedValue<string> (GetObjcSignature);
+			objCSignature = new CachedValue<string> (() => GetObjcSignature (true));
+			objCSelector = new CachedValue<string> (() => GetObjcSignature (false));
 			monoSignature = new CachedValue<string> (GetMonoSignature);
 		}
 
@@ -163,9 +168,15 @@ namespace Embeddinator {
 		public ParameterInfo[] Parameters { get; protected set; }
 		public int FirstDefaultParameter { get; set; }
 
-		protected abstract string GetObjcSignature ();
+		protected abstract string GetObjcSignature (bool includeParamNames);
+
+		public override IEnumerable<string> Selectors => ObjCSelector.Yield ();
+
 		CachedValue<string> objCSignature;
 		public string ObjCSignature => objCSignature.Value;
+
+		CachedValue<string> objCSelector;
+		public string ObjCSelector => objCSelector.Value;
 
 		protected abstract string GetMonoSignature ();
 		CachedValue<string> monoSignature;
@@ -174,6 +185,7 @@ namespace Embeddinator {
 		public void Freeze ()
 		{
 			objCSignature.Freeze ();
+			objCSelector.Freeze ();
 			monoSignature.Freeze ();
 		}
 	}
@@ -195,10 +207,9 @@ namespace Embeddinator {
 		}
 
 		public MethodType MethodType { get; set; }
-		public ProcessedType DeclaringType { get; set; }
 		public bool IsExtension { get; set; }
 
-		public ProcessedMethod (MethodInfo method, Processor processor) : base (processor)
+		public ProcessedMethod (MethodInfo method, Processor processor, ProcessedType declaringType) : base (processor, declaringType)
 		{
 			Method = method;
 			MethodType = MethodType.Normal;
@@ -226,7 +237,7 @@ namespace Embeddinator {
 			return mono.ToString ();
 		}
 
-		protected override string GetObjcSignature ()
+		protected override string GetObjcSignature (bool includeParamNames)
 		{
 			string objName = BaseName;
 
@@ -239,8 +250,10 @@ namespace Embeddinator {
 			for (int n = 0; n < end; ++n) {
 				ParameterInfo p = Parameters[n];
 
-				if (objc.Length > objName.Length)
-					objc.Append (' ');
+				if (includeParamNames) {
+					if (objc.Length > objName.Length)
+						objc.Append (' ');
+				}
 
 				string paramName = FallBackToTypeName ? NameGenerator.GetParameterTypeName (p.ParameterType) : p.Name;
 				if (n > 0 || !IsExtension) {
@@ -251,9 +264,13 @@ namespace Embeddinator {
 						objc.Append (paramName.CamelCase ());
 				}
 
-				if (n > 0 || !IsExtension) {
-					string ptname = NameGenerator.GetObjCParamTypeName (p, Processor.Types);
-					objc.Append (":(").Append (ptname).Append (")").Append (NameGenerator.GetExtendedParameterName (p, Parameters));
+				if (includeParamNames) {
+					if (n > 0 || !IsExtension) {
+						string ptname = NameGenerator.GetObjCParamTypeName (p, Processor.Types);
+						objc.Append (":(").Append (ptname).Append (")").Append (NameGenerator.GetExtendedParameterName (p, Parameters));
+					}
+				} else {
+					objc.Append (":");
 				}
 			}
 
@@ -264,20 +281,30 @@ namespace Embeddinator {
 	public class ProcessedProperty: ProcessedMemberBase {
 		public PropertyInfo Property { get; private set; }
 
-		public ProcessedProperty (PropertyInfo property, Processor processor) : base (processor)
+		public override IEnumerable<string> Selectors 
+		{
+			get {
+				if (HasGetter)
+					yield return GetterName;
+				if (HasSetter)
+					yield return SetterName;
+			}
+		}
+
+		public ProcessedProperty (PropertyInfo property, Processor processor, ProcessedType declaringType) : base (processor, declaringType)
 		{
 			Property = property;
 			getMethod = new CachedValue<ProcessedMethod> (() => {
 				var getter = Property.GetGetMethod ();
 				if (getter != null) {
-					return new ProcessedMethod (getter, Processor) { NameOverride = GetterName, IsPropertyImplementation = true };
+					return new ProcessedMethod (getter, Processor, declaringType) { NameOverride = GetterName, IsPropertyImplementation = true };
 				}
 				return null;
 			});
 			setMethod = new CachedValue<ProcessedMethod> (() => {
 				var setter = Property.GetSetMethod ();
 				if (setter != null) {
-					return new ProcessedMethod (setter, Processor) { NameOverride = SetterName, IsPropertyImplementation = true };
+					return new ProcessedMethod (setter, Processor, declaringType) { NameOverride = SetterName, IsPropertyImplementation = true };
 				}
 				return null;
 			});
@@ -339,7 +366,7 @@ namespace Embeddinator {
 		}
 		public ConstructorType ConstructorType { get; set; }
 
-		public ProcessedConstructor (ConstructorInfo constructor, Processor processor) : base (processor)
+		public ProcessedConstructor (ConstructorInfo constructor, Processor processor, ProcessedType declaringType) : base (processor, declaringType)
 		{
 			Constructor = constructor;
 			Parameters = Constructor.GetParameters ();
@@ -366,7 +393,7 @@ namespace Embeddinator {
 			return mono.ToString ();
 		}
 
-		protected override string GetObjcSignature ()
+		protected override string GetObjcSignature (bool includeParamNames)
 		{
 			var objc = new StringBuilder (BaseName);
 
@@ -374,8 +401,10 @@ namespace Embeddinator {
 			for (int n = 0; n < end; ++n) {
 				ParameterInfo p = Parameters[n];
 
-				if (objc.Length > BaseName.Length)
-					objc.Append (' ');
+				if (includeParamNames) {
+					if (objc.Length > BaseName.Length)
+						objc.Append (' ');
+				}
 
 				string paramName = FallBackToTypeName ? NameGenerator.GetParameterTypeName (p.ParameterType) : p.Name;
 				if (n == 0)
@@ -383,8 +412,12 @@ namespace Embeddinator {
 				else
 					objc.Append (paramName.CamelCase ());
 
-				string ptname = NameGenerator.GetObjCParamTypeName (p, Processor.Types);
-				objc.Append (":(").Append (ptname).Append (")").Append (NameGenerator.GetExtendedParameterName (p, Parameters));
+				if (includeParamNames) {
+					string ptname = NameGenerator.GetObjCParamTypeName (p, Processor.Types);
+					objc.Append (":(").Append (ptname).Append (")").Append (NameGenerator.GetExtendedParameterName (p, Parameters));
+				} else {
+					objc.Append (":");
+				}
 			}
 
 			return objc.ToString ();
@@ -399,7 +432,14 @@ namespace Embeddinator {
 		public string Name => (NameOverride ?? Field.Name).CamelCase ();
 		public string NameOverride { get; set; }
 
-		public ProcessedFieldInfo (FieldInfo field, Processor processor) : base (processor)
+		public override IEnumerable<string> Selectors {
+			get {
+				yield return GetterName;
+				yield return SetterName;
+			}
+		}
+
+		public ProcessedFieldInfo (FieldInfo field, Processor processor, ProcessedType declaringType) : base (processor, declaringType)
 		{
 			Field = field;
 			TypeName = ObjC.NameGenerator.GetTypeName (Field.DeclaringType);
