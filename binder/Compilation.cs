@@ -498,7 +498,7 @@ namespace MonoEmbeddinator4000
             File.WriteAllText(Path.Combine(androidDir, "AndroidManifest.xml"),
 $@"<?xml version=""1.0"" encoding=""utf-8""?>
 <manifest xmlns:android=""http://schemas.android.com/apk/res/android""
-    package=""com.{name}""
+    package=""com.{name}_dll""
     android:versionCode=""1""
     android:versionName=""1.0"" >
 
