@@ -105,6 +105,9 @@ public final class Runtime {
 
         if (!assemblyFile.exists()) {
             String resourcePath = "/assemblies/" + library + ".dll";
+            if (isRunningOnAndroid()){
+                resourcePath = "/assets" + resourcePath;
+            }
             InputStream stream = Runtime.class.getResourceAsStream(resourcePath);
             if (stream == null) {
                 throw new RuntimeException("Unable to locate " + resourcePath + " within jar file!");
@@ -149,5 +152,9 @@ public final class Runtime {
         library = com.sun.jna.Platform.isWindows()
             ? String.format("%s.dll", library) : String.format("lib%s.dylib", library);
         return Native.loadLibrary(library, klass);
+    }
+
+    public static Boolean isRunningOnAndroid() {
+        return System.getProperty("java.vm.name").equalsIgnoreCase("Dalvik");
     }
 }

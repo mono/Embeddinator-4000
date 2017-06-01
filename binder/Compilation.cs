@@ -512,7 +512,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
             File.Copy(Path.Combine(Options.OutputDir, name + ".jar"), Path.Combine(androidDir, "classes.jar"), true);
 
             //Copy .NET assemblies
-            var assembliesDir = Path.Combine(androidDir, "assemblies");
+            var assembliesDir = Path.Combine(androidDir, "assets", "assemblies");
             if (!Directory.Exists(assembliesDir))
                 Directory.CreateDirectory(assembliesDir);
 
