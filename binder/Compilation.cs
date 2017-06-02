@@ -467,6 +467,12 @@ namespace MonoEmbeddinator4000
                     }
                     else
                     {
+                        //NOTE: *.so files on Android will be packaged in a different way
+                        if (Options.Compilation.Platform == TargetPlatform.Android && entry.Name.EndsWith(".so", StringComparison.Ordinal))
+                        {
+                            continue;
+                        }
+
                         using (var zipEntryStream = entry.Open())
                         using (var fileStream = File.Create(entryPath))
                         {
