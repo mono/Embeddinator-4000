@@ -29,10 +29,7 @@
 package mono.embeddinator;
 
 import com.sun.jna.*;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
+import java.io.*;
 import java.util.*;
 
 public final class Runtime {
@@ -105,16 +102,27 @@ public final class Runtime {
 
         if (!assemblyFile.exists()) {
             String resourcePath = "/assemblies/" + library + ".dll";
-            if (isRunningOnAndroid()){
+            if (isRunningOnAndroid()) {
                 resourcePath = "/assets" + resourcePath;
             }
-            InputStream stream = Runtime.class.getResourceAsStream(resourcePath);
-            if (stream == null) {
+            InputStream input = Runtime.class.getResourceAsStream(resourcePath);
+            if (input == null) {
                 throw new RuntimeException("Unable to locate " + resourcePath + " within jar file!");
             }
 
             try {
-                Files.copy(stream, assemblyFile.toPath());
+                OutputStream output = new FileOutputStream(assemblyFile);
+                try {
+                    byte[] buffer = new byte[4 * 1024];
+                    int read;
+                    while ((read = input.read(buffer)) != -1) {
+                        output.write(buffer, 0, read);
+                    }
+                    output.flush();
+                } finally {
+                    output.close();
+                    input.close();
+                }
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
