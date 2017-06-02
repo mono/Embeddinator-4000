@@ -128,10 +128,6 @@ public final class Runtime {
             }
         }
 
-        if (isRunningOnAndroid()) {
-            //NOTE: JNA can't find the library on Android, unless you load it first
-            System.loadLibrary(library);
-        }
         runtimeLibrary = Native.loadLibrary(library, RuntimeLibrary.class);
 
         runtimeLibrary.mono_embeddinator_set_assembly_path(assemblyPath);
