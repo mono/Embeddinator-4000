@@ -529,6 +529,52 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
                 File.Copy(libSourcePath, libDestPath, true);
             }
 
+            //Copy JNA native libs
+            foreach (var file in Directory.GetFiles(Path.Combine(FindDirectory("external"), "jna"), "android-*"))
+            {
+                using (var stream = File.OpenRead(file))
+                using (var zip = new ZipArchive(stream))
+                {
+                    foreach (var entry in zip.Entries)
+                    {
+                        //Skip non-*.so files
+                        if (!entry.FullName.EndsWith(".so", StringComparison.Ordinal))
+                            continue;
+
+                        var arch = Path.GetFileNameWithoutExtension(file);
+                        string abi;
+                        switch (arch)
+                        {
+                        case "android-aarch64":
+                            abi = "arm64-v8a";
+                            break;
+                        case "android-arm":
+                            abi = "armeabi";
+                            break;
+                        case "android-armv7":
+                            abi = "armeabi-v7a";
+                            break;
+                        case "android-x86-64":
+                            abi = "x86_64";
+                            break;
+                        default:
+                            abi = arch.Replace("android-", string.Empty);
+                            break;
+                        }
+
+                        var abiDir = Path.Combine(androidDir, "jni", Path.GetFileName(abi));
+                        if (!Directory.Exists(abiDir))
+                            Directory.CreateDirectory(abiDir);
+
+                        using (var zipEntryStream = entry.Open())
+                        using (var fileStream = File.Create(Path.Combine(abiDir, entry.Name)))
+                        {
+                            zipEntryStream.CopyTo(fileStream);
+                        }
+                    }
+                }
+            }
+
             //Copy jar to android/classes.jar
             File.Copy(Path.Combine(Options.OutputDir, name + ".jar"), Path.Combine(androidDir, "classes.jar"), true);
 
