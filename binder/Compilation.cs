@@ -508,6 +508,21 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
 
 </manifest>");
 
+            //Copy libmonosgen-2.0.so
+            const string libMonoSgen = "libmonosgen-2.0.so";
+            var monoDroidPath = Path.Combine(MonoDroidSdk.BinPath, "..", "lib", "xbuild", "Xamarin", "Android", "lib");
+            foreach (var abi in Directory.GetDirectories(monoDroidPath))
+            {
+                var abiDir = Path.Combine(androidDir, "jni", Path.GetFileName(abi));
+                var libDestPath = Path.Combine(abiDir, libMonoSgen);
+                var libSourcePath = Path.Combine(abi, libMonoSgen);
+                if (!File.Exists(libSourcePath))
+                    continue;
+                if (!Directory.Exists(abiDir))
+                    Directory.CreateDirectory(abiDir);
+                File.Copy(libSourcePath, libDestPath, true);
+            }
+
             //Copy jar to android/classes.jar
             File.Copy(Path.Combine(Options.OutputDir, name + ".jar"), Path.Combine(androidDir, "classes.jar"), true);
 
