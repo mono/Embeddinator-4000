@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿using System;
+﻿﻿﻿﻿﻿﻿﻿﻿﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -8,6 +8,7 @@ using System.Text;
 using CppSharp;
 using CppSharp.Generators;
 using Xamarin.Android.Tools;
+using Xamarin.Android.Tasks;
 
 namespace MonoEmbeddinator4000
 {
@@ -736,57 +737,43 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
             Invoke(clangBin, invocation);
         }
 
-        void MakeNDKToolChains()
-        {
-            RefreshAndroidSdk();
-
-            var makeToolChain = Path.Combine(AndroidSdk.AndroidNdkPath, "build", "tools", "make_standalone_toolchain.py");
-            var externalDir = Path.Combine(FindDirectory("external"), "android");
-
-            foreach (var arch in new[] { "arm", "arm64", "x86", "x86_64" })
-            {
-                var toolChainPath = Path.Combine(externalDir, arch);
-                if (!Directory.Exists(toolChainPath))
-                {
-                    var args = new List<string> {
-                        $"--arch {arch}",
-                        //"--api 25", //TODO: is this an option?
-                        $"--install-dir {toolChainPath}"
-	                };
-
-                    var invocation = string.Join(" ", args);
-                    Invoke(makeToolChain, invocation);
-                }
-            }
-        }
-
         void CompileNDK(IEnumerable<string> files)
         {
-            MakeNDKToolChains();
+            RefreshAndroidSdk();
 
             var monoPath = ManagedToolchain.FindMonoPath();
             var name = Path.GetFileNameWithoutExtension(Project.Assemblies[0]);
             var libName = $"lib{name}.so";
+            var ndkPath = AndroidSdk.AndroidNdkPath;
 
-            //NOTE: "arm64-v8a" doesn't compile at the moment
-            foreach (var abi in new[] { "armeabi", "armeabi-v7a", "x86", "x86_64" })
+			//NOTE: "arm64-v8a" doesn't compile at the moment
+			//NOTE: do we need "armeabi-v7a"?
+			foreach (var abi in new[] { "armeabi", "x86", "x86_64" })
             {
-                string toolChain;
+                AndroidTargetArch targetArch;
                 switch (abi)
                 {
-                case "armeabi":
-                case "armeabi-v7a":
-                    toolChain = "arm";
-                    break;
-                case "arm64-v8a":
-                    toolChain = "arm64";
-                    break;
-                default:
-                    toolChain = abi;
-                    break;
+                    case "armeabi":
+                        targetArch = AndroidTargetArch.Arm;
+                        break;
+                    case "armeabi-v7a":
+                        targetArch = AndroidTargetArch.Arm;
+                        break;
+                    case "arm64-v8a":
+                        targetArch = AndroidTargetArch.Arm64;
+                        break;
+                    case "x86":
+                        targetArch = AndroidTargetArch.X86;
+                        break;
+                    case "x86_64":
+                        targetArch = AndroidTargetArch.X86_64;
+                        break;
+                    default:
+                        throw new NotImplementedException();
                 }
 
-                var clangBin = Path.Combine(FindDirectory("external"), "android", toolChain, "bin", "clang");
+                var clangBin = NdkUtil.GetNdkClangBin(Path.Combine(ndkPath, "toolchains"), targetArch);
+                var systemInclude = NdkUtil.GetNdkPlatformIncludePath(ndkPath, targetArch, 24); //NOTE: 24 should be an option?
                 var monoDroidPath = Path.Combine(MonoDroidSdk.BinPath, "..", "lib", "xbuild", "Xamarin", "Android", "lib", abi);
                 var abiDir = Path.Combine(Options.OutputDir, "android", "jni", abi);
                 var output = Path.Combine(abiDir, libName);
@@ -795,11 +782,12 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
                     Directory.CreateDirectory(abiDir);
 
                 var args = new List<string> {
-                    "-pie",
+                    $"--sysroot=\"{systemInclude}\"",
                     $"-D{DLLExportDefine}",
                     $"-I\"{monoPath}/include/mono-2.0\"",
                     $"-L\"{monoDroidPath}\" -lmonosgen-2.0",
                     string.Join(" ", files.ToList()),
+                    "--std=c99",
                     $"-o {output}",
                 };
 
