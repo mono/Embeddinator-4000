@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿using System;
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -588,6 +588,9 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
             {
                 File.Copy(assembly, Path.Combine(assembliesDir, Path.GetFileName(assembly)), true);
             }
+
+            //Copy mscorlib.dll
+            File.Copy(Path.Combine(MonoDroidSdk.BinPath, "..", "lib", "mono", "2.1", "mscorlib.dll"), Path.Combine(assembliesDir, "mscorlib.dll"), true);
 
             var invocation = string.Join(" ", args);
             Invoke(jar, invocation);
