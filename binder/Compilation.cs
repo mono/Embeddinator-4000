@@ -791,7 +791,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
                     $"-L\"{monoDroidPath}\" -lmonosgen-2.0",
                     string.Join(" ", files.ToList()),
                     "--std=c99",
-                    $"-o {output}",
+                    $"-shared -o {output}",
                 };
 
                 var invocation = string.Join(" ", args);
