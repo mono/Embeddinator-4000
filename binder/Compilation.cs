@@ -304,7 +304,7 @@ namespace MonoEmbeddinator4000
                 App.Abi.ToString(), appName);
         }
 
-        void CompileCode()
+        bool CompileCode()
         {
             IEnumerable<string> files = null;
 
@@ -334,9 +334,13 @@ namespace MonoEmbeddinator4000
 
             if (Options.GeneratorKind == GeneratorKind.Java)
             {
-                CompileJava(files);
+                if (!CompileJava(files))
+                    return false;
+
                 CreateJar();
             }
+
+            return true;
         }
 
         bool initXamarinAndroidTools = false;
@@ -393,7 +397,9 @@ namespace MonoEmbeddinator4000
                 Directory.CreateDirectory(classesDir);
 
             var invocation = string.Join(" ", args);
-            Invoke(javac, invocation);
+            var output = Invoke(javac, invocation);
+
+            return output.ExitCode == 0;
         }
 
         void CreateJar()
