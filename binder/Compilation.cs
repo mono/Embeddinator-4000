@@ -746,10 +746,10 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
             var libName = $"lib{name}.so";
             var ndkPath = AndroidSdk.AndroidNdkPath;
 
-			//NOTE: "arm64-v8a" doesn't compile at the moment
-			//NOTE: do we need "armeabi-v7a"?
-			foreach (var abi in new[] { "armeabi", "x86", "x86_64" })
+            //NOTE: "arm64-v8a" doesn't compile at the moment
+            foreach (var abi in new[] { "armeabi", "armeabi-v7a", "x86", "x86_64" })
             {
+                string extra = string.Empty;
                 AndroidTargetArch targetArch;
                 switch (abi)
                 {
@@ -758,15 +758,18 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
                         break;
                     case "armeabi-v7a":
                         targetArch = AndroidTargetArch.Arm;
+                        extra = " -march=armv7-a -mfloat-abi=softfp -mfpu=vfpv3-d16";
                         break;
                     case "arm64-v8a":
                         targetArch = AndroidTargetArch.Arm64;
                         break;
                     case "x86":
                         targetArch = AndroidTargetArch.X86;
+                        extra = " -march=i686 -mtune=intel -mssse3 -mfpmath=sse -m32";
                         break;
                     case "x86_64":
                         targetArch = AndroidTargetArch.X86_64;
+                        extra = " -march=x86-64 -mtune=intel -msse4.2 -mpopcnt -m64";
                         break;
                     default:
                         throw new NotImplementedException();
@@ -782,7 +785,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
                     Directory.CreateDirectory(abiDir);
 
                 var args = new List<string> {
-                    $"--sysroot=\"{systemInclude}\"",
+                    $"--sysroot=\"{systemInclude}\"{extra}",
                     $"-D{DLLExportDefine}",
                     $"-I\"{monoPath}/include/mono-2.0\"",
                     $"-L\"{monoDroidPath}\" -lmonosgen-2.0",
