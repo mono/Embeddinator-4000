@@ -229,8 +229,11 @@ namespace MonoEmbeddinator4000
             {
                 Diagnostics.Message("Compiling binding code...");
                 Diagnostics.PushIndent();
-                CompileCode();
+                var compiled = CompileCode();
                 Diagnostics.PopIndent();
+
+                if (!compiled)
+                    Diagnostics.Message("Failed to compile generated code.");
             }
         }
 

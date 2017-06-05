@@ -201,9 +201,19 @@ namespace MonoEmbeddinator4000
                 args.Append ("llvm-outfile=").Append (Quote (llvmOutputFile));
             args.Append (" \"").Append (filename).Append ("\"");
             return args.ToString ();
-        }    
+        }
 
-        string Invoke(string program, string arguments, Dictionary<string, string> envVars = null)
+        /// <summary>
+        /// Represents the output of a process invocation.
+        /// </summary>
+        public struct ProcessOutput
+        {
+            public int ExitCode;
+            public string StandardOutput;
+            public string StandardError;
+        }
+
+        ProcessOutput Invoke(string program, string arguments, Dictionary<string, string> envVars = null)
         {
             var process = new Process
             {
@@ -224,9 +234,19 @@ namespace MonoEmbeddinator4000
             var standardOut = new StringBuilder();
             process.OutputDataReceived += (sender, args) => standardOut.Append(args.Data);
 
+            var standardError = new StringBuilder();
+            process.ErrorDataReceived += (sender, args) => standardError.Append(args.Data);
+
             process.Start();
             process.BeginOutputReadLine();
             process.WaitForExit();
+
+            var output = new ProcessOutput
+            {
+                ExitCode = process.ExitCode,
+                StandardOutput = standardOut.ToString(),
+                StandardError = standardError.ToString()
+            };
 
             Diagnostics.Debug("Invoking: {0} {1}", program, arguments);
             Diagnostics.PushIndent();
@@ -234,7 +254,7 @@ namespace MonoEmbeddinator4000
                 Diagnostics.Message("{0}", standardOut.ToString());
             Diagnostics.PopIndent();
 
-            return standardOut.ToString();
+            return output;
         }
 
         private IEnumerable<string> GetOutputFiles(string pattern)
@@ -284,7 +304,7 @@ namespace MonoEmbeddinator4000
                 App.Abi.ToString(), appName);
         }
 
-        void CompileCode()
+        bool CompileCode()
         {
             IEnumerable<string> files = null;
 
@@ -314,9 +334,13 @@ namespace MonoEmbeddinator4000
 
             if (Options.GeneratorKind == GeneratorKind.Java)
             {
-                CompileJava(files);
+                if (!CompileJava(files))
+                    return false;
+
                 CreateJar();
             }
+
+            return true;
         }
 
         bool initXamarinAndroidTools = false;
@@ -331,12 +355,12 @@ namespace MonoEmbeddinator4000
 
             // If we are running on macOS, invoke java_home to figure out Java path.
             if (Platform.IsMacOS)
-                return Invoke("/usr/libexec/java_home", null, null);
+                return Invoke("/usr/libexec/java_home", null, null).StandardOutput;
 
             return Environment.GetEnvironmentVariable("JAVA_HOME");
         }
 
-        void CompileJava(IEnumerable<string> files)
+        bool CompileJava(IEnumerable<string> files)
         {
             if (Options.Compilation.Platform == TargetPlatform.Android)
             {
@@ -373,7 +397,9 @@ namespace MonoEmbeddinator4000
                 Directory.CreateDirectory(classesDir);
 
             var invocation = string.Join(" ", args);
-            Invoke(javac, invocation);
+            var output = Invoke(javac, invocation);
+
+            return output.ExitCode == 0;
         }
 
         void CreateJar()
