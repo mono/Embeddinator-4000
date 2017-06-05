@@ -80,6 +80,7 @@ public final class Runtime {
             void invoke(RuntimeLibrary.Error.ByValue error) throws RuntimeException;
         }
 
+        public void mono_embeddinator_set_mono_dylib_path(String path);
         public void mono_embeddinator_set_assembly_path(String path);
         public Pointer mono_embeddinator_install_error_report_hook(ErrorCallback cb);
     }
@@ -97,6 +98,19 @@ public final class Runtime {
     }
 
     public static void initialize(String library) {
+        error = new RuntimeLibrary.ErrorCallback() {
+            public void invoke(RuntimeLibrary.Error.ByValue error) {
+                if (error.type == RuntimeLibrary.ErrorType.MONO_EMBEDDINATOR_OK)
+                    return;
+
+                pendingException.set(new RuntimeException());
+            }
+        };
+
+        runtimeLibrary.mono_embeddinator_install_error_report_hook(error);
+
+        runtimeLibrary.mono_embeddinator_set_mono_dylib_path("monosgen-2.0");
+
         System.setProperty("jna.encoding", "utf8");
 
         String tmp = System.getProperty("java.io.tmpdir");
@@ -120,16 +134,6 @@ public final class Runtime {
         runtimeLibrary = Native.loadLibrary(library, RuntimeLibrary.class);
 
         runtimeLibrary.mono_embeddinator_set_assembly_path(assemblyPath);
-        error = new RuntimeLibrary.ErrorCallback() {
-            public void invoke(RuntimeLibrary.Error.ByValue error) {
-                if (error.type == RuntimeLibrary.ErrorType.MONO_EMBEDDINATOR_OK)
-                    return;
-
-                pendingException.set(new RuntimeException());
-            }
-        };
-
-        runtimeLibrary.mono_embeddinator_install_error_report_hook(error);
     }
 
     public static void checkExceptions() throws RuntimeException {

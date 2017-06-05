@@ -33,12 +33,15 @@
 
 MONO_EMBEDDINATOR_BEGIN_DECLS
 
+typedef struct DylibMono DylibMono;
+
 /** 
  * Represents a managed-to-native binding context.
  */
 typedef struct
 {
   MonoDomain* domain;
+  DylibMono* dylib;
 } mono_embeddinator_context_t;
 
 /** 
@@ -60,6 +63,12 @@ int mono_embeddinator_destroy(mono_embeddinator_context_t* ctx);
  */
 MONO_EMBEDDINATOR_API
 mono_embeddinator_context_t* mono_embeddinator_get_context();
+
+/**
+ * Override the default path where Mono shared library will be loaded from.
+ */
+MONO_EMBEDDINATOR_API
+void mono_embeddinator_set_mono_dylib_path (const char *path);
 
 /**
  * Override the default path (current executable) where assemblies will be loaded.
@@ -130,7 +139,9 @@ typedef enum
     MONO_EMBEDDINATOR_CLASS_LOOKUP_FAILED,
     // Mono failed to lookup method
     MONO_EMBEDDINATOR_METHOD_LOOKUP_FAILED,
-    // Failed to load Mono runtime shared library symbols
+    // Failed to load Mono runtime shared library
+    MONO_EMBEDDINATOR_MONO_RUNTIME_LOAD_FAILED,
+    // Failed to look up Mono runtime shared library symbols
     MONO_EMBEDDINATOR_MONO_RUNTIME_MISSING_SYMBOLS
 } mono_embeddinator_error_type_t;
 
