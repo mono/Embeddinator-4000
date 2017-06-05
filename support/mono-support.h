@@ -28,6 +28,8 @@
 #include <stdint.h>
 #include "embeddinator.h"
 
+MONO_EMBEDDINATOR_BEGIN_DECLS
+
 #if defined (XAMARIN_IOS) || defined (XAMARIN_MAC)
 #include <xamarin/xamarin.h>
 typedef void * gpointer;
@@ -37,7 +39,6 @@ typedef struct _MonoMethodDesc MonoMethodDesc;
 typedef uint16_t    mono_unichar2;
 typedef struct _GArray GArray;
 
-MONO_EMBEDDINATOR_BEGIN_DECLS
 MonoMethodDesc* mono_method_desc_new (const char *name, mono_bool include_namespace);
 void            mono_method_desc_free (MonoMethodDesc *desc);
 MonoMethod*     mono_method_desc_search_in_class (MonoMethodDesc *desc, MonoClass *klass);
@@ -67,8 +68,6 @@ MonoClass*      mono_get_uint64_class (void);
 MonoClass*      mono_get_single_class (void);
 MonoClass*      mono_get_double_class (void);
 int             mono_array_element_size (MonoClass *ac);
-
-MONO_EMBEDDINATOR_END_DECLS
 
 #else
 
@@ -114,13 +113,16 @@ typedef struct MonoMethodDesc MonoMethodDesc;
 typedef MonoMethodDesc* (*_mono_method_desc_new_fptr) (const char *name, mono_bool include_namespace);
 typedef void            (*_mono_method_desc_free_fptr) (MonoMethodDesc *desc);
 typedef MonoMethod*     (*_mono_method_desc_search_in_class_fptr) (MonoMethodDesc *desc, MonoClass *klass);
-typedef void            (*_mono_jit_cleanup_fptr)           (MonoDomain *domain);
-typedef MonoAssembly*   (*_mono_domain_assembly_open_fptr)  (MonoDomain *domain, const char *name);
+typedef void            (*_mono_config_parse_fptr) (const char *filename);
+typedef void            (*_mono_jit_cleanup_fptr) (MonoDomain *domain);
+typedef MonoDomain*     (*_mono_jit_init_version_fptr) (const char *root_domain_name, const char *runtime_version);
+typedef MonoAssembly*   (*_mono_domain_assembly_open_fptr) (MonoDomain *domain, const char *name);
+typedef MonoDomain*     (*_mono_domain_get_fptr) ();
 typedef int             (*_mono_string_length_fptr) (MonoString *s);
-typedef mono_unichar2*  (*_mono_string_chars_fptr)  (MonoString *s);
+typedef mono_unichar2*  (*_mono_string_chars_fptr) (MonoString *s);
 typedef MonoObject*     (*_mono_field_get_value_object_fptr) (MonoDomain *domain, MonoClassField *field, MonoObject *obj);
 typedef void            (*_mono_field_set_value_fptr) (MonoObject *obj, MonoClassField *field, void *value);
-typedef MonoVTable*     (*_mono_class_vtable_fptr)          (MonoDomain *domain, MonoClass *klass);
+typedef MonoVTable*     (*_mono_class_vtable_fptr) (MonoDomain *domain, MonoClass *klass);
 typedef void            (*_mono_field_static_set_value_fptr) (MonoVTable *vt, MonoClassField *field, void *value);
 typedef MonoString*     (*_mono_object_to_string_fptr) (MonoObject *obj, MonoObject **exc);
 typedef MonoClass*      (*_mono_class_get_fptr) (MonoImage *image, uint32_t type_token);
@@ -143,36 +145,10 @@ typedef int             (*_mono_array_element_size_fptr) (MonoClass *ac);
 
 /* NOTE: structure members MUST NOT CHANGE ORDER. */
 typedef struct DylibMono {
-	void                                    *dl_handle;
-	int                                      version;
-	_mono_method_desc_new_fptr               mono_method_desc_new;
-	_mono_method_desc_free_fptr              mono_method_desc_free;
-	_mono_method_desc_search_in_class_fptr   mono_method_desc_search_in_class;
-	_mono_jit_cleanup_fptr                   mono_jit_cleanup;
-	_mono_domain_assembly_open_fptr          mono_domain_assembly_open;
-	_mono_string_length_fptr                 mono_string_length;
-	_mono_string_chars_fptr                  mono_string_chars;
-	_mono_field_get_value_object_fptr        mono_field_get_value_object;
-	_mono_field_set_value_fptr               mono_field_set_value;
-	_mono_class_vtable_fptr                  mono_class_vtable;
-	_mono_field_static_set_value_fptr        mono_field_static_set_value;
-	_mono_object_to_string_fptr              mono_object_to_string;
-	_mono_class_get_fptr                     mono_class_get;
-	_mono_class_get_field_fptr               mono_class_get_field;
-	_mono_get_string_class_fptr              mono_get_string_class;
-	_mono_get_boolean_class_fptr             mono_get_boolean_class;
-	_mono_get_char_class_fptr                mono_get_char_class;
-	_mono_get_sbyte_class_fptr               mono_get_sbyte_class;
-	_mono_get_int16_class_fptr               mono_get_int16_class;
-	_mono_get_int32_class_fptr               mono_get_int32_class;
-	_mono_get_int64_class_fptr               mono_get_int64_class;
-	_mono_get_byte_class_fptr                mono_get_byte_class;
-	_mono_get_uint16_class_fptr              mono_get_uint16_class;
-	_mono_get_uint32_class_fptr              mono_get_uint32_class;
-	_mono_get_uint64_class_fptr              mono_get_uint64_class;
-	_mono_get_single_class_fptr              mono_get_single_class;
-	_mono_get_double_class_fptr              mono_get_double_class;
-	_mono_array_element_size_fptr            mono_array_element_size;
+	void *dl_handle;
+	int version;
+#define MONO_API_DEF(name) _##name##_fptr name;
+#include "mono-api.h"
 } DylibMono;
 
 MONO_EMBEDDINATOR_API DylibMono*
@@ -244,5 +220,7 @@ typedef struct {
 		uint64_t Lo64;
 	} v;
 } MonoDecimal;
+
+MONO_EMBEDDINATOR_END_DECLS
 
 #endif

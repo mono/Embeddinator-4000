@@ -71,6 +71,10 @@ int mono_embeddinator_dylib_mono_init (struct DylibMono *mono_imports, const cha
 	mono_imports->dl_handle = dlopen (libmono_path, RTLD_LAZY | RTLD_GLOBAL);
 
 	if (!mono_imports->dl_handle) {
+		mono_embeddinator_error_t error;
+		error.type = MONO_EMBEDDINATOR_MONO_RUNTIME_LOAD_FAILED;
+		mono_embeddinator_error(error);
+
 		return false;
 	}
 
@@ -85,34 +89,8 @@ int mono_embeddinator_dylib_mono_init (struct DylibMono *mono_imports, const cha
 		symbols_missing = true; \
 	}
 
-	LOAD_SYMBOL(mono_method_desc_new)
-	LOAD_SYMBOL(mono_method_desc_free)
-	LOAD_SYMBOL(mono_method_desc_search_in_class)
-	LOAD_SYMBOL(mono_jit_cleanup)
-	LOAD_SYMBOL(mono_domain_assembly_open)
-	LOAD_SYMBOL(mono_string_length)
-	LOAD_SYMBOL(mono_string_chars)
-	LOAD_SYMBOL(mono_field_get_value_object)
-	LOAD_SYMBOL(mono_field_set_value)
-	LOAD_SYMBOL(mono_class_vtable)
-	LOAD_SYMBOL(mono_field_static_set_value)
-	LOAD_SYMBOL(mono_object_to_string)
-	LOAD_SYMBOL(mono_class_get)
-	LOAD_SYMBOL(mono_class_get_field)
-	LOAD_SYMBOL(mono_get_string_class)
-	LOAD_SYMBOL(mono_get_boolean_class)
-	LOAD_SYMBOL(mono_get_char_class)
-	LOAD_SYMBOL(mono_get_sbyte_class)
-	LOAD_SYMBOL(mono_get_int16_class)
-	LOAD_SYMBOL(mono_get_int32_class)
-	LOAD_SYMBOL(mono_get_int64_class)
-	LOAD_SYMBOL(mono_get_byte_class)
-	LOAD_SYMBOL(mono_get_uint16_class)
-	LOAD_SYMBOL(mono_get_uint32_class)
-	LOAD_SYMBOL(mono_get_uint64_class)
-	LOAD_SYMBOL(mono_get_single_class)
-	LOAD_SYMBOL(mono_get_double_class)
-	LOAD_SYMBOL(mono_array_element_size)
+#define MONO_API_DEF(name) LOAD_SYMBOL(name);
+#include "mono-api.h"
 
 	if (symbols_missing) {
 		log_fatal (LOG_DEFAULT, "Failed to load some Mono symbols, aborting...");

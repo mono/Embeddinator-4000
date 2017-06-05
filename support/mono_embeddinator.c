@@ -50,6 +50,22 @@
 #include <unistd.h>
 #endif
 
+/* To support configurations where Mono symbols need to be looked up dinamically
+ * we define a macro for each Mono API that we rely on and either call the exported
+ * definition from the shared library linked in or the function address that we
+ * look up at runtime (see mono-support.h) */
+
+#if defined(__ANDROID__)
+#define MONO_DYLIB_DYNAMIC_CALLS
+#endif
+
+#if defined(MONO_DYLIB_DYNAMIC_CALLS)
+#define MONO_API_DEF(name, ...) static name() _;
+#else
+#define MONO_API_DEF(name, ...) _##name##_fptr name;
+#endif
+#include "mono-api.h"
+
 mono_embeddinator_context_t* _current_context;
 
 mono_embeddinator_context_t* mono_embeddinator_get_context()
@@ -62,10 +78,23 @@ void mono_embeddinator_set_context(mono_embeddinator_context_t* ctx)
     _current_context = ctx;
 }
 
+static GString* mono_dylib_path_override = NULL;
+
+void mono_embeddinator_set_mono_dylib_path (const char *path)
+{
+    mono_dylib_path_override = g_string_new (path);
+}
+
 int mono_embeddinator_init(mono_embeddinator_context_t* ctx, const char* domain)
 {
     if (ctx == 0 || ctx->domain != 0)
         return false;
+
+    if (mono_dylib_path_override != 0)
+    {
+        ctx->dylib = mono_embeddinator_dylib_mono_new (mono_dylib_path_override->str);
+        g_string_free (mono_dylib_path_override, true);
+    }
 
 #if defined (XAMARIN_IOS) || defined (XAMARIN_MAC)
     xamarin_initialize_embedded ();
@@ -90,6 +119,9 @@ int mono_embeddinator_destroy(mono_embeddinator_context_t* ctx)
         return false;
 
     mono_jit_cleanup (ctx->domain);
+
+    if (ctx->dylib != 0)
+        mono_embeddinator_dylib_mono_free (ctx->dylib);
 
     return true;
 }
@@ -277,8 +309,10 @@ char* mono_embeddinator_error_to_string(mono_embeddinator_error_t error)
         return "Mono failed to lookup class";
     case MONO_EMBEDDINATOR_METHOD_LOOKUP_FAILED:
         return "Mono failed to lookup method";
+    case MONO_EMBEDDINATOR_MONO_RUNTIME_LOAD_FAILED:
+        return "Failed to load Mono runtime shared library";
     case MONO_EMBEDDINATOR_MONO_RUNTIME_MISSING_SYMBOLS:
-        return "Failed to load Mono runtime shared libary symbols";
+        return "Failed to look up Mono runtime shared library symbols";
     }
 
     g_assert_not_reached();
