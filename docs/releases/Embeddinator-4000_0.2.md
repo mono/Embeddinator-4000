@@ -31,6 +31,7 @@ Objective-C Support
 * [pr299](https://github.com/mono/Embeddinator-4000/pull/299) - [interop] Added support for managed types implementing `IEquatable<T>`;
 * [pr292](https://github.com/mono/Embeddinator-4000/pull/292) - [interop] `System.Decimal` is now mapped with Foundation's `NSDecimalNumber`
 * [pr315](https://github.com/mono/Embeddinator-4000/pull/315) - [generator] Better names are generated when types are used
+* [pr344](https://github.com/mono/Embeddinator-4000/pull/344) - [interop] Added support for conversion between `NSDate` and `DateTime`.
 
 iOS Support
 -----------
