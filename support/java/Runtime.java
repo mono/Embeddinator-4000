@@ -78,7 +78,6 @@ public final class Runtime {
         }
 
         public void mono_embeddinator_set_assembly_path(String path);
-        public void mono_set_dirs(String assemblyDir, String configDir);
         public Pointer mono_embeddinator_install_error_report_hook(ErrorCallback cb);
     }
 
@@ -109,7 +108,6 @@ public final class Runtime {
             File monoFile = new File(monoPath);
             monoFile.mkdirs();
             extractAssembly(monoPath, "mscorlib");
-            runtimeLibrary.mono_set_dirs(tmp, tmp);
         }
         
         error = new RuntimeLibrary.ErrorCallback() {
