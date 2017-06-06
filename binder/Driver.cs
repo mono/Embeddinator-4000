@@ -275,7 +275,9 @@ namespace MonoEmbeddinator4000
             if (result.Kind != ParserResultKind.Success)
                 return;
 
-            Assemblies.Add(result.Output);
+            //NOTE: this can happen if multiple generators are running
+            if (!Assemblies.Contains(result.Output))
+                Assemblies.Add(result.Output);
         }
     }
 }
