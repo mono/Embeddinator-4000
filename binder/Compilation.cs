@@ -589,8 +589,25 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
                 File.Copy(assembly, Path.Combine(assembliesDir, Path.GetFileName(assembly)), true);
             }
 
-            //Copy mscorlib.dll
-            File.Copy(Path.Combine(MonoDroidSdk.BinPath, "..", "lib", "mono", "2.1", "mscorlib.dll"), Path.Combine(assembliesDir, "mscorlib.dll"), true);
+            //Copy any referenced assemblies such as mscorlib.dll
+            List<string> referencedAssemblies = new List<string>();
+            foreach (var assembly in Assemblies)
+            {
+                foreach (var reference in assembly.GetReferencedAssemblies())
+                {
+                    if (!referencedAssemblies.Contains(reference.Name))
+                        referencedAssemblies.Add(reference.Name);
+                }
+            }
+
+            foreach (var reference in referencedAssemblies)
+            {
+                var referencePath = Path.Combine(MonoDroidSdk.BinPath, "..", "lib", "mono", "2.1", reference + ".dll");
+                if (File.Exists(referencePath))
+                {
+                    File.Copy(referencePath, Path.Combine(assembliesDir, reference + ".dll"), true);
+                }
+            }
 
             var invocation = string.Join(" ", args);
             Invoke(jar, invocation);
