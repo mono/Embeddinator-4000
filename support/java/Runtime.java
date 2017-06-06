@@ -78,6 +78,7 @@ public final class Runtime {
         }
 
         public void mono_embeddinator_set_assembly_path(String path);
+        public void mono_set_dirs(String assemblyDir, String configDir);
         public Pointer mono_embeddinator_install_error_report_hook(ErrorCallback cb);
     }
 
@@ -97,6 +98,33 @@ public final class Runtime {
         System.setProperty("jna.encoding", "utf8");
 
         String tmp = System.getProperty("java.io.tmpdir");
+        String assemblyPath = extractAssembly(tmp, library);
+
+        runtimeLibrary = Native.loadLibrary(library, RuntimeLibrary.class);
+        runtimeLibrary.mono_embeddinator_set_assembly_path(assemblyPath);
+
+        //NOTE: need to make sure mscorlib.dll is extracted & directory set
+        if (isRunningOnAndroid()) {
+            String monoPath = Utilities.combinePath(tmp, "mono", "4.5");
+            File monoFile = new File(monoPath);
+            monoFile.mkdirs();
+            extractAssembly(monoPath, "mscorlib");
+            runtimeLibrary.mono_set_dirs(tmp, tmp);
+        }
+        
+        error = new RuntimeLibrary.ErrorCallback() {
+            public void invoke(RuntimeLibrary.Error.ByValue error) {
+                if (error.type == RuntimeLibrary.ErrorType.MONO_EMBEDDINATOR_OK)
+                    return;
+
+                pendingException.set(new RuntimeException());
+            }
+        };
+
+        runtimeLibrary.mono_embeddinator_install_error_report_hook(error);
+    }
+
+    private static String extractAssembly(String tmp, String library) {
         String assemblyPath = Utilities.combinePath(tmp, library);
         File assemblyFile = new File(assemblyPath + ".dll");
 
@@ -127,20 +155,7 @@ public final class Runtime {
                 throw new RuntimeException(e);
             }
         }
-
-        runtimeLibrary = Native.loadLibrary(library, RuntimeLibrary.class);
-
-        runtimeLibrary.mono_embeddinator_set_assembly_path(assemblyPath);
-        error = new RuntimeLibrary.ErrorCallback() {
-            public void invoke(RuntimeLibrary.Error.ByValue error) {
-                if (error.type == RuntimeLibrary.ErrorType.MONO_EMBEDDINATOR_OK)
-                    return;
-
-                pendingException.set(new RuntimeException());
-            }
-        };
-
-        runtimeLibrary.mono_embeddinator_install_error_report_hook(error);
+        return assemblyPath;
     }
 
     public static void checkExceptions() throws RuntimeException {
