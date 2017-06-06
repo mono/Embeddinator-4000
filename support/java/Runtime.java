@@ -29,10 +29,7 @@
 package mono.embeddinator;
 
 import com.sun.jna.*;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
+import java.io.*;
 import java.util.*;
 
 public final class Runtime {
@@ -100,26 +97,19 @@ public final class Runtime {
         System.setProperty("jna.encoding", "utf8");
 
         String tmp = System.getProperty("java.io.tmpdir");
-        String assemblyPath = Utilities.combinePath(tmp, library);
-        File assemblyFile = new File(assemblyPath + ".dll");
-
-        if (!assemblyFile.exists()) {
-            String resourcePath = "/assemblies/" + library + ".dll";
-            InputStream stream = Runtime.class.getResourceAsStream(resourcePath);
-            if (stream == null) {
-                throw new RuntimeException("Unable to locate " + resourcePath + " within jar file!");
-            }
-
-            try {
-                Files.copy(stream, assemblyFile.toPath());
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
+        String assemblyPath = extractAssembly(tmp, library);
 
         runtimeLibrary = Native.loadLibrary(library, RuntimeLibrary.class);
-
         runtimeLibrary.mono_embeddinator_set_assembly_path(assemblyPath);
+
+        //NOTE: need to make sure mscorlib.dll is extracted & directory set
+        if (isRunningOnAndroid()) {
+            String monoPath = Utilities.combinePath(tmp, "mono", "4.5");
+            File monoFile = new File(monoPath);
+            monoFile.mkdirs();
+            extractAssembly(monoPath, "mscorlib");
+        }
+        
         error = new RuntimeLibrary.ErrorCallback() {
             public void invoke(RuntimeLibrary.Error.ByValue error) {
                 if (error.type == RuntimeLibrary.ErrorType.MONO_EMBEDDINATOR_OK)
@@ -130,6 +120,40 @@ public final class Runtime {
         };
 
         runtimeLibrary.mono_embeddinator_install_error_report_hook(error);
+    }
+
+    private static String extractAssembly(String tmp, String library) {
+        String assemblyPath = Utilities.combinePath(tmp, library);
+        File assemblyFile = new File(assemblyPath + ".dll");
+
+        if (!assemblyFile.exists()) {
+            String resourcePath = "/assemblies/" + library + ".dll";
+            if (isRunningOnAndroid()) {
+                resourcePath = "/assets" + resourcePath;
+            }
+            InputStream input = Runtime.class.getResourceAsStream(resourcePath);
+            if (input == null) {
+                throw new RuntimeException("Unable to locate " + resourcePath + " within jar file!");
+            }
+
+            try {
+                OutputStream output = new FileOutputStream(assemblyFile);
+                try {
+                    byte[] buffer = new byte[4 * 1024];
+                    int read;
+                    while ((read = input.read(buffer)) != -1) {
+                        output.write(buffer, 0, read);
+                    }
+                    output.flush();
+                } finally {
+                    output.close();
+                    input.close();
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return assemblyPath;
     }
 
     public static void checkExceptions() throws RuntimeException {
@@ -146,8 +170,14 @@ public final class Runtime {
             initialized = true;
         }
 
-        library = com.sun.jna.Platform.isWindows()
-            ? String.format("%s.dll", library) : String.format("lib%s.dylib", library);
+        if (!isRunningOnAndroid()) {
+            library = com.sun.jna.Platform.isWindows()
+                ? String.format("%s.dll", library) : String.format("lib%s.dylib", library);
+        }
         return Native.loadLibrary(library, klass);
+    }
+
+    public static Boolean isRunningOnAndroid() {
+        return System.getProperty("java.vm.name").equalsIgnoreCase("Dalvik");
     }
 }

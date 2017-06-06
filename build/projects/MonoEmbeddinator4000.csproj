@@ -148,6 +148,9 @@
     <Compile Include="../../binder/Utils/Utils.cs">
       <Link>binder/Utils/Utils.cs</Link>
     </Compile>
+    <Compile Include="..\..\binder\Utils\NdkUtils.cs">
+      <Link>binder\Utils\NdkUtils.cs</Link>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="IKVM.Reflection.csproj">

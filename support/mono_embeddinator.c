@@ -62,6 +62,25 @@ void mono_embeddinator_set_context(mono_embeddinator_context_t* ctx)
     _current_context = ctx;
 }
 
+static gchar* strrchr_seperator (const gchar* filename)
+{
+#ifdef G_OS_WIN32
+    char *p2;
+#endif
+    char *p;
+
+    p = strrchr (filename, G_DIR_SEPARATOR);
+#ifdef G_OS_WIN32
+    p2 = strrchr (filename, '/');
+    if (p2 > p)
+        p = p2;
+#endif
+
+    return p;
+}
+
+static GString* path_override = NULL;
+
 int mono_embeddinator_init(mono_embeddinator_context_t* ctx, const char* domain)
 {
     if (ctx == 0 || ctx->domain != 0)
@@ -71,6 +90,15 @@ int mono_embeddinator_init(mono_embeddinator_context_t* ctx, const char* domain)
     xamarin_initialize_embedded ();
     ctx->domain = mono_domain_get ();
 #else
+    #if defined (__ANDROID__)
+        if (path_override) {
+            GString* tmp = g_string_new(path_override->str);
+            gchar* sep = strrchr_seperator(tmp->str);
+            g_string_truncate(tmp, sep - tmp->str);
+            mono_set_dirs(tmp->str, tmp->str);
+            g_string_free(tmp, /*free_segment=*/ FALSE);
+        }
+    #endif
     mono_config_parse(NULL);
     ctx->domain = mono_jit_init_version(domain, "v4.0.30319");
 #endif
@@ -93,8 +121,6 @@ int mono_embeddinator_destroy(mono_embeddinator_context_t* ctx)
 
     return true;
 }
-
-static GString* path_override = NULL;
 
 void mono_embeddinator_set_assembly_path (const char *path)
 {
@@ -119,23 +145,6 @@ static GString* get_current_executable_path()
 #else
     g_assert_not_reached();
 #endif
-}
-
-static gchar* strrchr_seperator (const gchar* filename)
-{
-#ifdef G_OS_WIN32
-    char *p2;
-#endif
-    char *p;
-
-    p = strrchr (filename, G_DIR_SEPARATOR);
-#ifdef G_OS_WIN32
-    p2 = strrchr (filename, '/');
-    if (p2 > p)
-        p = p2;
-#endif
-
-    return p;
 }
 
 char* mono_embeddinator_search_assembly(const char* assembly)
