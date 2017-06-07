@@ -346,11 +346,13 @@ namespace MonoEmbeddinator4000
                 if (!CompileJava(files))
                     return false;
 
-                CreateJar();
+                if (!CreateJar())
+                    return false;
 
                 if (Options.Compilation.Platform == TargetPlatform.Android)
                 {
-                    CreateAar();
+                    if (!CreateAar())
+                        return false;
                 }
             }
 
@@ -421,7 +423,7 @@ namespace MonoEmbeddinator4000
             return output.ExitCode == 0;
         }
 
-        void CreateJar()
+        bool CreateJar()
         {
             var executableSuffix = Platform.IsWindows ? ".exe" : string.Empty;
             var jar = $"{Path.Combine(GetJavaSdkPath(), "bin", "jar" + executableSuffix)}";
@@ -443,8 +445,8 @@ namespace MonoEmbeddinator4000
                     Directory.CreateDirectory(platformDir);
 
                 var libName = $"lib{name}.dylib";
-                var output = Path.Combine(Options.OutputDir, libName);
-                File.Copy(output, Path.Combine(platformDir, libName), true);
+                var outputDir = Path.Combine(Options.OutputDir, libName);
+                File.Copy(outputDir, Path.Combine(platformDir, libName), true);
 
                 //Copy .NET assemblies
                 var assembliesDir = Path.Combine(classesDir, "assemblies");
@@ -492,10 +494,11 @@ namespace MonoEmbeddinator4000
             }
 
             var invocation = string.Join(" ", args);
-            Invoke(jar, invocation);
+            var output = Invoke(jar, invocation);
+            return output.ExitCode == 0;
         }
 
-        void CreateAar()
+        bool CreateAar()
         {
             var executableSuffix = Platform.IsWindows ? ".exe" : string.Empty;
             var jar = $"{Path.Combine(GetJavaSdkPath(), "bin", "jar" + executableSuffix)}";
@@ -618,7 +621,8 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
             }
 
             var invocation = string.Join(" ", args);
-            Invoke(jar, invocation);
+            var output = Invoke(jar, invocation);
+            return output.ExitCode == 0;
         }
 
         string FindDirectory(string dir)
