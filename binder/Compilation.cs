@@ -429,7 +429,7 @@ namespace MonoEmbeddinator4000
             var name = Path.GetFileNameWithoutExtension(Project.Assemblies[0]);
 
             var args = new List<string> {
-                "cvf",
+                "cf",
                 Path.Combine(Options.OutputDir, name + ".jar"),
                 $"-C {classesDir} ."
             };
