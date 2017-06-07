@@ -103,10 +103,11 @@ public final class Runtime {
         runtimeLibrary.mono_embeddinator_set_assembly_path(assemblyPath);
 
         //NOTE: need to make sure mscorlib.dll is extracted & directory set
-        if (isRunningOnAndroid()) {
-            String monoPath = Utilities.combinePath(tmp, "mono", "4.5");
-            File monoFile = new File(monoPath);
+        String monoPath = Utilities.combinePath(tmp, "mono", "4.5");
+        File monoFile = new File(monoPath);
+        if (!monoFile.isDirectory()) {
             monoFile.mkdirs();
+            monoFile.deleteOnExit();
             extractAssembly(monoPath, "mscorlib");
         }
         

@@ -90,15 +90,13 @@ int mono_embeddinator_init(mono_embeddinator_context_t* ctx, const char* domain)
     xamarin_initialize_embedded ();
     ctx->domain = mono_domain_get ();
 #else
-    #if defined (__ANDROID__)
-        if (path_override) {
-            GString* tmp = g_string_new(path_override->str);
-            gchar* sep = strrchr_seperator(tmp->str);
-            g_string_truncate(tmp, sep - tmp->str);
-            mono_set_dirs(tmp->str, tmp->str);
-            g_string_free(tmp, /*free_segment=*/ FALSE);
-        }
-    #endif
+    if (path_override) {
+        GString* tmp = g_string_new(path_override->str);
+        gchar* sep = strrchr_seperator(tmp->str);
+        g_string_truncate(tmp, sep - tmp->str);
+        mono_set_dirs(tmp->str, tmp->str);
+        g_string_free(tmp, /*free_segment=*/ FALSE);
+    }
     mono_config_parse(NULL);
     ctx->domain = mono_jit_init_version(domain, "v4.0.30319");
 #endif

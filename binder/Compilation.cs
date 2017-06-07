@@ -447,6 +447,27 @@ namespace MonoEmbeddinator4000
                 {
                     File.Copy(assembly, Path.Combine(assembliesDir, Path.GetFileName(assembly)), true);
                 }
+
+                //Copy any referenced assemblies such as mscorlib.dll
+                List<string> referencedAssemblies = new List<string>();
+                foreach (var assembly in Assemblies)
+                {
+                    foreach (var reference in assembly.GetReferencedAssemblies())
+                    {
+                        if (!referencedAssemblies.Contains(reference.Name))
+                            referencedAssemblies.Add(reference.Name);
+                    }
+                }
+
+                var monoPath = ManagedToolchain.FindMonoPath();
+                foreach (var reference in referencedAssemblies)
+                {
+                    var referencePath = Path.Combine(monoPath, "lib", "mono", "4.5", reference + ".dll");
+                    if (File.Exists(referencePath))
+                    {
+                        File.Copy(referencePath, Path.Combine(assembliesDir, reference + ".dll"), true);
+                    }
+                }
             }
 
             //Embed JNA into our jar file
