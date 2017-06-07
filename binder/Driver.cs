@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using CppSharp;
@@ -201,17 +201,17 @@ namespace MonoEmbeddinator4000
             return true;
         }
 
-        public void Run()
+        public bool Run()
         {
             if (!ValidateAssemblies())
-                return;
+                return false;
 
             Project.BuildInputs();
 
             Diagnostics.Message("Parsing assemblies...");
             Diagnostics.PushIndent();
             if (!Parse())
-                return;
+                return false;
             Diagnostics.PopIndent();
 
             Diagnostics.Message("Processing assemblies...");
@@ -233,8 +233,13 @@ namespace MonoEmbeddinator4000
                 Diagnostics.PopIndent();
 
                 if (!compiled)
+                {
                     Diagnostics.Message("Failed to compile generated code.");
+                    return false;
+                }
             }
+
+            return true;
         }
 
         void HandleParserResult<T>(ParserResult<T> result)

@@ -182,13 +182,13 @@ namespace MonoEmbeddinator4000
             return true;
         }
 
-        static void Main(string[] args)
+        static int Main(string[] args)
         {
             ParseCommandLineArgs(args);
 
             var options = new Options();
             if (!SetupOptions(options))
-                return;
+                return -1;
 
             var project = new Project();
 
@@ -204,8 +204,11 @@ namespace MonoEmbeddinator4000
 
                 var driver = new Driver(project, options);
 
-                driver.Run();
+                if (!driver.Run())
+                    return -1;
             }
+
+            return 0;
         }
     }
 }
