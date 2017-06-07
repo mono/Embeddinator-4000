@@ -126,32 +126,33 @@ public final class Runtime {
         String assemblyPath = Utilities.combinePath(tmp, library);
         File assemblyFile = new File(assemblyPath + ".dll");
 
-        if (!assemblyFile.exists()) {
-            String resourcePath = "/assemblies/" + library + ".dll";
-            if (isRunningOnAndroid()) {
-                resourcePath = "/assets" + resourcePath;
-            }
-            InputStream input = Runtime.class.getResourceAsStream(resourcePath);
-            if (input == null) {
-                throw new RuntimeException("Unable to locate " + resourcePath + " within jar file!");
+        String resourcePath = "/assemblies/" + library + ".dll";
+        if (isRunningOnAndroid()) {
+            resourcePath = "/assets" + resourcePath;
+        }
+        InputStream input = Runtime.class.getResourceAsStream(resourcePath);
+        if (input == null) {
+            throw new RuntimeException("Unable to locate " + resourcePath + " within jar file!");
+        }
+
+        try {
+            OutputStream output = new FileOutputStream(assemblyFile);
+            try {
+                byte[] buffer = new byte[4 * 1024];
+                int read;
+                while ((read = input.read(buffer)) != -1) {
+                    output.write(buffer, 0, read);
+                }
+                output.flush();
+            } finally {
+                output.close();
+                input.close();
             }
 
-            try {
-                OutputStream output = new FileOutputStream(assemblyFile);
-                try {
-                    byte[] buffer = new byte[4 * 1024];
-                    int read;
-                    while ((read = input.read(buffer)) != -1) {
-                        output.write(buffer, 0, read);
-                    }
-                    output.flush();
-                } finally {
-                    output.close();
-                    input.close();
-                }
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+            //NOTE: this file should be temporary
+            assemblyFile.deleteOnExit();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
         return assemblyPath;
     }
