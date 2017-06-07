@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿using System;
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -224,7 +224,8 @@ namespace MonoEmbeddinator4000
                     Arguments = arguments,
                     WindowStyle = ProcessWindowStyle.Hidden,
                     UseShellExecute = false,
-                    RedirectStandardOutput = true
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true
                 }
             };
 
@@ -233,13 +234,20 @@ namespace MonoEmbeddinator4000
                     process.StartInfo.EnvironmentVariables[kvp.Key] = kvp.Value;
 
             var standardOut = new StringBuilder();
-            process.OutputDataReceived += (sender, args) => standardOut.Append(args.Data);
+            process.OutputDataReceived += (sender, args) => {
+                if (!string.IsNullOrWhiteSpace(args.Data))
+                    standardOut.AppendLine(args.Data);
+            };
 
             var standardError = new StringBuilder();
-            process.ErrorDataReceived += (sender, args) => standardError.Append(args.Data);
+            process.ErrorDataReceived += (sender, args) => {
+                if (!string.IsNullOrWhiteSpace(args.Data))
+                    standardError.AppendLine(args.Data);
+            };
 
             process.Start();
             process.BeginOutputReadLine();
+            process.BeginErrorReadLine();
             process.WaitForExit();
 
             var output = new ProcessOutput
