@@ -369,7 +369,7 @@ namespace MonoEmbeddinator4000
 
             // If we are running on macOS, invoke java_home to figure out Java path.
             if (Platform.IsMacOS)
-                return Invoke("/usr/libexec/java_home", null, null).StandardOutput;
+                return Invoke("/usr/libexec/java_home", null, null).StandardOutput.Trim();
 
             return Environment.GetEnvironmentVariable("JAVA_HOME");
         }
