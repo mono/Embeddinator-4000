@@ -803,8 +803,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
             var libName = $"lib{name}.so";
             var ndkPath = AndroidSdk.AndroidNdkPath;
 
-            //NOTE: "arm64-v8a" doesn't compile at the moment
-            foreach (var abi in new[] { "armeabi", "armeabi-v7a", "x86", "x86_64" })
+            foreach (var abi in new[] { "armeabi", "armeabi-v7a", "arm64-v8a", "x86", "x86_64" })
             {
                 string extra = string.Empty;
                 AndroidTargetArch targetArch;
