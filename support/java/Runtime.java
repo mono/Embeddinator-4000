@@ -29,7 +29,6 @@
 package mono.embeddinator;
 
 import com.sun.jna.*;
-import java.io.*;
 import java.util.*;
 
 public final class Runtime {
@@ -97,6 +96,8 @@ public final class Runtime {
         public Pointer mono_embeddinator_install_error_report_hook(ErrorCallback cb);
     }
 
+    private static RuntimeImpl implementation;
+
     public static boolean initialized;
 
     public static RuntimeLibrary runtimeLibrary;
@@ -110,22 +111,12 @@ public final class Runtime {
     }
 
     public static void initialize(String library) {
-        System.setProperty("jna.encoding", "utf8");
-
-        String tmp = System.getProperty("java.io.tmpdir");
-        String assemblyPath = extractAssembly(tmp, library);
-
-        runtimeLibrary = Native.loadLibrary(library, RuntimeLibrary.class);
-        runtimeLibrary.mono_embeddinator_set_assembly_path(assemblyPath);
-
-        //NOTE: need to make sure mscorlib.dll is extracted & directory set
-        String monoPath = Utilities.combinePath(tmp, "mono", "4.5");
-        File monoFile = new File(monoPath);
-        if (!monoFile.isDirectory()) {
-            monoFile.mkdirs();
-            monoFile.deleteOnExit();
-            extractAssembly(monoPath, "mscorlib");
+        if (isRunningOnAndroid()) {
+            implementation = new AndroidRuntimeImpl();
+        } else {
+            implementation = new RuntimeImpl();
         }
+        implementation.initialize(library);
         
         error = new RuntimeLibrary.ErrorCallback() {
             public void invoke(RuntimeLibrary.Error.ByValue error) {
@@ -139,40 +130,7 @@ public final class Runtime {
         runtimeLibrary.mono_embeddinator_install_error_report_hook(error);
     }
 
-    private static String extractAssembly(String tmp, String library) {
-        String assemblyPath = Utilities.combinePath(tmp, library);
-        File assemblyFile = new File(assemblyPath + ".dll");
 
-        String resourcePath = "/assemblies/" + library + ".dll";
-        if (isRunningOnAndroid()) {
-            resourcePath = "/assets" + resourcePath;
-        }
-        InputStream input = Runtime.class.getResourceAsStream(resourcePath);
-        if (input == null) {
-            throw new RuntimeException("Unable to locate " + resourcePath + " within jar file!");
-        }
-
-        try {
-            OutputStream output = new FileOutputStream(assemblyFile);
-            try {
-                byte[] buffer = new byte[4 * 1024];
-                int read;
-                while ((read = input.read(buffer)) != -1) {
-                    output.write(buffer, 0, read);
-                }
-                output.flush();
-            } finally {
-                output.close();
-                input.close();
-            }
-
-            //NOTE: this file should be temporary
-            assemblyFile.deleteOnExit();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        return assemblyPath;
-    }
 
     public static void checkExceptions() throws RuntimeException {
         RuntimeException exception = pendingException.get();
