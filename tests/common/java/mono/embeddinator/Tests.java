@@ -1,3 +1,5 @@
+package mono.embeddinator;
+
 import managed_dll.*;
 import managed_dll.properties.*;
 import managed_dll.first.*;
@@ -9,8 +11,6 @@ import managed_dll.fields.*;
 import managed_dll.interfaces.*;
 import managed_dll.methods.*;
 import managed_dll.structs.*;
-
-import mono.embeddinator.*;
 
 import static org.junit.Assert.*;
 import org.junit.*;

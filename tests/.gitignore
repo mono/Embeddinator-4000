@@ -3,7 +3,6 @@
 **/gen/java
 **/c
 **/objc
-**/java
 **/obj
 **/*.Tests
 *.dylib

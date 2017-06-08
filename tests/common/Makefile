@@ -31,16 +31,16 @@ JUNIT_CLASSPATH=../../external/junit/hamcrest-core-1.3.jar:../../external/junit/
 JAVAC_FLAGS=-d mk/java -Xdiags:verbose -Xlint:deprecation
 
 java: compile_java
-	java -cp "$(subst :,$(PATH_SEPERATOR),mk/java:mk/java/managed.jar:$(JUNIT_CLASSPATH):.)" -D -Djna.dump_memory=true -Djna.library.path=c/ org.junit.runner.JUnitCore Tests
+	java -cp "$(subst :,$(PATH_SEPERATOR),java:mk/java:mk/java/managed.jar:$(JUNIT_CLASSPATH):.)" -D -Djna.dump_memory=true -Djna.library.path=c/ org.junit.runner.JUnitCore mono.embeddinator.Tests
 
 compile_java:
 	mkdir -p mk/java
 	$(EMBEDDINATOR_CMD) -gen=java -out=mk/java $(PLATFORM_FLAG) -compile $(MANAGED_DLL)
-	javac -cp "$(subst :,$(PATH_SEPERATOR),$(JUNIT_CLASSPATH):mk/java/managed.jar)" $(JAVAC_FLAGS) Tests.java
+	javac -cp "$(subst :,$(PATH_SEPERATOR),$(JUNIT_CLASSPATH):mk/java/managed.jar)" $(JAVAC_FLAGS) java/mono/embeddinator/Tests.java
 
 run:
 	mk/bin/Debug/common.Tests
 
 clean:
-	rm -rf mk c objc java *.dylib *.jar *.class *.dll
+	rm -rf mk c objc *.dylib *.jar *.class *.dll
 	make -C ../managed clean
