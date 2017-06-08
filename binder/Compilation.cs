@@ -339,18 +339,23 @@ namespace MonoEmbeddinator4000
                 throw new Exception("No generated files found.");
 
             if (Options.GeneratorKind != GeneratorKind.Java)
-                CompileNativeCode(files);
+            {
+                if (!CompileNativeCode(files))
+                    return false;
+            }
 
             if (Options.GeneratorKind == GeneratorKind.Java)
             {
                 if (!CompileJava(files))
                     return false;
 
-                CreateJar();
+                if (!CreateJar())
+                    return false;
 
                 if (Options.Compilation.Platform == TargetPlatform.Android)
                 {
-                    CreateAar();
+                    if (!CreateAar())
+                        return false;
                 }
             }
 
@@ -421,7 +426,7 @@ namespace MonoEmbeddinator4000
             return output.ExitCode == 0;
         }
 
-        void CreateJar()
+        bool CreateJar()
         {
             var executableSuffix = Platform.IsWindows ? ".exe" : string.Empty;
             var jar = $"{Path.Combine(GetJavaSdkPath(), "bin", "jar" + executableSuffix)}";
@@ -443,8 +448,8 @@ namespace MonoEmbeddinator4000
                     Directory.CreateDirectory(platformDir);
 
                 var libName = $"lib{name}.dylib";
-                var output = Path.Combine(Options.OutputDir, libName);
-                File.Copy(output, Path.Combine(platformDir, libName), true);
+                var outputDir = Path.Combine(Options.OutputDir, libName);
+                File.Copy(outputDir, Path.Combine(platformDir, libName), true);
 
                 //Copy .NET assemblies
                 var assembliesDir = Path.Combine(classesDir, "assemblies");
@@ -513,10 +518,11 @@ namespace MonoEmbeddinator4000
             }
 
             var invocation = string.Join(" ", args);
-            Invoke(jar, invocation);
+            var output = Invoke(jar, invocation);
+            return output.ExitCode == 0;
         }
 
-        void CreateAar()
+        bool CreateAar()
         {
             var executableSuffix = Platform.IsWindows ? ".exe" : string.Empty;
             var jar = $"{Path.Combine(GetJavaSdkPath(), "bin", "jar" + executableSuffix)}";
@@ -639,7 +645,8 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
             }
 
             var invocation = string.Join(" ", args);
-            Invoke(jar, invocation);
+            var output = Invoke(jar, invocation);
+            return output.ExitCode == 0;
         }
 
         string FindDirectory(string dir)
@@ -667,7 +674,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
 
         const string DLLExportDefine = "MONO_EMBEDDINATOR_DLL_EXPORT";
 
-        void CompileMSVC(IEnumerable<string> files)
+        bool CompileMSVC(IEnumerable<string> files)
         {
             List<ToolchainVersion> vsSdks;
             MSVCToolchain.GetVisualStudioSdks(out vsSdks);
@@ -700,7 +707,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
             Diagnostics.Debug($"VS path {vsSdk.Directory}");
 
             var monoPath = ManagedToolchain.FindMonoPath();
-            var output = Path.Combine(Options.OutputDir, Options.LibraryName ??
+            var outputPath = Path.Combine(Options.OutputDir, Options.LibraryName ??
                 Path.GetFileNameWithoutExtension(Project.Assemblies[0]));
 
             var args = new List<string> {
@@ -710,7 +717,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
                 string.Join(" ", files.Select(file => "\""+ Path.GetFullPath(file) + "\"")),
                 $"\"{GetSgenLibPath(monoPath)}\"",
                 Options.Compilation.CompileSharedLibrary ? "/LD" : string.Empty,
-                $"/Fe{output}"
+                $"/Fe{outputPath}"
             };
 
             var invocation = string.Join(" ", args);
@@ -735,7 +742,8 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
                 envVars["LIB"] = clLib + ";" + string.Join(";", libPaths.Select(path => Path.Combine(path.FullName, "x86")));
             }
 
-            Invoke(clBin, invocation, envVars);
+            var output = Invoke(clBin, invocation, envVars);
+            return output.ExitCode == 0;
         }
 
         string GetSgenLibPath(string monoPath)
@@ -745,7 +753,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
             return File.Exists(sgenPath) ? sgenPath : Path.Combine(libPath, "monosgen-2.0.lib");
         }
 
-        void CompileClang(IEnumerable<string> files)
+        bool CompileClang(IEnumerable<string> files)
         {
             var xcodePath = XcodeToolchain.GetXcodeToolchainPath();
             var clangBin = Path.Combine(xcodePath, "usr/bin/clang");
@@ -766,8 +774,8 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
             {
                 var name = Path.GetFileNameWithoutExtension(Project.Assemblies[0]);
                 var libName = $"lib{name}.dylib";
-                var output = Path.Combine(Options.OutputDir, libName);
-                args.Add($"-dynamiclib -install_name {libName} -o {output}");
+                var outputPath = Path.Combine(Options.OutputDir, libName);
+                args.Add($"-dynamiclib -install_name {libName} -o {outputPath}");
             }
 
             switch (Options.GeneratorKind)
@@ -782,11 +790,11 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
             }
 
             var invocation = string.Join(" ", args);
-
-            Invoke(clangBin, invocation);
+            var output = Invoke(clangBin, invocation);
+            return output.ExitCode == 0;
         }
 
-        void CompileNDK(IEnumerable<string> files)
+        bool CompileNDK(IEnumerable<string> files)
         {
             RefreshAndroidSdk();
 
@@ -828,7 +836,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
                 var systemInclude = NdkUtil.GetNdkPlatformIncludePath(ndkPath, targetArch, 24); //NOTE: 24 should be an option?
                 var monoDroidPath = Path.Combine(MonoDroidSdk.BinPath, "..", "lib", "xbuild", "Xamarin", "Android", "lib", abi);
                 var abiDir = Path.Combine(Options.OutputDir, "android", "jni", abi);
-                var output = Path.Combine(abiDir, libName);
+                var outputPath = Path.Combine(abiDir, libName);
 
                 if (!Directory.Exists(abiDir))
                     Directory.CreateDirectory(abiDir);
@@ -840,20 +848,22 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
                     $"-L\"{monoDroidPath}\" -lmonosgen-2.0",
                     string.Join(" ", files.ToList()),
                     "--std=c99",
-                    $"-shared -o {output}",
+                    $"-shared -o {outputPath}",
                 };
 
                 var invocation = string.Join(" ", args);
-                Invoke(clangBin, invocation);
+                var output = Invoke(clangBin, invocation);
+                if (output.ExitCode != 0)
+                    return false;
             }
+            return true;
         }
 
-        void CompileNativeCode(IEnumerable<string> files)
+        bool CompileNativeCode(IEnumerable<string> files)
         {
             if (Platform.IsWindows)
             {
-                CompileMSVC(files);
-                return;
+                return CompileMSVC(files);
             }
             else if (Platform.IsMacOS)
             {
@@ -866,13 +876,11 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
                     throw new NotSupportedException(
                         $"Cross compilation to target platform '{Options.Compilation.Platform}' is not supported.");
                 case TargetPlatform.MacOS:
-                    CompileClang(files);
-                    break;
+                    return CompileClang(files);
                 case TargetPlatform.Android:
-                    CompileNDK(files);
-                    break;
+                    return CompileNDK(files);
                 }
-                return;
+                return true;
             }
 
             throw new NotImplementedException();
