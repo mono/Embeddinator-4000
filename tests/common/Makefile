@@ -38,6 +38,9 @@ compile_java:
 	$(EMBEDDINATOR_CMD) -gen=java -out=mk/java $(PLATFORM_FLAG) -compile $(MANAGED_DLL)
 	javac -cp "$(subst :,$(PATH_SEPERATOR),$(JUNIT_CLASSPATH):mk/java/managed.jar)" $(JAVAC_FLAGS) java/mono/embeddinator/Tests.java
 
+android:
+	make -C ../android compile deploy run
+
 run:
 	mk/bin/Debug/common.Tests
 
