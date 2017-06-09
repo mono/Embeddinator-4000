@@ -648,6 +648,9 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
                         referencedAssemblies.Add(reference.Name);
                 }
             }
+            //NOTE: Mono.Android.dll is always needed
+            if (!referencedAssemblies.Contains("Mono.Android"))
+                referencedAssemblies.Add("Mono.Android");
 
             foreach (var reference in referencedAssemblies)
             {
