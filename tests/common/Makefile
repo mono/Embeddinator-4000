@@ -1,12 +1,6 @@
-MAKEFLAGS += --no-builtin-rules
 .PHONY: java
 
-
-EMBEDDINATOR_EXE=../../build/lib/Debug/MonoEmbeddinator4000.exe
-
-MANAGED_DLL=../managed/generic/bin/Debug/managed.dll
-
-BUILD_FLAGS=/v:minimal
+include Shared.make
 
 all: binder managed c java run 
 
@@ -15,26 +9,6 @@ managed:
 	mkdir -p mk/bin/Debug
 	cp $(MANAGED_DLL)* mk/bin/Debug 
 	cp $(MANAGED_DLL)* .
-
-ifeq ($(OS),Windows_NT)
-# Defines
-MSBUILD = msbuild.exe
-PROJECT = ../../build/projects/MonoEmbeddinator4000.csproj
-EMBEDDINATOR_CMD= $(EMBEDDINATOR_EXE)
-PLATFORM_FLAG= -p=windows
-PATH_SEPERATOR=;
-PREMAKE_GENERATE=../../external/CppSharp/build/premake5.exe --os=windows vs2015
-BUILD_COMMON= msbuild.exe /nologo /v:minimal mk/mk.sln
-else
-# Defines
-MSBUILD = /Library/Frameworks/Mono.framework/Versions/Current/Commands/msbuild
-PROJECT = ../../build/MonoEmbeddinator4000.sln
-EMBEDDINATOR_CMD= mono --debug $(EMBEDDINATOR_EXE)
-PLATFORM_FLAG= -p=macos
-PATH_SEPERATOR=:
-PREMAKE_GENERATE=../../external/CppSharp/build/premake5-osx gmake
-BUILD_COMMON= make -C mk
-endif
 
 # Targets
 binder:
@@ -57,16 +31,19 @@ JUNIT_CLASSPATH=../../external/junit/hamcrest-core-1.3.jar:../../external/junit/
 JAVAC_FLAGS=-d mk/java -Xdiags:verbose -Xlint:deprecation
 
 java: compile_java
-	java -cp "$(subst :,$(PATH_SEPERATOR),mk/java:mk/java/managed.jar:$(JUNIT_CLASSPATH):.)" -D -Djna.dump_memory=true -Djna.library.path=c/ org.junit.runner.JUnitCore Tests
+	java -cp "$(subst :,$(PATH_SEPERATOR),java:mk/java:mk/java/managed.jar:$(JUNIT_CLASSPATH):.)" -D -Djna.dump_memory=true -Djna.library.path=c/ org.junit.runner.JUnitCore mono.embeddinator.Tests
 
 compile_java:
 	mkdir -p mk/java
-	$(EMBEDDINATOR_CMD) -gen=java -out=mk/java $(PLATFORM_FLAG) -target=shared $(MANAGED_DLL) -c
-	javac -cp "$(subst :,$(PATH_SEPERATOR),$(JUNIT_CLASSPATH):mk/java/managed.jar)" $(JAVAC_FLAGS) Tests.java
+	$(EMBEDDINATOR_CMD) -gen=java -out=mk/java $(PLATFORM_FLAG) -compile $(MANAGED_DLL)
+	javac -cp "$(subst :,$(PATH_SEPERATOR),$(JUNIT_CLASSPATH):mk/java/managed.jar)" $(JAVAC_FLAGS) java/mono/embeddinator/Tests.java
+
+android:
+	make -C ../android compile deploy run
 
 run:
 	mk/bin/Debug/common.Tests
 
 clean:
-	rm -rf mk c objc java *.dylib *.jar *.class *.dll
+	rm -rf mk c objc *.dylib *.jar *.class *.dll
 	make -C ../managed clean
