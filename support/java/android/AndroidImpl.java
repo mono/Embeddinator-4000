@@ -4,22 +4,18 @@ import android.content.*;
 import android.content.pm.*;
 import com.sun.jna.*;
 import java.util.*;
+
+import mono.embeddinator.DesktopImpl;
 import mono.embeddinator.Runtime.RuntimeLibrary;
 
-public class AndroidRuntimeImpl extends RuntimeImpl {
-    interface AndroidRuntime extends com.sun.jna.Library {
-        public void Java_mono_android_Runtime_init(String lang, String[] runtimeApks, String runtimeDataDir, String[] appDirs, ClassLoader loader, String externalStorageDir, String[] assemblies, String packageName);
-    }
+public class AndroidImpl extends DesktopImpl {
 
-    private AndroidRuntime androidRuntime;
-
-    //TODO: currently setting this via getApplicationContext() in Android app
+    /* TODO: currently setting this via getApplicationContext() in Android app */
     public static Context context;
 
     @Override
     public RuntimeLibrary initialize(String library) {
-        androidRuntime = Native.loadLibrary("monodroid", AndroidRuntime.class);
-
+        System.loadLibrary("monodroid");
         ApplicationInfo app = context.getApplicationInfo();
         Locale locale       = Locale.getDefault ();
         String language     = locale.getLanguage () + "-" + locale.getCountry ();
@@ -28,7 +24,7 @@ public class AndroidRuntimeImpl extends RuntimeImpl {
         String dataDir      = app.nativeLibraryDir;
         ClassLoader loader  = context.getClassLoader ();
 
-        androidRuntime.Java_mono_android_Runtime_init (
+        mono.android.Runtime.init (
                 language,
                 new String[] { app.sourceDir },
                 app.nativeLibraryDir,
@@ -44,6 +40,7 @@ public class AndroidRuntimeImpl extends RuntimeImpl {
                 new String[] {
                         "managed.dll",
                         "mscorlib.dll",
+                        "Mono.Android.dll",
                         "System.Core.dll"
                 },
                 context.getPackageName ());
