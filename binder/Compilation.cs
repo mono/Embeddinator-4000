@@ -402,9 +402,12 @@ namespace MonoEmbeddinator4000
             var javac = $"{Path.Combine(GetJavaSdkPath(), "bin", "javac" + executableSuffix)}";
             var classesDir = Path.Combine(Options.OutputDir, "classes");
 
+            var supportFiles = Directory.GetFiles(FindDirectory("support"), "*.java", SearchOption.AllDirectories)
+                .Where(f => Options.Compilation.Platform == TargetPlatform.Android || Path.GetFileName(Path.GetDirectoryName(f)) != "android");
+
             var args = new List<string> {
                 string.Join(" ", files.Select(file => Path.GetFullPath(file))),
-                string.Join(" ", Directory.GetFiles(FindDirectory("support"), "*.java", SearchOption.AllDirectories)),
+                string.Join(" ", supportFiles),
                 "-source 1.7 -target 1.7",
                 $"-d {classesDir}",
             };
@@ -412,10 +415,21 @@ namespace MonoEmbeddinator4000
             if (Options.Compilation.DebugMode)
                 args.Add("-g");
 
-            //JNA library
+            //Jar files needed: JNA, Android
             args.Add("-cp");
-            args.Add(Path.Combine(FindDirectory("external"), "jna", "jna-4.4.0.jar"));
+            var jnaPath = Path.Combine(FindDirectory("external"), "jna", "jna-4.4.0.jar");
 
+            if (Options.Compilation.Platform == TargetPlatform.Android)
+            {
+                var maxVersion = AndroidSdk.GetInstalledPlatformVersions().Select(m => m.ApiLevel).Max();
+                var androidDir = AndroidSdk.GetPlatformDirectory(maxVersion);
+                args.Add(Path.Combine(androidDir, "android.jar") + ":" + jnaPath);
+            }
+            else
+            {
+                args.Add(jnaPath);
+            }
+                
             //If "classes" directory doesn't exists, javac fails
             if (!Directory.Exists(classesDir))
                 Directory.CreateDirectory(classesDir);

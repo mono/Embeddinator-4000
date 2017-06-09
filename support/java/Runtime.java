@@ -80,7 +80,7 @@ public final class Runtime {
         public Pointer mono_embeddinator_install_error_report_hook(ErrorCallback cb);
     }
 
-    private static RuntimeImpl implementation;
+    private static DesktopImpl implementation;
 
     public static boolean initialized;
 
@@ -96,9 +96,18 @@ public final class Runtime {
 
     public static void initialize(String library) {
         if (isRunningOnAndroid()) {
-            implementation = new AndroidRuntimeImpl();
+            try {
+                Class<DesktopImpl> klass = (Class<DesktopImpl>) Class.forName("mono.embeddinator.android.AndroidImpl");
+                implementation = klass.newInstance();
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            } catch (InstantiationException e) {
+                throw new RuntimeException(e);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
         } else {
-            implementation = new RuntimeImpl();
+            implementation = new DesktopImpl();
         }
         implementation.initialize(library);
         

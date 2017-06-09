@@ -4,7 +4,7 @@ import com.sun.jna.*;
 import java.io.*;
 import mono.embeddinator.Runtime.RuntimeLibrary;
 
-public class RuntimeImpl {
+public class DesktopImpl {
     public RuntimeLibrary initialize(String library) {
         System.setProperty("jna.encoding", "utf8");
 
