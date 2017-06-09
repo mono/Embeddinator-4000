@@ -12,6 +12,7 @@
     {
       "System",
       "System.Core",
+      "System.IO.Compression",
       "IKVM.Reflection",
       "CppSharp",
       "CppSharp.AST",
