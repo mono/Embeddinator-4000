@@ -26,14 +26,14 @@ namespace MonoEmbeddinator4000.Generators
 
         public static string GenId(string id)
         {
-            return "__" + id;
+            return "__" + id.Replace('-', '_');
         }
 
         public static string ObjectInstanceId => GenId("object");
 
         public static string AssemblyId(TranslationUnit unit)
         {
-            return GenId(unit.FileName).Replace('.', '_');
+            return GenId(unit.FileName).Replace('.', '_').Replace('-', '_');
         }
 
         private static CppTypePrintFlavorKind GetTypePrinterFlavorKind(GeneratorKind kind)

@@ -21,7 +21,7 @@ namespace MonoEmbeddinator4000.Generators
         }
 
         public static string GetNativeLibClassName(TranslationUnit unit) =>
-            $"Native_{unit.FileName.Replace('.', '_')}";
+            $"Native_{unit.FileName.Replace('.', '_').Replace('-', '_')}";
 
         public string ClassName => GetNativeLibClassName(TranslationUnit);
 

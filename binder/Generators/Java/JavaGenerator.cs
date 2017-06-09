@@ -13,7 +13,7 @@ namespace MonoEmbeddinator4000.Generators
         public static string IntPtrType = "com.sun.jna.Pointer";
 
         public static string GetNativeLibPackageName(TranslationUnit unit) =>
-            unit.FileName.Replace('.', '_').ToLowerInvariant();
+            unit.FileName.Replace('.', '_').Replace('-', '_').ToLowerInvariant();
 
         public JavaTypePrinter TypePrinter;
 
