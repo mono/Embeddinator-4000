@@ -632,7 +632,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
                 string xamarinAndroidSource = Path.Combine(FindDirectory("support"), "..", "..", "xamarin-android");
                 if (Directory.Exists(xamarinAndroidSource))
                 {
-                    libMonoAndroidSourcePath = Path.Combine(xamarinAndroidSource, "bin", "Debug", "lib", "xbuild", "Xamarin", "Android", "lib", abi, libMonoAndroid);
+                    libMonoAndroidSourcePath = Path.Combine(xamarinAndroidSource, "bin", "Debug", "lib", "xbuild", "Xamarin", "Android", "lib", Path.GetFileName(abi), libMonoAndroid);
                 }
                 else
                 {
@@ -749,6 +749,13 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
                 }
 
                 referencePath = Path.Combine(MonoDroidSdk.BinPath, "..", "lib", "xbuild-frameworks", "MonoAndroid", "v1.0", "Facades", reference + ".dll");
+                if (File.Exists(referencePath))
+                {
+                    File.Copy(referencePath, Path.Combine(assembliesDir, reference + ".dll"), true);
+                    continue;
+                }
+
+                referencePath = Path.Combine(MonoDroidSdk.BinPath, "..", "lib", "xbuild-frameworks", "MonoAndroid", "v2.3", reference + ".dll");
                 if (File.Exists(referencePath))
                 {
                     File.Copy(referencePath, Path.Combine(assembliesDir, reference + ".dll"), true);
