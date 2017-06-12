@@ -1,6 +1,6 @@
 # Embeddinator-4000 0.2
 
-This is the second public release of Embeddinator-4000. It supports the Objective-C language on both macOS, iOS, and tvOS. More languages and platforms will be added in future releases.
+This is the second public release of Embeddinator-4000. It supports the Objective-C language on macOS, iOS, and tvOS. More languages and platforms will be added in future releases.
 
 Requirements
 ============
