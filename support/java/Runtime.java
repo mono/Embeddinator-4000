@@ -113,7 +113,7 @@ public final class Runtime {
     public static void initialize(String library) {
         if (isRunningOnAndroid()) {
             try {
-                Class<DesktopImpl> klass = (Class<DesktopImpl>) Class.forName("mono.embeddinator.android.AndroidImpl");
+                Class<DesktopImpl> klass = (Class<DesktopImpl>) Class.forName("mono.embeddinator.AndroidImpl");
                 implementation = klass.newInstance();
             } catch (ClassNotFoundException e) {
                 throw new RuntimeException(e);
@@ -125,7 +125,7 @@ public final class Runtime {
         } else {
             implementation = new DesktopImpl();
         }
-        implementation.initialize(library);
+        runtimeLibrary = implementation.initialize(library);
         
         error = new RuntimeLibrary.ErrorCallback() {
             public void invoke(RuntimeLibrary.Error.ByValue error) {
