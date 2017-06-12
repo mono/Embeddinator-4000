@@ -611,8 +611,19 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
                 if (!File.Exists(libMonoSgenSourcePath))
                     continue;
 
-                var libMonoAndroidDestPath = Path.Combine(abiDir, "libmonodroid.so"); //NOTE: Xamarin.Android runtime uses different name from APK
-                var libMonoAndroidSourcePath = Path.Combine(abi, libMonoAndroid);
+                string libMonoAndroidSourcePath;
+                string libMonoAndroidDestPath = Path.Combine(abiDir, "libmonodroid.so"); //NOTE: Xamarin.Android runtime uses different name from APK
+
+                //Attempt to find compiled libs for Xamarin.Android
+                string xamarinAndroidSource = Path.Combine(FindDirectory("support"), "..", "..", "xamarin-android");
+                if (Directory.Exists(xamarinAndroidSource))
+                {
+                    libMonoAndroidSourcePath = Path.Combine(xamarinAndroidSource, "bin", "Debug", "lib", "xbuild", "Xamarin", "Android", "lib", abi, libMonoAndroid);
+                }
+                else
+                {
+                    libMonoAndroidSourcePath = Path.Combine(abi, libMonoAndroid);
+                }
                 if (!File.Exists(libMonoAndroidSourcePath))
                     continue;
 
