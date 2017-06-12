@@ -415,19 +415,21 @@ namespace MonoEmbeddinator4000
             if (Options.Compilation.DebugMode)
                 args.Add("-g");
 
-            //Jar files needed: JNA, Android
+            //Jar files needed: JNA, android.jar, mono.android.jar
             args.Add("-cp");
-            var jnaPath = Path.Combine(FindDirectory("external"), "jna", "jna-4.4.0.jar");
 
+            var jnaJar = Path.Combine(FindDirectory("external"), "jna", "jna-4.4.0.jar");
             if (Options.Compilation.Platform == TargetPlatform.Android)
             {
                 var maxVersion = AndroidSdk.GetInstalledPlatformVersions().Select(m => m.ApiLevel).Max();
                 var androidDir = AndroidSdk.GetPlatformDirectory(maxVersion);
-                args.Add(Path.Combine(androidDir, "android.jar") + ":" + jnaPath);
+                var androidJar = Path.Combine(androidDir, "android.jar");
+                var monoAndroidJar = Path.Combine(MonoDroidSdk.BinPath, "..", "lib", "xbuild-frameworks", "MonoAndroid", "v2.3", "mono.android.jar"); //TODO: 1.0 may also need to be an option
+                args.Add(string.Join(":", jnaJar, androidJar, monoAndroidJar));
             }
             else
             {
-                args.Add(jnaPath);
+                args.Add(jnaJar);
             }
                 
             //If "classes" directory doesn't exists, javac fails
