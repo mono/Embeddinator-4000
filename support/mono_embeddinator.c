@@ -97,8 +97,12 @@ int mono_embeddinator_init(mono_embeddinator_context_t* ctx, const char* domain)
         mono_set_dirs(tmp->str, tmp->str);
         g_string_free(tmp, /*free_segment=*/ FALSE);
     }
+    #if defined (__ANDROID__)
+    ctx->domain = mono_domain_get ();
+    #else
     mono_config_parse(NULL);
     ctx->domain = mono_jit_init_version(domain, "v4.0.30319");
+    #endif
 #endif
 
     mono_embeddinator_set_context(ctx);
@@ -147,6 +151,14 @@ static GString* get_current_executable_path()
 
 char* mono_embeddinator_search_assembly(const char* assembly)
 {
+#if defined(__ANDROID__)
+    GString* path = g_string_new(assembly);
+    gchar* sep = strrchr(path->str, '.');
+    g_string_truncate(path, sep - path->str);
+    assembly = path->str;
+    g_string_free(path, /*free_segment=*/ FALSE);
+    return assembly;
+#else
     GString* path = get_current_executable_path();
 
     gchar* sep = strrchr_seperator(path->str);
@@ -159,6 +171,7 @@ char* mono_embeddinator_search_assembly(const char* assembly)
     g_string_free(path, /*free_segment=*/ FALSE);
 
     return data;
+#endif
 }
 
 static mono_embeddinator_assembly_load_hook_t g_assembly_load_hook = NULL;
