@@ -691,9 +691,20 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
                         referencedAssemblies.Add(reference.Name);
                 }
             }
-            //NOTE: Mono.Android.dll is always needed
-            if (!referencedAssemblies.Contains("Mono.Android"))
-                referencedAssemblies.Add("Mono.Android");
+
+            //NOTE: these are always needed
+            //TODO: this list should be computed, and only a few hardcoded
+            foreach (var assembly in new[]  { 
+                "Java.Interop", "Mono.Android", 
+                "System.Collections", "System.Collections.Concurrent", 
+                "System.Linq", 
+                "System.Reflection", "System.Reflection.Extensions",
+                "System.Runtime", "System.Runtime.Extensions", 
+                "System.Runtime.InteropServices", "System.Threading" })
+            {
+                if (!referencedAssemblies.Contains(assembly))
+                    referencedAssemblies.Add(assembly);
+            }
 
             foreach (var reference in referencedAssemblies)
             {
@@ -701,6 +712,21 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
                 if (File.Exists(referencePath))
                 {
                     File.Copy(referencePath, Path.Combine(assembliesDir, reference + ".dll"), true);
+                    continue;
+                }
+
+                referencePath = Path.Combine(MonoDroidSdk.BinPath, "..", "lib", "xbuild-frameworks", "MonoAndroid", "v1.0", reference + ".dll");
+                if (File.Exists(referencePath))
+                {
+                    File.Copy(referencePath, Path.Combine(assembliesDir, reference + ".dll"), true);
+                    continue;
+                }
+
+                referencePath = Path.Combine(MonoDroidSdk.BinPath, "..", "lib", "xbuild-frameworks", "MonoAndroid", "v1.0", "Facades", reference + ".dll");
+                if (File.Exists(referencePath))
+                {
+                    File.Copy(referencePath, Path.Combine(assembliesDir, reference + ".dll"), true);
+                    continue;
                 }
             }
 
