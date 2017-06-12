@@ -611,19 +611,29 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
 
 </manifest>");
 
-            //Copy libmonosgen-2.0.so
+            //Copy libmonosgen-2.0.so and libmonodroid.so
             const string libMonoSgen = "libmonosgen-2.0.so";
+            const string libMonoAndroid = "libmono-android.release.so";
+
             var monoDroidPath = GetMonoDroidLibPath();
             foreach (var abi in Directory.GetDirectories(monoDroidPath))
             {
                 var abiDir = Path.Combine(androidDir, "jni", Path.GetFileName(abi));
-                var libDestPath = Path.Combine(abiDir, libMonoSgen);
-                var libSourcePath = Path.Combine(abi, libMonoSgen);
-                if (!File.Exists(libSourcePath))
+
+                var libMonoSgenDestPath = Path.Combine(abiDir, libMonoSgen);
+                var libMonoSgenSourcePath = Path.Combine(abi, libMonoSgen);
+                if (!File.Exists(libMonoSgenSourcePath))
                     continue;
+
+                var libMonoAndroidDestPath = Path.Combine(abiDir, "libmonodroid.so"); //NOTE: Xamarin.Android runtime uses different name from APK
+                var libMonoAndroidSourcePath = Path.Combine(abi, libMonoAndroid);
+                if (!File.Exists(libMonoAndroidSourcePath))
+                    continue;
+
                 if (!Directory.Exists(abiDir))
                     Directory.CreateDirectory(abiDir);
-                File.Copy(libSourcePath, libDestPath, true);
+                File.Copy(libMonoSgenSourcePath, libMonoSgenDestPath, true);
+                File.Copy(libMonoAndroidSourcePath, libMonoAndroidDestPath, true);
             }
 
             //Copy JNA native libs
