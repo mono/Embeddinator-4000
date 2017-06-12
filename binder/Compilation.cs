@@ -533,6 +533,38 @@ namespace MonoEmbeddinator4000
                 }
             }
 
+            //Embed mono.android.jar into our jar file
+            if (Options.Compilation.Platform == TargetPlatform.Android)
+            {
+                //TODO: 1.0 may also need to be an option
+                using (var stream = File.OpenRead(Path.Combine(MonoDroidSdk.BinPath, "..", "lib", "xbuild-frameworks", "MonoAndroid", "v2.3", "mono.android.jar")))
+                using (var zip = new ZipArchive(stream))
+                {
+                    foreach (var entry in zip.Entries)
+                    {
+                        //Skip META-INF
+                        if (entry.FullName.StartsWith("META-INF", StringComparison.Ordinal))
+                            continue;
+
+                        var entryPath = Path.Combine(classesDir, entry.FullName);
+
+                        if (string.IsNullOrEmpty(entry.Name))
+                        {
+                            if (!Directory.Exists(entryPath))
+                                Directory.CreateDirectory(entryPath);
+                        }
+                        else
+                        {
+                            using (var zipEntryStream = entry.Open())
+                            using (var fileStream = File.Create(entryPath))
+                            {
+                                zipEntryStream.CopyTo(fileStream);
+                            }
+                        }
+                    }
+                }
+            }
+
             var invocation = string.Join(" ", args);
             var output = Invoke(jar, invocation);
             return output.ExitCode == 0;
