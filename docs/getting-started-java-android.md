@@ -21,22 +21,22 @@ public class Hello
 
 Build the project, the resulting assembly will be saved as `~/Projects/hello-from-csharp/hello-from-csharp/bin/Debug/hello-from-csharp.dll`.
 
-If you followed the [previous guide](getting-started-java.md), clone the source of Embeddinator 4000 into an easy-to-find directory such as `~/Projects/Embeddinator-4000` and compile it.
+Follow the [previous guide](getting-started-java.md) for details, and clone the source of Embeddinator 4000 into an easy-to-find directory such as `~/Projects/Embeddinator-4000` and compile it.
 
 Run the embeddinator to create a native AAR file for the managed assembly:
 
 ```shell
 cd ~/Projects/Embeddinator-4000
-mono ~/Projects/Embeddinator-4000/build/lib/Debug/MonoEmbeddinator4000.exe ~/Projects/hello-from-csharp/hello-from-csharp/bin/Debug/hello-from-csharp.dll --gen=Java --platform=Android --outdir=~/Projects/hello-from-csharp/output -c
+mono ~/Projects/Embeddinator-4000/build/lib/Debug/MonoEmbeddinator4000.exe ~/Projects/hello-from-csharp/hello-from-csharp/bin/Debug/hello-from-csharp.dll --gen=Java --platform=Android --outdir=../hello-from-csharp/output -c
 ```
 
-The Android AAR file will be placed in `~/Projects/hello-from-csharp/output/hello-from-csharp.aar`.
+The Android AAR file will be placed in `~/Projects/hello-from-csharp/output/hello_from_csharp.aar`. _NOTE: hyphens are replaced because Java does not support it in package names._
 
 ### Use the generated output in an Android Studio project
 
 Open Android Studio and create a new project with an `Empty Activity`.
 
-Right-click on your `app` module and choose `New | Module`. Select `Import .JAR/.AAR Package`. Use the directory browser to locate `~/Projects/Embeddinator-4000/output/hello-from-csharp.aar` and hit `Finish`.
+Right-click on your `app` module and choose `New | Module`. Select `Import .JAR/.AAR Package`. Use the directory browser to locate `~/Projects/hello-from-csharp/output/hello_from_csharp.aar` and hit `Finish`.
 
 ![Import AAR into Android Studio](AndroidStudioImport.png)
 
