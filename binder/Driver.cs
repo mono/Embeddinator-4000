@@ -7,6 +7,7 @@ using CppSharp.Generators;
 using CppSharp.Passes;
 using MonoEmbeddinator4000.Generators;
 using MonoEmbeddinator4000.Passes;
+using Xamarin.Android.Tools;
 using BindingContext = CppSharp.Generators.BindingContext;
 
 namespace MonoEmbeddinator4000
@@ -47,6 +48,12 @@ namespace MonoEmbeddinator4000
         bool Parse()
         {
             var parser = new Parser();
+            if (Options.Compilation.Platform == TargetPlatform.Android)
+            {
+                parser.AddAssemblyResolveDirectory(Path.Combine(MonoDroidSdk.BinPath, "..", "lib", "xbuild-frameworks", "MonoAndroid", "v1.0"));
+                parser.AddAssemblyResolveDirectory(Path.Combine(MonoDroidSdk.BinPath, "..", "lib", "xbuild-frameworks", "MonoAndroid", "v2.3"));
+            }
+
             parser.OnAssemblyParsed += HandleAssemblyParsed;
 
             return parser.Parse(Project);
