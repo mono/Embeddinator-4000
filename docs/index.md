@@ -34,3 +34,4 @@ supported languages:
 
 * [C](getting-started-c): covers C language on desktop platforms.
 * [Objective-C](getting-started-objective-c): covers macOS and iOS.
+* [Java](getting-started-java): covers macOS and Android.

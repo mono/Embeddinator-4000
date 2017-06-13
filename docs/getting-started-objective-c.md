@@ -1,6 +1,6 @@
 # Getting started with Objective-C
 
-This is the getting started page for Objective-C and cover the basic for all supported platforms.
+This is the getting started page for Objective-C, which covers the basics for all supported platforms.
 
 
 ## Requirements
