@@ -23,7 +23,7 @@ Notes:
 
 ## Installation
 
-There is not currently an installer with Java/Android support. For now you can build from source, see our [git repository](https://github.com/mono/Embeddinator-4000/tree/objc) and the [contributing](Contributing.md) document for instructions.
+There is not currently an installer with Java/Android support. For now you can build from source, see our [git repository](https://github.com/mono/Embeddinator-4000/) and the [contributing](Contributing.md) document for instructions.
 
 ## Platforms
 
