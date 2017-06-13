@@ -9,7 +9,7 @@ public class AndroidRuntimeProvider extends android.content.ContentProvider {
 
     @Override
     public void attachInfo (android.content.Context context, android.content.pm.ProviderInfo info) {
-        AndroidImpl.context = context;
+        Runtime.setImplementation(new AndroidImpl(context));
         super.attachInfo (context, info);
     }
 
