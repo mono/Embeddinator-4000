@@ -94,17 +94,14 @@ public final class Runtime {
         pendingException = new ThreadLocal<RuntimeException>();
     }
 
+    public static void setImplementation(DesktopImpl implementation) {
+        Runtime.implementation = implementation;
+    }
+
     public static void initialize(String library) {
         if (isRunningOnAndroid()) {
-            try {
-                Class<DesktopImpl> klass = (Class<DesktopImpl>) Class.forName("mono.embeddinator.AndroidImpl");
-                implementation = klass.newInstance();
-            } catch (ClassNotFoundException e) {
-                throw new RuntimeException(e);
-            } catch (InstantiationException e) {
-                throw new RuntimeException(e);
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
+            if (implementation == null) {
+                throw new RuntimeException("AndroidRuntimeProvider is not configured as a ContentProvider!");
             }
         } else {
             implementation = new DesktopImpl();

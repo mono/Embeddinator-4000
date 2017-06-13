@@ -8,16 +8,14 @@ import java.util.*;
 import mono.embeddinator.Runtime.RuntimeLibrary;
 
 public class AndroidImpl extends DesktopImpl {
-    /* NOTE: currently setting this from AndroidRuntimeProvider */
-    public static Context context;
+    private final Context context;
+
+    public AndroidImpl(Context context) {
+        this.context = context;
+    }
 
     @Override
     public RuntimeLibrary initialize(String library) {
-
-        if (context == null) {
-            throw new RuntimeException("Application 'context' was not set!");
-        }
-
         System.loadLibrary("monodroid");
         ApplicationInfo app = context.getApplicationInfo();
         Locale locale       = Locale.getDefault ();
