@@ -4,6 +4,7 @@ EMBEDDINATOR_EXE=../../build/lib/Debug/MonoEmbeddinator4000.exe
 
 MANAGED_DLL=../managed/generic/bin/Debug/managed.dll
 MANAGED_PCL_DLL=../managed/pcl/bin/Debug/managed.dll
+MANAGED_ANDROID_DLL=../managed/android/bin/Debug/managed.dll
 
 BUILD_FLAGS=/v:minimal
 

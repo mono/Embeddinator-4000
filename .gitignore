@@ -66,3 +66,4 @@ xcuserdata/
 *.nupkg
 .cake/**
 !.cake/packages.config
+Resource.designer.cs
