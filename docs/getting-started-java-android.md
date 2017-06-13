@@ -74,4 +74,11 @@ Upon launching your app:
 
 ## Current Limitations on Android
 
-Right now your C# library can't have any access to Android APIs or `Mono.Android.dll`--it must be a plain .NET 4.5 class library. The current plan is to support Android Library Projects in the future.
+Right now your C# library can't have any access to Android APIs or `Mono.Android.dll`. Your assembly must be a plain .NET 4.5 class library. The current plan is to support Android Library Projects in the future.
+
+## Further Reading
+
+* [Preliminary Android Research](android-preliminary-research.md)
+* [Embeddinator Limitations](Limitations.md)
+* [Contributing to the open source project](Contributing.md)
+* [Error codes and descriptions](errors.md)
