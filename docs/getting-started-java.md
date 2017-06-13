@@ -18,7 +18,7 @@ Optionally you can install [Xamarin Studio](https://developer.xamarin.com/guides
 
 Notes:
 
-* Earlier versions of Xcode, Xamarin.Android, Android Studio, and Mono _might_ work, but are untested and unsupported;
+* Earlier versions of Xcode, Xamarin.Android, Android Studio, and Mono _might_ work, but are untested and unsupported.
 * Code generation can be done on Windows, and desktop Java _should_ work (needs testing). Full support for Windows will be coming soon.
 
 ## Installation

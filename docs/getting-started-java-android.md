@@ -30,15 +30,23 @@ cd ~/Projects/Embeddinator-4000
 mono ~/Projects/Embeddinator-4000/build/lib/Debug/MonoEmbeddinator4000.exe ~/Projects/hello-from-csharp/hello-from-csharp/bin/Debug/hello-from-csharp.dll --gen=Java --platform=Android --outdir=~/Projects/hello-from-csharp/output -c
 ```
 
-The Android AAR file will be placed in `~/Projects/Embeddinator-4000/output/hello-from-csharp.aar`.
+The Android AAR file will be placed in `~/Projects/hello-from-csharp/output/hello-from-csharp.aar`.
 
 ### Use the generated output in an Android Studio project
 
 Open Android Studio and create a new project with an `Empty Activity`.
 
-Right-click on your `app` module and choose `New | Module`. Select `Import .JAR/.AAR Package`. Use the directory browser to locate `~/Projects/Embeddinator-4000/output/hello-from-csharp.aar` and hit `Finish`. This will copy the AAR file into a new module named `hello-from-csharp`.
+Right-click on your `app` module and choose `New | Module`. Select `Import .JAR/.AAR Package`. Use the directory browser to locate `~/Projects/Embeddinator-4000/output/hello-from-csharp.aar` and hit `Finish`.
+
+![Import AAR into Android Studio](AndroidStudioImport.png)
+
+This will copy the AAR file into a new module named `hello-from-csharp`.
+
+![Android Studio Project](AndroidStudioProject.png)
 
 To use the new module from your `app`, right-click and choose `Open Module Settings`. On the `Dependencies` tab, add a new `Module Dependency` and choose `:hello-from-csharp`.
+
+![Android Studio Dependencies](AndroidStudioDependencies.png)
 
 Open your main layout file `activity_main.xml`, and give the default `TextView` an `ID` of `text`.
 
@@ -61,3 +69,9 @@ public class MainActivity extends AppCompatActivity {
 ```
 
 Upon launching your app:
+
+![Hello from C# sample running in the emulator](hello-from-csharp-android.png)
+
+## Current Limitations on Android
+
+Right now your C# library can't have any access to Android APIs or `Mono.Android.dll`--it must be a plain .NET 4.5 class library. The current plan is to support Android Library Projects in the future.
