@@ -1,4 +1,10 @@
+if [ -n "$TRAVIS_BUILD_DIR" ]; then
 BUILD_DIR=$TRAVIS_BUILD_DIR/build
+fi;
+
+if [ -n "$BUILD_SOURCESDIRECTORY" ]; then
+BUILD_DIR=$BUILD_SOURCESDIRECTORY/build
+fi
 
 cd $BUILD_DIR/../objcgen
 ./system-dependencies.sh --provision
