@@ -16,7 +16,7 @@ fi
 
 cd $BUILD_DIR
 if [ ! -f $BUILD_DIR/nuget.exe ]; then
-	curl https://nuget.org/nuget.exe -o $BUILD_DIR/nuget.exe
+	curl -L https://nuget.org/nuget.exe -o $BUILD_DIR/nuget.exe
 fi
 
 mono $BUILD_DIR/nuget.exe install Mono.TextTransform -OutputDirectory $BUILD_DIR/../deps
