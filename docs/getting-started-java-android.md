@@ -40,11 +40,11 @@ Right-click on your `app` module and choose `New | Module`. Select `Import .JAR/
 
 ![Import AAR into Android Studio](AndroidStudioImport.png)
 
-This will copy the AAR file into a new module named `hello-from-csharp`.
+This will copy the AAR file into a new module named `hello_from_csharp`.
 
 ![Android Studio Project](AndroidStudioProject.png)
 
-To use the new module from your `app`, right-click and choose `Open Module Settings`. On the `Dependencies` tab, add a new `Module Dependency` and choose `:hello-from-csharp`.
+To use the new module from your `app`, right-click and choose `Open Module Settings`. On the `Dependencies` tab, add a new `Module Dependency` and choose `:hello_from_csharp`.
 
 ![Android Studio Dependencies](AndroidStudioDependencies.png)
 
