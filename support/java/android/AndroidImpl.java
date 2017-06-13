@@ -5,16 +5,19 @@ import android.content.pm.*;
 import com.sun.jna.*;
 import java.util.*;
 
-import mono.embeddinator.DesktopImpl;
 import mono.embeddinator.Runtime.RuntimeLibrary;
 
 public class AndroidImpl extends DesktopImpl {
-
-    /* TODO: currently setting this via getApplicationContext() in Android app */
+    /* NOTE: currently setting this from AndroidRuntimeProvider */
     public static Context context;
 
     @Override
     public RuntimeLibrary initialize(String library) {
+
+        if (context == null) {
+            throw new RuntimeException("Application 'context' was not set!");
+        }
+
         System.loadLibrary("monodroid");
         ApplicationInfo app = context.getApplicationInfo();
         Locale locale       = Locale.getDefault ();
@@ -48,10 +51,5 @@ public class AndroidImpl extends DesktopImpl {
         RuntimeLibrary runtimeLibrary = Native.loadLibrary(library, RuntimeLibrary.class);
 
         return runtimeLibrary;
-    }
-
-    @Override
-    public String getResourcePath(String library) {
-        return "/assets/assemblies/" + library + ".dll";
     }
 }
