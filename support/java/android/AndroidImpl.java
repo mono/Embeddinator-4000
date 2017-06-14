@@ -39,10 +39,7 @@ public class AndroidImpl extends DesktopImpl {
                         android.os.Environment.getExternalStorageDirectory (),
                         "Android/data/" + context.getPackageName () + "/files/.__override__").getAbsolutePath (),
                 new String[] {
-                        "managed.dll",
-                        "mscorlib.dll",
-                        "Mono.Android.dll",
-                        "System.Core.dll"
+                        library + ".dll",
                 },
                 context.getPackageName ());
 
