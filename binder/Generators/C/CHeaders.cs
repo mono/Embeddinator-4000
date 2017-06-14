@@ -3,6 +3,7 @@ using CppSharp.AST;
 using CppSharp.Generators;
 using System.Linq;
 using System;
+using MonoEmbeddinator4000.Passes;
 
 namespace MonoEmbeddinator4000.Generators
 {
@@ -63,14 +64,16 @@ namespace MonoEmbeddinator4000.Generators
 
         public virtual void WriteForwardDecls()
         {
+            var getReferencedDecls = new GetReferencedDecls();
+            Unit.Visit(getReferencedDecls);
+            
+            foreach (var decl in getReferencedDecls.Enums)
+                if (decl.IsGenerated)
+                    decl.Visit(this);
         }
 
         public override bool VisitDeclContext(DeclarationContext context)
         {
-            foreach (var decl in context.Enums)
-                if (decl.IsGenerated)
-                    decl.Visit(this);
-
             foreach (var decl in context.Declarations.Where(d => !(d is Enumeration)))
                 if (decl.IsGenerated)
                     decl.Visit(this);
