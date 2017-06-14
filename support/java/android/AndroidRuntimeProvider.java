@@ -1,6 +1,6 @@
 package mono.embeddinator;
 
-/* We have to get the main Application Context for Xamarin.Android to work, this content provider stores it in a static variable */
+/* We have to get the main Application Context for Xamarin.Android to work, this content provider passes it to AndroidImpl for later use */
 public class AndroidRuntimeProvider extends android.content.ContentProvider {
     @Override
     public boolean onCreate () {
