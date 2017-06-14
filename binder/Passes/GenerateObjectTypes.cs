@@ -8,6 +8,7 @@ using MonoEmbeddinator4000.Generators;
 namespace MonoEmbeddinator4000.Passes
 {
     public class GetReferencedClasses : TranslationUnitPass
+    public class GetReferencedDecls : TranslationUnitPass
     {
         public OrderedSet<Class> Classes = new OrderedSet<Class>();
 
@@ -41,7 +42,7 @@ namespace MonoEmbeddinator4000.Passes
         }
     }
 
-    public class GenerateObjectTypesPass : GetReferencedClasses
+    public class GenerateObjectTypesPass : GetReferencedDecls
     {
         TranslationUnit TranslationUnit;
 

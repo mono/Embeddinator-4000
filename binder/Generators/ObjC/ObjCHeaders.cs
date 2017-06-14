@@ -26,7 +26,7 @@ namespace MonoEmbeddinator4000.Generators
 
         public override void WriteForwardDecls()
         {
-            var refs = new GetReferencedClasses();
+            var refs = new GetReferencedDecls();
             TranslationUnit.Visit(refs);
 
             var classes = refs.Classes.ToList();
