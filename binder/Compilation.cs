@@ -613,7 +613,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
             android:name=""mono.embeddinator.AndroidRuntimeProvider""
             android:exported=""false""
             android:initOrder=""{int.MaxValue}""
-            android:authorities=""mono.embeddinator.AndroidRuntimeProvider.__mono_init__"" />
+            android:authorities=""${{applicationId}}.mono.embeddinator.AndroidRuntimeProvider.__mono_init__"" />
     </application>
 </manifest>");
 
