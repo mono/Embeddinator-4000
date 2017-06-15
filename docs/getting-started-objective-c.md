@@ -24,8 +24,8 @@ Notes:
 
 Your next step is to download and install the embeddinator on your Mac.
 
-* [Package](https://dl.xamarin.com/embeddinator/Xamarin.Embeddinator-4000-0.1.0.28.pkg)
-* [Release Notes](releases/Embeddinator-4000_0.1.md)
+* [Package](https://dl.xamarin.com/embeddinator/Xamarin.Embeddinator-4000-0.2.0.79.pkg)
+* [Release Notes](releases/Embeddinator-4000_0.2.md)
 
 As an alternative it is possible to build it from our [git repository](https://github.com/mono/Embeddinator-4000/tree/objc), see the [contributing](Contributing.md) document for instructions.
 
