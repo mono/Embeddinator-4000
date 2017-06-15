@@ -50,6 +50,18 @@
 #include <unistd.h>
 #endif
 
+#if defined(__ANDROID__)
+#include <jni.h>
+
+MONO_API int monodroid_embedded_assemblies_set_assemblies_prefix (const char *prefix);
+
+JNIEXPORT void JNICALL
+Java_mono_embeddinator_AndroidImpl_setAssemblyPrefix()
+{
+    monodroid_embedded_assemblies_set_assemblies_prefix("assets/assemblies/");
+}
+#endif
+
 mono_embeddinator_context_t* _current_context;
 
 mono_embeddinator_context_t* mono_embeddinator_get_context()

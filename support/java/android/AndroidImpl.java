@@ -17,6 +17,9 @@ public class AndroidImpl extends DesktopImpl {
     @Override
     public RuntimeLibrary initialize(String library) {
         System.loadLibrary("monodroid");
+        System.loadLibrary(library);
+        setAssemblyPrefix();
+
         ApplicationInfo app = context.getApplicationInfo();
         Locale locale       = Locale.getDefault ();
         String language     = locale.getLanguage () + "-" + locale.getCountry ();
@@ -47,4 +50,6 @@ public class AndroidImpl extends DesktopImpl {
 
         return runtimeLibrary;
     }
+
+    private static native void setAssemblyPrefix();
 }

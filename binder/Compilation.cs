@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿using System;
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -982,7 +982,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
                     $"--sysroot=\"{systemInclude}\"{extra}",
                     $"-D{DLLExportDefine}",
                     $"-I\"{monoPath}\"",
-                    $"-L\"{monoDroidPath}\" -lmonosgen-2.0",
+                    $"-L\"{monoDroidPath}\" -lmonosgen-2.0 -lmono-android.release",
                     string.Join(" ", files.ToList()),
                     "--std=c99",
                     $"-shared -o {outputPath}",
