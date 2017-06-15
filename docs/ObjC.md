@@ -95,7 +95,7 @@ This [article](http://nshipster.com/object-subscripting/) is a great introductio
 
 ## Main differences with .NET
 
-### Constructors v.s. Initializers
+### Constructors vs Initializers
 
 In Objective-C, you can call any of the initializer prototypes of any of the parent classes in the inheritance chain unless it is marked as unavailable (NS_UNAVAILABLE).
 
@@ -180,3 +180,41 @@ becomes:
 In general operator == in C# is handled as a general operator as noted above.
 
 However, if the "friendly" Equals operator is found, both operator == and operator != will be skipped in generation.
+
+### DateTime vs NSDate
+
+From [NSDate's](https://developer.apple.com/reference/foundation/nsdate?language=objc) documentation:
+
+> NSDate objects encapsulate a single point in time, independent of any particular calendrical system or time zone. Date objects are immutable, representing an invariant time interval relative to an absolute reference date (00:00:00 UTC on 1 January 2001).
+
+Due to `NSDate` reference date, all conversions between it and `DateTime` must be done in UTC.
+
+#### DateTime to NSDate
+
+When converting from `DateTime` to `NSDate` the DateTime's `Kind` property is taken into account.
+
+| Kind         | Results                                                                                            |
+| ------------ | -------------------------------------------------------------------------------------------------- |
+| Utc          | Conversion is performed using the provided DateTime object as is.                                  |
+| Local        | The result of calling `ToUniversalTime ()` in the provided DateTime object is used for conversion. |
+| Unspecified  | The provided DateTime object is assumed to be UTC, so same behavior as Kind == Utc.                |
+
+The conversion is done by using the following formula:
+
+**TimeInterval** = DateTimeObjectTicks - NSDateReferenceDateTicks[dt] / [TicksPerSecond](https://msdn.microsoft.com/en-us/library/system.timespan.tickspersecond(v=vs.110).aspx)
+
+Once we have the TimeInterval we use NSDate's [dateWithTimeIntervalSinceReferenceDate:](https://developer.apple.com/reference/foundation/nsdate/1591577-datewithtimeintervalsincereferen?language=objc) selector to create it.
+
+#### NSDate to DateTime
+
+Going from NSDate to DateTime we assume we are getting a NSDate instance which's reference date is **00:00:00 UTC on 1 January 2001** and use the following formula:
+
+**DateTimeTicks** = NSDateTimeIntervalSinceReferenceDate * [TicksPerSecond](https://msdn.microsoft.com/en-us/library/system.timespan.tickspersecond(v=vs.110).aspx) + NSDateReferenceDateTicks[dt]
+
+Once we calculated the **DateTimeTicks** we use the following DateTime [constructor](https://msdn.microsoft.com/en-us/library/w0d47c9c(v=vs.110).aspx) setting its `kind` to `DateTimeKind.Utc`.
+
+There are some considerations that you must be aware of, NSDate can be `nil` but a DateTime is a struct in .NET and by definition it can't be `null`. If you give a `nil` NSDate we will translate it to the default DateTime value which maps to `DateTime.MinValue`.
+
+MinValue and MaxValue are also different, NSDate can support greater and lower boundaries than DateTime's so whenever you give a greater or lower value we will set it to DateTime's [MaxValue](https://msdn.microsoft.com/en-us/library/system.datetime.maxvalue(v=vs.110).aspx) or [MinValue](https://msdn.microsoft.com/en-us/library/system.datetime.minvalue(v=vs.110).aspx) respectively.
+
+**dt**: NSDate reference date **00:00:00 UTC on 1 January 2001** => `new DateTime (year:2001, month:1, day:1, hour:0, minute:0, second:0, kind:DateTimeKind.Utc).Ticks;`
