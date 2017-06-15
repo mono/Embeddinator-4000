@@ -364,7 +364,6 @@ namespace MonoEmbeddinator4000
             return true;
         }
 
-        bool initXamarinAndroidTools = false;
 
         string GetJavaSdkPath()
         {
@@ -381,20 +380,45 @@ namespace MonoEmbeddinator4000
             return home;
         }
 
+        bool initAndroidSdk = false;
+
         void RefreshAndroidSdk()
         {
             if (Options.Compilation.Platform == TargetPlatform.Android)
             {
-                if (!initXamarinAndroidTools)
+                if (!initAndroidSdk)
                 {
                     AndroidLogger.Info += AndroidLogger_Info;
                     AndroidLogger.Warning += AndroidLogger_Warning;
                     AndroidLogger.Error += AndroidLogger_Error;
-                    initXamarinAndroidTools = true;
+                    initAndroidSdk = true;
                 }
 
                 AndroidSdk.Refresh();
             }
+        }
+
+        string monoDroidSdkPath;
+
+        string GetMonoDroidSdkPath()
+        {
+            if (!string.IsNullOrEmpty(monoDroidSdkPath))
+                return monoDroidSdkPath;
+
+            //First see if there is source directory
+            string xamarinAndroidSource = Path.Combine(FindDirectory("support"), "..", "..", "xamarin-android", "bin", "Release");
+            if (Directory.Exists(xamarinAndroidSource))
+            {
+                xamarinAndroidSource = Path.GetFullPath(xamarinAndroidSource);
+
+                Diagnostics.Message("Using Xamarin.Android output directory: {0}", xamarinAndroidSource);
+
+                return monoDroidSdkPath = xamarinAndroidSource;
+            }
+
+            //TODO: add support here checking for extracted Xamarin.Android build artifacts
+
+            return monoDroidSdkPath = Path.Combine(MonoDroidSdk.BinPath, "..");
         }
 
         bool CompileJava(IEnumerable<string> files)
@@ -437,7 +461,7 @@ namespace MonoEmbeddinator4000
                 var maxVersion = AndroidSdk.GetInstalledPlatformVersions().Select(m => m.ApiLevel).Max();
                 var androidDir = AndroidSdk.GetPlatformDirectory(maxVersion);
                 var androidJar = Path.Combine(androidDir, "android.jar");
-                var monoAndroidJar = Path.Combine(MonoDroidSdk.BinPath, "..", "lib", "xbuild-frameworks", "MonoAndroid", "v2.3", "mono.android.jar"); //TODO: 1.0 may also need to be an option
+                var monoAndroidJar = Path.Combine(GetMonoDroidSdkPath(), "lib", "xbuild-frameworks", "MonoAndroid", "v7.0", "mono.android.jar"); //TODO: 1.0 may also need to be an option
                 args.Add(string.Join(":", jnaJar, androidJar, monoAndroidJar));
             }
             else
@@ -550,7 +574,7 @@ namespace MonoEmbeddinator4000
             if (Options.Compilation.Platform == TargetPlatform.Android)
             {
                 //TODO: 1.0 may also need to be an option
-                using (var stream = File.OpenRead(Path.Combine(MonoDroidSdk.BinPath, "..", "lib", "xbuild-frameworks", "MonoAndroid", "v2.3", "mono.android.jar")))
+                using (var stream = File.OpenRead(Path.Combine(GetMonoDroidSdkPath(), "lib", "xbuild-frameworks", "MonoAndroid", "v7.0", "mono.android.jar")))
                 using (var zip = new ZipArchive(stream))
                 {
                     foreach (var entry in zip.Entries)
@@ -590,6 +614,7 @@ namespace MonoEmbeddinator4000
             var classesDir = Path.Combine(Options.OutputDir, "classes");
             var androidDir = Path.Combine(Options.OutputDir, "android");
             var name = Path.GetFileNameWithoutExtension(Project.Assemblies[0]).Replace('-', '_');
+            var monoDroidPath = GetMonoDroidSdkPath();
 
             var args = new List<string> {
                 "cvf",
@@ -621,30 +646,17 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
             const string libMonoSgen = "libmonosgen-2.0.so";
             const string libMonoAndroid = "libmono-android.release.so";
 
-            var monoDroidPath = GetMonoDroidLibPath();
-            foreach (var abi in Directory.GetDirectories(monoDroidPath))
+            foreach (var abi in Directory.GetDirectories(GetMonoDroidLibPath()))
             {
                 var abiDir = Path.Combine(androidDir, "jni", Path.GetFileName(abi));
 
-                var libMonoSgenDestPath = Path.Combine(abiDir, libMonoSgen);
-                var libMonoSgenSourcePath = Path.Combine(abi, libMonoSgen);
-                if (!File.Exists(libMonoSgenSourcePath))
-                    continue;
+                string libMonoSgenSourcePath = Path.Combine(abi, libMonoSgen);
+                string libMonoSgenDestPath = Path.Combine(abiDir, libMonoSgen);
 
-                string libMonoAndroidSourcePath;
+                string libMonoAndroidSourcePath = Path.Combine(abi, libMonoAndroid);
                 string libMonoAndroidDestPath = Path.Combine(abiDir, "libmonodroid.so"); //NOTE: Xamarin.Android runtime uses different name from APK
 
-                //Attempt to find compiled libs for Xamarin.Android
-                string xamarinAndroidSource = Path.Combine(FindDirectory("support"), "..", "..", "xamarin-android");
-                if (Directory.Exists(xamarinAndroidSource))
-                {
-                    libMonoAndroidSourcePath = Path.Combine(xamarinAndroidSource, "bin", "Debug", "lib", "xbuild", "Xamarin", "Android", "lib", Path.GetFileName(abi), libMonoAndroid);
-                }
-                else
-                {
-                    libMonoAndroidSourcePath = Path.Combine(abi, libMonoAndroid);
-                }
-                if (!File.Exists(libMonoAndroidSourcePath))
+                if (!File.Exists(libMonoSgenSourcePath) || !File.Exists(libMonoAndroidSourcePath))
                     continue;
 
                 if (!Directory.Exists(abiDir))
@@ -737,36 +749,38 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
                     referencedAssemblies.Add(assembly);
             }
 
-            string frameworkPath = MonoDroidSdk.FrameworkPath;
             foreach (var reference in referencedAssemblies)
             {
-                var referencePath = Path.Combine(frameworkPath, reference + ".dll");
+                var referencePath = Path.Combine(monoDroidPath, "lib", "mono", "2.1", reference + ".dll");
+
                 if (File.Exists(referencePath))
                 {
                     File.Copy(referencePath, Path.Combine(assembliesDir, reference + ".dll"), true);
                     continue;
                 }
 
-                referencePath = Path.Combine(MonoDroidSdk.BinPath, "..", "lib", "xbuild-frameworks", "MonoAndroid", "v1.0", reference + ".dll");
+                referencePath = Path.Combine(monoDroidPath, "lib", "xbuild-frameworks", "MonoAndroid", "v1.0", reference + ".dll");
                 if (File.Exists(referencePath))
                 {
                     File.Copy(referencePath, Path.Combine(assembliesDir, reference + ".dll"), true);
                     continue;
                 }
 
-                referencePath = Path.Combine(MonoDroidSdk.BinPath, "..", "lib", "xbuild-frameworks", "MonoAndroid", "v1.0", "Facades", reference + ".dll");
+                referencePath = Path.Combine(monoDroidPath, "lib", "xbuild-frameworks", "MonoAndroid", "v1.0", "Facades", reference + ".dll");
                 if (File.Exists(referencePath))
                 {
                     File.Copy(referencePath, Path.Combine(assembliesDir, reference + ".dll"), true);
                     continue;
                 }
 
-                referencePath = Path.Combine(MonoDroidSdk.BinPath, "..", "lib", "xbuild-frameworks", "MonoAndroid", "v2.3", reference + ".dll");
+                referencePath = Path.Combine(monoDroidPath, "lib", "xbuild-frameworks", "MonoAndroid", "v7.0", reference + ".dll");
                 if (File.Exists(referencePath))
                 {
                     File.Copy(referencePath, Path.Combine(assembliesDir, reference + ".dll"), true);
                     continue;
                 }
+
+                throw new Exception($"Could not locate {reference}!");
             }
 
             var invocation = string.Join(" ", args);
@@ -940,6 +954,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
             var name = Path.GetFileNameWithoutExtension(Project.Assemblies[0]);
             var libName = $"lib{name}.so";
             var ndkPath = AndroidSdk.AndroidNdkPath;
+            var monoDroidSdkPath = GetMonoDroidSdkPath();
 
             foreach (var abi in new[] { "armeabi", "armeabi-v7a", "arm64-v8a", "x86", "x86_64" })
             {
