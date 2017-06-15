@@ -399,6 +399,7 @@ namespace MonoEmbeddinator4000
         }
 
         string monoDroidSdkPath;
+        const string MonoDroidTargetFrameworkVersion = "v7.0";
 
         string GetMonoDroidSdkPath()
         {
@@ -461,7 +462,7 @@ namespace MonoEmbeddinator4000
                 var maxVersion = AndroidSdk.GetInstalledPlatformVersions().Select(m => m.ApiLevel).Max();
                 var androidDir = AndroidSdk.GetPlatformDirectory(maxVersion);
                 var androidJar = Path.Combine(androidDir, "android.jar");
-                var monoAndroidJar = Path.Combine(GetMonoDroidSdkPath(), "lib", "xbuild-frameworks", "MonoAndroid", "v7.0", "mono.android.jar"); //TODO: 1.0 may also need to be an option
+                var monoAndroidJar = Path.Combine(GetMonoDroidSdkPath(), "lib", "xbuild-frameworks", "MonoAndroid", MonoDroidTargetFrameworkVersion, "mono.android.jar");
                 args.Add(string.Join(":", jnaJar, androidJar, monoAndroidJar));
             }
             else
@@ -573,8 +574,7 @@ namespace MonoEmbeddinator4000
             //Embed mono.android.jar into our jar file
             if (Options.Compilation.Platform == TargetPlatform.Android)
             {
-                //TODO: 1.0 may also need to be an option
-                using (var stream = File.OpenRead(Path.Combine(GetMonoDroidSdkPath(), "lib", "xbuild-frameworks", "MonoAndroid", "v7.0", "mono.android.jar")))
+                using (var stream = File.OpenRead(Path.Combine(GetMonoDroidSdkPath(), "lib", "xbuild-frameworks", "MonoAndroid", MonoDroidTargetFrameworkVersion, "mono.android.jar")))
                 using (var zip = new ZipArchive(stream))
                 {
                     foreach (var entry in zip.Entries)
@@ -773,7 +773,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
                     continue;
                 }
 
-                referencePath = Path.Combine(monoDroidPath, "lib", "xbuild-frameworks", "MonoAndroid", "v7.0", reference + ".dll");
+                referencePath = Path.Combine(monoDroidPath, "lib", "xbuild-frameworks", "MonoAndroid", MonoDroidTargetFrameworkVersion, reference + ".dll");
                 if (File.Exists(referencePath))
                 {
                     File.Copy(referencePath, Path.Combine(assembliesDir, reference + ".dll"), true);
