@@ -7,9 +7,10 @@ using MonoEmbeddinator4000.Generators;
 
 namespace MonoEmbeddinator4000.Passes
 {
-    public class GetReferencedClasses : TranslationUnitPass
+    public class GetReferencedDecls : TranslationUnitPass
     {
         public OrderedSet<Class> Classes = new OrderedSet<Class>();
+        public OrderedSet<Enumeration> Enums = new OrderedSet<Enumeration>();
 
         public override bool VisitTranslationUnit(TranslationUnit unit)
         {
@@ -30,18 +31,22 @@ namespace MonoEmbeddinator4000.Passes
             return base.VisitClassDecl(@class);
         }
 
-        public override bool VisitTagType(TagType tag, TypeQualifiers quals)
+        public override bool VisitEnumDecl(Enumeration @enum)
         {
-            var @class = tag.Declaration as Class;
-
-            if (@class == null)
+            if (AlreadyVisited(@enum))
                 return false;
 
-            return VisitClassDecl(@class);
+            // Check if we already handled this class.
+            if (Enums.Contains(@enum))
+                return false;
+
+            Enums.Add(@enum);
+
+            return base.VisitEnumDecl(@enum);
         }
     }
 
-    public class GenerateObjectTypesPass : GetReferencedClasses
+    public class GenerateObjectTypesPass : GetReferencedDecls
     {
         TranslationUnit TranslationUnit;
 

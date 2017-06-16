@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿using System;
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -261,6 +261,8 @@ namespace MonoEmbeddinator4000
             Diagnostics.PushIndent();
             if (standardOut.Length > 0)
                 Diagnostics.Message("{0}", standardOut.ToString());
+            if (standardError.Length > 0)
+                Diagnostics.Message("{0}", standardError.ToString());
             Diagnostics.PopIndent();
 
             return output;

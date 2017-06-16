@@ -78,7 +78,7 @@ namespace MonoEmbeddinator4000.Generators
 
         public void GenerateObjectDeclarations()
         {
-            var referencedClasses = new GetReferencedClasses();
+            var referencedClasses = new GetReferencedDecls();
             Unit.Visit(referencedClasses);
 
             var classNames = referencedClasses.Classes

@@ -4,7 +4,7 @@ using CppSharp.AST;
 
 namespace MonoEmbeddinator4000.Passes
 {
-    public class InterfacesPass : GetReferencedClasses
+    public class InterfacesPass : GetReferencedDecls
     {
         public List<Class> InterfaceImplementations;
 
