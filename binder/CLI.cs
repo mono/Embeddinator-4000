@@ -154,7 +154,6 @@ namespace MonoEmbeddinator4000
             options.CompileCode = CompileCode;
             options.Compilation.Target = Target;
             options.Compilation.DebugMode = DebugMode;
-            options.Compilation.XamarinPath = XamarinPath;
 
             if (options.OutputDir == null)
                 options.OutputDir = Directory.GetCurrentDirectory();
@@ -183,19 +182,6 @@ namespace MonoEmbeddinator4000
             var vsVersion = ConvertToVsVersion(VsVersion);
             options.Compilation.VsVersion = vsVersion;
 
-            if (targetPlatform == TargetPlatform.Android)
-            {
-                if (string.IsNullOrEmpty(XamarinPath))
-                {
-                    options.Compilation.XamarinPath = Path.Combine(MonoDroidSdk.BinPath, "..");
-                }
-                else if (!Directory.Exists(XamarinPath))
-                {
-                    Console.Error.WriteLine("Cannot find Xamarin SDK at path: " + XamarinPath);
-                    return false;
-                }
-            }
-
             return true;
         }
 
@@ -214,6 +200,20 @@ namespace MonoEmbeddinator4000
 
             foreach (var assembly in Assemblies)
                 project.Assemblies.Add(assembly);
+
+            project.XamarinPath = XamarinPath;
+            if (options.Compilation.Platform == TargetPlatform.Android)
+            {
+                if (string.IsNullOrEmpty(XamarinPath))
+                {
+                    project.XamarinPath = Path.Combine(MonoDroidSdk.BinPath, "..");
+                }
+                else if (!Directory.Exists(XamarinPath))
+                {
+                    Console.Error.WriteLine("Cannot find Xamarin SDK at path: " + XamarinPath);
+                    return -1;
+                }
+            }
 
             foreach (var generator in Generators)
             {
