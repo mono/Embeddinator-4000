@@ -4,10 +4,16 @@ This is the getting started page for Java, which covers the basics for all suppo
 
 ## Requirements
 
-In order to use the embeddinator with Java you'll need a Mac running:
-* Java 1.7
-* Xcode 8.3.2 or later
+In order to use the embeddinator with Java you will need:
+* Java 1.7 or later
 * [Mono 5.0](http://www.mono-project.com/download/)
+
+For Mac:
+* Xcode 8.3.2 or later
+
+For Windows:
+* Visual Studio 2017 with C++ support
+* Windows 10 SDK
 
 For Android:
 * Xamarin.Android 7.3.x or later
@@ -18,8 +24,7 @@ Optionally you can install [Xamarin Studio](https://developer.xamarin.com/guides
 
 Notes:
 
-* Earlier versions of Xcode, Xamarin.Android, Android Studio, and Mono _might_ work, but are untested and unsupported.
-* Code generation can be done on Windows, and desktop Java _should_ work (needs testing). Full support for Windows will be coming soon.
+* Earlier versions of Xcode, Visual Studio, Xamarin.Android, Android Studio, and Mono _might_ work, but are untested and unsupported.
 
 ## Installation
 
@@ -32,13 +37,9 @@ Java is currently in a prototype state for macOS and Android.
 The platform is selected by passing the `--platform=<platform>` command-line
 argument to the embeddinator. Currently `macOS` and `Android` are supported. `Windows` will be coming soon, but _might_ currently work to some extent.
 
-### macOS
+### macOS and Windows
 
 For development, should be able to use any Java IDE that supports Java 1.7. You can even use Android Studio for this if desired, [see here](https://stackoverflow.com/questions/16626810/can-android-studio-be-used-to-run-standard-java-projects). You can use the JAR file output as you would any standard Java jar file.
-
-### Windows
-
-_Coming soon_
 
 ### Android
 
