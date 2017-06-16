@@ -401,13 +401,23 @@ namespace MonoEmbeddinator4000
             RefreshAndroidSdk();
 
             var executableSuffix = Platform.IsWindows ? ".exe" : string.Empty;
-            var javac = $"{Path.Combine(GetJavaSdkPath(), "bin", "javac" + executableSuffix)}";
+            var javaSdk = GetJavaSdkPath();
+            var javac = $"{Path.Combine(javaSdk, "bin", "javac" + executableSuffix)}";
             var classesDir = Path.Combine(Options.OutputDir, "classes");
+            var bootClassPath = Path.Combine(javaSdk, "jre", "lib", "rt.jar");
+
+            if (Options.Compilation.Platform == TargetPlatform.Android)
+            {
+                var maxVersion = AndroidSdk.GetInstalledPlatformVersions().Select(m => m.ApiLevel).Max();
+                var androidDir = AndroidSdk.GetPlatformDirectory(maxVersion);
+                bootClassPath = Path.Combine(androidDir, "android.jar");
+            }
 
             var args = new List<string> {
                 string.Join(" ", files.Select(file => Path.GetFullPath(file))),
                 string.Join(" ", Directory.GetFiles(FindDirectory("support"), "*.java", SearchOption.AllDirectories)),
                 "-source 1.7 -target 1.7",
+                $"-bootclasspath {bootClassPath}",
                 $"-d {classesDir}",
             };
 

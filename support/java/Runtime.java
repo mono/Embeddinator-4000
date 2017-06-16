@@ -54,7 +54,7 @@ public final class Runtime {
             public String string;
 
             @Override
-            protected List getFieldOrder() {
+            protected List<String> getFieldOrder() {
                 return Arrays.asList("type", "monoException", "string");
             }
         }
@@ -68,7 +68,7 @@ public final class Runtime {
             public NativeLong allocated_len = new NativeLong();
 
             @Override
-            protected List getFieldOrder() {
+            protected List<String> getFieldOrder() {
                 return Arrays.asList("str", "len", "allocated_len");
             }
         }
