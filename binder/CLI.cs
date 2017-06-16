@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using CppSharp;
 using CppSharp.Generators;
+using Xamarin.Android.Tools;
 
 namespace MonoEmbeddinator4000
 {
@@ -18,6 +19,7 @@ namespace MonoEmbeddinator4000
         static bool Verbose;
         static CompilationTarget Target;
         static bool DebugMode;
+        static string XamarinPath;
 
         static void ParseCommandLineArgs(string[] args)
         {
@@ -37,6 +39,7 @@ namespace MonoEmbeddinator4000
                 { "dll|shared", "compiles as a shared library", v => Target = CompilationTarget.SharedLibrary },
                 { "static", "compiles as a static library", v => Target = CompilationTarget.StaticLibrary },
                 { "vs=", $"Visual Studio version for compilation: {vsVersions} (defaults to Latest)", v => VsVersion = v },
+                { "xamarinPath=", "Path to Xamarin.Android SDK, defaults to standard installation", v => XamarinPath = v },
                 { "v|verbose", "generates diagnostic verbose output", v => Verbose = true },
                 { "h|help",  "show this message and exit",  v => showHelp = v != null },
             };
@@ -151,6 +154,7 @@ namespace MonoEmbeddinator4000
             options.CompileCode = CompileCode;
             options.Compilation.Target = Target;
             options.Compilation.DebugMode = DebugMode;
+            options.Compilation.XamarinPath = XamarinPath;
 
             if (options.OutputDir == null)
                 options.OutputDir = Directory.GetCurrentDirectory();
@@ -178,6 +182,19 @@ namespace MonoEmbeddinator4000
 
             var vsVersion = ConvertToVsVersion(VsVersion);
             options.Compilation.VsVersion = vsVersion;
+
+            if (targetPlatform == TargetPlatform.Android)
+            {
+                if (string.IsNullOrEmpty(XamarinPath))
+                {
+                    options.Compilation.XamarinPath = Path.Combine(MonoDroidSdk.BinPath, "..");
+                }
+                else if (!Directory.Exists(XamarinPath))
+                {
+                    Console.Error.WriteLine("Cannot find Xamarin SDK at path: " + XamarinPath);
+                    return false;
+                }
+            }
 
             return true;
         }
