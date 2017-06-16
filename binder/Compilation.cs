@@ -874,7 +874,14 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
         {
             if (Platform.IsWindows)
             {
-                return CompileMSVC(files);
+                if (Options.Compilation.Platform == TargetPlatform.Android)
+                {
+                    return CompileNDK(files);
+                }
+                else
+                {
+                    return CompileMSVC(files);
+                }
             }
             else if (Platform.IsMacOS)
             {
