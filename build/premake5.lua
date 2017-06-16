@@ -104,7 +104,7 @@ workspace "MonoEmbeddinator4000"
       "System.Xml.Linq"
     }
 
-  if string.startswith(_ACTION, "vs") then
+  if string.startswith(_ACTION, "vs") and os.is("macosx") then
     externalproject "objcgen"
       SetupManagedProject()
       location "../objcgen"
