@@ -564,7 +564,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
 
             //Copy libmonosgen-2.0.so
             const string libMonoSgen = "libmonosgen-2.0.so";
-            var monoDroidPath = Path.Combine(MonoDroidSdk.BinPath, "..", "lib", "xbuild", "Xamarin", "Android", "lib");
+            var monoDroidPath = GetMonoDroidLibPath();
             foreach (var abi in Directory.GetDirectories(monoDroidPath))
             {
                 var abiDir = Path.Combine(androidDir, "jni", Path.GetFileName(abi));
@@ -647,9 +647,10 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
                 }
             }
 
+            string frameworkPath = MonoDroidSdk.FrameworkPath;
             foreach (var reference in referencedAssemblies)
             {
-                var referencePath = Path.Combine(MonoDroidSdk.BinPath, "..", "lib", "mono", "2.1", reference + ".dll");
+                var referencePath = Path.Combine(frameworkPath, reference + ".dll");
                 if (File.Exists(referencePath))
                 {
                     File.Copy(referencePath, Path.Combine(assembliesDir, reference + ".dll"), true);
@@ -806,6 +807,14 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
             return output.ExitCode == 0;
         }
 
+        string GetMonoDroidLibPath()
+        {
+            var monoDroidPath = Path.Combine(MonoDroidSdk.BinPath, "..", "lib", "xbuild", "Xamarin", "Android", "lib");
+            if (!Directory.Exists(monoDroidPath))
+                monoDroidPath = Path.Combine(MonoDroidSdk.BinPath, "lib");
+            return monoDroidPath;
+        }
+
         bool CompileNDK(IEnumerable<string> files)
         {
             RefreshAndroidSdk();
@@ -845,7 +854,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
 
                 var clangBin = NdkUtil.GetNdkClangBin(Path.Combine(ndkPath, "toolchains"), targetArch);
                 var systemInclude = NdkUtil.GetNdkPlatformIncludePath(ndkPath, targetArch, 24); //NOTE: 24 should be an option?
-                var monoDroidPath = Path.Combine(MonoDroidSdk.BinPath, "..", "lib", "xbuild", "Xamarin", "Android", "lib", abi);
+                var monoDroidPath = Path.Combine(GetMonoDroidLibPath(), abi);
                 var abiDir = Path.Combine(Options.OutputDir, "android", "jni", abi);
                 var outputPath = Path.Combine(abiDir, libName);
 
