@@ -3,6 +3,8 @@
 var target = Argument("target", "Default");
 var configuration = Argument("configuration", "Release");
 var buildDir = Directory("./build/lib") + Directory(configuration);
+var embeddinator = File("MonoEmbeddinator4000.exe");
+var managedDll = Directory("../../../tests/managed/generic/bin") + Directory(configuration) + File("managed.dll");
 
 Task("Clean")
     .Does(() =>
@@ -27,18 +29,27 @@ Task("Generate-C")
     .IsDependentOn("Build-Managed")
     .Does(() =>
     {
-        var managedDll = Directory("../../../tests/managed/generic/bin") + Directory(configuration) + File("managed.dll");
-
         DoInDirectory(buildDir, () =>
         {
-            var exitCode = StartProcess("MonoEmbeddinator4000.exe", $"-gen=c -out=c -platform=Windows -compile -target=shared {managedDll}");
+            var exitCode = StartProcess(embeddinator, $"-gen=c -out=c -platform=Windows -compile -target=shared {managedDll}");
             if (exitCode != 0)
-                throw new Exception("MonoEmbeddinator4000.exe failed!");
+                throw new Exception(embeddinator + " failed!");
         });
-        
+    });
+
+Task("Generate-Java")
+    .IsDependentOn("Generate-C")
+    .Does(() =>
+    {
+        DoInDirectory(buildDir, () =>
+        {
+            var exitCode = StartProcess(embeddinator, $"-gen=Java -out=java -platform=Windows -compile -target=shared {managedDll}");
+            if (exitCode != 0)
+                throw new Exception(embeddinator + " failed!");
+        });
     });
 
 Task("Default")
-    .IsDependentOn("Generate-C");
+    .IsDependentOn("Generate-Java");
 
 RunTarget(target);
