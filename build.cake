@@ -44,12 +44,14 @@ Task("Clean")
     });
 
 Task("Build-Binder")
+    .IsDependentOn("Clean")
     .Does(() =>
     {
         MSBuild("./build/projects/MonoEmbeddinator4000.csproj", settings => settings.SetConfiguration(configuration).SetVerbosity(Verbosity.Minimal));
     });
 
 Task("Build-Managed")
+    .IsDependentOn("Clean")
     .Does(() =>
     {
         MSBuild("./tests/managed/generic/managed-generic.csproj", settings => settings.SetConfiguration(configuration).SetVerbosity(Verbosity.Minimal));
@@ -67,7 +69,8 @@ Task("Generate-C")
     });
 
 Task("Generate-Java")
-    .IsDependentOn("Generate-C")
+    .IsDependentOn("Build-Binder")
+    .IsDependentOn("Build-Managed")
     .Does(() =>
     {
         DoInDirectory(buildDir, () =>
