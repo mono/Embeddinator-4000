@@ -45,7 +45,7 @@ Param(
     [ValidateSet("Release", "Debug")]
     [string]$Configuration = "Release",
     [ValidateSet("Quiet", "Minimal", "Normal", "Verbose", "Diagnostic")]
-    [string]$Verbosity = "Verbose",
+    [string]$Verbosity = "Normal",
     [switch]$Experimental = $True,
     [Alias("DryRun","Noop")]
     [switch]$WhatIf,
@@ -150,6 +150,7 @@ if (!(Test-Path $NUGET_EXE)) {
 
 # Save nuget.exe path to environment to be available to child processed
 $ENV:NUGET_EXE = $NUGET_EXE
+$ENV:CAKE_PATHS_TOOLS = $TOOLS_DIR
 
 # Restore tools from NuGet?
 if(-Not $SkipToolPackageRestore.IsPresent) {
