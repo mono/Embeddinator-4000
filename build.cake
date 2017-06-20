@@ -13,13 +13,13 @@ Task("Clean")
 Task("Build-Binder")
     .Does(() =>
     {
-        MSBuild("./build/projects/MonoEmbeddinator4000.csproj", settings => settings.SetConfiguration(configuration));
+        MSBuild("./build/projects/MonoEmbeddinator4000.csproj", settings => settings.SetConfiguration(configuration).SetVerbosity(Verbosity.Minimal));
     });
 
 Task("Build-Managed")
     .Does(() =>
 {
-    MSBuild("./tests/managed/generic/managed-generic.csproj", settings => settings.SetConfiguration(configuration));
+    MSBuild("./tests/managed/generic/managed-generic.csproj", settings => settings.SetConfiguration(configuration).SetVerbosity(Verbosity.Minimal));
 });
 
 Task("Generate-C")
