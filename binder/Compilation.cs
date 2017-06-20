@@ -372,7 +372,11 @@ namespace MonoEmbeddinator4000
                 return AndroidSdk.JavaSdkPath;
 
             if (Platform.IsWindows)
-                return Environment.GetEnvironmentVariable("JAVA_HOME");
+            {
+                string home = Environment.GetEnvironmentVariable("JAVA_HOME");
+                if (string.IsNullOrEmpty(home))
+                    throw new Exception("Cannot find JAVA_HOME!");
+            }
 
             // If we are running on macOS, invoke java_home to figure out Java path.
             if (Platform.IsMacOS)
@@ -402,7 +406,7 @@ namespace MonoEmbeddinator4000
 
             var executableSuffix = Platform.IsWindows ? ".exe" : string.Empty;
             var javaSdk = GetJavaSdkPath();
-            var javac = $"{Path.Combine(javaSdk, "bin", "javac" + executableSuffix)}";
+            var javac = Path.Combine(javaSdk, "bin", "javac" + executableSuffix);
             var classesDir = Path.Combine(Options.OutputDir, "classes");
             var bootClassPath = Path.Combine(javaSdk, "jre", "lib", "rt.jar");
 
