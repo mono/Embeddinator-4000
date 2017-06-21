@@ -1,8 +1,9 @@
-﻿﻿using CppSharp;
+﻿﻿﻿﻿﻿using CppSharp;
 using CppSharp.AST;
 using CppSharp.Generators;
-using System.Linq;
+using CppSharp.Generators.AST;
 using System;
+using System.Linq;
 using MonoEmbeddinator4000.Passes;
 
 namespace MonoEmbeddinator4000.Generators
@@ -30,6 +31,17 @@ namespace MonoEmbeddinator4000.Generators
 
             WriteInclude("glib.h");
             WriteInclude("mono_embeddinator.h");
+
+            // Find dependent headers
+            var referencedDecls = new GetReferencedDecls();
+            Unit.Visit(referencedDecls);
+
+            var dependencies = referencedDecls.Declarations
+                .Where(d => !d.IsImplicit && d.TranslationUnit != Unit)
+                .Select(d => d.TranslationUnit).Distinct();
+
+            foreach (var dep in dependencies)
+                WriteInclude($"{dep.TranslationUnit.FileNameWithoutExtension}.h");
         }
 
         public override void Process()
@@ -67,8 +79,8 @@ namespace MonoEmbeddinator4000.Generators
             var getReferencedDecls = new GetReferencedDecls();
             Unit.Visit(getReferencedDecls);
             
-            foreach (var decl in getReferencedDecls.Enums)
-                if (decl.IsGenerated)
+            foreach (var decl in getReferencedDecls.Enums.Where(
+                c => c.TranslationUnit == TranslationUnit && c.IsGenerated))
                     decl.Visit(this);
         }
 
