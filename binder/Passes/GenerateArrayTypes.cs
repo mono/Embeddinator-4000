@@ -42,7 +42,7 @@ namespace MonoEmbeddinator4000.Passes
             return ret;
         }
 
-        public static Class MonoEmbedArray = new Class { Name = "MonoEmbedArray" };
+        public static Class MonoEmbedArray = new Class { Name = "MonoEmbedArray", IsImplicit = true };
 
         QualifiedType GenerateArrayType(ArrayType array, Declaration decl)
         {

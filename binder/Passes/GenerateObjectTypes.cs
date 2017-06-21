@@ -91,7 +91,7 @@ namespace MonoEmbeddinator4000.Passes
                 AddObjectFieldsToClass(@class);
         }
         
-        public static Class MonoEmbedObject = new Class { Name = "MonoEmbedObject" };
+        public static Class MonoEmbedObject = new Class { Name = "MonoEmbedObject", IsImplicit = true };
 
         void CreateTypedefObjectForClass(Class @class)
         {
