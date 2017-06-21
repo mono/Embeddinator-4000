@@ -371,18 +371,14 @@ namespace MonoEmbeddinator4000
             if (Options.Compilation.Platform == TargetPlatform.Android)
                 return AndroidSdk.JavaSdkPath;
 
-            if (Platform.IsWindows)
-            {
-                string home = Environment.GetEnvironmentVariable("JAVA_HOME");
-                if (string.IsNullOrEmpty(home))
-                    throw new Exception("Cannot find JAVA_HOME!");
-            }
-
             // If we are running on macOS, invoke java_home to figure out Java path.
             if (Platform.IsMacOS)
                 return Invoke("/usr/libexec/java_home", null, null).StandardOutput.Trim();
 
-            return Environment.GetEnvironmentVariable("JAVA_HOME");
+            string home = Environment.GetEnvironmentVariable("JAVA_HOME");
+            if (string.IsNullOrEmpty(home))
+                throw new Exception("Cannot find Java SDK: JAVA_HOME environment variable is not set.");
+            return home;
         }
 
         void RefreshAndroidSdk()
