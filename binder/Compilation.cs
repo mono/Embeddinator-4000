@@ -392,6 +392,7 @@ namespace MonoEmbeddinator4000
                 if (!initXamarinAndroidTools)
                 {
                     AndroidLogger.Info += AndroidLogger_Info;
+                    AndroidLogger.Warning += AndroidLogger_Warning;
                     AndroidLogger.Error += AndroidLogger_Error;
                     initXamarinAndroidTools = true;
                 }
@@ -682,6 +683,11 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
         private void AndroidLogger_Info(string task, string message)
         {
             Diagnostics.Debug(message);
+        }
+
+        private void AndroidLogger_Warning(string task, string message)
+        {
+            Diagnostics.Warning(message);
         }
 
         private void AndroidLogger_Error(string task, string message)
