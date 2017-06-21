@@ -1,8 +1,9 @@
-﻿﻿using CppSharp;
+﻿﻿﻿﻿﻿using CppSharp;
 using CppSharp.AST;
 using CppSharp.Generators;
-using System.Linq;
+using CppSharp.Generators.AST;
 using System;
+using System.Linq;
 using MonoEmbeddinator4000.Passes;
 
 namespace MonoEmbeddinator4000.Generators
@@ -67,8 +68,8 @@ namespace MonoEmbeddinator4000.Generators
             var getReferencedDecls = new GetReferencedDecls();
             Unit.Visit(getReferencedDecls);
             
-            foreach (var decl in getReferencedDecls.Enums)
-                if (decl.IsGenerated)
+            foreach (var decl in getReferencedDecls.Enums.Where(
+                c => c.TranslationUnit == TranslationUnit && c.IsGenerated))
                     decl.Visit(this);
         }
 

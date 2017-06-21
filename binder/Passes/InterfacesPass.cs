@@ -11,21 +11,21 @@ namespace MonoEmbeddinator4000.Passes
         public InterfacesPass()
         {
             InterfaceImplementations = new List<Class>();
+            ClearVisitedDeclarations = false;
         }
 
         public override bool VisitTranslationUnit(TranslationUnit unit)
         {
             var ret = base.VisitTranslationUnit(unit);
 
-            var interfaces = Classes.Where(c => c.IsInterface);
+            var interfaces = Classes.Where(c => c.IsInterface && c.IsGenerated);
             foreach (var @interface in interfaces)
-                if (@interface.IsGenerated)
                     HandleInterface(@interface);
 
             unit.Declarations.InsertRange(0, InterfaceImplementations);
             InterfaceImplementations.Clear();
 
-            Classes.Clear();
+            Declarations.Clear();
 
             return ret;
         }
