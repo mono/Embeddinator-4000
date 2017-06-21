@@ -338,7 +338,7 @@ TEST_CASE("Interfaces.C", "[C][Interfaces]") {
 
 TEST_CASE("Arrays.C", "[C][Arrays]") {
     char _byte_arr[] = { 1, 2, 3 };
-    _UnsignedcharArray _byte;
+    _ByteArray _byte;
     _byte.array = g_array_sized_new(/*zero_terminated=*/false,
         /*clear=*/true, sizeof(char), G_N_ELEMENTS(_byte_arr));
     g_array_append_vals (_byte.array, _byte_arr, G_N_ELEMENTS(_byte_arr));
@@ -346,7 +346,7 @@ TEST_CASE("Arrays.C", "[C][Arrays]") {
     int _sum = Arrays_Arr_SumByteArray(_byte);
     REQUIRE(_sum == 6);
 
-    _IntArray _int = Arrays_Arr_ReturnsIntArray();
+    _Int32Array _int = Arrays_Arr_ReturnsIntArray();
     REQUIRE(_int.array->len == 3);
     REQUIRE(g_array_index(_int.array, int, 0) == 1);
     REQUIRE(g_array_index(_int.array, int, 1) == 2);
