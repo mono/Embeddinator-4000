@@ -829,7 +829,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
         {
             RefreshAndroidSdk();
 
-            var monoPath = ManagedToolchain.FindMonoPath();
+            var monoPath = Path.Combine(ManagedToolchain.FindMonoPath(), "include", "mono-2.0");
             var name = Path.GetFileNameWithoutExtension(Project.Assemblies[0]);
             var libName = $"lib{name}.so";
             var ndkPath = AndroidSdk.AndroidNdkPath;
@@ -874,7 +874,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
                 var args = new List<string> {
                     $"--sysroot=\"{systemInclude}\"{extra}",
                     $"-D{DLLExportDefine}",
-                    $"-I\"{monoPath}/include/mono-2.0\"",
+                    $"-I\"{monoPath}\"",
                     $"-L\"{monoDroidPath}\" -lmonosgen-2.0",
                     string.Join(" ", files.ToList()),
                     "--std=c99",
