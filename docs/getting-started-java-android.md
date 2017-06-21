@@ -7,7 +7,7 @@ In addition to the requirements from our [Getting started with Java](getting-sta
 
 Open Visual Studio for Windows or Mac, create a new .NET Class Library project, name it `hello-from-csharp`, and save it to `~/Projects/hello-from-csharp` or `%USERPROFILE%\Projects\hello-from-csharp`.
 
-Replace the code in the `MyClass.cs` file with the following snippet:
+Replace the code in the `MyClass.cs` or `Class1.cs` file with the following snippet:
 
 ```csharp
 public class Hello
@@ -18,6 +18,7 @@ public class Hello
 	}
 }
 ```
+*NOTE: leave out the namespace and everything for this example, just put the class*
 
 Build the project, the resulting assembly will be saved as `$(ProjectDir)/bin/Debug/hello-from-csharp.dll`.
 
@@ -30,9 +31,9 @@ cd ~/Projects/Embeddinator-4000
 mono ~/Projects/Embeddinator-4000/build/lib/Debug/MonoEmbeddinator4000.exe ~/Projects/hello-from-csharp/hello-from-csharp/bin/Debug/hello-from-csharp.dll --gen=Java --platform=Android --outdir=../hello-from-csharp/output -c
 ```
 
-Or on Windows, navigate to the root of Embeddinator-4000 in cmd:
+Or on Windows, navigate to where Embeddinator-4000 is compiled in cmd:
 ```
-build\lib\Debug\MonoEmbeddinator4000.exe %USERPROFILE%\Projects\hello-from-csharp\hello-from-csharp\bin\Debug\hello-from-csharp.dll --gen=Java --platform=Android --outdir=../hello-from-csharp/output -c
+MonoEmbeddinator4000.exe %USERPROFILE%\Projects\hello-from-csharp\hello-from-csharp\bin\Debug\hello-from-csharp.dll --gen=Java --platform=Android --outdir=%USERPROFILE%\Projects\hello-from-csharp\output -c
 ```
 
 The Android AAR file will be placed in `~/Projects/hello-from-csharp/output/hello_from_csharp.aar`. _NOTE: hyphens are replaced because Java does not support it in package names._
