@@ -37,11 +37,11 @@ string GetJavaClassPath()
     return string.Join(";", classPath);
 }
 
-void RunEmbeddinator(string generator, string platform = "Windows")
+void RunEmbeddinator(string generator, string outDir, string platform = "Windows")
 {
     DoInDirectory(buildDir, () =>
     {
-        Exec(embeddinator, $"-gen={generator} -out=c -platform={platform} -compile -target=shared {managedDll}");
+        Exec(embeddinator, $"-gen={generator} -out={outDir} -platform={platform} -compile -target=shared {managedDll}");
     });
 }
 
@@ -70,7 +70,7 @@ Task("Generate-C")
     .IsDependentOn("Build-Managed")
     .Does(() =>
     {
-        RunEmbeddinator("c");
+        RunEmbeddinator("c", "c");
     });
 
 Task("Generate-Java")
@@ -78,7 +78,7 @@ Task("Generate-Java")
     .IsDependentOn("Build-Managed")
     .Does(() =>
     {
-        RunEmbeddinator("Java");
+        RunEmbeddinator("Java", "java");
     });
 
 Task("Generate-Android")
@@ -86,7 +86,7 @@ Task("Generate-Android")
     .IsDependentOn("Build-Managed")
     .Does(() =>
     {
-        RunEmbeddinator("Java", "Android");
+        RunEmbeddinator("Java", "java", "Android");
     });
 
 Task("Build-Java-Tests")
