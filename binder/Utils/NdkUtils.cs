@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CppSharp;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -128,7 +129,8 @@ namespace Xamarin.Android.Tasks
             var toolChainDir = GetNdkToolchainDirectories(toolchainsPath, arch).First();
             var machineDir = Directory.GetDirectories(Path.Combine(toolChainDir, "prebuilt")).First();
 
-            var gcc = Path.Combine(machineDir, "bin", GetNdkToolchainPrefix(arch) + "gcc");
+            var executableSuffix = Platform.IsWindows ? ".exe" : string.Empty;
+            var gcc = Path.Combine(machineDir, "bin", GetNdkToolchainPrefix(arch) + "gcc" + executableSuffix);
             if (File.Exists(gcc))
                 return gcc;
 

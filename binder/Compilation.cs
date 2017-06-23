@@ -371,14 +371,14 @@ namespace MonoEmbeddinator4000
             if (Options.Compilation.Platform == TargetPlatform.Android)
                 return AndroidSdk.JavaSdkPath;
 
-            if (Platform.IsWindows)
-                return Environment.GetEnvironmentVariable("JAVA_HOME");
-
             // If we are running on macOS, invoke java_home to figure out Java path.
             if (Platform.IsMacOS)
                 return Invoke("/usr/libexec/java_home", null, null).StandardOutput.Trim();
 
-            return Environment.GetEnvironmentVariable("JAVA_HOME");
+            string home = Environment.GetEnvironmentVariable("JAVA_HOME");
+            if (string.IsNullOrEmpty(home))
+                throw new Exception("Cannot find Java SDK: JAVA_HOME environment variable is not set.");
+            return home;
         }
 
         void RefreshAndroidSdk()
@@ -388,6 +388,7 @@ namespace MonoEmbeddinator4000
                 if (!initXamarinAndroidTools)
                 {
                     AndroidLogger.Info += AndroidLogger_Info;
+                    AndroidLogger.Warning += AndroidLogger_Warning;
                     AndroidLogger.Error += AndroidLogger_Error;
                     initXamarinAndroidTools = true;
                 }
@@ -402,7 +403,7 @@ namespace MonoEmbeddinator4000
 
             var executableSuffix = Platform.IsWindows ? ".exe" : string.Empty;
             var javaSdk = GetJavaSdkPath();
-            var javac = $"{Path.Combine(javaSdk, "bin", "javac" + executableSuffix)}";
+            var javac = Path.Combine(javaSdk, "bin", "javac" + executableSuffix);
             var classesDir = Path.Combine(Options.OutputDir, "classes");
             var bootClassPath = Path.Combine(javaSdk, "jre", "lib", "rt.jar");
 
@@ -417,7 +418,7 @@ namespace MonoEmbeddinator4000
                 string.Join(" ", files.Select(file => Path.GetFullPath(file))),
                 string.Join(" ", Directory.GetFiles(FindDirectory("support"), "*.java", SearchOption.AllDirectories)),
                 "-source 1.7 -target 1.7",
-                $"-bootclasspath {bootClassPath}",
+                $"-bootclasspath \"{bootClassPath}\"",
                 $"-d {classesDir}",
             };
 
@@ -564,7 +565,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
 
             //Copy libmonosgen-2.0.so
             const string libMonoSgen = "libmonosgen-2.0.so";
-            var monoDroidPath = Path.Combine(MonoDroidSdk.BinPath, "..", "lib", "xbuild", "Xamarin", "Android", "lib");
+            var monoDroidPath = GetMonoDroidLibPath();
             foreach (var abi in Directory.GetDirectories(monoDroidPath))
             {
                 var abiDir = Path.Combine(androidDir, "jni", Path.GetFileName(abi));
@@ -647,9 +648,10 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
                 }
             }
 
+            string frameworkPath = MonoDroidSdk.FrameworkPath;
             foreach (var reference in referencedAssemblies)
             {
-                var referencePath = Path.Combine(MonoDroidSdk.BinPath, "..", "lib", "mono", "2.1", reference + ".dll");
+                var referencePath = Path.Combine(frameworkPath, reference + ".dll");
                 if (File.Exists(referencePath))
                 {
                     File.Copy(referencePath, Path.Combine(assembliesDir, reference + ".dll"), true);
@@ -677,6 +679,11 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
         private void AndroidLogger_Info(string task, string message)
         {
             Diagnostics.Debug(message);
+        }
+
+        private void AndroidLogger_Warning(string task, string message)
+        {
+            Diagnostics.Warning(message);
         }
 
         private void AndroidLogger_Error(string task, string message)
@@ -806,11 +813,19 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
             return output.ExitCode == 0;
         }
 
+        string GetMonoDroidLibPath()
+        {
+            var monoDroidPath = Path.Combine(MonoDroidSdk.BinPath, "..", "lib", "xbuild", "Xamarin", "Android", "lib");
+            if (!Directory.Exists(monoDroidPath))
+                monoDroidPath = Path.Combine(MonoDroidSdk.BinPath, "lib");
+            return monoDroidPath;
+        }
+
         bool CompileNDK(IEnumerable<string> files)
         {
             RefreshAndroidSdk();
 
-            var monoPath = ManagedToolchain.FindMonoPath();
+            var monoPath = Path.Combine(ManagedToolchain.FindMonoPath(), "include", "mono-2.0");
             var name = Path.GetFileNameWithoutExtension(Project.Assemblies[0]);
             var libName = $"lib{name}.so";
             var ndkPath = AndroidSdk.AndroidNdkPath;
@@ -845,7 +860,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
 
                 var clangBin = NdkUtil.GetNdkClangBin(Path.Combine(ndkPath, "toolchains"), targetArch);
                 var systemInclude = NdkUtil.GetNdkPlatformIncludePath(ndkPath, targetArch, 24); //NOTE: 24 should be an option?
-                var monoDroidPath = Path.Combine(MonoDroidSdk.BinPath, "..", "lib", "xbuild", "Xamarin", "Android", "lib", abi);
+                var monoDroidPath = Path.Combine(GetMonoDroidLibPath(), abi);
                 var abiDir = Path.Combine(Options.OutputDir, "android", "jni", abi);
                 var outputPath = Path.Combine(abiDir, libName);
 
@@ -855,7 +870,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
                 var args = new List<string> {
                     $"--sysroot=\"{systemInclude}\"{extra}",
                     $"-D{DLLExportDefine}",
-                    $"-I\"{monoPath}/include/mono-2.0\"",
+                    $"-I\"{monoPath}\"",
                     $"-L\"{monoDroidPath}\" -lmonosgen-2.0",
                     string.Join(" ", files.ToList()),
                     "--std=c99",
@@ -874,7 +889,14 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
         {
             if (Platform.IsWindows)
             {
-                return CompileMSVC(files);
+                if (Options.Compilation.Platform == TargetPlatform.Android)
+                {
+                    return CompileNDK(files);
+                }
+                else
+                {
+                    return CompileMSVC(files);
+                }
             }
             else if (Platform.IsMacOS)
             {

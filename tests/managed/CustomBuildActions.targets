@@ -1,7 +1,8 @@
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 	<Target Name="BeforeBuild" Inputs="$(MSBuildThisFileDirectory)subscripts.tt" Outputs="$(MSBuildThisFileDirectory)subscripts.cs">
-		<Exec WorkingDirectory="$(MSBuildThisFileDirectory)" Command="nuget install Mono.TextTransform -OutputDirectory ../../packages/" />
+		<Exec Condition=" '$(OS)' == 'Unix' " WorkingDirectory="$(MSBuildThisFileDirectory)" Command="nuget install Mono.TextTransform -OutputDirectory ../../packages/" />
 		<Exec Condition=" '$(OS)' == 'Unix' " WorkingDirectory="$(MSBuildThisFileDirectory)" Command=" /Library/Frameworks/Mono.framework/Commands/mono ../../packages/Mono.TextTransform.1.0.0/tools/TextTransform.exe subscripts.tt -o subscripts.cs" />
-		<Exec Condition=" '$(OS)' != 'Unix' " WorkingDirectory="$(MSBuildThisFileDirectory)" Command="echo need to process subscripts.tt -o subscripts.cs" />
-    	</Target>  
+		<Exec Condition=" '$(OS)' != 'Unix' " WorkingDirectory="$(MSBuildThisFileDirectory)" Command="..\..\.nuget\nuget.exe install Mono.TextTransform -OutputDirectory ..\..\packages\" />
+		<Exec Condition=" '$(OS)' != 'Unix' " WorkingDirectory="$(MSBuildThisFileDirectory)" Command="..\..\packages\Mono.TextTransform.1.0.0\tools\TextTransform.exe subscripts.tt -o subscripts.cs" />
+	</Target>  
 </Project>
