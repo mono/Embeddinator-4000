@@ -20,5 +20,8 @@
       "CppSharp.Parser",
       "CppSharp.Parser.CSharp",
       "Xamarin.Android.Tools",
-      "Xamarin.MacDev"
+      "Xamarin.MacDev",
+      "Microsoft.Build.Engine",
+      "Microsoft.Build",
+      "Microsoft.Build.Framework"
     }

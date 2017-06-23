@@ -204,9 +204,18 @@ namespace MonoEmbeddinator4000
             project.XamarinPath = XamarinPath;
             if (options.Compilation.Platform == TargetPlatform.Android)
             {
+                //TODO: is this code in the right place?
                 if (string.IsNullOrEmpty(XamarinPath))
                 {
-                    project.XamarinPath = Path.Combine(MonoDroidSdk.BinPath, "..");
+                    string binPath = MonoDroidSdk.BinPath;
+                    if (File.Exists(Path.Combine(binPath, "lib")))
+                    {
+                        project.XamarinPath = Path.GetFullPath(MonoDroidSdk.BinPath);
+                    }
+                    else
+                    {
+                        project.XamarinPath = Path.GetFullPath(Path.Combine(MonoDroidSdk.BinPath, ".."));
+                    }
                 }
                 else if (!Directory.Exists(XamarinPath))
                 {
