@@ -598,26 +598,6 @@ namespace MonoEmbeddinator4000
                 $"-C {androidDir} ."
             };
 
-            //Create an AndroidManifest.xml
-            File.WriteAllText(Path.Combine(androidDir, "AndroidManifest.xml"),
-$@"<?xml version=""1.0"" encoding=""utf-8""?>
-<manifest xmlns:android=""http://schemas.android.com/apk/res/android""
-    package=""com.{name}_dll""
-    android:versionCode=""1""
-    android:versionName=""1.0"" >
-
-    <uses-sdk
-        android:minSdkVersion=""9""
-        android:targetSdkVersion=""25"" />
-    <application>
-        <provider
-            android:name=""mono.embeddinator.AndroidRuntimeProvider""
-            android:exported=""false""
-            android:initOrder=""{int.MaxValue}""
-            android:authorities=""${{applicationId}}.mono.embeddinator.AndroidRuntimeProvider.__mono_init__"" />
-    </application>
-</manifest>");
-
             //Copy libmonosgen-2.0.so and libmonodroid.so
             const string libMonoSgen = "libmonosgen-2.0.so";
             const string libMonoAndroid = "libmono-android.release.so";

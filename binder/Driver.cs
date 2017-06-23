@@ -163,7 +163,7 @@ namespace MonoEmbeddinator4000
             return generator;
         }
 
-        void WriteFiles()
+        bool WriteFiles()
         {
             if (!Directory.Exists(Options.OutputDir))
                 Directory.CreateDirectory(Options.OutputDir);
@@ -188,6 +188,17 @@ namespace MonoEmbeddinator4000
 
                 Diagnostics.Message("Generated: {0}", path);
             }
+
+            if (Options.Compilation.Platform == TargetPlatform.Android)
+            {
+                RefreshAndroidSdk();
+
+                var project = XamarinAndroidBuild.GenerateJavaStubsProject(Project.XamarinPath, Project.Assemblies[0], Options.OutputDir);
+                if (!MSBuild(project))
+                    return false;
+            }
+
+            return true;
         }
 
         bool ValidateAssemblies()
@@ -227,7 +238,8 @@ namespace MonoEmbeddinator4000
             Diagnostics.Message("Generating binding code...");
             Diagnostics.PushIndent();
             Generate();
-            WriteFiles();
+            if (!WriteFiles())
+                return false;
             Diagnostics.PopIndent();
 
             if (Options.CompileCode)
