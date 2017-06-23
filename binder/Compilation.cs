@@ -713,12 +713,18 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
 
             //Links .NET assemblies and places output into /android/assets/assemblies
             var project = XamarinAndroidBuild.GenerateLinkAssembliesProject(Project.XamarinPath, Project.Assemblies[0], Options.OutputDir, assembliesDir);
-            var output = Invoke("/Library/Frameworks/Mono.framework/Versions/Current/Commands/msbuild", project);
-            if (output.ExitCode != 0)
+            if (!MSBuild(project))
                 return false;
 
             var invocation = string.Join(" ", args);
-            output = Invoke(jar, invocation);
+            var output = Invoke(jar, invocation);
+            return output.ExitCode == 0;
+        }
+
+        bool MSBuild(string project)
+        {
+            var msbuild = Platform.IsWindows ? "MSBuild.exe" : "/Library/Frameworks/Mono.framework/Versions/Current/Commands/msbuild";
+            var output = Invoke(msbuild, $"/nologo /verbosity:minimal {project}");
             return output.ExitCode == 0;
         }
 
