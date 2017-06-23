@@ -124,7 +124,7 @@ namespace MonoEmbeddinator4000.Generators
 
         public void HandleBaseType(IKVM.Reflection.Type type, Class @class)
         {
-            if (type.FullName == "System.Object" || type.FullName == "System.ValueType" || type.IsAndroidSubclass())
+            if (type.FullName == "System.Object" || type.FullName == "System.ValueType")
                 return;
 
             var baseClass = Visit(type.GetTypeInfo()) as Class;
@@ -717,7 +717,8 @@ namespace MonoEmbeddinator4000.Generators
             {
                 if (type == null)
                     return false;
-                if (type.Assembly.FullName.StartsWith("Mono.Android, ", StringComparison.Ordinal))
+                if (type.Assembly.FullName.StartsWith("Mono.Android, ", StringComparison.Ordinal) ||
+                    type.Assembly.FullName.StartsWith("Java.Interop, ", StringComparison.Ordinal))
                     return true;
 
                 type = type.BaseType;
