@@ -110,7 +110,7 @@ namespace MonoEmbeddinator4000.Generators
             if (decl.Namespace == null)
                 throw new Exception("Declaration should have a namespace");
 
-            if (typeInfo.IsGenericParameter || typeInfo.IsGenericType)
+            if (typeInfo.IsGenericParameter || typeInfo.IsGenericType || typeInfo.IsAndroidSubclass())
                 decl.GenerationKind = GenerationKind.None;
 
             return decl;
@@ -124,7 +124,7 @@ namespace MonoEmbeddinator4000.Generators
 
         public void HandleBaseType(IKVM.Reflection.Type type, Class @class)
         {
-            if (type.FullName == "System.Object" || type.FullName == "System.ValueType")
+            if (type.FullName == "System.Object" || type.FullName == "System.ValueType" || type.IsAndroidSubclass())
                 return;
 
             var baseClass = Visit(type.GetTypeInfo()) as Class;
@@ -709,6 +709,20 @@ namespace MonoEmbeddinator4000.Generators
                     return true;
             }
             return false;
+        }
+
+        public static bool IsAndroidSubclass (this IKVM.Reflection.Type type)
+        {
+            do
+            {
+                if (type == null)
+                    return false;
+                if (type.Assembly.FullName.StartsWith("Mono.Android, ", StringComparison.Ordinal))
+                    return true;
+
+                type = type.BaseType;
+
+            } while (true);
         }
     }
 }
