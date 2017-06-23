@@ -26,25 +26,23 @@ namespace MonoEmbeddinator4000
 
             var solution = new ProjectCollection();
             var project = ProjectRootElement.Create();
-            project.DefaultTargets = "Build";
-            //project.AddProperty("DebugSymbols", "False");
-
+            project.AddProperty("TargetFrameworkDirectory", string.Join(";", 
+                Path.Combine(xamarinPath, "lib", "xbuild-frameworks", "MonoAndroid", "v1.0"),
+                Path.Combine(xamarinPath, "lib", "xbuild-frameworks", "MonoAndroid", "v1.0", "Facades"),
+                Path.Combine(xamarinPath, "lib", "xbuild-frameworks", "MonoAndroid", TargetFrameworkVersion)));
             project.AddImport(ProjectCollection.Escape(Path.Combine(msBuildPath, "Xamarin.Android.CSharp.targets")));
 
             //Build Target
             var target = project.AddTarget("Build");
-            var itemGroup = target.AddItemGroup();
-            itemGroup.AddItem("ResolvedAssemblies", mainAssembly);
 
-            //Need to add list of assemblies from MonoDroid
-            foreach (var dir in new[] { "v1.0", Path.Combine("v1.0", "Facades"), TargetFrameworkVersion })
-            {
-                var frameworkDir = Path.Combine(xamarinPath, "lib", "xbuild-frameworks", "MonoAndroid", dir);
-                foreach (var assembly in Directory.GetFiles(frameworkDir, "*.dll"))
-                {
-                    itemGroup.AddItem("ResolvedAssemblies", ProjectCollection.Escape(Path.GetFullPath(assembly)));
-                }
-            }
+            //ResolveAssemblies Task
+            var resolveAssemblies = target.AddTask("ResolveAssemblies");
+            resolveAssemblies.SetParameter("Assemblies", mainAssembly);
+            resolveAssemblies.SetParameter("LinkMode", "$(AndroidLinkMode)");
+            resolveAssemblies.SetParameter("ReferenceAssembliesDirectory", "$(TargetFrameworkDirectory)");
+            resolveAssemblies.AddOutputItem("ResolvedAssemblies", "ResolvedAssemblies");
+            resolveAssemblies.AddOutputItem("ResolvedUserAssemblies", "ResolvedUserAssemblies");
+            resolveAssemblies.AddOutputItem("ResolvedFrameworkAssemblies", "ResolvedFrameworkAssemblies");
 
             //LinkAssemblies Task
             var linkAssemblies = target.AddTask("LinkAssemblies");
