@@ -193,6 +193,7 @@ namespace MonoEmbeddinator4000
             {
                 RefreshAndroidSdk();
 
+                Diagnostics.Message("Generating Java stubs...");
                 var project = XamarinAndroidBuild.GenerateJavaStubsProject(Project.XamarinPath, Project.Assemblies[0], Options.OutputDir);
                 if (!MSBuild(project))
                     return false;

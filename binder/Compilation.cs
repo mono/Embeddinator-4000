@@ -705,6 +705,7 @@ namespace MonoEmbeddinator4000
             }
 
             //Links .NET assemblies and places output into /android/assets/assemblies
+            Diagnostics.Message("Linking assemblies...");
             var project = XamarinAndroidBuild.GenerateLinkAssembliesProject(Project.XamarinPath, Project.Assemblies[0], Options.OutputDir, assembliesDir);
             if (!MSBuild(project))
                 return false;
