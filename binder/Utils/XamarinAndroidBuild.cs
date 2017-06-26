@@ -27,6 +27,20 @@ namespace MonoEmbeddinator4000
             return project;
         }
 
+        static void ResolveAssemblies(ProjectTargetElement target, string xamarinPath, string mainAssembly)
+        {
+            //NOTE: [Export] requires Mono.Android.Export.dll
+            string monoAndroidExport = Path.Combine(xamarinPath, "lib", "xbuild-frameworks", "MonoAndroid", TargetFrameworkVersion, "Mono.Android.Export.dll");
+
+            var resolveAssemblies = target.AddTask("ResolveAssemblies");
+            resolveAssemblies.SetParameter("Assemblies", mainAssembly + ";" + monoAndroidExport);
+            resolveAssemblies.SetParameter("LinkMode", "$(AndroidLinkMode)");
+            resolveAssemblies.SetParameter("ReferenceAssembliesDirectory", "$(TargetFrameworkDirectory)");
+            resolveAssemblies.AddOutputItem("ResolvedAssemblies", "ResolvedAssemblies");
+            resolveAssemblies.AddOutputItem("ResolvedUserAssemblies", "ResolvedUserAssemblies");
+            resolveAssemblies.AddOutputItem("ResolvedFrameworkAssemblies", "ResolvedFrameworkAssemblies");
+        }
+
         /// <summary>
         /// Generates a LinkAssemblies.proj file for MSBuild to invoke
         /// - Links .NET assemblies and places output into /android/assets/assemblies
@@ -41,13 +55,7 @@ namespace MonoEmbeddinator4000
             var target = project.AddTarget("Build");
 
             //ResolveAssemblies Task
-            var resolveAssemblies = target.AddTask("ResolveAssemblies");
-            resolveAssemblies.SetParameter("Assemblies", mainAssembly);
-            resolveAssemblies.SetParameter("LinkMode", "$(AndroidLinkMode)");
-            resolveAssemblies.SetParameter("ReferenceAssembliesDirectory", "$(TargetFrameworkDirectory)");
-            resolveAssemblies.AddOutputItem("ResolvedAssemblies", "ResolvedAssemblies");
-            resolveAssemblies.AddOutputItem("ResolvedUserAssemblies", "ResolvedUserAssemblies");
-            resolveAssemblies.AddOutputItem("ResolvedFrameworkAssemblies", "ResolvedFrameworkAssemblies");
+            ResolveAssemblies(target, xamarinPath, mainAssembly);
 
             //LinkAssemblies Task
             var linkAssemblies = target.AddTask("LinkAssemblies");
@@ -108,13 +116,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
             var target = project.AddTarget("Build");
 
             //ResolveAssemblies Task
-            var resolveAssemblies = target.AddTask("ResolveAssemblies");
-            resolveAssemblies.SetParameter("Assemblies", mainAssembly);
-            resolveAssemblies.SetParameter("LinkMode", "$(AndroidLinkMode)");
-            resolveAssemblies.SetParameter("ReferenceAssembliesDirectory", "$(TargetFrameworkDirectory)");
-            resolveAssemblies.AddOutputItem("ResolvedAssemblies", "ResolvedAssemblies");
-            resolveAssemblies.AddOutputItem("ResolvedUserAssemblies", "ResolvedUserAssemblies");
-            resolveAssemblies.AddOutputItem("ResolvedFrameworkAssemblies", "ResolvedFrameworkAssemblies");
+            ResolveAssemblies(target, xamarinPath, mainAssembly);
 
             //GenerateJavaStubs Task
             var generateJavaStubs = target.AddTask("GenerateJavaStubs");

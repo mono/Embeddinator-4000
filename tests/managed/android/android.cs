@@ -1,5 +1,6 @@
 ﻿using Android.Widget;
 using Android.Content;
+using Java.Interop;
 
 namespace Android
 {
@@ -9,10 +10,13 @@ namespace Android
 
         public string TextToApply
         {
+            [Export]
             get;
+            [Export]
             set;
         }
 
+        [Export]
         public void Apply()
         {
             Text = TextToApply;
