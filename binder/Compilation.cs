@@ -418,9 +418,13 @@ namespace MonoEmbeddinator4000
             var supportFiles = Directory.GetFiles(FindDirectory("support"), "*.java", SearchOption.AllDirectories)
                 .Where(f => Options.Compilation.Platform == TargetPlatform.Android || Path.GetFileName(Path.GetDirectoryName(f)) != "android");
 
+            //NOTE: GenerateJavaStubs puts them in /src/
+            var javaStubs = Directory.GetFiles(Path.Combine(Options.OutputDir, "src"), "*.java", SearchOption.AllDirectories);
+
             var args = new List<string> {
                 string.Join(" ", files.Select(file => Path.GetFullPath(file))),
                 string.Join(" ", supportFiles),
+                string.Join(" ", javaStubs),
                 "-source 1.7 -target 1.7",
                 $"-bootclasspath \"{bootClassPath}\"",
                 $"-d {classesDir}",
