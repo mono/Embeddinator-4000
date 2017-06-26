@@ -67,3 +67,4 @@ xcuserdata/
 .cake/**
 !.cake/packages.config
 Resource.designer.cs
+external/Xamarin.Android

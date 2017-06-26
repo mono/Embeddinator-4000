@@ -222,6 +222,10 @@ namespace MonoEmbeddinator4000
                     Console.Error.WriteLine("Cannot find Xamarin SDK at path: " + XamarinPath);
                     return -1;
                 }
+                else
+                {
+                    project.XamarinPath = Path.GetFullPath(project.XamarinPath);
+                }
             }
 
             foreach (var generator in Generators)

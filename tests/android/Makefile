@@ -1,7 +1,7 @@
 include ../common/Shared.make
 
 compile:
-	$(EMBEDDINATOR_CMD) -gen=java -out=mk -p=android -compile $(MANAGED_ANDROID_DLL)
+	$(EMBEDDINATOR_CMD) -gen=java -out=mk -p=android -compile $(MANAGED_ANDROID_DLL) -xamarinPath=../../external/Xamarin.Android
 	cp mk/managed.aar managed/managed.aar
 	cp -R ../common/java/ app/src/main/java
 	./gradlew assemble

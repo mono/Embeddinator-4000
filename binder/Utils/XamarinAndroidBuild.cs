@@ -55,7 +55,6 @@ namespace MonoEmbeddinator4000
             linkAssemblies.SetParameter("LinkMode", "$(AndroidLinkMode)");
             linkAssemblies.SetParameter("LinkSkip", "$(AndroidLinkSkip)");
             linkAssemblies.SetParameter("LinkDescriptions", "@(LinkDescription)");
-            linkAssemblies.SetParameter("PortablePdbFiles", "@(PortablePdbFiles)");
             linkAssemblies.SetParameter("DumpDependencies", "True");
             linkAssemblies.SetParameter("ResolvedAssemblies", "@(ResolvedAssemblies)");
             linkAssemblies.SetParameter("MainAssembly", mainAssembly);
