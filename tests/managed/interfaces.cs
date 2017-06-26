@@ -71,7 +71,7 @@ namespace Interfaces {
 
 		public static IFormatProvider GetCulture (string name)
 		{
-			return System.Globalization.CultureInfo.GetCultureInfo (name);
+			return new System.Globalization.CultureInfo (name);
 		}
 
 		public static string Format (double value, IFormatProvider provider)

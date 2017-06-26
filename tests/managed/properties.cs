@@ -6,6 +6,10 @@ public static class Platform {
 	// static get-only property
 	public static bool IsWindows {
 		get {
+#if PCL
+			//NOTE: maybe there is something more precise than this
+			return Environment.NewLine == "\r\n";
+#else
 			switch (Environment.OSVersion.Platform) {
 			case PlatformID.Win32NT:
 			case PlatformID.Win32S:
@@ -14,6 +18,7 @@ public static class Platform {
 				return true;
 			}
 			return false;
+#endif
 		}
 	}
 	
