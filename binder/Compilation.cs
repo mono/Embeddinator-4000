@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿using System;
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -415,16 +415,25 @@ namespace MonoEmbeddinator4000
                 bootClassPath = Path.Combine(androidDir, "android.jar");
             }
 
+            var javaFiles = files.Select(file => Path.GetFullPath(file)).ToList();
+
             var supportFiles = Directory.GetFiles(FindDirectory("support"), "*.java", SearchOption.AllDirectories)
                 .Where(f => Options.Compilation.Platform == TargetPlatform.Android || Path.GetFileName(Path.GetDirectoryName(f)) != "android");
+            javaFiles.AddRange(supportFiles);
 
             //NOTE: GenerateJavaStubs puts them in /src/
-            var javaStubs = Directory.GetFiles(Path.Combine(Options.OutputDir, "src"), "*.java", SearchOption.AllDirectories);
+            if (Options.Compilation.Platform == TargetPlatform.Android)
+            {
+                var stubsPath = Path.Combine(Options.OutputDir, "src");
+                if (Directory.Exists(stubsPath))
+                {
+                    var stubFiles = Directory.GetFiles(stubsPath, "*.java", SearchOption.AllDirectories);
+                    javaFiles.AddRange(stubFiles);
+                }
+            }
 
             var args = new List<string> {
-                string.Join(" ", files.Select(file => Path.GetFullPath(file))),
-                string.Join(" ", supportFiles),
-                string.Join(" ", javaStubs),
+                string.Join(" ", javaFiles),
                 "-source 1.7 -target 1.7",
                 $"-bootclasspath \"{bootClassPath}\"",
                 $"-d {classesDir}",
