@@ -80,7 +80,9 @@ typedef uint16_t gunichar2;
 /* This is copied from mono's header files */
 
 /* utils/mono-publib.h */
+#ifndef MONO_API
 #define MONO_API
+#endif
 typedef int32_t	mono_bool;
 typedef uint16_t mono_unichar2;
 
