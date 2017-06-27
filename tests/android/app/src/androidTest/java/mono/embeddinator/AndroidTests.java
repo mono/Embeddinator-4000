@@ -3,7 +3,9 @@ package mono.embeddinator;
 import static org.junit.Assert.*;
 import org.junit.*;
 import org.junit.runner.RunWith;
-import android.content.Intent;
+
+import android.app.Activity;
+import android.content.*;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import managed_dll.Native_managed_dll;
@@ -44,9 +46,9 @@ public class AndroidTests {
     }
 
     @Test
-    public void createActivity() throws Throwable {
-        Intent intent = new Intent(rule.getActivity(), ActivitySubclass.class);
-        ActivitySubclass a = (ActivitySubclass)rule.launchActivity(intent);
-        assertEquals("Hello from C#!", a.getText());
+    public void startActivity() throws Throwable {
+        Activity activity = rule.getActivity();
+        Intent intent = new Intent(activity, ActivitySubclass.class);
+        activity.startActivity(intent);
     }
 }

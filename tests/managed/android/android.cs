@@ -1,4 +1,4 @@
-﻿using Android.App;
+﻿﻿using Android.App;
 using Android.Content;
 using Android.OS;
 using Android.Runtime;
@@ -43,13 +43,21 @@ namespace Android
         {
             base.OnCreate(savedInstanceState);
 
-            SetContentView(R.Layout.hello);
+            //SetContentView(R.Layout.hello);
+
+            //TODO: temporary until resources are working
+            var text = new TextView(this);
+            text.Text = GetText();
+            SetContentView(text);
         }
 
         [Export("getText")]
         public string GetText()
         {
-            return Resources.GetString(R.String.hello);
+            //TODO: temporary until resources are working
+            return "Hello from C#!";
+
+            //return Resources.GetString(R.String.hello);
         }
     }
 }
