@@ -3,11 +3,12 @@ package mono.embeddinator;
 import static org.junit.Assert.*;
 import org.junit.*;
 import org.junit.runner.RunWith;
+import android.content.Intent;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import managed_dll.Native_managed_dll;
-import mono.embeddinator.ViewSubclass;
 import mono.embeddinator.testrunner.MainActivity;
+import mono.embeddinator.android.*;
 
 @RunWith(AndroidJUnit4.class)
 public class AndroidTests {
@@ -17,9 +18,7 @@ public class AndroidTests {
 
     @Before
     public void setUp() {
-        //NOTE: this forces the tests to run in the same context an app referencing the AAR would
-        //  Instrumented tests do not seem to follow the pattern of loading content providers, etc.
-        Runtime.setImplementation(new AndroidImpl(rule.getActivity()));
+        //NOTE: we need to force Embeddinator to initialize, using Native_managed_dll.INSTANCE does this
         assertNotNull(Native_managed_dll.INSTANCE);
     }
 
@@ -42,5 +41,12 @@ public class AndroidTests {
         ButtonSubclass b = new ButtonSubclass(rule.getActivity());
         b.performClick();
         assertEquals(1, b.getTimes());
+    }
+
+    @Test
+    public void createActivity() throws Throwable {
+        Intent intent = new Intent(rule.getActivity(), ActivitySubclass.class);
+        ActivitySubclass a = (ActivitySubclass)rule.launchActivity(intent);
+        assertEquals("Hello from C#!", a.getText());
     }
 }

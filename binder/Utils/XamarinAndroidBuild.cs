@@ -95,21 +95,8 @@ namespace MonoEmbeddinator4000
             //AndroidManifest.xml templatel
             File.WriteAllText(manifestPath,
 $@"<?xml version=""1.0"" encoding=""utf-8""?>
-<manifest xmlns:android=""http://schemas.android.com/apk/res/android""
-    package=""{packageName}""
-    android:versionCode=""1""
-    android:versionName=""1.0"" >
-
-    <uses-sdk
-        android:minSdkVersion=""9""
-        android:targetSdkVersion=""25"" />
-    <application>
-        <provider
-            android:name=""mono.embeddinator.AndroidRuntimeProvider""
-            android:exported=""false""
-            android:initOrder=""{int.MaxValue}""
-            android:authorities=""${{applicationId}}.mono.embeddinator.AndroidRuntimeProvider.__mono_init__"" />
-    </application>
+<manifest xmlns:android=""http://schemas.android.com/apk/res/android"">
+    <uses-sdk android:minSdkVersion=""9"" android:targetSdkVersion=""25"" />
 </manifest>");
 
             var project = CreateProject(xamarinPath);
@@ -123,20 +110,39 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
             generateJavaStubs.SetParameter("ResolvedAssemblies", "@(ResolvedAssemblies)");
             generateJavaStubs.SetParameter("ResolvedUserAssemblies", "@(ResolvedUserAssemblies)");
             generateJavaStubs.SetParameter("ManifestTemplate", manifestPath);
+            generateJavaStubs.SetParameter("MergedAndroidManifestOutput", manifestPath);
             generateJavaStubs.SetParameter("MergedManifestDocuments", "@(ExtractedManifestDocuments)");
             generateJavaStubs.SetParameter("Debug", "False");
             generateJavaStubs.SetParameter("NeedsInternet", "$(AndroidNeedsInternetPermission)");
             generateJavaStubs.SetParameter("AndroidSdkPlatform", "25"); //TODO: should be an option
             generateJavaStubs.SetParameter("AndroidSdkDir", AndroidSdk.AndroidSdkPath);
-            generateJavaStubs.SetParameter("PackageName", packageName);
             generateJavaStubs.SetParameter("ManifestPlaceholders", "$(AndroidManifestPlaceholders)");
             generateJavaStubs.SetParameter("OutputDirectory", outputDirectory);
-            generateJavaStubs.SetParameter("MergedAndroidManifestOutput", manifestPath + ".merged");
             generateJavaStubs.SetParameter("UseSharedRuntime", "False");
             generateJavaStubs.SetParameter("EmbedAssemblies", "False");
             generateJavaStubs.SetParameter("ResourceDirectory", "$(MonoAndroidResDirIntermediate)");
             generateJavaStubs.SetParameter("PackageNamingPolicy", "$(AndroidPackageNamingPolicy)");
             generateJavaStubs.SetParameter("AcwMapFile", "$(MonoAndroidIntermediate)acw-map.txt");
+
+            //XmlPoke to fix up AndroidManifest
+            var xmlPoke = target.AddTask("XmlPoke");
+            xmlPoke.SetParameter("XmlInputPath", manifestPath);
+            xmlPoke.SetParameter("Query", "/manifest/@package");
+            xmlPoke.SetParameter("Value", packageName);
+
+            //android:name
+            xmlPoke = target.AddTask("XmlPoke");
+            xmlPoke.SetParameter("XmlInputPath", manifestPath);
+            xmlPoke.SetParameter("Namespaces", "<Namespace Prefix='android' Uri='http://schemas.android.com/apk/res/android' />");
+            xmlPoke.SetParameter("Query", "/manifest/application/provider/@android:name");
+            xmlPoke.SetParameter("Value", "mono.embeddinator.AndroidRuntimeProvider");
+
+            //android:authorities
+            xmlPoke = target.AddTask("XmlPoke");
+            xmlPoke.SetParameter("XmlInputPath", manifestPath);
+            xmlPoke.SetParameter("Namespaces", "<Namespace Prefix='android' Uri='http://schemas.android.com/apk/res/android' />");
+            xmlPoke.SetParameter("Query", "/manifest/application/provider/@android:authorities");
+            xmlPoke.SetParameter("Value", "${applicationId}.mono.embeddinator.AndroidRuntimeProvider.__mono_init__");
 
             //NOTE: might avoid the temp file later
             var projectFile = Path.Combine(outputDirectory, "GenerateJavaStubs.proj");
