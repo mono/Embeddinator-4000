@@ -36,4 +36,11 @@ public class AndroidTests {
         v.apply(expected);
         assertEquals(expected, v.getText());
     }
+
+    @Test
+    public void buttonClick() throws Throwable {
+        ButtonSubclass b = new ButtonSubclass(rule.getActivity());
+        b.performClick();
+        assertEquals(1, b.getTimes());
+    }
 }

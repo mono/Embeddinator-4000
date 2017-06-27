@@ -16,4 +16,20 @@ namespace Android
             Text = text;
         }
     }
+
+    [Register("mono.embeddinator.ButtonSubclass")]
+    public class ButtonSubclass : Button
+    {
+        public ButtonSubclass(Context context) : base(context)
+        {
+            Click += (sender, e) => Times++;
+        }
+
+        public int Times
+        {
+            [Export("getTimes")]
+            get;
+            private set;
+        }
+    }
 }
