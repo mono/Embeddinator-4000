@@ -1,5 +1,6 @@
-﻿using CppSharp;
+﻿﻿using CppSharp;
 using CppSharp.AST;
+using System;
 using System.Linq;
 
 namespace MonoEmbeddinator4000.Generators
@@ -53,6 +54,7 @@ namespace MonoEmbeddinator4000.Generators
 
                     return "const char*";
                 }
+                case PrimitiveType.Decimal: return "MonoDecimal";
             }
 
             return base.VisitPrimitiveType(primitive);
@@ -70,10 +72,19 @@ namespace MonoEmbeddinator4000.Generators
         public override string VisitArrayType(ArrayType array, TypeQualifiers quals)
         {
             var typeName = array.Type.Visit(this);
+
+            if (string.IsNullOrWhiteSpace(typeName))
+                throw new Exception($"Unhandled array type printing for type '{array.Type}'");
+
             typeName = AsCIdentifier(typeName);
             typeName = StringHelpers.Capitalize(typeName);
 
             return string.Format("{0}Array", typeName);
+        }
+
+        public override string VisitUnsupportedType(UnsupportedType type, TypeQualifiers quals)
+        {
+            return type.Description;
         }
 
         public override string VisitPrimitiveType(PrimitiveType primitive)
@@ -106,6 +117,8 @@ namespace MonoEmbeddinator4000.Generators
                     return "Double";
                 case PrimitiveType.String:
                     return "String";
+                case PrimitiveType.Decimal:
+                    return "Decimal";
             }
 
             return base.VisitPrimitiveType(primitive);

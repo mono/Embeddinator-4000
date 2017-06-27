@@ -50,7 +50,7 @@ typedef MonoEmbedArray _UInt64Array;
 typedef MonoEmbedArray _SingleArray;
 typedef MonoEmbedArray _DoubleArray;
 typedef MonoEmbedArray _StringArray;
-
+typedef MonoEmbedArray _DecimalArray;
 /**
  * Performs marshaling of a given MonoString to a GLib string.
  */

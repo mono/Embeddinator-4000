@@ -445,7 +445,6 @@ namespace MonoEmbeddinator4000.Generators
                 type = new BuiltinType(PrimitiveType.Null);
                 break;
             case TypeCode.Object:
-            case TypeCode.Decimal:
             case TypeCode.DateTime:
                 if (managedType.FullName == "System.Void")
                 {
@@ -503,6 +502,9 @@ namespace MonoEmbeddinator4000.Generators
                 break;
             case TypeCode.String:
                 type = new BuiltinType(PrimitiveType.String);
+                break;
+            case TypeCode.Decimal:
+                type = new BuiltinType(PrimitiveType.Decimal);
                 break;
             }
 

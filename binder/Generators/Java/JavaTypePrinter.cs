@@ -152,11 +152,12 @@ namespace MonoEmbeddinator4000.Generators
                 case PrimitiveType.Half: return "__fp16";
                 case PrimitiveType.Float: return useReferencePrimitiveTypes ? "Float" : "float";
                 case PrimitiveType.Double: return useReferencePrimitiveTypes ? "Double" : "double";
-                case PrimitiveType.LongDouble: return "decimal";
                 case PrimitiveType.IntPtr:
                 case PrimitiveType.UIntPtr:
                 case PrimitiveType.Null: return JavaGenerator.IntPtrType;
                 case PrimitiveType.String: return "String";
+                case PrimitiveType.Decimal: return "java.math.BigDecimal";
+
             }
 
             throw new NotSupportedException();

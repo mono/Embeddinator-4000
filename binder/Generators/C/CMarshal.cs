@@ -162,7 +162,7 @@ namespace MonoEmbeddinator4000.Generators
                 case PrimitiveType.ULongLong:
                 case PrimitiveType.Float:
                 case PrimitiveType.Double:
-                case PrimitiveType.LongDouble:
+                case PrimitiveType.Decimal:
                 case PrimitiveType.Null:
                 {
                     var typePrinter = CTypePrinter;
@@ -246,6 +246,8 @@ namespace MonoEmbeddinator4000.Generators
                     return "mono_get_uintptr_class()";
                 case PrimitiveType.String:
                     return "mono_get_string_class()";
+                case PrimitiveType.Decimal:
+                    return "mono_embeddinator_get_decimal_class()";
                 default:
                     throw new System.NotImplementedException();
             }
@@ -485,7 +487,7 @@ namespace MonoEmbeddinator4000.Generators
                 case PrimitiveType.ULongLong:
                 case PrimitiveType.Float:
                 case PrimitiveType.Double:
-                case PrimitiveType.LongDouble:
+                case PrimitiveType.Decimal:
                 case PrimitiveType.Null:
                 {
                     var prefix = "&";
