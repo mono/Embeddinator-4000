@@ -87,12 +87,12 @@ namespace MonoEmbeddinator4000
             //Copy Task, to copy AndroidAsset files
             var copy = target.AddTask("Copy");
             copy.SetParameter("SourceFiles", "@(AndroidAsset)");
-            copy.SetParameter("DestinationFolder", Path.Combine(outputDirectory, "android", "assets"));
+            copy.SetParameter("DestinationFiles", $"@(AndroidAsset->'{Path.Combine(outputDirectory, "android", "assets") + Path.DirectorySeparatorChar}%(RecursiveDir)%(Filename)%(Extension)')");
 
             //Copy Task, to copy AndroidResource files
             copy = target.AddTask("Copy");
             copy.SetParameter("SourceFiles", "@(AndroidResource)");
-            copy.SetParameter("DestinationFolder", Path.Combine(outputDirectory, "android", "res"));
+            copy.SetParameter("DestinationFiles", $"@(AndroidResource->'{Path.Combine(outputDirectory, "android", "res") + Path.DirectorySeparatorChar}%(RecursiveDir)%(Filename)%(Extension)')");
 
             //NOTE: might avoid the temp file later
             var projectFile = Path.Combine(outputDirectory, "LinkAssemblies.proj");
