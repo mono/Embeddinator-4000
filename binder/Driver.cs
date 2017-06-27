@@ -189,7 +189,7 @@ namespace MonoEmbeddinator4000
                 Diagnostics.Message("Generated: {0}", path);
             }
 
-            if (Options.Compilation.Platform == TargetPlatform.Android)
+            if (Options.GeneratorKind == GeneratorKind.Java && Options.Compilation.Platform == TargetPlatform.Android)
             {
                 RefreshAndroidSdk();
 
