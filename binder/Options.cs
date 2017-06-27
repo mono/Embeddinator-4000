@@ -4,6 +4,11 @@ namespace MonoEmbeddinator4000
 {
     public class Options : DriverOptions
     {
+        /// <summary>
+        /// The name of the library to be bound.
+        /// </summary>
+        public string LibraryName;
+
         // If true, will use unmanaged->managed thunks to call managed methods.
         // In this mode the JIT will generate specialized wrappers for marshaling
         // which will be faster but also lead to higher memory consumption.

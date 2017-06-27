@@ -188,6 +188,9 @@
     <Compile Include="../../external/CppSharp/src/Generator/Passes/HandleDefaultParamValuesPass.cs">
       <Link>Passes/HandleDefaultParamValuesPass.cs</Link>
     </Compile>
+    <Compile Include="../../external/CppSharp/src/Generator/Passes/IgnoreMoveConstructorsPass.cs">
+      <Link>Passes/IgnoreMoveConstructorsPass.cs</Link>
+    </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Passes/IgnoreSystemDeclarationsPass.cs">
       <Link>Passes/IgnoreSystemDeclarationsPass.cs</Link>
     </Compile>
