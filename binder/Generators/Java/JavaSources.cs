@@ -1,4 +1,4 @@
-﻿﻿﻿using System.Collections.Generic;
+﻿﻿﻿﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -221,10 +221,11 @@ namespace MonoEmbeddinator4000.Generators
                 if (classes.Count() > 0)
                     Write(" extends {0}", string.Join(", ", classes));
 
+                var implements = @class.IsInterface ? "extends" : "implements";
                 var interfaces = bases.Where(@base => @base.Class.IsInterface && @base.Class.IsGenerated)
                                       .Select(@base => @base.Class.Visit(TypePrinter).Type);
                 if (interfaces.Count() > 0)
-                    Write(" implements {0}", string.Join(", ", interfaces));
+                    Write($" {implements} {string.Join(", ", interfaces)}");
             }
         }
 
