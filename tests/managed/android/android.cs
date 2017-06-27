@@ -10,18 +10,10 @@ namespace Android
     {
         public ViewSubclass(Context context) : base(context) { }
 
-        public string TextToApply
+        [Export("apply")]
+        public void Apply(string text)
         {
-            [Export]
-            get;
-            [Export]
-            set;
-        }
-
-        [Export]
-        public void Apply()
-        {
-            Text = TextToApply;
+            Text = text;
         }
     }
 }

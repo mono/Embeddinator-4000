@@ -33,8 +33,7 @@ public class AndroidTests {
     public void callExports() throws Throwable {
         String expected = "Hello";
         ViewSubclass v = new ViewSubclass(rule.getActivity());
-        v.set_TextToApply(expected);
-        v.Apply();
+        v.apply(expected);
         assertEquals(expected, v.getText());
     }
 }
