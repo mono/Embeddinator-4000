@@ -28,8 +28,6 @@ namespace MonoEmbeddinator4000
             Project = project;
             Options = options;
 
-            Options.MainModule.LibraryName = null;
-
             Options.GenerateSupportFiles = 
                 Options.GeneratorKind == GeneratorKind.C ||
                 Options.GeneratorKind == GeneratorKind.CPlusPlus ||

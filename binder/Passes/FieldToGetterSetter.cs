@@ -27,7 +27,6 @@ namespace MonoEmbeddinator4000.Passes
                 Namespace = @class,
                 ReturnType = field.QualifiedType,
                 Access = field.Access,
-                SynthKind = FunctionSynthKind.FieldAcessor,
                 Field = field,
                 IsStatic = field.IsStatic
             };
@@ -38,7 +37,6 @@ namespace MonoEmbeddinator4000.Passes
                 Namespace = @class,
                 ReturnType = new QualifiedType(new BuiltinType(PrimitiveType.Void)),
                 Access = field.Access,
-                SynthKind = FunctionSynthKind.FieldAcessor,
                 Field = field,
                 IsStatic = field.IsStatic
             };
