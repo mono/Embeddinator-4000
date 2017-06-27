@@ -49,6 +49,7 @@ namespace MonoEmbeddinator4000
         public static string GenerateLinkAssembliesProject(string xamarinPath, string mainAssembly, string outputDirectory, string assembliesDirectory)
         {
             mainAssembly = Path.GetFullPath(mainAssembly);
+            outputDirectory = Path.GetFullPath(outputDirectory);
             assembliesDirectory = Path.GetFullPath(assembliesDirectory);
 
             var project = CreateProject(xamarinPath);
@@ -68,11 +69,36 @@ namespace MonoEmbeddinator4000
             linkAssemblies.SetParameter("MainAssembly", mainAssembly);
             linkAssemblies.SetParameter("OutputDirectory", assembliesDirectory);
 
+            //ResolveLibraryProjectImports Task, extracts Android resources
+            var resolveLibraryProject = target.AddTask("ResolveLibraryProjectImports");
+            resolveLibraryProject.SetParameter("Assemblies", "@(ResolvedUserAssemblies)");
+            resolveLibraryProject.SetParameter("UseShortFileNames", "False");
+            resolveLibraryProject.SetParameter("ImportsDirectory", outputDirectory);
+            resolveLibraryProject.SetParameter("OutputDirectory", outputDirectory);
+            resolveLibraryProject.SetParameter("OutputImportDirectory", outputDirectory);
+            resolveLibraryProject.AddOutputItem("ResolvedAssetDirectories", "ResolvedAssetDirectories");
+            resolveLibraryProject.AddOutputItem("ResolvedResourceDirectories", "ResolvedResourceDirectories");
+
+            //Create ItemGroup of Android files
+            var androidResources = target.AddItemGroup();
+            androidResources.AddItem("AndroidAsset", @"%(ResolvedAssetDirectories.Identity)\**\*");
+            androidResources.AddItem("AndroidResource", @"%(ResolvedResourceDirectories.Identity)\**\*");
+
+            //Copy Task, to copy AndroidAsset files
+            var copy = target.AddTask("Copy");
+            copy.SetParameter("SourceFiles", "@(AndroidAsset)");
+            copy.SetParameter("DestinationFolder", Path.Combine(outputDirectory, "android", "assets"));
+
+            //Copy Task, to copy AndroidResource files
+            copy = target.AddTask("Copy");
+            copy.SetParameter("SourceFiles", "@(AndroidResource)");
+            copy.SetParameter("DestinationFolder", Path.Combine(outputDirectory, "android", "res"));
+
             //NOTE: might avoid the temp file later
             var projectFile = Path.Combine(outputDirectory, "LinkAssemblies.proj");
             File.WriteAllText(projectFile, project.RawXml);
             return projectFile;
-;        }
+        }
 
         /// <summary>
         /// Generates a GenerateJavaStubs.proj file for MSBuild to invoke
