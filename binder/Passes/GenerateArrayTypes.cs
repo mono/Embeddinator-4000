@@ -1,4 +1,5 @@
 using CppSharp.AST;
+using CppSharp.AST.Extensions;
 using CppSharp.Passes;
 using MonoEmbeddinator4000.Generators;
 using System.Collections.Generic;
@@ -57,7 +58,8 @@ namespace MonoEmbeddinator4000.Passes
                 QualifiedType = new QualifiedType(new TagType(MonoEmbedArray))
             };
 
-            Declarations.Add(typedef);
+            if (!array.Type.IsPrimitiveType())
+                Declarations.Add(typedef);
 
             var typedefType = new TypedefType(typedef);
             var arrayType = new ManagedArrayType(array, typedefType);
@@ -99,6 +101,9 @@ namespace MonoEmbeddinator4000.Passes
 
         public override bool VisitFunctionDecl(Function function)
         {
+            if (function.TranslationUnit != TranslationUnit)
+                return false;
+
             QualifiedType newType;
 
             var retType = function.ReturnType;

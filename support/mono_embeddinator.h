@@ -166,12 +166,6 @@ typedef void (*mono_embeddinator_error_report_hook_t)(mono_embeddinator_error_t)
 MONO_EMBEDDINATOR_API
 void* mono_embeddinator_install_error_report_hook(mono_embeddinator_error_report_hook_t hook);
 
-
-struct MonoEmbedArray
-{
-    GArray* array;
-};
-
 struct MonoEmbedObject
 {
     MonoClass* _class;

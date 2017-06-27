@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿using CppSharp;
+﻿﻿﻿﻿﻿﻿using CppSharp;
 using CppSharp.AST;
 using CppSharp.Generators;
 using CppSharp.Generators.AST;
@@ -31,6 +31,7 @@ namespace MonoEmbeddinator4000.Generators
 
             WriteInclude("glib.h");
             WriteInclude("mono_embeddinator.h");
+            WriteInclude("c-support.h");
 
             // Find dependent headers
             var referencedDecls = new GetReferencedDecls();

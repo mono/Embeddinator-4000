@@ -23,9 +23,33 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+#pragma once
+
 #include "embeddinator.h"
 #include "glib.h"
 #include "mono-support.h"
+
+/**
+ * Arrays
+ */
+typedef struct MonoEmbedArray
+{
+    GArray* array;
+} MonoEmbedArray;
+
+typedef MonoEmbedArray _BoolArray;
+typedef MonoEmbedArray _CharArray;
+typedef MonoEmbedArray _SByteArray;
+typedef MonoEmbedArray _ByteArray;
+typedef MonoEmbedArray _Int16Array;
+typedef MonoEmbedArray _UInt16Array;
+typedef MonoEmbedArray _Int32Array;
+typedef MonoEmbedArray _UInt32Array;
+typedef MonoEmbedArray _Int64Array;
+typedef MonoEmbedArray _UInt64Array;
+typedef MonoEmbedArray _SingleArray;
+typedef MonoEmbedArray _DoubleArray;
+typedef MonoEmbedArray _StringArray;
 
 /**
  * Performs marshaling of a given MonoString to a GLib string.
