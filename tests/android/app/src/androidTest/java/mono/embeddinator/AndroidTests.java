@@ -3,8 +3,9 @@ package mono.embeddinator;
 import static org.junit.Assert.*;
 import org.junit.*;
 import org.junit.runner.RunWith;
-
 import android.app.Activity;
+import android.view.View;
+import android.widget.TextView;
 import android.content.*;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
@@ -50,5 +51,25 @@ public class AndroidTests {
         Activity activity = rule.getActivity();
         Intent intent = new Intent(activity, ActivitySubclass.class);
         activity.startActivity(intent);
+    }
+
+    @Test
+    public void resourceString() {
+        String actual = rule.getActivity().getResources().getString(com.managed_dll.R.string.hello);
+        assertEquals("Hello from C#!", actual);
+    }
+
+    @Test
+    public void resourceLayout() {
+        View view = rule.getActivity().getLayoutInflater().inflate(com.managed_dll.R.layout.hello, null);
+        assertNotNull(view);
+    }
+
+    @Test
+    public void resourceId() {
+        View view = rule.getActivity().getLayoutInflater().inflate(com.managed_dll.R.layout.hello, null);
+        TextView text = (TextView)view.findViewById(com.managed_dll.R.id.text);
+        assertNotNull(text);
+        assertEquals("Hello from C#!", text.getText());
     }
 }
