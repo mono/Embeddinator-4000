@@ -27,24 +27,25 @@
 
 GString* mono_embeddinator_decimal_to_gstring (MonoDecimal decimal)
 {
-	static MonoMethod* tostringmethod = 0;
+    static MonoMethod* tostringmethod = 0;
 
-	MonoObject* invariantculture = mono_embeddinator_get_cultureinfo_invariantculture_object ();
-	void* tostringargs [1];
-	tostringargs [0] = invariantculture;
+    MonoObject* invariantculture = mono_embeddinator_get_cultureinfo_invariantculture_object ();
+    void* tostringargs [1];
+    tostringargs [0] = invariantculture;
 
-	if (!tostringmethod)
-		tostringmethod = mono_embeddinator_lookup_method (":ToString(System.IFormatProvider)", mono_embeddinator_get_decimal_class ());
+    if (!tostringmethod)
+        tostringmethod = mono_embeddinator_lookup_method (":ToString(System.IFormatProvider)", mono_embeddinator_get_decimal_class ());
 
-	MonoObject* ex = 0;
-	if (ex)
-		mono_embeddinator_throw_exception (ex);
+    MonoObject* ex = 0;
     MonoString* decimalmonostr = (MonoString *) mono_runtime_invoke (tostringmethod, &decimal, tostringargs, &ex);
+    if (ex)
+        mono_embeddinator_throw_exception (ex);
 
-	GString* gstring = g_string_new("");
-	mono_embeddinator_marshal_string_to_gstring (gstring, decimalmonostr);
-	
-	return gstring;
+    GString* gstring = g_string_new("");
+    mono_embeddinator_marshal_string_to_gstring (gstring, decimalmonostr);
+    
+    return gstring;
+}
 }
 
 void mono_embeddinator_marshal_string_to_gstring(GString* g_string, MonoString* mono_string)
