@@ -44,16 +44,6 @@ namespace Android
         {
             base.OnCreate(savedInstanceState);
 
-            //For ResourceIdManager to pick it up, Resource.designer.dll must be loaded
-            //TODO: put this code somewhere else...
-            System.Reflection.Assembly.Load("Resource.designer");
-
-            //For testing, print all loaded assemblies
-            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
-            {
-                Util.Log.Debug("E4K", "Found assembly: {0}", assembly.FullName);
-            }
-
             SetContentView(R.Layout.hello);
         }
 

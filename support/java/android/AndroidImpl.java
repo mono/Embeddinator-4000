@@ -43,6 +43,7 @@ public class AndroidImpl extends DesktopImpl {
                         "Android/data/" + context.getPackageName () + "/files/.__override__").getAbsolutePath (),
                 new String[] {
                         library + ".dll",
+                        "Resource.designer.dll"
                 },
                 context.getPackageName ());
 
