@@ -49,35 +49,35 @@ TEST_CASE("Types.C", "[C][Types]") {
     GString* result;
 
     MonoDecimal decimalmax = Type_Decimal_get_Max();
-    result = mono_embeddinator_decimal_to_gstring(&decimalmax);
+    result = mono_embeddinator_decimal_to_gstring(decimalmax);
     REQUIRE(strcmp(result->str, "79228162514264337593543950335") == 0);
 
     MonoDecimal decimalmin = Type_Decimal_get_Min();
-    result = mono_embeddinator_decimal_to_gstring(&decimalmin);
+    result = mono_embeddinator_decimal_to_gstring(decimalmin);
     REQUIRE(strcmp(result->str, "-79228162514264337593543950335") == 0);
 
     MonoDecimal decimalzero = Type_Decimal_get_Zero();
-    result = mono_embeddinator_decimal_to_gstring(&decimalzero);
+    result = mono_embeddinator_decimal_to_gstring(decimalzero);
     REQUIRE(strcmp(result->str, "0") == 0);
 
     MonoDecimal decimalone = Type_Decimal_get_One();
-    result = mono_embeddinator_decimal_to_gstring(&decimalone);
+    result = mono_embeddinator_decimal_to_gstring(decimalone);
     REQUIRE(strcmp(result->str, "1") == 0);
 
     MonoDecimal decimalminusone = Type_Decimal_get_MinusOne();
-    result = mono_embeddinator_decimal_to_gstring(&decimalminusone);
+    result = mono_embeddinator_decimal_to_gstring(decimalminusone);
     REQUIRE(strcmp(result->str, "-1") == 0);
 
     MonoDecimal decimalpi = Type_Decimal_get_Pi();
-    result = mono_embeddinator_decimal_to_gstring(&decimalpi);
+    result = mono_embeddinator_decimal_to_gstring(decimalpi);
     REQUIRE(strcmp(result->str, "3.14159265358979323846264") == 0);
 
     MonoDecimal decimalminustau = Type_Decimal_get_MinusTau();
-    result = mono_embeddinator_decimal_to_gstring(&decimalminustau);
+    result = mono_embeddinator_decimal_to_gstring(decimalminustau);
     REQUIRE(strcmp(result->str, "-6.28318530717958647692") == 0);
 
     MonoDecimal decimalfortytwo = Type_Decimal_get_FortyTwo();
-    result = mono_embeddinator_decimal_to_gstring(&decimalfortytwo);
+    result = mono_embeddinator_decimal_to_gstring(decimalfortytwo);
     REQUIRE(strcmp(result->str, "42") == 0);
 
     BuiltinTypes* bt = BuiltinTypes_new();

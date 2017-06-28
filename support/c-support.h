@@ -59,7 +59,7 @@ typedef MonoEmbedArray _DecimalArray;
  * Performs marshaling of a given MonoDecimal to a GLib string.
  */
 MONO_EMBEDDINATOR_API
-GString* mono_embeddinator_decimal_to_gstring (MonoDecimal *decimal);
+GString* mono_embeddinator_decimal_to_gstring (MonoDecimal decimal);
 
 /**
  * Performs marshaling of a given MonoString to a GLib string.

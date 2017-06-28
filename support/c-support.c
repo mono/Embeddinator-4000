@@ -25,7 +25,7 @@
 
 #include "c-support.h"
 
-GString* mono_embeddinator_decimal_to_gstring (MonoDecimal *decimal)
+GString* mono_embeddinator_decimal_to_gstring (MonoDecimal decimal)
 {
 	static MonoMethod* tostringmethod = 0;
 
@@ -37,9 +37,9 @@ GString* mono_embeddinator_decimal_to_gstring (MonoDecimal *decimal)
 		tostringmethod = mono_embeddinator_lookup_method (":ToString(System.IFormatProvider)", mono_embeddinator_get_decimal_class ());
 
 	MonoObject* ex = 0;
-	MonoString* decimalmonostr = (MonoString *) mono_runtime_invoke (tostringmethod, decimal, tostringargs, &ex);
 	if (ex)
 		mono_embeddinator_throw_exception (ex);
+    MonoString* decimalmonostr = (MonoString *) mono_runtime_invoke (tostringmethod, &decimal, tostringargs, &ex);
 
 	GString* gstring = g_string_new("");
 	mono_embeddinator_marshal_string_to_gstring (gstring, decimalmonostr);
