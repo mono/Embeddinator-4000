@@ -55,6 +55,7 @@ namespace MonoEmbeddinator4000
             outputDirectory = Path.GetFullPath(outputDirectory);
             assembliesDirectory = Path.GetFullPath(assembliesDirectory);
 
+            var intermediateDir = Path.Combine(outputDirectory, "obj");
             var androidDir = Path.Combine(outputDirectory, "android");
             var assetsDir = Path.Combine(androidDir, "assets");
             var resourceDir = Path.Combine(androidDir, "res");
@@ -81,9 +82,9 @@ namespace MonoEmbeddinator4000
             var resolveLibraryProject = target.AddTask("ResolveLibraryProjectImports");
             resolveLibraryProject.SetParameter("Assemblies", "@(ResolvedUserAssemblies)");
             resolveLibraryProject.SetParameter("UseShortFileNames", "False");
-            resolveLibraryProject.SetParameter("ImportsDirectory", outputDirectory);
-            resolveLibraryProject.SetParameter("OutputDirectory", outputDirectory);
-            resolveLibraryProject.SetParameter("OutputImportDirectory", outputDirectory);
+            resolveLibraryProject.SetParameter("ImportsDirectory", intermediateDir);
+            resolveLibraryProject.SetParameter("OutputDirectory", intermediateDir);
+            resolveLibraryProject.SetParameter("OutputImportDirectory", intermediateDir);
             resolveLibraryProject.AddOutputItem("ResolvedAssetDirectories", "ResolvedAssetDirectories");
             resolveLibraryProject.AddOutputItem("ResolvedResourceDirectories", "ResolvedResourceDirectories");
 
