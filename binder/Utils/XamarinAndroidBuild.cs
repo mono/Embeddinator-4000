@@ -164,17 +164,10 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
             generateJavaStubs.SetParameter("ResolvedUserAssemblies", "@(ResolvedUserAssemblies)");
             generateJavaStubs.SetParameter("ManifestTemplate", manifestPath);
             generateJavaStubs.SetParameter("MergedAndroidManifestOutput", manifestPath);
-            generateJavaStubs.SetParameter("MergedManifestDocuments", "@(ExtractedManifestDocuments)");
-            generateJavaStubs.SetParameter("Debug", "False");
-            generateJavaStubs.SetParameter("NeedsInternet", "$(AndroidNeedsInternetPermission)");
             generateJavaStubs.SetParameter("AndroidSdkPlatform", TargetSdkVersion); //TODO: should be an option
             generateJavaStubs.SetParameter("AndroidSdkDir", AndroidSdk.AndroidSdkPath);
-            generateJavaStubs.SetParameter("ManifestPlaceholders", "$(AndroidManifestPlaceholders)");
             generateJavaStubs.SetParameter("OutputDirectory", outputDirectory);
-            generateJavaStubs.SetParameter("UseSharedRuntime", "False");
-            generateJavaStubs.SetParameter("EmbedAssemblies", "False");
             generateJavaStubs.SetParameter("ResourceDirectory", "$(MonoAndroidResDirIntermediate)");
-            generateJavaStubs.SetParameter("PackageNamingPolicy", "$(AndroidPackageNamingPolicy)");
             generateJavaStubs.SetParameter("AcwMapFile", "$(MonoAndroidIntermediate)acw-map.txt");
 
             //XmlPoke to fix up AndroidManifest
