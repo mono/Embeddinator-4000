@@ -45,6 +45,74 @@ namespace MonoEmbeddinator4000
             resolveAssemblies.AddOutputItem("ResolvedFrameworkAssemblies", "ResolvedFrameworkAssemblies");
         }
 
+        static void GenerateResourceDesigner(ProjectTargetElement target, string mainAssembly, string outputDirectory)
+        {
+            string resourcePath = Path.Combine(outputDirectory, "Resource.designer.cs");
+
+            File.WriteAllText(resourcePath, @"
+using System;
+using Android.Runtime;
+using Android.Util;
+
+[assembly: Android.Runtime.ResourceDesignerAttribute(""MonoEmbeddinator4000.Resource"", IsApplication = true)]
+
+namespace MonoEmbeddinator4000
+{
+    [System.CodeDom.Compiler.GeneratedCodeAttribute(""Xamarin.Android.Build.Tasks"", ""1.0.0.0"")]
+    public class Resource
+    {
+        private const string TAG = ""E4K"";
+
+        public static void UpdateIdValues()
+        {
+            Log.Debug(TAG, ""Starting UpdateIdValues!"");
+
+            {
+                var R = JNIEnv.FindClass(""com.managed_dll.R$id"");
+                Log.Debug(TAG, ""R$id is {0}"", R);
+
+                global::managedandroid.Resource.Id.text = ReadField(R, ""text"");
+            }
+
+            {
+                var R = JNIEnv.FindClass(""com.managed_dll.R$layout"");
+                Log.Debug(TAG, ""R$layout is {0}"", R);
+
+                global::managedandroid.Resource.Layout.hello = ReadField(R, ""hello"");
+            }
+
+            {
+                var R = JNIEnv.FindClass(""com.managed_dll.R$string"");
+                Log.Debug(TAG, ""R$string is {0}"", R);
+
+                global::managedandroid.Resource.String.hello = ReadField(R, ""hello"");
+                global::managedandroid.Resource.String.library_name = ReadField(R, ""library_name"");
+            }
+
+            Log.Debug(TAG, ""Completed UpdateIdValues!"");
+        }
+
+        static int ReadField(IntPtr R, string fieldName)
+        {
+            var fieldId = JNIEnv.GetStaticFieldID(R, fieldName, ""I"");
+            int value = JNIEnv.GetStaticIntField(R, fieldId);
+
+            Log.Debug(TAG, ""Reading {0} as {1:X}"", fieldName, value);
+            return value;
+        }
+    }
+}");
+
+            var itemGroup = target.AddItemGroup();
+            itemGroup.AddItem("Compile", resourcePath);
+
+            var csc = target.AddTask("Csc");
+            csc.SetParameter("TargetType", "library");
+            csc.SetParameter("Sources", "@(Compile)");
+            csc.SetParameter("References", $"Mono.Android.dll;{Path.GetFileName(mainAssembly)}");
+            csc.SetParameter("AdditionalLibPaths", $"$(TargetFrameworkDirectory);{Path.GetDirectoryName(mainAssembly)}");
+        }
+
         /// <summary>
         /// Generates a Package.proj file for MSBuild to invoke
         /// - Links .NET assemblies and places output into /android/assets/assemblies
@@ -68,6 +136,9 @@ namespace MonoEmbeddinator4000
             var project = CreateProject(xamarinPath);
             var target = project.AddTarget("Build");
 
+            //Generate Resource.designer.dll
+            GenerateResourceDesigner(target, mainAssembly, outputDirectory);
+
             //ResolveAssemblies Task
             ResolveAssemblies(target, xamarinPath, mainAssembly);
 
@@ -77,7 +148,7 @@ namespace MonoEmbeddinator4000
             linkAssemblies.SetParameter("LinkMode", LinkMode);
             linkAssemblies.SetParameter("LinkDescriptions", "@(LinkDescription)");
             linkAssemblies.SetParameter("DumpDependencies", "True");
-            linkAssemblies.SetParameter("ResolvedAssemblies", "@(ResolvedAssemblies)");
+            linkAssemblies.SetParameter("ResolvedAssemblies", "@(ResolvedAssemblies);" + Path.Combine(outputDirectory, "Resource.designer.dll"));
             linkAssemblies.SetParameter("MainAssembly", mainAssembly);
             linkAssemblies.SetParameter("OutputDirectory", assembliesDirectory);
 

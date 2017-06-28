@@ -1,4 +1,5 @@
-﻿﻿using Android.App;
+﻿using System;
+﻿using Android.App;
 using Android.Content;
 using Android.OS;
 using Android.Runtime;
@@ -43,21 +44,23 @@ namespace Android
         {
             base.OnCreate(savedInstanceState);
 
-            //SetContentView(R.Layout.hello);
+            //For ResourceIdManager to pick it up, Resource.designer.dll must be loaded
+            //TODO: put this code somewhere else...
+            System.Reflection.Assembly.Load("Resource.designer");
 
-            //TODO: temporary until resources are working
-            var text = new TextView(this);
-            text.Text = GetText();
-            SetContentView(text);
+            //For testing, print all loaded assemblies
+            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                Util.Log.Debug("E4K", "Found assembly: {0}", assembly.FullName);
+            }
+
+            SetContentView(R.Layout.hello);
         }
 
         [Export("getText")]
         public string GetText()
         {
-            //TODO: temporary until resources are working
-            return "Hello from C#!";
-
-            //return Resources.GetString(R.String.hello);
+            return Resources.GetString(R.String.hello);
         }
     }
 }
