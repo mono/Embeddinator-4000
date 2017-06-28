@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using Microsoft.Build.Construction;
 using Microsoft.Build.Evaluation;
 using Microsoft.Build.Execution;
@@ -10,6 +11,8 @@ namespace MonoEmbeddinator4000
     static class XamarinAndroidBuild
     {
         public const string TargetFrameworkVersion = "v2.3";
+        public const string MinSdkVersion = "9";
+        public const string TargetSdkVersion = "25";
 
         static ProjectRootElement CreateProject(string xamarinPath)
         {
@@ -52,6 +55,11 @@ namespace MonoEmbeddinator4000
             outputDirectory = Path.GetFullPath(outputDirectory);
             assembliesDirectory = Path.GetFullPath(assembliesDirectory);
 
+            var androidDir = Path.Combine(outputDirectory, "android");
+            var assetsDir = Path.Combine(androidDir, "assets");
+            var resourceDir = Path.Combine(androidDir, "res");
+            var manifestPath = Path.Combine(androidDir, "AndroidManifest.xml");
+            var packageName = "com." + Path.GetFileNameWithoutExtension(mainAssembly).Replace('-', '_') + "_dll";
             var project = CreateProject(xamarinPath);
             var target = project.AddTarget("Build");
 
@@ -87,12 +95,27 @@ namespace MonoEmbeddinator4000
             //Copy Task, to copy AndroidAsset files
             var copy = target.AddTask("Copy");
             copy.SetParameter("SourceFiles", "@(AndroidAsset)");
-            copy.SetParameter("DestinationFiles", $"@(AndroidAsset->'{Path.Combine(outputDirectory, "android", "assets") + Path.DirectorySeparatorChar}%(RecursiveDir)%(Filename)%(Extension)')");
+            copy.SetParameter("DestinationFiles", $"@(AndroidAsset->'{assetsDir + Path.DirectorySeparatorChar}%(RecursiveDir)%(Filename)%(Extension)')");
 
             //Copy Task, to copy AndroidResource files
             copy = target.AddTask("Copy");
             copy.SetParameter("SourceFiles", "@(AndroidResource)");
-            copy.SetParameter("DestinationFiles", $"@(AndroidResource->'{Path.Combine(outputDirectory, "android", "res") + Path.DirectorySeparatorChar}%(RecursiveDir)%(Filename)%(Extension)')");
+            copy.SetParameter("DestinationFiles", $"@(AndroidResource->'{resourceDir + Path.DirectorySeparatorChar}%(RecursiveDir)%(Filename)%(Extension)')");
+
+            //Aapt Task to generate R.txt
+            var aapt = target.AddTask("Aapt");
+            aapt.SetParameter("ImportsDirectory", outputDirectory);
+            aapt.SetParameter("OutputImportDirectory", outputDirectory);
+            aapt.SetParameter("ManifestFiles", manifestPath);
+            aapt.SetParameter("ApplicationName", packageName);
+            aapt.SetParameter("JavaPlatformJarPath", Path.Combine(AndroidSdk.GetPlatformDirectory(AndroidSdk.GetInstalledPlatformVersions().Select(v => v.ApiLevel).Max()), "android.jar"));
+            aapt.SetParameter("JavaDesignerOutputDirectory", outputDirectory);
+            aapt.SetParameter("AssetDirectory", assetsDir);
+            aapt.SetParameter("ResourceDirectory", resourceDir);
+            aapt.SetParameter("ToolPath", AndroidSdk.GetBuildToolsPaths().First());
+            aapt.SetParameter("ToolExe", "aapt");
+            aapt.SetParameter("ApiLevel", TargetSdkVersion);
+            aapt.SetParameter("ExtraArgs", "--output-text-symbols " + androidDir);
 
             //NOTE: might avoid the temp file later
             var projectFile = Path.Combine(outputDirectory, "LinkAssemblies.proj");
@@ -122,7 +145,7 @@ namespace MonoEmbeddinator4000
             File.WriteAllText(manifestPath,
 $@"<?xml version=""1.0"" encoding=""utf-8""?>
 <manifest xmlns:android=""http://schemas.android.com/apk/res/android"">
-    <uses-sdk android:minSdkVersion=""9"" android:targetSdkVersion=""25"" />
+    <uses-sdk android:minSdkVersion=""{MinSdkVersion}"" android:targetSdkVersion=""{TargetSdkVersion}"" />
 </manifest>");
 
             var project = CreateProject(xamarinPath);
@@ -140,7 +163,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
             generateJavaStubs.SetParameter("MergedManifestDocuments", "@(ExtractedManifestDocuments)");
             generateJavaStubs.SetParameter("Debug", "False");
             generateJavaStubs.SetParameter("NeedsInternet", "$(AndroidNeedsInternetPermission)");
-            generateJavaStubs.SetParameter("AndroidSdkPlatform", "25"); //TODO: should be an option
+            generateJavaStubs.SetParameter("AndroidSdkPlatform", TargetSdkVersion); //TODO: should be an option
             generateJavaStubs.SetParameter("AndroidSdkDir", AndroidSdk.AndroidSdkPath);
             generateJavaStubs.SetParameter("ManifestPlaceholders", "$(AndroidManifestPlaceholders)");
             generateJavaStubs.SetParameter("OutputDirectory", outputDirectory);
