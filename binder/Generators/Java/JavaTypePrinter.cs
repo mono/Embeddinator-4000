@@ -82,6 +82,8 @@ namespace MonoEmbeddinator4000.Generators
                     return "com.sun.jna.ptr.PointerByReference";
                 case PrimitiveType.String:
                     return "mono.embeddinator.GString";
+                case PrimitiveType.Decimal:
+                    return "mono.embeddinator.Decimal";
                 default:
                     return JavaGenerator.IntPtrType;
             }
@@ -124,6 +126,8 @@ namespace MonoEmbeddinator4000.Generators
                     return HandleNativeRefOutPrimitiveType(primitive);
                 else if (primitive == PrimitiveType.Bool)
                     return "byte";
+                else if (primitive == PrimitiveType.Decimal)
+                    return "mono.embeddinator.Decimal";
             }
 
             bool useReferencePrimitiveTypes = ContextKind == TypePrinterContextKind.Template;

@@ -106,11 +106,17 @@ namespace MonoEmbeddinator4000.Generators
                 HandleRefOutPrimitiveType(type);
                 return true;
             }
+            else if (type == PrimitiveType.Decimal)
+            {
+                Context.Return.Write($"new mono.embeddinator.Decimal({Context.ArgName})");
+                return true;
+            }
             else if (type == PrimitiveType.Bool)
             {
                 Context.Return.Write($"(byte)({Context.ArgName}? 1 : 0)");
                 return true;
             }
+
 
             Context.Return.Write(Context.ArgName);
             return true;
@@ -161,6 +167,8 @@ namespace MonoEmbeddinator4000.Generators
         {
             if(type == PrimitiveType.Bool)
                 Context.Return.Write($"{Context.ReturnVarName} != 0");
+            else if (type == PrimitiveType.Decimal)
+                Context.Return.Write($"{Context.ReturnVarName}.getValue()");
             else
                 Context.Return.Write(Context.ReturnVarName);
             return true;
