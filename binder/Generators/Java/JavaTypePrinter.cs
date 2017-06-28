@@ -82,6 +82,8 @@ namespace MonoEmbeddinator4000.Generators
                     return "com.sun.jna.ptr.PointerByReference";
                 case PrimitiveType.String:
                     return "mono.embeddinator.GString";
+                case PrimitiveType.Decimal:
+                    return "mono.embeddinator.Decimal";
                 default:
                     return JavaGenerator.IntPtrType;
             }
@@ -124,6 +126,8 @@ namespace MonoEmbeddinator4000.Generators
                     return HandleNativeRefOutPrimitiveType(primitive);
                 else if (primitive == PrimitiveType.Bool)
                     return "byte";
+                else if (primitive == PrimitiveType.Decimal)
+                    return "mono.embeddinator.Decimal";
             }
 
             bool useReferencePrimitiveTypes = ContextKind == TypePrinterContextKind.Template;
@@ -152,11 +156,12 @@ namespace MonoEmbeddinator4000.Generators
                 case PrimitiveType.Half: return "__fp16";
                 case PrimitiveType.Float: return useReferencePrimitiveTypes ? "Float" : "float";
                 case PrimitiveType.Double: return useReferencePrimitiveTypes ? "Double" : "double";
-                case PrimitiveType.LongDouble: return "decimal";
                 case PrimitiveType.IntPtr:
                 case PrimitiveType.UIntPtr:
                 case PrimitiveType.Null: return JavaGenerator.IntPtrType;
                 case PrimitiveType.String: return "String";
+                case PrimitiveType.Decimal: return "java.math.BigDecimal";
+
             }
 
             throw new NotSupportedException();

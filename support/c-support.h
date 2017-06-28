@@ -28,6 +28,9 @@
 #include "embeddinator.h"
 #include "glib.h"
 #include "mono-support.h"
+#include "mono_embeddinator.h"
+
+MONO_EMBEDDINATOR_BEGIN_DECLS
 
 /**
  * Arrays
@@ -50,9 +53,24 @@ typedef MonoEmbedArray _UInt64Array;
 typedef MonoEmbedArray _SingleArray;
 typedef MonoEmbedArray _DoubleArray;
 typedef MonoEmbedArray _StringArray;
+typedef MonoEmbedArray _DecimalArray;
+
+/**
+ * Performs marshaling of a given MonoDecimal to a GLib string.
+ */
+MONO_EMBEDDINATOR_API
+GString* mono_embeddinator_decimal_to_gstring (MonoDecimal decimal);
+
+/**
+ * Performs marshaling of a given MonoDecimal to a GLib string.
+ */
+MONO_EMBEDDINATOR_API
+MonoDecimal mono_embeddinator_string_to_decimal (const char * number);
 
 /**
  * Performs marshaling of a given MonoString to a GLib string.
  */
 MONO_EMBEDDINATOR_API
 void mono_embeddinator_marshal_string_to_gstring(GString* g_string, MonoString* mono_string);
+
+MONO_EMBEDDINATOR_END_DECLS

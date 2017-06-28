@@ -25,6 +25,53 @@
 
 #include "c-support.h"
 
+GString* mono_embeddinator_decimal_to_gstring (MonoDecimal decimal)
+{
+    static MonoMethod* tostringmethod = 0;
+
+    MonoObject* invariantculture = mono_embeddinator_get_cultureinfo_invariantculture_object ();
+    void* tostringargs [1];
+    tostringargs [0] = invariantculture;
+
+    if (!tostringmethod)
+        tostringmethod = mono_embeddinator_lookup_method (":ToString(System.IFormatProvider)", mono_embeddinator_get_decimal_class ());
+
+    MonoObject* ex = 0;
+    MonoString* decimalmonostr = (MonoString *) mono_runtime_invoke (tostringmethod, &decimal, tostringargs, &ex);
+    if (ex)
+        mono_embeddinator_throw_exception (ex);
+
+    GString* gstring = g_string_new("");
+    mono_embeddinator_marshal_string_to_gstring (gstring, decimalmonostr);
+    
+    return gstring;
+}
+
+MonoDecimal mono_embeddinator_string_to_decimal (const char * number)
+{
+    static MonoMethod* decimalparsemethod = 0;
+
+    MonoString* decimalstr = mono_string_new (mono_embeddinator_get_context()->domain, number);
+
+    MonoObject* invariantculture = mono_embeddinator_get_cultureinfo_invariantculture_object ();
+    void* parseargs [2];
+    parseargs [0] = decimalstr;
+    parseargs [1] = invariantculture;
+
+    if (!decimalparsemethod)
+        decimalparsemethod = mono_embeddinator_lookup_method ("System.Decimal:Parse(string,System.IFormatProvider)",
+            mono_embeddinator_get_decimal_class ());
+
+    MonoObject* ex = 0;
+    MonoObject* boxeddecimal = mono_runtime_invoke (decimalparsemethod, NULL, parseargs, &ex);
+    if (ex)
+        mono_embeddinator_throw_exception (ex);
+
+    MonoDecimal mdecimal = *(MonoDecimal*) mono_object_unbox (boxeddecimal);
+
+    return mdecimal;
+}
+
 void mono_embeddinator_marshal_string_to_gstring(GString* g_string, MonoString* mono_string)
 {
     if (!mono_string)

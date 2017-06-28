@@ -61,7 +61,7 @@ public final class Runtime {
 
         public class GString extends Structure {
             public static class ByValue extends GString implements Structure.ByValue { }
-            public static class ByReference  extends GString implements Structure.ByReference { }
+            public static class ByReference extends GString implements Structure.ByReference { }
 
             public Pointer str = Pointer.NULL;
             public NativeLong len = new NativeLong();
@@ -72,6 +72,22 @@ public final class Runtime {
                 return Arrays.asList("str", "len", "allocated_len");
             }
         }
+
+        public class MonoDecimal extends Structure {
+            public short signscale;
+            public short reserved;
+            public short Hi32;
+            public short Lo32;
+            public short Mid32;
+
+            @Override
+            protected List<String> getFieldOrder() {
+                return Arrays.asList("signscale", "reserved", "Hi32", "Lo32", "Mid32");
+            }
+        }
+
+        MonoDecimal.ByValue mono_embeddinator_string_to_decimal (String number);
+        GString.ByReference mono_embeddinator_decimal_to_gstring (MonoDecimal decimal);
 
         public static interface ErrorCallback extends Callback {
             void invoke(RuntimeLibrary.Error.ByValue error) throws RuntimeException;
