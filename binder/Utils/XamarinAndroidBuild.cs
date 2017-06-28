@@ -13,6 +13,7 @@ namespace MonoEmbeddinator4000
         public const string TargetFrameworkVersion = "v2.3";
         public const string MinSdkVersion = "9";
         public const string TargetSdkVersion = "25";
+        const string LinkMode = "SdkOnly";
 
         static ProjectRootElement CreateProject(string xamarinPath)
         {
@@ -37,7 +38,7 @@ namespace MonoEmbeddinator4000
 
             var resolveAssemblies = target.AddTask("ResolveAssemblies");
             resolveAssemblies.SetParameter("Assemblies", mainAssembly + ";" + monoAndroidExport);
-            resolveAssemblies.SetParameter("LinkMode", "$(AndroidLinkMode)");
+            resolveAssemblies.SetParameter("LinkMode", LinkMode);
             resolveAssemblies.SetParameter("ReferenceAssembliesDirectory", "$(TargetFrameworkDirectory)");
             resolveAssemblies.AddOutputItem("ResolvedAssemblies", "ResolvedAssemblies");
             resolveAssemblies.AddOutputItem("ResolvedUserAssemblies", "ResolvedUserAssemblies");
@@ -73,8 +74,7 @@ namespace MonoEmbeddinator4000
             //LinkAssemblies Task
             var linkAssemblies = target.AddTask("LinkAssemblies");
             linkAssemblies.SetParameter("UseSharedRuntime", "False");
-            linkAssemblies.SetParameter("LinkMode", "$(AndroidLinkMode)");
-            linkAssemblies.SetParameter("LinkSkip", "$(AndroidLinkSkip)");
+            linkAssemblies.SetParameter("LinkMode", LinkMode);
             linkAssemblies.SetParameter("LinkDescriptions", "@(LinkDescription)");
             linkAssemblies.SetParameter("DumpDependencies", "True");
             linkAssemblies.SetParameter("ResolvedAssemblies", "@(ResolvedAssemblies)");
