@@ -45,11 +45,14 @@ namespace MonoEmbeddinator4000
         }
 
         /// <summary>
-        /// Generates a LinkAssemblies.proj file for MSBuild to invoke
+        /// Generates a Package.proj file for MSBuild to invoke
         /// - Links .NET assemblies and places output into /android/assets/assemblies
+        /// - Extracts assets and resources from Android library projects into /obj/
+        /// - Copies assets and resources into AAR
+        /// - Invokes aapt to generate R.txt
         /// - One day I would like to get rid of the temp files, but I could not get the MSBuild APIs to work in-process
         /// </summary>
-        public static string GenerateLinkAssembliesProject(string xamarinPath, string mainAssembly, string outputDirectory, string assembliesDirectory)
+        public static string GeneratePackageProject(string xamarinPath, string mainAssembly, string outputDirectory, string assembliesDirectory)
         {
             mainAssembly = Path.GetFullPath(mainAssembly);
             outputDirectory = Path.GetFullPath(outputDirectory);
@@ -119,7 +122,7 @@ namespace MonoEmbeddinator4000
             aapt.SetParameter("ExtraArgs", "--output-text-symbols " + androidDir);
 
             //NOTE: might avoid the temp file later
-            var projectFile = Path.Combine(outputDirectory, "LinkAssemblies.proj");
+            var projectFile = Path.Combine(outputDirectory, "Package.proj");
             File.WriteAllText(projectFile, project.RawXml);
             return projectFile;
         }
