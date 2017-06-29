@@ -1,8 +1,8 @@
-﻿using System;
 ﻿using Android.App;
 using Android.Content;
 using Android.OS;
 using Android.Runtime;
+using Android.Util;
 using Android.Widget;
 using Java.Interop;
 using R = managedandroid.Resource;
@@ -13,6 +13,15 @@ namespace Android
     public class ViewSubclass : TextView
     {
         public ViewSubclass(Context context) : base(context) { }
+
+        /// <summary>
+        /// NOTE: this ctor tests theming
+        /// </summary>
+        public ViewSubclass(Context context, IAttributeSet attrs) : base(context, attrs)
+        {
+            var a = context.ObtainStyledAttributes(attrs, R.Styleable.Theme);
+            Text = a.GetString(R.Styleable.Theme_hello);
+        }
 
         [Export("apply")]
         public void Apply(string text)

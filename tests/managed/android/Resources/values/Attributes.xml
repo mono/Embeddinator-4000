@@ -1,9 +1,6 @@
 ﻿<?xml version="1.0" encoding="UTF-8" ?>
 <resources>
     <declare-styleable name="Theme">
-        <attr name="my_enum">
-            <enum name="value1" value="1" />
-            <enum name="value2" value="2" />
-        </attr>
+        <attr name="hello" format="string" />
     </declare-styleable>
 </resources>

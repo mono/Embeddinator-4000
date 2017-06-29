@@ -50,6 +50,7 @@
     <AndroidResource Include="Resources\values\Strings.xml" />
     <AndroidResource Include="Resources\layout\hello.axml" />
     <AndroidResource Include="Resources\values\Attributes.xml" />
+    <AndroidResource Include="Resources\layout\customView.axml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\layout\" />

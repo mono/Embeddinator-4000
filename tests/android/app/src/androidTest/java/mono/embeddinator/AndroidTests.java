@@ -72,4 +72,10 @@ public class AndroidTests {
         assertNotNull(text);
         assertEquals("Hello from C#!", text.getText());
     }
+
+    @Test
+    public void resourceCustomView() {
+        TextView text = (TextView)rule.getActivity().getLayoutInflater().inflate(com.managed_dll.R.layout.customview, null);
+        assertEquals("World!", text.getText());
+    }
 }
