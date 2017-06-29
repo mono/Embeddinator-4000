@@ -49,7 +49,7 @@ namespace MonoEmbeddinator4000
             resolveAssemblies.AddOutputItem("ResolvedFrameworkAssemblies", "ResolvedFrameworkAssemblies");
         }
 
-        static void GenerateResourceDesigner(List<IKVM.Reflection.Assembly> assemblies, ProjectTargetElement target, string xamarinPath, string mainAssembly, string outputDirectory, string packageName)
+        static void GenerateResourceDesigner(List<IKVM.Reflection.Assembly> assemblies, string xamarinPath, string mainAssembly, string outputDirectory, string packageName)
         {
             var unit = new CodeCompileUnit();
             unit.AssemblyCustomAttributes.Add(new CodeAttributeDeclaration("Android.Runtime.ResourceDesignerAttribute", 
@@ -156,6 +156,7 @@ namespace MonoEmbeddinator4000
 
         /// <summary>
         /// Generates a Package.proj file for MSBuild to invoke
+        /// - Generates Resource.designer.dll for rewiring resource values from the final Java project
         /// - Links .NET assemblies and places output into /android/assets/assemblies
         /// - Extracts assets and resources from Android library projects into /obj/
         /// - Copies assets and resources into AAR
@@ -178,7 +179,7 @@ namespace MonoEmbeddinator4000
             var target = project.AddTarget("Build");
 
             //Generate Resource.designer.dll
-            GenerateResourceDesigner(assemblies, target, xamarinPath, mainAssembly, outputDirectory, packageName);
+            GenerateResourceDesigner(assemblies, xamarinPath, mainAssembly, outputDirectory, packageName);
 
             //ResolveAssemblies Task
             ResolveAssemblies(target, xamarinPath, mainAssembly);
