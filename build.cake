@@ -1,16 +1,28 @@
-#addin nuget:?package=Cake.DoInDirectory
-
 var target = Argument("target", "Default");
 var configuration = Argument("configuration", "Release");
 var buildDir = Directory("./build/lib") + Directory(configuration);
-var embeddinator = File("MonoEmbeddinator4000.exe");
-var managedDll = Directory("../../../tests/managed/generic/bin") + Directory(configuration) + File("managed.dll");
+var embeddinator = buildDir + File("MonoEmbeddinator4000.exe");
+var managedDll = Directory("./tests/managed/generic/bin") + Directory(configuration) + File("managed.dll");
 
 //Java settings
-var javaHome = EnvironmentVariable("JAVA_HOME");
+string javaHome;
+if (IsRunningOnWindows())
+{
+    javaHome = EnvironmentVariable("JAVA_HOME");
+}
+else
+{
+    using (var process = StartAndReturnProcess("/usr/libexec/java_home", new ProcessSettings { RedirectStandardOutput = true }))
+    {
+        process.WaitForExit();
+
+        javaHome = process.GetStandardOutput().First().Trim();
+    }
+}
 if (string.IsNullOrEmpty(javaHome))
     throw new Exception("Could not find JAVA_HOME!");
-var classPath = string.Join(";", new[]
+
+var classPath = string.Join(IsRunningOnWindows() ? ";" : ":", new[]
 {
     "./external/junit/hamcrest-core-1.3.jar",
     "./external/junit/junit-4.12.jar",
@@ -20,7 +32,7 @@ var classPath = string.Join(";", new[]
 
 void Exec(string path, string args)
 {
-    var exitCode = StartProcess(path, args);
+    var exitCode = IsRunningOnWindows() || !path.EndsWith(".exe") ? StartProcess(path, args) : StartProcess("mono", path + " " + args);
     if (exitCode != 0)
         throw new Exception(path + " failed!");
 }
@@ -50,11 +62,9 @@ Task("Generate-C")
     .IsDependentOn("Build-Managed")
     .Does(() =>
     {
-        DoInDirectory(buildDir, () =>
-        {
-            var platform = IsRunningOnWindows() ? "Windows" : "macOS";
-            Exec(embeddinator, $"-gen=c -out=c -platform={platform} -compile -target=shared {managedDll}");
-        });
+        var platform = IsRunningOnWindows() ? "Windows" : "macOS";
+        var output = buildDir + Directory("c");
+        Exec(embeddinator, $"-gen=c -out={output} -platform={platform} -compile -target=shared {managedDll}");
     });
 
 Task("Generate-Java")
@@ -62,11 +72,9 @@ Task("Generate-Java")
     .IsDependentOn("Build-Managed")
     .Does(() =>
     {
-        DoInDirectory(buildDir, () =>
-        {
-            var platform = IsRunningOnWindows() ? "Windows" : "macOS";
-            Exec(embeddinator, $"-gen=Java -out=java -platform={platform} -compile -target=shared {managedDll}");
-        });
+        var platform = IsRunningOnWindows() ? "Windows" : "macOS";
+        var output = buildDir + Directory("java");
+        Exec(embeddinator, $"-gen=Java -out={output} -platform={platform} -compile -target=shared {managedDll}");
     });
 
 Task("Generate-Android")
@@ -74,10 +82,8 @@ Task("Generate-Android")
     .IsDependentOn("Build-Managed")
     .Does(() =>
     {
-        DoInDirectory(buildDir, () =>
-        {
-            Exec(embeddinator, $"-gen=c -out=c -platform=Android -compile -target=shared {managedDll}");
-        });
+        var output = buildDir + Directory("java");
+        Exec(embeddinator, $"-gen=Java -out={output} -platform=Android -compile -target=shared {managedDll}");
     });
 
 Task("Build-Java-Tests")
@@ -85,7 +91,7 @@ Task("Build-Java-Tests")
     .Does(() =>
     {
         var output = buildDir + Directory("java");
-        var tests = "./tests/common/java/mono/embeddinator/Tests.java";
+        var tests = File("./tests/common/java/mono/embeddinator/Tests.java");
         var javac = Directory(javaHome) + File("bin/javac");
         Exec(javac, $"-cp {classPath} -d {output} -Xdiags:verbose -Xlint:deprecation {tests}");
     });
