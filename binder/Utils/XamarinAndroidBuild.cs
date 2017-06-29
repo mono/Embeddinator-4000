@@ -69,6 +69,10 @@ namespace MonoEmbeddinator4000
             };
             ns.Types.Add(resource);
 
+            resource.CustomAttributes.Add(new CodeAttributeDeclaration("System.CodeDom.Compiler.GeneratedCodeAttribute",
+                new CodeAttributeArgument(new CodeSnippetExpression("\"Xamarin.Android.Build.Tasks\"")),
+                new CodeAttributeArgument(new CodeSnippetExpression("\"1.0.0.0\""))));
+
             var readField = new CodeMemberMethod
             {
                 Name = "ReadField",
@@ -79,8 +83,10 @@ namespace MonoEmbeddinator4000
             readField.Parameters.Add(new CodeParameterDeclarationExpression("String", "fieldName"));
             resource.Members.Add(readField);
 
-            readField.Statements.Add(new CodeSnippetStatement("var fieldId = JNIEnv.GetStaticFieldID(R, fieldName, \"I\");"));
-            readField.Statements.Add(new CodeSnippetStatement("return JNIEnv.GetStaticIntField(R, fieldId);"));
+            readField.Statements.Add(new CodeAssignStatement(
+                new CodeSnippetExpression("IntPtr fieldId"),
+                new CodeSnippetExpression("JNIEnv.GetStaticFieldID(R, fieldName, \"I\")")));
+            readField.Statements.Add(new CodeMethodReturnStatement(new CodeSnippetExpression("JNIEnv.GetStaticIntField(R, fieldId)")));
 
             var updateIdValues = new CodeMemberMethod
             {
@@ -97,21 +103,24 @@ namespace MonoEmbeddinator4000
                 {
                     if (type.Name == "Resource" && 
                         type.CustomAttributes.Any(a => 
-                                                  a.AttributeType.Name == "GeneratedCodeAttribute" && 
+                                                  a.AttributeType.FullName == "System.CodeDom.Compiler.GeneratedCodeAttribute" && 
                                                   a.ConstructorArguments.Count > 0 && 
                                                   a.ConstructorArguments[0].Value.ToString() == "Xamarin.Android.Build.Tasks"))
                     {
                         foreach (var nested in type.DeclaredNestedTypes)
                         {
-                            updateIdValues.Statements.Add(new CodeAssignStatement(
-                                new CodeSnippetExpression("R"),
-                                new CodeSnippetExpression($"JNIEnv.FindClass(\"{packageName}.R${nested.Name.ToLowerInvariant()}\");")));
-
-                            foreach (var field in nested.DeclaredFields)
+                            if (nested.DeclaredFields.Any())
                             {
-                                var left = new CodeSnippetExpression(type.FullName + "." + nested.Name + "." + field.Name);
-                                var right = new CodeSnippetExpression("ReadField(R, \"" + field.Name + "\")");
-                                updateIdValues.Statements.Add(new CodeAssignStatement(left, right));
+                                updateIdValues.Statements.Add(new CodeAssignStatement(
+                                    new CodeSnippetExpression("R"),
+                                    new CodeSnippetExpression($"JNIEnv.FindClass(\"{packageName}.R${nested.Name.ToLowerInvariant()}\");")));
+
+                                foreach (var field in nested.DeclaredFields)
+                                {
+                                    var left = new CodeSnippetExpression(type.FullName + "." + nested.Name + "." + field.Name);
+                                    var right = new CodeSnippetExpression("ReadField(R, \"" + field.Name + "\")");
+                                    updateIdValues.Statements.Add(new CodeAssignStatement(left, right));
+                                }
                             }
                         }
                     }
@@ -121,8 +130,9 @@ namespace MonoEmbeddinator4000
             var csc = new Microsoft.CSharp.CSharpCodeProvider();
             var parameters = new CompilerParameters
             {
-                OutputAssembly = "Resource.designer.dll",
+                OutputAssembly = Path.Combine(outputDirectory, "android", "assets", "assemblies", "Resource.designer.dll"),
             };
+            parameters.ReferencedAssemblies.Add(Path.Combine(xamarinPath, "lib", "xbuild-frameworks", "MonoAndroid", "v1.0", "System.dll"));
             parameters.ReferencedAssemblies.Add(Path.Combine(xamarinPath, "lib", "xbuild-frameworks", "MonoAndroid", TargetFrameworkVersion, "Mono.Android.dll"));
             parameters.ReferencedAssemblies.Add(mainAssembly);
 
