@@ -49,6 +49,7 @@
   <ItemGroup>
     <AndroidResource Include="Resources\values\Strings.xml" />
     <AndroidResource Include="Resources\layout\hello.axml" />
+    <AndroidResource Include="Resources\values\Attributes.xml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\layout\" />
