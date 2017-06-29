@@ -104,10 +104,10 @@ Task("Run-Java-Tests")
     .Does(() =>
     {
         var classPath = GetJavaClassPath();
-        Exec(GetJavaTool("java"), $"-cp {classPath} -D -Djna.dump_memory=true org.junit.runner.JUnitCore mono.embeddinator.Tests");
+        Exec(GetJavaTool("java"), $"-cp {classPath} -Djna.dump_memory=true org.junit.runner.JUnitCore mono.embeddinator.Tests");
     });
 
 Task("Default")
-    .IsDependentOn("Generate-Java");
+    .IsDependentOn("Generate-Android");
 
 RunTarget(target);
