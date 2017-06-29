@@ -9,6 +9,8 @@ string javaHome;
 if (IsRunningOnWindows())
 {
     javaHome = EnvironmentVariable("JAVA_HOME");
+    if (string.IsNullOrEmpty(javaHome))
+        throw new Exception("Cannot find Java SDK: JAVA_HOME environment variable is not set.");
 }
 else
 {
@@ -19,8 +21,6 @@ else
         javaHome = process.GetStandardOutput().First().Trim();
     }
 }
-if (string.IsNullOrEmpty(javaHome))
-    throw new Exception("Could not find JAVA_HOME!");
 
 var classPath = string.Join(IsRunningOnWindows() ? ";" : ":", new[]
 {
