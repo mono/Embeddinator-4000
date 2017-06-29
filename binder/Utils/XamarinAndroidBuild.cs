@@ -51,8 +51,6 @@ namespace MonoEmbeddinator4000
 
         static void GenerateResourceDesigner(List<IKVM.Reflection.Assembly> assemblies, ProjectTargetElement target, string xamarinPath, string mainAssembly, string outputDirectory, string packageName)
         {
-            string resourcePath = Path.Combine(outputDirectory, "Resource.designer.cs");
-
             var unit = new CodeCompileUnit();
             unit.AssemblyCustomAttributes.Add(new CodeAttributeDeclaration("Android.Runtime.ResourceDesignerAttribute", 
                 new CodeAttributeArgument(new CodeSnippetExpression("\"__embeddinator__.Resource\"")),
@@ -136,12 +134,6 @@ namespace MonoEmbeddinator4000
             parameters.ReferencedAssemblies.Add(Path.Combine(xamarinPath, "lib", "xbuild-frameworks", "MonoAndroid", TargetFrameworkVersion, "Mono.Android.dll"));
             parameters.ReferencedAssemblies.Add(mainAssembly);
 
-            using (var stream = File.Create(resourcePath))
-            using (var writer = new StreamWriter(stream))
-            {
-                csc.GenerateCodeFromCompileUnit(unit, writer, new CodeGeneratorOptions());
-            }
-
             var results = csc.CompileAssemblyFromDom(parameters, unit);
             if (results.Errors.HasErrors)
             {
@@ -149,7 +141,16 @@ namespace MonoEmbeddinator4000
                 {
                     Diagnostics.Error("Error: {0}", error);
                 }
-                throw new Exception("Resource.designer.dll compilation failed!");
+
+                //Let's generate CS if this failed
+                string resourcePath = Path.Combine(outputDirectory, "Resource.designer.cs");
+                using (var stream = File.Create(resourcePath))
+	            using (var writer = new StreamWriter(stream))
+	            {
+	                csc.GenerateCodeFromCompileUnit(unit, writer, new CodeGeneratorOptions());
+	            }
+
+                throw new Exception($"Resource.designer.dll compilation failed! See {resourcePath} for details.");
             }
         }
 
