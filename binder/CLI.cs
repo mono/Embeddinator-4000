@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using CppSharp;
 using CppSharp.Generators;
-using Xamarin.Android.Tools;
 
 namespace MonoEmbeddinator4000
 {
