@@ -192,6 +192,6 @@ Task("Generate-Project-Files")
     });
 
 Task("Default")
-    .IsDependentOn("Generate-Android");
+    .IsDependentOn("Build-Binder");
 
 RunTarget(target);
