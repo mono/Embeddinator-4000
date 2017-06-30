@@ -32,7 +32,7 @@ var classPath = string.Join(IsRunningOnWindows() ? ";" : ":", new[]
     buildDir + File("java/managed.jar"),
 });
 
-void Exec(string path, string args)
+void Exec(string path, string args = "")
 {
     var exitCode = IsRunningOnWindows() || !path.EndsWith(".exe") ? StartProcess(path, args) : StartProcess("mono", path + " " + args);
     if (exitCode != 0)
@@ -67,6 +67,34 @@ Task("Generate-C")
         var platform = IsRunningOnWindows() ? "Windows" : "macOS";
         var output = buildDir + Directory("c");
         Exec(embeddinator, $"-gen=c -out={output} -platform={platform} -compile -target=shared {managedDll}");
+    });
+
+Task("Build-C-Tests")
+    .IsDependentOn("Generate-C")
+    .Does(() =>
+    {
+        var commonDir = Directory("./tests/common");
+
+        // Generate native project build files using Premake.
+        var os = IsRunningOnWindows() ? "--os=windows" : "--os=macosx";
+        var action = IsRunningOnWindows() ? "vs2015" : "gmake";
+        Premake(commonDir + File("premake5.lua"), os, action);
+
+        // Execute the build files.
+        var mkDir = commonDir + Directory("mk");
+        if (IsRunningOnWindows())
+            MSBuild(mkDir + File("mk.sln"), settings =>
+                settings.SetConfiguration(configuration).SetVerbosity(Verbosity.Minimal));
+        else
+            Exec("make", $"-C {mkDir}");
+    });
+
+Task("Run-C-Tests")
+    .IsDependentOn("Build-C-Tests")
+    .Does(() =>
+    {
+        var binDir = Directory("./tests/common/mk/bin/Debug");
+        Exec(binDir + File("common.Tests"));
     });
 
 Task("Generate-Java")
