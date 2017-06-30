@@ -200,7 +200,7 @@ Task("Build-Android-Tests")
     .Does(() =>
     {
         CopyFile(buildDir + File("android/managed.aar"), File("./tests/android/managed.aar"));
-        CopyFiles("./tests/common/java/**/*.java", Directory("./tests/android/app/src/main/java"));
+        CopyDirectory(Directory("./tests/common/java"), Directory("./tests/android/app/src/main/java"));
         Exec("./tests/android/gradlew", "assemble", "./tests/android");
     });
 
