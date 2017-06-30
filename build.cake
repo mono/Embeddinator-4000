@@ -143,6 +143,16 @@ Task("Generate-Android")
         Exec(embeddinator, $"-gen=Java -out={output} -platform=Android -compile -target=shared {androidDll} -xamarinPath={xamarinPath}");
     });
 
+Task("Generate-Android-PCL")
+    .IsDependentOn("Build-Binder")
+    .IsDependentOn("Build-PCL")
+    .Does(() =>
+    {
+        var output = buildDir + Directory("pcl");
+        var xamarinPath = Directory("./external/Xamarin.Android");
+        Exec(embeddinator, $"-gen=Java -out={output} -platform=Android -compile -target=shared {pclDll} -xamarinPath={xamarinPath}");
+    });
+
 Task("Build-Java-Tests")
     .IsDependentOn("Generate-Java")
     .Does(() =>
@@ -162,8 +172,16 @@ Task("Build-Android-Tests")
         Exec("./tests/android/gradlew", "assemble", "./tests/android");
     });
 
+Task("Build-Android-PCL-Tests")
+    .IsDependentOn("Generate-Android-PCL")
+    .Does(() =>
+    {
+        CopyFile(buildDir + File("pcl/managed.aar"), File("./tests/android/managed.aar"));
+        CopyFiles("./tests/common/java/**/*.java", Directory("./tests/android/app/src/main/java"));
+        Exec("./tests/android/gradlew", "assemble", "./tests/android");
+    });
+
 Task("Install-Android-Tests")
-    .IsDependentOn("Build-Android-Tests")
     .Does(() => Exec("./tests/android/gradlew", "installDebug", "./tests/android"));
 
 Task("Run-Java-Tests")
@@ -175,8 +193,14 @@ Task("Run-Java-Tests")
     });
 
 Task("Run-Android-Tests")
+    .IsDependentOn("Build-Android-Tests")
     .IsDependentOn("Install-Android-Tests")
     .Does(() => Exec("./tests/android/gradlew", "connectedAndroidTest", "./tests/android"));
+
+Task("Run-Android-PCL-Tests")
+    .IsDependentOn("Build-Android-PCL-Tests")
+    .IsDependentOn("Install-Android-Tests")
+    .Does(() => Exec("./tests/android/gradlew", "-Pandroid.testInstrumentationRunnerArguments.class=mono.embeddinator.TestRunner connectedAndroidTest", "./tests/android"));
 
 void Premake(string file, string args, string action)
 {
@@ -193,5 +217,10 @@ Task("Generate-Project-Files")
 
 Task("Default")
     .IsDependentOn("Build-Binder");
+
+//Runs all Android-related tests
+Task("Android")
+    .IsDependentOn("Run-Android-PCL-Tests")
+    .IsDependentOn("Run-Android-Tests");
 
 RunTarget(target);
