@@ -19,7 +19,6 @@ namespace MonoEmbeddinator4000
         static bool Verbose;
         static CompilationTarget Target;
         static bool DebugMode;
-        static string XamarinPath;
 
         static void ParseCommandLineArgs(string[] args)
         {
@@ -39,7 +38,6 @@ namespace MonoEmbeddinator4000
                 { "dll|shared", "compiles as a shared library", v => Target = CompilationTarget.SharedLibrary },
                 { "static", "compiles as a static library", v => Target = CompilationTarget.StaticLibrary },
                 { "vs=", $"Visual Studio version for compilation: {vsVersions} (defaults to Latest)", v => VsVersion = v },
-                { "xamarinPath=", "Path to Xamarin.Android SDK, defaults to standard installation", v => XamarinPath = v },
                 { "v|verbose", "generates diagnostic verbose output", v => Verbose = true },
                 { "h|help",  "show this message and exit",  v => showHelp = v != null },
             };
@@ -200,33 +198,6 @@ namespace MonoEmbeddinator4000
 
             foreach (var assembly in Assemblies)
                 project.Assemblies.Add(assembly);
-
-            project.XamarinPath = XamarinPath;
-            if (options.Compilation.Platform == TargetPlatform.Android)
-            {
-                //TODO: is this code in the right place?
-                if (string.IsNullOrEmpty(XamarinPath))
-                {
-                    string binPath = MonoDroidSdk.BinPath;
-                    if (File.Exists(Path.Combine(binPath, "lib")))
-                    {
-                        project.XamarinPath = Path.GetFullPath(MonoDroidSdk.BinPath);
-                    }
-                    else
-                    {
-                        project.XamarinPath = Path.GetFullPath(Path.Combine(MonoDroidSdk.BinPath, ".."));
-                    }
-                }
-                else if (!Directory.Exists(XamarinPath))
-                {
-                    Console.Error.WriteLine("Cannot find Xamarin SDK at path: " + XamarinPath);
-                    return -1;
-                }
-                else
-                {
-                    project.XamarinPath = Path.GetFullPath(project.XamarinPath);
-                }
-            }
 
             foreach (var generator in Generators)
             {

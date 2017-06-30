@@ -67,8 +67,6 @@ namespace MonoEmbeddinator4000
         public List<string> AssemblyDirs;
         public List<string> Assemblies;
 
-        public string XamarinPath;
-
         internal List<ProjectInput> AssemblyInputs;
 
         public Project()

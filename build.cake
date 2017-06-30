@@ -8,9 +8,6 @@ var managedDll = Directory("./tests/managed/generic/bin") + Directory(configurat
 var androidDll = Directory("./tests/managed/android/bin") + Directory(configuration) + File("managed.dll");
 var pclDll = Directory("./tests/managed/pcl/bin") + Directory(configuration) + File("managed.dll");
 
-//Used for Xamarin.Android custom build
-var xamarinPath = Directory("./external/Xamarin.Android");
-
 //Java settings
 string javaHome;
 if (IsRunningOnWindows())
@@ -129,6 +126,7 @@ Task("Run-C-Tests")
 Task("Download-Xamarin-Android")
     .Does(() =>
     {
+        var xamarinPath = Directory("./external/Xamarin.Android");
         if (!DirectoryExists(xamarinPath))
         {
             Console.WriteLine("Downloading Xamarin.Android SDK, this will take a while...");
@@ -153,7 +151,7 @@ Task("Download-Xamarin-Android")
         }
         else
         {
-            Console.WriteLine("Xamarin.Android SDK directory already downloaded...");
+            Console.WriteLine("Xamarin.Android SDK already downloaded...");
         }
     });
 
@@ -174,7 +172,7 @@ Task("Generate-Android")
     .Does(() =>
     {
         var output = buildDir + Directory("android");
-        Exec(embeddinator, $"-gen=Java -out={output} -platform=Android -compile -target=shared {androidDll} -xamarinPath={xamarinPath}");
+        Exec(embeddinator, $"-gen=Java -out={output} -platform=Android -compile -target=shared {androidDll}");
     });
 
 Task("Generate-Android-PCL")
@@ -184,7 +182,7 @@ Task("Generate-Android-PCL")
     .Does(() =>
     {
         var output = buildDir + Directory("pcl");
-        Exec(embeddinator, $"-gen=Java -out={output} -platform=Android -compile -target=shared {pclDll} -xamarinPath={xamarinPath}");
+        Exec(embeddinator, $"-gen=Java -out={output} -platform=Android -compile -target=shared {pclDll}");
     });
 
 Task("Build-Java-Tests")

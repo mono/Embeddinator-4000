@@ -19,26 +19,26 @@ namespace MonoEmbeddinator4000
         public const string TargetSdkVersion = "25";
         const string LinkMode = "SdkOnly";
 
-        static ProjectRootElement CreateProject(string xamarinPath)
+        static ProjectRootElement CreateProject(string monoDroidPath)
         {
-            var msBuildPath = Path.Combine(xamarinPath, "lib", "xbuild", "Xamarin", "Android");
+            var msBuildPath = Path.Combine(monoDroidPath, "lib", "xbuild", "Xamarin", "Android");
             if (!msBuildPath.EndsWith(Path.DirectorySeparatorChar.ToString(), StringComparison.OrdinalIgnoreCase))
                 msBuildPath = msBuildPath + Path.DirectorySeparatorChar;
 
             var project = ProjectRootElement.Create();
             project.AddProperty("TargetFrameworkDirectory", string.Join(";", 
-                Path.Combine(xamarinPath, "lib", "xbuild-frameworks", "MonoAndroid", "v1.0"),
-                Path.Combine(xamarinPath, "lib", "xbuild-frameworks", "MonoAndroid", "v1.0", "Facades"),
-                Path.Combine(xamarinPath, "lib", "xbuild-frameworks", "MonoAndroid", TargetFrameworkVersion)));
+                Path.Combine(monoDroidPath, "lib", "xbuild-frameworks", "MonoAndroid", "v1.0"),
+                Path.Combine(monoDroidPath, "lib", "xbuild-frameworks", "MonoAndroid", "v1.0", "Facades"),
+                Path.Combine(monoDroidPath, "lib", "xbuild-frameworks", "MonoAndroid", TargetFrameworkVersion)));
             project.AddImport(ProjectCollection.Escape(Path.Combine(msBuildPath, "Xamarin.Android.CSharp.targets")));
 
             return project;
         }
 
-        static void ResolveAssemblies(ProjectTargetElement target, string xamarinPath, string mainAssembly)
+        static void ResolveAssemblies(ProjectTargetElement target, string monoDroidPath, string mainAssembly)
         {
             //NOTE: [Export] requires Mono.Android.Export.dll
-            string monoAndroidExport = Path.Combine(xamarinPath, "lib", "xbuild-frameworks", "MonoAndroid", TargetFrameworkVersion, "Mono.Android.Export.dll");
+            string monoAndroidExport = Path.Combine(monoDroidPath, "lib", "xbuild-frameworks", "MonoAndroid", TargetFrameworkVersion, "Mono.Android.Export.dll");
 
             var resolveAssemblies = target.AddTask("ResolveAssemblies");
             resolveAssemblies.SetParameter("Assemblies", mainAssembly + ";" + monoAndroidExport);
@@ -58,7 +58,7 @@ namespace MonoEmbeddinator4000
             return name[0] + name.Substring(1, name.Length - 1).ToLowerInvariant();
         }
 
-        static void GenerateResourceDesigner(List<IKVM.Reflection.Assembly> assemblies, string xamarinPath, string mainAssembly, string outputDirectory, string packageName)
+        static void GenerateResourceDesigner(List<IKVM.Reflection.Assembly> assemblies, string monoDroidPath, string mainAssembly, string outputDirectory, string packageName)
         {
             var unit = new CodeCompileUnit();
             unit.AssemblyCustomAttributes.Add(new CodeAttributeDeclaration("Android.Runtime.ResourceDesignerAttribute",
@@ -170,10 +170,10 @@ namespace MonoEmbeddinator4000
                 //NOTE: we place this assembly in the output directory, the linker will move it to the final folder
                 OutputAssembly = Path.Combine(outputDirectory, "Resource.designer.dll"),
             };
-            parameters.ReferencedAssemblies.Add(Path.Combine(xamarinPath, "lib", "xbuild-frameworks", "MonoAndroid", "v1.0", "System.dll"));
-            parameters.ReferencedAssemblies.Add(Path.Combine(xamarinPath, "lib", "xbuild-frameworks", "MonoAndroid", "v1.0", "Facades", "System.Runtime.dll"));
-            parameters.ReferencedAssemblies.Add(Path.Combine(xamarinPath, "lib", "xbuild-frameworks", "MonoAndroid", "v1.0", "Java.Interop.dll"));
-            parameters.ReferencedAssemblies.Add(Path.Combine(xamarinPath, "lib", "xbuild-frameworks", "MonoAndroid", TargetFrameworkVersion, "Mono.Android.dll"));
+            parameters.ReferencedAssemblies.Add(Path.Combine(monoDroidPath, "lib", "xbuild-frameworks", "MonoAndroid", "v1.0", "System.dll"));
+            parameters.ReferencedAssemblies.Add(Path.Combine(monoDroidPath, "lib", "xbuild-frameworks", "MonoAndroid", "v1.0", "Facades", "System.Runtime.dll"));
+            parameters.ReferencedAssemblies.Add(Path.Combine(monoDroidPath, "lib", "xbuild-frameworks", "MonoAndroid", "v1.0", "Java.Interop.dll"));
+            parameters.ReferencedAssemblies.Add(Path.Combine(monoDroidPath, "lib", "xbuild-frameworks", "MonoAndroid", TargetFrameworkVersion, "Mono.Android.dll"));
             parameters.ReferencedAssemblies.Add(mainAssembly);
 
             var results = csc.CompileAssemblyFromDom(parameters, unit);
@@ -205,7 +205,7 @@ namespace MonoEmbeddinator4000
         /// - Invokes aapt to generate R.txt
         /// - One day I would like to get rid of the temp files, but I could not get the MSBuild APIs to work in-process
         /// </summary>
-        public static string GeneratePackageProject(List<IKVM.Reflection.Assembly> assemblies, string xamarinPath, string outputDirectory, string assembliesDirectory)
+        public static string GeneratePackageProject(List<IKVM.Reflection.Assembly> assemblies, string monoDroidPath, string outputDirectory, string assembliesDirectory)
         {
             var mainAssembly = assemblies[0].Location;
             outputDirectory = Path.GetFullPath(outputDirectory);
@@ -217,14 +217,14 @@ namespace MonoEmbeddinator4000
             var resourceDir = Path.Combine(androidDir, "res");
             var manifestPath = Path.Combine(androidDir, "AndroidManifest.xml");
             var packageName = "com." + Path.GetFileNameWithoutExtension(mainAssembly).Replace('-', '_') + "_dll";
-            var project = CreateProject(xamarinPath);
+            var project = CreateProject(monoDroidPath);
             var target = project.AddTarget("Build");
 
             //Generate Resource.designer.dll
-            GenerateResourceDesigner(assemblies, xamarinPath, mainAssembly, outputDirectory, packageName);
+            GenerateResourceDesigner(assemblies, monoDroidPath, mainAssembly, outputDirectory, packageName);
 
             //ResolveAssemblies Task
-            ResolveAssemblies(target, xamarinPath, mainAssembly);
+            ResolveAssemblies(target, monoDroidPath, mainAssembly);
 
             //LinkAssemblies Task
             var linkAssemblies = target.AddTask("LinkAssemblies");
@@ -288,7 +288,7 @@ namespace MonoEmbeddinator4000
         /// - Generates AndroidManifest.xml
         /// - One day I would like to get rid of the temp files, but I could not get the MSBuild APIs to work in-process
         /// </summary>
-        public static string GenerateJavaStubsProject(List<IKVM.Reflection.Assembly> assemblies, string xamarinPath, string outputDirectory)
+        public static string GenerateJavaStubsProject(List<IKVM.Reflection.Assembly> assemblies, string monoDroidPath, string outputDirectory)
         {
             var mainAssembly = assemblies[0].Location;
             outputDirectory = Path.GetFullPath(outputDirectory);
@@ -307,11 +307,11 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
     <uses-sdk android:minSdkVersion=""{MinSdkVersion}"" android:targetSdkVersion=""{TargetSdkVersion}"" />
 </manifest>");
 
-            var project = CreateProject(xamarinPath);
+            var project = CreateProject(monoDroidPath);
             var target = project.AddTarget("Build");
 
             //ResolveAssemblies Task
-            ResolveAssemblies(target, xamarinPath, mainAssembly);
+            ResolveAssemblies(target, monoDroidPath, mainAssembly);
 
             //GenerateJavaStubs Task
             var generateJavaStubs = target.AddTask("GenerateJavaStubs");
