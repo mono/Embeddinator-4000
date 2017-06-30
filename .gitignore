@@ -64,3 +64,5 @@ xcuserdata/
 *.dSYM.zip
 *.dSYM
 *.nupkg
+.cake/**
+!.cake/packages.config

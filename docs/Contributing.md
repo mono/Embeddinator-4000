@@ -36,6 +36,21 @@ Tests can be executed by running `make` from the `tests/common` directory.
 
 Or running the `tests/RunTestsuite.sh` shell script.
 
+### Cake
+
+We will slowly be moving our build scripts to Cake. We only have a few build targets setup so far.
+
+To run on Windows, open powershell and run:
+```
+.\build.ps1
+```
+To run on OS X:
+```
+./build.sh
+```
+
+To run a specific target, append `-t Generate-Android`, for example.
+
 ## Objective-C
 
 The work on the Objective-C generator occurs in the [`objc`](https://github.com/mono/Embeddinator-4000/tree/objc) branch. Here are the steps to build it from our repository/branch:
