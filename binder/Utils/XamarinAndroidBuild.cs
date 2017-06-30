@@ -205,9 +205,9 @@ namespace MonoEmbeddinator4000
         /// - Invokes aapt to generate R.txt
         /// - One day I would like to get rid of the temp files, but I could not get the MSBuild APIs to work in-process
         /// </summary>
-        public static string GeneratePackageProject(List<IKVM.Reflection.Assembly> assemblies, string xamarinPath, string mainAssembly, string outputDirectory, string assembliesDirectory)
+        public static string GeneratePackageProject(List<IKVM.Reflection.Assembly> assemblies, string xamarinPath, string outputDirectory, string assembliesDirectory)
         {
-            mainAssembly = Path.GetFullPath(mainAssembly);
+            var mainAssembly = assemblies[0].Location;
             outputDirectory = Path.GetFullPath(outputDirectory);
             assembliesDirectory = Path.GetFullPath(assembliesDirectory);
 
@@ -248,8 +248,8 @@ namespace MonoEmbeddinator4000
 
             //Create ItemGroup of Android files
             var androidResources = target.AddItemGroup();
-            androidResources.AddItem("AndroidAsset", @"%(ResolvedAssetDirectories.Identity)\**\*");
-            androidResources.AddItem("AndroidResource", @"%(ResolvedResourceDirectories.Identity)\**\*");
+            androidResources.AddItem("AndroidAsset", @"%(ResolvedAssetDirectories.Identity)\**\*").Condition = "'@(ResolvedAssetDirectories)' != ''";
+            androidResources.AddItem("AndroidResource", @"%(ResolvedResourceDirectories.Identity)\**\*").Condition = "'@(ResolvedAssetDirectories)' != ''";
 
             //Copy Task, to copy AndroidAsset files
             var copy = target.AddTask("Copy");
@@ -288,9 +288,9 @@ namespace MonoEmbeddinator4000
         /// - Generates AndroidManifest.xml
         /// - One day I would like to get rid of the temp files, but I could not get the MSBuild APIs to work in-process
         /// </summary>
-        public static string GenerateJavaStubsProject(string xamarinPath, string mainAssembly, string outputDirectory)
+        public static string GenerateJavaStubsProject(List<IKVM.Reflection.Assembly> assemblies, string xamarinPath, string outputDirectory)
         {
-            mainAssembly = Path.GetFullPath(mainAssembly);
+            var mainAssembly = assemblies[0].Location;
             outputDirectory = Path.GetFullPath(outputDirectory);
 
             var androidDir = Path.Combine(outputDirectory, "android");

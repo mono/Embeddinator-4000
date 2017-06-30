@@ -707,7 +707,7 @@ namespace MonoEmbeddinator4000
             Diagnostics.Message("Linking assemblies...");
 
             //Performs Xamarin.Android build tasks such as Linking, Resource/Asset extraction, invoking aapt.
-            var project = XamarinAndroidBuild.GeneratePackageProject(Assemblies, Project.XamarinPath, Project.Assemblies[0], Options.OutputDir, assembliesDir);
+            var project = XamarinAndroidBuild.GeneratePackageProject(Assemblies, Project.XamarinPath, Options.OutputDir, assembliesDir);
             if (!MSBuild(project))
                 return false;
 

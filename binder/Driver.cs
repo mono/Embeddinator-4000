@@ -1,5 +1,6 @@
 ﻿﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.IO;
 using CppSharp;
 using CppSharp.AST;
@@ -191,12 +192,18 @@ namespace MonoEmbeddinator4000
 
             if (Options.GeneratorKind == GeneratorKind.Java && Options.Compilation.Platform == TargetPlatform.Android)
             {
-                RefreshAndroidSdk();
+                if (Assemblies.Any(
+                    a => a.CustomAttributes.Any(
+                        ca => ca.AttributeType.FullName == "System.Runtime.Versioning.TargetFrameworkAttribute" &&
+                              ca.ConstructorArguments.FirstOrDefault().Value.ToString().StartsWith("MonoAndroid,", StringComparison.Ordinal))))
+                {
+                    RefreshAndroidSdk();
 
-                Diagnostics.Message("Generating Java stubs...");
-                var project = XamarinAndroidBuild.GenerateJavaStubsProject(Project.XamarinPath, Project.Assemblies[0], Options.OutputDir);
-                if (!MSBuild(project))
-                    return false;
+                    Diagnostics.Message("Generating Java stubs...");
+                    var project = XamarinAndroidBuild.GenerateJavaStubsProject(Assemblies, Project.XamarinPath, Options.OutputDir);
+                    if (!MSBuild(project))
+                        return false;
+                }
             }
 
             return true;
