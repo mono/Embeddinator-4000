@@ -34,9 +34,19 @@ var classPath = string.Join(IsRunningOnWindows() ? ";" : ":", new[]
     buildDir + File("java/managed.jar"),
 });
 
-void Exec(string path, string args = "")
+void Exec(string path, string args = "", string workingDir = ".")
 {
-    var exitCode = IsRunningOnWindows() || !path.EndsWith(".exe") ? StartProcess(path, args) : StartProcess("mono", path + " " + args);
+    var settings = new ProcessSettings
+    {
+        Arguments = args,
+        WorkingDirectory = workingDir,
+    };
+    if (path.EndsWith(".exe") && !IsRunningOnWindows())
+    {
+        settings.Arguments = path + " " + args;
+        path = "mono";
+    }
+    var exitCode = StartProcess(path, settings);
     if (exitCode != 0)
         throw new Exception(path + " failed!");
 }
@@ -143,6 +153,19 @@ Task("Build-Java-Tests")
         Exec(javac, $"-cp {classPath} -d {output} -Xdiags:verbose -Xlint:deprecation {tests}");
     });
 
+Task("Build-Android-Tests")
+    .IsDependentOn("Generate-Android")
+    .Does(() =>
+    {
+        CopyFile(buildDir + File("android/managed.aar"), File("./tests/android/managed.aar"));
+        CopyFiles("./tests/common/java/**/*.java", Directory("./tests/android/app/src/main/java"));
+        Exec("./tests/android/gradlew", "assemble", "./tests/android");
+    });
+
+Task("Install-Android-Tests")
+    .IsDependentOn("Build-Android-Tests")
+    .Does(() => Exec("./tests/android/gradlew", "installDebug", "./tests/android"));
+
 Task("Run-Java-Tests")
     .IsDependentOn("Build-Java-Tests")
     .Does(() =>
@@ -150,6 +173,10 @@ Task("Run-Java-Tests")
         var java = Directory(javaHome) + File("bin/java");
         Exec(java, $"-cp {classPath} -Djna.dump_memory=true org.junit.runner.JUnitCore mono.embeddinator.Tests");
     });
+
+Task("Run-Android-Tests")
+    .IsDependentOn("Install-Android-Tests")
+    .Does(() => Exec("./tests/android/gradlew", "connectedAndroidTest", "./tests/android"));
 
 void Premake(string file, string args, string action)
 {
