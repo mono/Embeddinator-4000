@@ -1,3 +1,5 @@
+#!mono .cake/Cake/Cake.exe
+
 var target = Argument("target", "Default");
 var configuration = Argument("configuration", "Release");
 var buildDir = Directory("./build/lib") + Directory(configuration);
