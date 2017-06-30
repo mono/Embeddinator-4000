@@ -8,6 +8,9 @@ var managedDll = Directory("./tests/managed/generic/bin") + Directory(configurat
 var androidDll = Directory("./tests/managed/android/bin") + Directory(configuration) + File("managed.dll");
 var pclDll = Directory("./tests/managed/pcl/bin") + Directory(configuration) + File("managed.dll");
 
+//Used for Xamarin.Android custom build
+var xamarinPath = Directory("./external/Xamarin.Android");
+
 //Java settings
 string javaHome;
 if (IsRunningOnWindows())
@@ -123,6 +126,37 @@ Task("Run-C-Tests")
         Exec(binDir + File("common.Tests"));
     });
 
+Task("Download-Xamarin-Android")
+    .Does(() =>
+    {
+        if (!DirectoryExists(xamarinPath))
+        {
+            Console.WriteLine("Downloading Xamarin.Android SDK, this will take a while...");
+
+            //We can also update this URL later from here: https://jenkins.mono-project.com/view/Xamarin.Android/job/xamarin-android/lastSuccessfulBuild/Azure/
+            var artifact = "oss-xamarin.android_v7.4.99.16_Darwin-x86_64_master_e83c99c";
+            var url = $"https://jenkins.mono-project.com/view/Xamarin.Android/job/xamarin-android/444/Azure/processDownloadRequest/xamarin-android/{artifact}.zip";
+            var temp = DownloadFile(url);
+            var tempDir = temp + "-extracted";
+            try
+            {
+                Console.WriteLine("Unzipping Xamarin.Android SDK...");
+
+                Unzip(temp, tempDir);
+                MoveDirectory(Directory(tempDir) + Directory(artifact) + Directory("bin/Release"), xamarinPath);
+            }
+            finally
+            {
+                DeleteDirectory(tempDir, true);
+                DeleteFile(temp);
+            }
+        }
+        else
+        {
+            Console.WriteLine("Xamarin.Android SDK directory already downloaded...");
+        }
+    });
+
 Task("Generate-Java")
     .IsDependentOn("Build-Binder")
     .IsDependentOn("Build-Managed")
@@ -134,22 +168,22 @@ Task("Generate-Java")
     });
 
 Task("Generate-Android")
+    .IsDependentOn("Download-Xamarin-Android")
     .IsDependentOn("Build-Binder")
     .IsDependentOn("Build-Android")
     .Does(() =>
     {
         var output = buildDir + Directory("android");
-        var xamarinPath = Directory("./external/Xamarin.Android");
         Exec(embeddinator, $"-gen=Java -out={output} -platform=Android -compile -target=shared {androidDll} -xamarinPath={xamarinPath}");
     });
 
 Task("Generate-Android-PCL")
+    .IsDependentOn("Download-Xamarin-Android")
     .IsDependentOn("Build-Binder")
     .IsDependentOn("Build-PCL")
     .Does(() =>
     {
         var output = buildDir + Directory("pcl");
-        var xamarinPath = Directory("./external/Xamarin.Android");
         Exec(embeddinator, $"-gen=Java -out={output} -platform=Android -compile -target=shared {pclDll} -xamarinPath={xamarinPath}");
     });
 
