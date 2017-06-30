@@ -5,6 +5,8 @@ var configuration = Argument("configuration", "Release");
 var buildDir = Directory("./build/lib") + Directory(configuration);
 var embeddinator = buildDir + File("MonoEmbeddinator4000.exe");
 var managedDll = Directory("./tests/managed/generic/bin") + Directory(configuration) + File("managed.dll");
+var androidDll = Directory("./tests/managed/android/bin") + Directory(configuration) + File("managed.dll");
+var pclDll = Directory("./tests/managed/pcl/bin") + Directory(configuration) + File("managed.dll");
 
 //Java settings
 string javaHome;
@@ -59,6 +61,20 @@ Task("Build-Managed")
         MSBuild("./tests/managed/generic/managed-generic.csproj", settings => settings.SetConfiguration(configuration).SetVerbosity(Verbosity.Minimal));
     });
 
+Task("Build-Android")
+    .IsDependentOn("Clean")
+    .Does(() =>
+    {
+        MSBuild("./tests/managed/android/managed-android.csproj", settings => settings.SetConfiguration(configuration).SetVerbosity(Verbosity.Minimal));
+    });
+
+Task("Build-PCL")
+    .IsDependentOn("Clean")
+    .Does(() =>
+    {
+        MSBuild("./tests/managed/pcl/managed-pcl.csproj", settings => settings.SetConfiguration(configuration).SetVerbosity(Verbosity.Minimal));
+    });
+
 Task("Generate-C")
     .IsDependentOn("Build-Binder")
     .IsDependentOn("Build-Managed")
@@ -109,11 +125,12 @@ Task("Generate-Java")
 
 Task("Generate-Android")
     .IsDependentOn("Build-Binder")
-    .IsDependentOn("Build-Managed")
+    .IsDependentOn("Build-Android")
     .Does(() =>
     {
-        var output = buildDir + Directory("java");
-        Exec(embeddinator, $"-gen=Java -out={output} -platform=Android -compile -target=shared {managedDll}");
+        var output = buildDir + Directory("android");
+        var xamarinPath = Directory("./external/Xamarin.Android");
+        Exec(embeddinator, $"-gen=Java -out={output} -platform=Android -compile -target=shared {androidDll} -xamarinPath={xamarinPath}");
     });
 
 Task("Build-Java-Tests")
