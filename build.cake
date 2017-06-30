@@ -106,6 +106,19 @@ Task("Run-Java-Tests")
         Exec(java, $"-cp {classPath} -Djna.dump_memory=true org.junit.runner.JUnitCore mono.embeddinator.Tests");
     });
 
+void Premake(string file, string args, string action)
+{
+    var premakePath = Directory("./external/CppSharp/build/") + (IsRunningOnWindows() ?
+        File("premake5.exe") : File("premake5-osx"));
+    Exec(premakePath, $"--file={file} {args} {action}");
+}
+
+Task("Generate-Project-Files")
+    .Does(() =>
+    {
+        Premake(File("./build/premake5.lua"), "--outdir=. --os=macosx", "vs2015");
+    });
+
 Task("Default")
     .IsDependentOn("Generate-Android");
 
