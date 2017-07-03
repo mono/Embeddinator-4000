@@ -278,7 +278,7 @@ namespace MonoEmbeddinator4000
 
             //NOTE: might avoid the temp file later
             var projectFile = Path.Combine(outputDirectory, "Package.proj");
-            File.WriteAllText(projectFile, project.RawXml);
+            project.Save(projectFile);
             return projectFile;
         }
 
@@ -347,7 +347,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
 
             //NOTE: might avoid the temp file later
             var projectFile = Path.Combine(outputDirectory, "GenerateJavaStubs.proj");
-            File.WriteAllText(projectFile, project.RawXml);
+            project.Save(projectFile);
             return projectFile;
         }
     }
