@@ -135,13 +135,17 @@ Task("Download-Xamarin-Android")
             var artifact = "oss-xamarin.android_v7.4.99.16_Darwin-x86_64_master_e83c99c";
             var url = $"https://jenkins.mono-project.com/view/Xamarin.Android/job/xamarin-android/444/Azure/processDownloadRequest/xamarin-android/{artifact}.zip";
             var temp = DownloadFile(url);
-            var tempDir = temp + "-extracted";
+            var tempDir = temp.GetDirectory() + "/" + artifact;
             try
             {
                 Console.WriteLine("Unzipping Xamarin.Android SDK...");
 
-                Unzip(temp, tempDir);
-                MoveDirectory(Directory(tempDir) + Directory(artifact) + Directory("bin/Release"), xamarinPath);
+                //Unzip into root of %TEMP%
+                //Root directory of zip will contain {artifact} as directory name
+                Unzip(temp, temp.GetDirectory());
+
+                //Move bin/Release to final directory in ./external/Xamarin.Android
+                MoveDirectory(Directory(tempDir) + Directory("./bin/Release"), xamarinPath);
             }
             finally
             {
