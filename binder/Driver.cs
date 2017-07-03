@@ -205,6 +205,11 @@ namespace MonoEmbeddinator4000
                     if (!MSBuild(project))
                         return false;
                 }
+                else
+                {
+                    //We need a default AndroidManifest.xml otherwise
+                    XamarinAndroidBuild.GenerateAndroidManifest(Assemblies, Path.Combine(Options.OutputDir, "android", "AndroidManifest.xml"));
+                }
             }
 
             return true;

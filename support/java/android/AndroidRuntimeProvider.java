@@ -1,5 +1,7 @@
 package mono.embeddinator;
 
+import android.content.pm.*;
+
 /* We have to get the main Application Context for Xamarin.Android to work, this content provider passes it to AndroidImpl for later use */
 public class AndroidRuntimeProvider extends android.content.ContentProvider {
     @Override
@@ -10,6 +12,21 @@ public class AndroidRuntimeProvider extends android.content.ContentProvider {
     @Override
     public void attachInfo (android.content.Context context, android.content.pm.ProviderInfo info) {
         Runtime.setImplementation(new AndroidImpl(context));
+
+        //NOTE: this looks a bit weird, but here is what is happening
+        //  We put the main assembly name, "managed" for example, in AndroidManifest.xml metadata as mono.embeddinator.mainassembly
+        //  We need managed_dll.Native_managed_dll's static constructor to run, we can do this via Class.forName
+        try {
+            ApplicationInfo appInfo = context.getPackageManager().getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA);
+            String mainAssembly = appInfo.metaData.getString("mono.embeddinator.mainassembly");
+            String className = mainAssembly + "_dll.Native_" + mainAssembly + "_dll";
+            Class.forName(className);
+        } catch (PackageManager.NameNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
         super.attachInfo (context, info);
     }
 

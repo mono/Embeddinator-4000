@@ -20,12 +20,6 @@ public class AndroidTests {
     @Rule
     public ActivityTestRule rule = new ActivityTestRule<>(MainActivity.class);
 
-    @Before
-    public void setUp() {
-        //NOTE: we need to force Embeddinator to initialize, using Native_managed_dll.INSTANCE does this
-        assertNotNull(Native_managed_dll.INSTANCE);
-    }
-
     @Test
     public void createView() throws Throwable {
         ViewSubclass v = new ViewSubclass(rule.getActivity());

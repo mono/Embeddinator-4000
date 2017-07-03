@@ -283,6 +283,29 @@ namespace MonoEmbeddinator4000
         }
 
         /// <summary>
+        /// Generates AndroidManifest.xml
+        /// </summary>
+        public static void GenerateAndroidManifest(List<IKVM.Reflection.Assembly> assemblies, string path, bool includeProvider = true)
+        {
+            string name = assemblies[0].GetName().Name.Replace('-', '_');
+            string provider = string.Empty;
+            if (includeProvider)
+            {
+                provider = $"<provider android:name=\"mono.embeddinator.AndroidRuntimeProvider\" android:exported=\"false\" android:initOrder=\"{int.MaxValue}\" android:authorities=\"${{applicationId}}.mono.embeddinator.AndroidRuntimeProvider.__mono_init__\" />";
+            }
+
+            File.WriteAllText(path,
+$@"<?xml version=""1.0"" encoding=""utf-8""?>
+<manifest xmlns:android=""http://schemas.android.com/apk/res/android"" package=""com.{name}_dll"">
+    <uses-sdk android:minSdkVersion=""{MinSdkVersion}"" android:targetSdkVersion=""{TargetSdkVersion}"" />
+    <application>
+        <meta-data android:name=""mono.embeddinator.mainassembly"" android:value=""{name}"" />
+        {provider}
+    </application>
+</manifest>");
+        }
+
+        /// <summary>
         /// Generates a GenerateJavaStubs.proj file for MSBuild to invoke
         /// - Generates Java source code for each C# class that subclasses Java.Lang.Object
         /// - Generates AndroidManifest.xml
@@ -300,12 +323,8 @@ namespace MonoEmbeddinator4000
             if (!Directory.Exists(androidDir))
                 Directory.CreateDirectory(androidDir);
 
-            //AndroidManifest.xml templatel
-            File.WriteAllText(manifestPath,
-$@"<?xml version=""1.0"" encoding=""utf-8""?>
-<manifest xmlns:android=""http://schemas.android.com/apk/res/android"">
-    <uses-sdk android:minSdkVersion=""{MinSdkVersion}"" android:targetSdkVersion=""{TargetSdkVersion}"" />
-</manifest>");
+            //AndroidManifest.xml template
+            GenerateAndroidManifest(assemblies, manifestPath, false);
 
             var project = CreateProject(monoDroidPath);
             var target = project.AddTarget("Build");
