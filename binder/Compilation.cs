@@ -452,7 +452,8 @@ namespace MonoEmbeddinator4000
                 var androidDir = AndroidSdk.GetPlatformDirectory(maxVersion);
                 var androidJar = Path.Combine(androidDir, "android.jar");
                 var monoAndroidJar = Path.Combine(GetMonoDroidPath(), "lib", "xbuild-frameworks", "MonoAndroid", XamarinAndroidBuild.TargetFrameworkVersion, "mono.android.jar");
-                args.Add(string.Join(":", jnaJar, androidJar, monoAndroidJar));
+                var delimiter = Platform.IsWindows ? ";" : ":";
+                args.Add("\"" + string.Join(delimiter, jnaJar, androidJar, monoAndroidJar) + "\"");
             }
             else
             {
