@@ -51,6 +51,18 @@ void Exec(string path, string args = "", string workingDir = ".")
         throw new Exception(path + " failed!");
 }
 
+void Gradle(string args)
+{
+    if (IsRunningOnWindows())
+    {
+        Exec("cmd.exe", "/c gradlew.bat " + args, "./tests/android");
+    }
+    else
+    {
+        Exec("./tests/android/gradlew", args, "./tests/android");
+    }
+}
+
 Task("Clean")
     .Does(() =>
     {
@@ -205,7 +217,7 @@ Task("Build-Android-Tests")
     {
         CopyFile(buildDir + File("android/managed.aar"), File("./tests/android/managed/managed.aar"));
         CopyDirectory(Directory("./tests/common/java"), Directory("./tests/android/app/src/main/java"));
-        Exec("./tests/android/gradlew", "assemble", "./tests/android");
+        Gradle("assemble");
     });
 
 Task("Build-Android-PCL-Tests")
@@ -214,11 +226,11 @@ Task("Build-Android-PCL-Tests")
     {
         CopyFile(buildDir + File("pcl/managed.aar"), File("./tests/android/managed/managed.aar"));
         CopyFiles("./tests/common/java/**/*.java", Directory("./tests/android/app/src/main/java"));
-        Exec("./tests/android/gradlew", "assemble", "./tests/android");
+        Gradle("assemble");
     });
 
 Task("Install-Android-Tests")
-    .Does(() => Exec("./tests/android/gradlew", "installDebug", "./tests/android"));
+    .Does(() => Gradle("installDebug"));
 
 Task("Run-Java-Tests")
     .IsDependentOn("Build-Java-Tests")
@@ -231,12 +243,12 @@ Task("Run-Java-Tests")
 Task("Run-Android-Tests")
     .IsDependentOn("Build-Android-Tests")
     .IsDependentOn("Install-Android-Tests")
-    .Does(() => Exec("./tests/android/gradlew", "connectedAndroidTest", "./tests/android"));
+    .Does(() => Gradle("connectedAndroidTest"));
 
 Task("Run-Android-PCL-Tests")
     .IsDependentOn("Build-Android-PCL-Tests")
     .IsDependentOn("Install-Android-Tests")
-    .Does(() => Exec("./tests/android/gradlew", "-Pandroid.testInstrumentationRunnerArguments.class=mono.embeddinator.TestRunner connectedAndroidTest", "./tests/android"));
+    .Does(() => Gradle("-Pandroid.testInstrumentationRunnerArguments.class=mono.embeddinator.TestRunner connectedAndroidTest"));
 
 void Premake(string file, string args, string action)
 {
