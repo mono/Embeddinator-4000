@@ -225,7 +225,7 @@ Task("Build-Android-PCL-Tests")
     .Does(() =>
     {
         CopyFile(buildDir + File("pcl/managed.aar"), File("./tests/android/managed/managed.aar"));
-        CopyFiles("./tests/common/java/**/*.java", Directory("./tests/android/app/src/main/java"));
+        CopyFiles("./tests/common/java/mono/embeddinator/*.java", Directory("./tests/android/app/src/main/java/mono/embeddinator"));
         Gradle("assemble");
     });
 
