@@ -9,6 +9,7 @@ import android.widget.TextView;
 import android.content.*;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
+import java.io.*;
 import managed_dll.Native_managed_dll;
 import mono.embeddinator.testrunner.MainActivity;
 import mono.embeddinator.android.*;
@@ -77,5 +78,17 @@ public class AndroidTests {
     public void resourceCustomView() {
         TextView text = (TextView)rule.getActivity().getLayoutInflater().inflate(com.managed_dll.R.layout.customview, null);
         assertEquals("World!", text.getText());
+    }
+
+    @Test
+    public void asset() throws IOException {
+        InputStream stream = rule.getActivity().getAssets().open("test.txt");
+        BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+        try {
+            String text = reader.readLine();
+            assertTrue(text.contains("This is an asset"));
+        } finally {
+            reader.close();
+        }
     }
 }

@@ -199,7 +199,7 @@ Task("Build-Android-Tests")
     .IsDependentOn("Generate-Android")
     .Does(() =>
     {
-        CopyFile(buildDir + File("android/managed.aar"), File("./tests/android/managed.aar"));
+        CopyFile(buildDir + File("android/managed.aar"), File("./tests/android/managed/managed.aar"));
         CopyDirectory(Directory("./tests/common/java"), Directory("./tests/android/app/src/main/java"));
         Exec("./tests/android/gradlew", "assemble", "./tests/android");
     });
@@ -208,7 +208,7 @@ Task("Build-Android-PCL-Tests")
     .IsDependentOn("Generate-Android-PCL")
     .Does(() =>
     {
-        CopyFile(buildDir + File("pcl/managed.aar"), File("./tests/android/managed.aar"));
+        CopyFile(buildDir + File("pcl/managed.aar"), File("./tests/android/managed/managed.aar"));
         CopyFiles("./tests/common/java/**/*.java", Directory("./tests/android/app/src/main/java"));
         Exec("./tests/android/gradlew", "assemble", "./tests/android");
     });
