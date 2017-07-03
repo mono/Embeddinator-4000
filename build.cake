@@ -266,9 +266,7 @@ Task("Generate-Project-Files")
 Task("Default")
     .IsDependentOn("Build-Binder");
 
-//Runs all Android-related tests
 Task("Android")
-    .IsDependentOn("Run-Android-PCL-Tests")
     .IsDependentOn("Run-Android-Tests");
 
 RunTarget(target);
