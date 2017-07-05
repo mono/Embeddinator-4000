@@ -65,7 +65,7 @@ public class HelloActivity : Activity
     {
         base.OnCreate(savedInstanceState);
 
-        SetContentView(Resource.Layout.hello);nui   
+        SetContentView(Resource.Layout.hello);
     }
 }
 ```
