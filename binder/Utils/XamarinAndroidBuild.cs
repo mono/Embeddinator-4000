@@ -276,6 +276,10 @@ namespace MonoEmbeddinator4000
             aapt.SetParameter("ApiLevel", TargetSdkVersion);
             aapt.SetParameter("ExtraArgs", "--output-text-symbols " + androidDir);
 
+            //There is an extra /manifest/AndroidManifest.xml file created
+            var removeDir = target.AddTask("RemoveDir");
+            removeDir.SetParameter("Directories", Path.Combine(androidDir, "manifest"));
+
             //NOTE: might avoid the temp file later
             var projectFile = Path.Combine(outputDirectory, "Package.proj");
             project.Save(projectFile);
