@@ -61,4 +61,5 @@
   </ItemGroup>
   <Import Project="..\managed-shared.projitems" Label="Shared" Condition="Exists('..\managed-shared.projitems')" />
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
+  <Import Project="..\CustomBuildActions.targets" />
 </Project>
