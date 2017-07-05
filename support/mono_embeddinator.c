@@ -167,9 +167,9 @@ char* mono_embeddinator_search_assembly(const char* assembly)
     GString* path = g_string_new(assembly);
     gchar* sep = strrchr(path->str, '.');
     g_string_truncate(path, sep - path->str);
-    assembly = path->str;
+    char* assembly_name = path->str;
     g_string_free(path, /*free_segment=*/ FALSE);
-    return strdup(assembly);
+    return assembly_name;
 #else
     GString* path = get_current_executable_path();
 
