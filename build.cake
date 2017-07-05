@@ -5,6 +5,8 @@ var configuration = Argument("configuration", "Release");
 var buildDir = Directory("./build/lib") + Directory(configuration);
 var embeddinator = buildDir + File("MonoEmbeddinator4000.exe");
 var managedDll = Directory("./tests/managed/generic/bin") + Directory(configuration) + File("managed.dll");
+var androidDll = Directory("./tests/managed/android/bin") + Directory(configuration) + File("managed.dll");
+var pclDll = Directory("./tests/managed/pcl/bin") + Directory(configuration) + File("managed.dll");
 
 //Java settings
 string javaHome;
@@ -32,11 +34,33 @@ var classPath = string.Join(IsRunningOnWindows() ? ";" : ":", new[]
     buildDir + File("java/managed.jar"),
 });
 
-void Exec(string path, string args = "")
+void Exec(string path, string args = "", string workingDir = ".")
 {
-    var exitCode = IsRunningOnWindows() || !path.EndsWith(".exe") ? StartProcess(path, args) : StartProcess("mono", path + " " + args);
+    var settings = new ProcessSettings
+    {
+        Arguments = args,
+        WorkingDirectory = workingDir,
+    };
+    if (path.EndsWith(".exe") && !IsRunningOnWindows())
+    {
+        settings.Arguments = path + " " + args;
+        path = "mono";
+    }
+    var exitCode = StartProcess(path, settings);
     if (exitCode != 0)
         throw new Exception(path + " failed!");
+}
+
+void Gradle(string args)
+{
+    if (IsRunningOnWindows())
+    {
+        Exec("cmd.exe", "/c gradlew.bat " + args, "./tests/android");
+    }
+    else
+    {
+        Exec("./tests/android/gradlew", args, "./tests/android");
+    }
 }
 
 Task("Clean")
@@ -57,6 +81,20 @@ Task("Build-Managed")
     .Does(() =>
     {
         MSBuild("./tests/managed/generic/managed-generic.csproj", settings => settings.SetConfiguration(configuration).SetVerbosity(Verbosity.Minimal));
+    });
+
+Task("Build-Android")
+    .IsDependentOn("Clean")
+    .Does(() =>
+    {
+        MSBuild("./tests/managed/android/managed-android.csproj", settings => settings.SetConfiguration(configuration).SetVerbosity(Verbosity.Minimal));
+    });
+
+Task("Build-PCL")
+    .IsDependentOn("Clean")
+    .Does(() =>
+    {
+        MSBuild("./tests/managed/pcl/managed-pcl.csproj", settings => settings.SetConfiguration(configuration).SetVerbosity(Verbosity.Minimal));
     });
 
 Task("Generate-C")
@@ -97,6 +135,42 @@ Task("Run-C-Tests")
         Exec(binDir + File("common.Tests"));
     });
 
+Task("Download-Xamarin-Android")
+    .Does(() =>
+    {
+        var xamarinPath = Directory("./external/Xamarin.Android");
+        if (!DirectoryExists(xamarinPath))
+        {
+            Console.WriteLine("Downloading Xamarin.Android SDK, this will take a while...");
+
+            //We can also update this URL later from here: https://jenkins.mono-project.com/view/Xamarin.Android/job/xamarin-android/lastSuccessfulBuild/Azure/
+            var artifact = "oss-xamarin.android_v7.4.99.16_Darwin-x86_64_master_e83c99c";
+            var url = $"https://jenkins.mono-project.com/view/Xamarin.Android/job/xamarin-android/444/Azure/processDownloadRequest/xamarin-android/{artifact}.zip";
+            var temp = DownloadFile(url);
+            var tempDir = temp.GetDirectory() + "/" + artifact;
+            try
+            {
+                Console.WriteLine("Unzipping Xamarin.Android SDK...");
+
+                //Unzip into root of %TEMP%
+                //Root directory of zip will contain {artifact} as directory name
+                Unzip(temp, temp.GetDirectory());
+
+                //Move bin/Release to final directory in ./external/Xamarin.Android
+                MoveDirectory(Directory(tempDir) + Directory("./bin/Release"), xamarinPath);
+            }
+            finally
+            {
+                DeleteDirectory(tempDir, true);
+                DeleteFile(temp);
+            }
+        }
+        else
+        {
+            Console.WriteLine("Xamarin.Android SDK already downloaded...");
+        }
+    });
+
 Task("Generate-Java")
     .IsDependentOn("Build-Binder")
     .IsDependentOn("Build-Managed")
@@ -108,12 +182,23 @@ Task("Generate-Java")
     });
 
 Task("Generate-Android")
+    .IsDependentOn("Download-Xamarin-Android")
     .IsDependentOn("Build-Binder")
-    .IsDependentOn("Build-Managed")
+    .IsDependentOn("Build-Android")
     .Does(() =>
     {
-        var output = buildDir + Directory("java");
-        Exec(embeddinator, $"-gen=Java -out={output} -platform=Android -compile -target=shared {managedDll}");
+        var output = buildDir + Directory("android");
+        Exec(embeddinator, $"-gen=Java -out={output} -platform=Android -compile -target=shared {androidDll}");
+    });
+
+Task("Generate-Android-PCL")
+    .IsDependentOn("Download-Xamarin-Android")
+    .IsDependentOn("Build-Binder")
+    .IsDependentOn("Build-PCL")
+    .Does(() =>
+    {
+        var output = buildDir + Directory("pcl");
+        Exec(embeddinator, $"-gen=Java -out={output} -platform=Android -compile -target=shared {pclDll}");
     });
 
 Task("Build-Java-Tests")
@@ -126,6 +211,27 @@ Task("Build-Java-Tests")
         Exec(javac, $"-cp {classPath} -d {output} -Xdiags:verbose -Xlint:deprecation {tests}");
     });
 
+Task("Build-Android-Tests")
+    .IsDependentOn("Generate-Android")
+    .Does(() =>
+    {
+        CopyFile(buildDir + File("android/managed.aar"), File("./tests/android/managed/managed.aar"));
+        CopyDirectory(Directory("./tests/common/java"), Directory("./tests/android/app/src/main/java"));
+        Gradle("assemble");
+    });
+
+Task("Build-Android-PCL-Tests")
+    .IsDependentOn("Generate-Android-PCL")
+    .Does(() =>
+    {
+        CopyFile(buildDir + File("pcl/managed.aar"), File("./tests/android/managed/managed.aar"));
+        CopyFiles("./tests/common/java/mono/embeddinator/*.java", Directory("./tests/android/app/src/main/java/mono/embeddinator"));
+        Gradle("assemble");
+    });
+
+Task("Install-Android-Tests")
+    .Does(() => Gradle("installDebug"));
+
 Task("Run-Java-Tests")
     .IsDependentOn("Build-Java-Tests")
     .Does(() =>
@@ -133,6 +239,16 @@ Task("Run-Java-Tests")
         var java = Directory(javaHome) + File("bin/java");
         Exec(java, $"-cp {classPath} -Djna.dump_memory=true org.junit.runner.JUnitCore mono.embeddinator.Tests");
     });
+
+Task("Run-Android-Tests")
+    .IsDependentOn("Build-Android-Tests")
+    .IsDependentOn("Install-Android-Tests")
+    .Does(() => Gradle("connectedAndroidTest"));
+
+Task("Run-Android-PCL-Tests")
+    .IsDependentOn("Build-Android-PCL-Tests")
+    .IsDependentOn("Install-Android-Tests")
+    .Does(() => Gradle("-Pandroid.testInstrumentationRunnerArguments.class=mono.embeddinator.TestRunner connectedAndroidTest"));
 
 void Premake(string file, string args, string action)
 {
@@ -148,6 +264,9 @@ Task("Generate-Project-Files")
     });
 
 Task("Default")
-    .IsDependentOn("Generate-Android");
+    .IsDependentOn("Build-Binder");
+
+Task("Android")
+    .IsDependentOn("Run-Android-Tests");
 
 RunTarget(target);

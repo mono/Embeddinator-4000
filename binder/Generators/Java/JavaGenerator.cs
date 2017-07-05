@@ -37,9 +37,13 @@ namespace MonoEmbeddinator4000.Generators
             {
                 GenerateDeclarationContext(generators, unit);
 
-                // Also generate a separate file with equivalent of P/Invoke declarations
-                // for JNA.
-                GenerateNativeDeclarations(generators, unit);
+                //NOTE: we should skip over Mono.Android and Java.Interop
+                if (unit.FileName != "Mono.Android.dll" && unit.FileName != "Java.Interop.dll")
+                {
+                    // Also generate a separate file with equivalent of P/Invoke declarations
+                    // for JNA.
+                    GenerateNativeDeclarations(generators, unit);
+                }
             }
 
             return generators;

@@ -1,5 +1,6 @@
 ﻿﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.IO;
 using CppSharp;
 using CppSharp.AST;
@@ -7,6 +8,7 @@ using CppSharp.Generators;
 using CppSharp.Passes;
 using MonoEmbeddinator4000.Generators;
 using MonoEmbeddinator4000.Passes;
+using Xamarin.Android.Tools;
 using BindingContext = CppSharp.Generators.BindingContext;
 
 namespace MonoEmbeddinator4000
@@ -47,6 +49,13 @@ namespace MonoEmbeddinator4000
         bool Parse()
         {
             var parser = new Parser();
+            if (Options.Compilation.Platform == TargetPlatform.Android)
+            {
+                var monoDroidPath = GetMonoDroidPath();
+                parser.AddAssemblyResolveDirectory(Path.Combine(monoDroidPath, "lib", "xbuild-frameworks", "MonoAndroid", "v1.0"));
+                parser.AddAssemblyResolveDirectory(Path.Combine(monoDroidPath, "lib", "xbuild-frameworks", "MonoAndroid", "v2.3"));
+            }
+
             parser.OnAssemblyParsed += HandleAssemblyParsed;
 
             return parser.Parse(Project);
@@ -156,7 +165,7 @@ namespace MonoEmbeddinator4000
             return generator;
         }
 
-        void WriteFiles()
+        bool WriteFiles()
         {
             if (!Directory.Exists(Options.OutputDir))
                 Directory.CreateDirectory(Options.OutputDir);
@@ -181,6 +190,29 @@ namespace MonoEmbeddinator4000
 
                 Diagnostics.Message("Generated: {0}", path);
             }
+
+            if (Options.GeneratorKind == GeneratorKind.Java && Options.Compilation.Platform == TargetPlatform.Android)
+            {
+                if (Assemblies.Any(
+                    a => a.CustomAttributes.Any(
+                        ca => ca.AttributeType.FullName == "System.Runtime.Versioning.TargetFrameworkAttribute" &&
+                              ca.ConstructorArguments.FirstOrDefault().Value.ToString().StartsWith("MonoAndroid,", StringComparison.Ordinal))))
+                {
+                    RefreshAndroidSdk();
+
+                    Diagnostics.Message("Generating Java stubs...");
+                    var project = XamarinAndroidBuild.GenerateJavaStubsProject(Assemblies, GetMonoDroidPath(), Options.OutputDir);
+                    if (!MSBuild(project))
+                        return false;
+                }
+                else
+                {
+                    //We need a default AndroidManifest.xml otherwise
+                    XamarinAndroidBuild.GenerateAndroidManifest(Assemblies, Path.Combine(Options.OutputDir, "android", "AndroidManifest.xml"));
+                }
+            }
+
+            return true;
         }
 
         bool ValidateAssemblies()
@@ -220,7 +252,8 @@ namespace MonoEmbeddinator4000
             Diagnostics.Message("Generating binding code...");
             Diagnostics.PushIndent();
             Generate();
-            WriteFiles();
+            if (!WriteFiles())
+                return false;
             Diagnostics.PopIndent();
 
             if (Options.CompileCode)

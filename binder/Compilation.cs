@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -364,7 +364,6 @@ namespace MonoEmbeddinator4000
             return true;
         }
 
-        bool initXamarinAndroidTools = false;
 
         string GetJavaSdkPath()
         {
@@ -381,16 +380,18 @@ namespace MonoEmbeddinator4000
             return home;
         }
 
+        bool initAndroidSdk = false;
+
         void RefreshAndroidSdk()
         {
             if (Options.Compilation.Platform == TargetPlatform.Android)
             {
-                if (!initXamarinAndroidTools)
+                if (!initAndroidSdk)
                 {
                     AndroidLogger.Info += AndroidLogger_Info;
                     AndroidLogger.Warning += AndroidLogger_Warning;
                     AndroidLogger.Error += AndroidLogger_Error;
-                    initXamarinAndroidTools = true;
+                    initAndroidSdk = true;
                 }
 
                 AndroidSdk.Refresh();
@@ -414,9 +415,25 @@ namespace MonoEmbeddinator4000
                 bootClassPath = Path.Combine(androidDir, "android.jar");
             }
 
+            var javaFiles = files.Select(file => Path.GetFullPath(file)).ToList();
+
+            var supportFiles = Directory.GetFiles(FindDirectory("support"), "*.java", SearchOption.AllDirectories)
+                .Where(f => Options.Compilation.Platform == TargetPlatform.Android || Path.GetFileName(Path.GetDirectoryName(f)) != "android");
+            javaFiles.AddRange(supportFiles);
+
+            //NOTE: GenerateJavaStubs puts them in /src/
+            if (Options.Compilation.Platform == TargetPlatform.Android)
+            {
+                var stubsPath = Path.Combine(Options.OutputDir, "src");
+                if (Directory.Exists(stubsPath))
+                {
+                    var stubFiles = Directory.GetFiles(stubsPath, "*.java", SearchOption.AllDirectories);
+                    javaFiles.AddRange(stubFiles);
+                }
+            }
+
             var args = new List<string> {
-                string.Join(" ", files.Select(file => Path.GetFullPath(file))),
-                string.Join(" ", Directory.GetFiles(FindDirectory("support"), "*.java", SearchOption.AllDirectories)),
+                string.Join(" ", javaFiles),
                 "-source 1.7 -target 1.7",
                 $"-bootclasspath \"{bootClassPath}\"",
                 $"-d {classesDir}",
@@ -425,10 +442,24 @@ namespace MonoEmbeddinator4000
             if (Options.Compilation.DebugMode)
                 args.Add("-g");
 
-            //JNA library
+            //Jar files needed: JNA, android.jar, mono.android.jar
             args.Add("-cp");
-            args.Add(Path.Combine(FindDirectory("external"), "jna", "jna-4.4.0.jar"));
 
+            var jnaJar = Path.Combine(FindDirectory("external"), "jna", "jna-4.4.0.jar");
+            if (Options.Compilation.Platform == TargetPlatform.Android)
+            {
+                var maxVersion = AndroidSdk.GetInstalledPlatformVersions().Select(m => m.ApiLevel).Max();
+                var androidDir = AndroidSdk.GetPlatformDirectory(maxVersion);
+                var androidJar = Path.Combine(androidDir, "android.jar");
+                var monoAndroidJar = Path.Combine(GetMonoDroidPath(), "lib", "xbuild-frameworks", "MonoAndroid", XamarinAndroidBuild.TargetFrameworkVersion, "mono.android.jar");
+                var delimiter = Platform.IsWindows ? ";" : ":";
+                args.Add("\"" + string.Join(delimiter, jnaJar, androidJar, monoAndroidJar) + "\"");
+            }
+            else
+            {
+                args.Add(jnaJar);
+            }
+                
             //If "classes" directory doesn't exists, javac fails
             if (!Directory.Exists(classesDir))
                 Directory.CreateDirectory(classesDir);
@@ -530,6 +561,37 @@ namespace MonoEmbeddinator4000
                 }
             }
 
+            //Embed mono.android.jar into our jar file
+            if (Options.Compilation.Platform == TargetPlatform.Android)
+            {
+                using (var stream = File.OpenRead(Path.Combine(GetMonoDroidPath(), "lib", "xbuild-frameworks", "MonoAndroid", XamarinAndroidBuild.TargetFrameworkVersion, "mono.android.jar")))
+                using (var zip = new ZipArchive(stream))
+                {
+                    foreach (var entry in zip.Entries)
+                    {
+                        //Skip META-INF
+                        if (entry.FullName.StartsWith("META-INF", StringComparison.Ordinal))
+                            continue;
+
+                        var entryPath = Path.Combine(classesDir, entry.FullName);
+
+                        if (string.IsNullOrEmpty(entry.Name))
+                        {
+                            if (!Directory.Exists(entryPath))
+                                Directory.CreateDirectory(entryPath);
+                        }
+                        else
+                        {
+                            using (var zipEntryStream = entry.Open())
+                            using (var fileStream = File.Create(entryPath))
+                            {
+                                zipEntryStream.CopyTo(fileStream);
+                            }
+                        }
+                    }
+                }
+            }
+
             var invocation = string.Join(" ", args);
             var output = Invoke(jar, invocation);
             return output.ExitCode == 0;
@@ -542,6 +604,8 @@ namespace MonoEmbeddinator4000
             var classesDir = Path.Combine(Options.OutputDir, "classes");
             var androidDir = Path.Combine(Options.OutputDir, "android");
             var name = Path.GetFileNameWithoutExtension(Project.Assemblies[0]).Replace('-', '_');
+            var monoDroidPath = GetMonoDroidPath();
+            var monoDroidLibPath = GetMonoDroidLibPath();
 
             var args = new List<string> {
                 "cvf",
@@ -549,33 +613,27 @@ namespace MonoEmbeddinator4000
                 $"-C {androidDir} ."
             };
 
-            //Create an AndroidManifest.xml
-            File.WriteAllText(Path.Combine(androidDir, "AndroidManifest.xml"),
-$@"<?xml version=""1.0"" encoding=""utf-8""?>
-<manifest xmlns:android=""http://schemas.android.com/apk/res/android""
-    package=""com.{name}_dll""
-    android:versionCode=""1""
-    android:versionName=""1.0"" >
-
-    <uses-sdk
-        android:minSdkVersion=""9""
-        android:targetSdkVersion=""25"" />
-
-</manifest>");
-
-            //Copy libmonosgen-2.0.so
+            //Copy libmonosgen-2.0.so and libmonodroid.so
             const string libMonoSgen = "libmonosgen-2.0.so";
-            var monoDroidPath = GetMonoDroidLibPath();
-            foreach (var abi in Directory.GetDirectories(monoDroidPath))
+            const string libMonoAndroid = "libmono-android.release.so";
+
+            foreach (var abi in Directory.GetDirectories(monoDroidLibPath))
             {
                 var abiDir = Path.Combine(androidDir, "jni", Path.GetFileName(abi));
-                var libDestPath = Path.Combine(abiDir, libMonoSgen);
-                var libSourcePath = Path.Combine(abi, libMonoSgen);
-                if (!File.Exists(libSourcePath))
+
+                string libMonoSgenSourcePath = Path.Combine(abi, libMonoSgen);
+                string libMonoSgenDestPath = Path.Combine(abiDir, libMonoSgen);
+
+                string libMonoAndroidSourcePath = Path.Combine(abi, libMonoAndroid);
+                string libMonoAndroidDestPath = Path.Combine(abiDir, "libmonodroid.so"); //NOTE: Xamarin.Android runtime uses different name from APK
+
+                if (!File.Exists(libMonoSgenSourcePath) || !File.Exists(libMonoAndroidSourcePath))
                     continue;
+
                 if (!Directory.Exists(abiDir))
                     Directory.CreateDirectory(abiDir);
-                File.Copy(libSourcePath, libDestPath, true);
+                File.Copy(libMonoSgenSourcePath, libMonoSgenDestPath, true);
+                File.Copy(libMonoAndroidSourcePath, libMonoAndroidDestPath, true);
             }
 
             //Copy JNA native libs
@@ -648,18 +706,22 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
                 }
             }
 
-            string frameworkPath = MonoDroidSdk.FrameworkPath;
-            foreach (var reference in referencedAssemblies)
-            {
-                var referencePath = Path.Combine(frameworkPath, reference + ".dll");
-                if (File.Exists(referencePath))
-                {
-                    File.Copy(referencePath, Path.Combine(assembliesDir, reference + ".dll"), true);
-                }
-            }
+            Diagnostics.Message("Linking assemblies...");
+
+            //Performs Xamarin.Android build tasks such as Linking, Resource/Asset extraction, invoking aapt.
+            var project = XamarinAndroidBuild.GeneratePackageProject(Assemblies, monoDroidPath, Options.OutputDir, assembliesDir);
+            if (!MSBuild(project))
+                return false;
 
             var invocation = string.Join(" ", args);
             var output = Invoke(jar, invocation);
+            return output.ExitCode == 0;
+        }
+
+        bool MSBuild(string project)
+        {
+            var msbuild = Platform.IsWindows ? "MSBuild.exe" : "/Library/Frameworks/Mono.framework/Versions/Current/Commands/msbuild";
+            var output = Invoke(msbuild, $"/nologo /verbosity:minimal {project}");
             return output.ExitCode == 0;
         }
 
@@ -813,12 +875,29 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
             return output.ExitCode == 0;
         }
 
+        string GetMonoDroidPath()
+        {
+            string external = Path.Combine(FindDirectory("external"), "Xamarin.Android");
+            if (Directory.Exists(external))
+                return external;
+
+            string binPath = MonoDroidSdk.BinPath;
+
+            //On Windows, it is generally correct, but probe for "lib"
+            if (File.Exists(Path.Combine(binPath, "lib")))
+                return Path.GetFullPath(MonoDroidSdk.BinPath);
+
+            //On Mac, it is up one directory from BinPath
+            return Path.GetFullPath(Path.Combine(MonoDroidSdk.BinPath, ".."));
+        }
+
         string GetMonoDroidLibPath()
         {
-            var monoDroidPath = Path.Combine(MonoDroidSdk.BinPath, "..", "lib", "xbuild", "Xamarin", "Android", "lib");
-            if (!Directory.Exists(monoDroidPath))
-                monoDroidPath = Path.Combine(MonoDroidSdk.BinPath, "lib");
-            return monoDroidPath;
+            var basePath = GetMonoDroidPath();
+            var libPath = Path.Combine(basePath, "lib", "xbuild", "Xamarin", "Android", "lib");
+            if (!Directory.Exists(libPath))
+                libPath = Path.Combine(basePath, "lib");
+            return libPath;
         }
 
         bool CompileNDK(IEnumerable<string> files)
@@ -871,7 +950,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
                     $"--sysroot=\"{systemInclude}\"{extra}",
                     $"-D{DLLExportDefine}",
                     $"-I\"{monoPath}\"",
-                    $"-L\"{monoDroidPath}\" -lmonosgen-2.0",
+                    $"-L\"{monoDroidPath}\" -lmonosgen-2.0 -lmono-android.release",
                     string.Join(" ", files.ToList()),
                     "--std=c99",
                     $"-shared -o {outputPath}",

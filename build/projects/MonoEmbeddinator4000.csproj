@@ -40,6 +40,9 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.IO.Compression" />
+    <Reference Include="Microsoft.Build.Engine" />
+    <Reference Include="Microsoft.Build" />
+    <Reference Include="Microsoft.Build.Framework" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="../../binder/CLI.cs">
@@ -149,6 +152,9 @@
     </Compile>
     <Compile Include="../../binder/Utils/Utils.cs">
       <Link>binder/Utils/Utils.cs</Link>
+    </Compile>
+    <Compile Include="../../binder/Utils/XamarinAndroidBuild.cs">
+      <Link>binder/Utils/XamarinAndroidBuild.cs</Link>
     </Compile>
   </ItemGroup>
   <ItemGroup>
