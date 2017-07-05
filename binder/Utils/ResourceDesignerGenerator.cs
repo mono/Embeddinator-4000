@@ -179,7 +179,7 @@ namespace MonoEmbeddinator4000
             return true;
         }
 
-        public void WriteSource()
+        public string WriteSource()
         {
             string resourcePath = Path.Combine(OutputDirectory, "Resource.designer.cs");
             using (var stream = File.Create(resourcePath))
@@ -187,6 +187,7 @@ namespace MonoEmbeddinator4000
             {
                 csc.GenerateCodeFromCompileUnit(unit, writer, options);
             }
+            return resourcePath;
         }
 
         public string ToSource()

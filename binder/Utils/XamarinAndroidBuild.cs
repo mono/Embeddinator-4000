@@ -83,7 +83,8 @@ namespace MonoEmbeddinator4000
             if (!resourceDesigner.WriteAssembly())
             {
                 //Let's generate CS if this failed
-                resourceDesigner.WriteSource();
+                string resourcePath = resourceDesigner.WriteSource();
+                throw new Exception($"Resource.designer.dll compilation failed! See {resourcePath} for details.");
             }
 
             //ResolveAssemblies Task
