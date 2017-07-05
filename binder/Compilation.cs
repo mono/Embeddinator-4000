@@ -908,7 +908,6 @@ namespace MonoEmbeddinator4000
             var name = Path.GetFileNameWithoutExtension(Project.Assemblies[0]);
             var libName = $"lib{name}.so";
             var ndkPath = AndroidSdk.AndroidNdkPath;
-            var monoDroidSdkPath = GetMonoDroidPath();
 
             foreach (var abi in new[] { "armeabi", "armeabi-v7a", "arm64-v8a", "x86", "x86_64" })
             {
