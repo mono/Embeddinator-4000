@@ -44,6 +44,10 @@ To run on Windows, open powershell and run:
 ```
 .\build.ps1
 ```
+Or cmd in Windows:
+```
+powershell -File build.ps1
+```
 To run on OS X:
 ```
 ./build.sh
