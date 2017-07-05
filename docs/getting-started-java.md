@@ -16,7 +16,7 @@ For Windows:
 * Windows 10 SDK
 
 For Android:
-* Xamarin.Android 7.4.99 or later (build from Jenkins)
+* Xamarin.Android 7.4.99 or later (build from [Jenkins](https://jenkins.mono-project.com/view/Xamarin.Android/job/xamarin-android/lastSuccessfulBuild/Azure/))
 * Android Studio 2.3.2 or later
 
 Optionally you can install [Xamarin Studio](https://developer.xamarin.com/guides/cross-platform/xamarin-studio/) or the new [Visual Studio for Mac](https://www.visualstudio.com/vs/visual-studio-mac/) to edit and compile your C# code. The rest of the getting started guide assume you'll be using **Visual Studio for Mac**.
