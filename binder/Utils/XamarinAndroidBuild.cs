@@ -1,14 +1,10 @@
 using System;
-using System.CodeDom;
-using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Microsoft.Build.Construction;
 using Microsoft.Build.Evaluation;
-using Microsoft.Build.Execution;
 using Xamarin.Android.Tools;
-using CppSharp;
 
 namespace MonoEmbeddinator4000
 {
@@ -49,152 +45,7 @@ namespace MonoEmbeddinator4000
             resolveAssemblies.AddOutputItem("ResolvedFrameworkAssemblies", "ResolvedFrameworkAssemblies");
         }
 
-        static string ToJavaName(string name)
-        {
-            //NOTE: aapt seems to modify the names for Java, examples so far:
-            // customView -> customview
-            // Theme -> Theme
-            // Theme_hello -> Theme_hello
-            return name[0] + name.Substring(1, name.Length - 1).ToLowerInvariant();
-        }
 
-        static void GenerateResourceDesigner(List<IKVM.Reflection.Assembly> assemblies, string monoDroidPath, string mainAssembly, string outputDirectory, string packageName)
-        {
-            var unit = new CodeCompileUnit();
-            unit.AssemblyCustomAttributes.Add(new CodeAttributeDeclaration("Android.Runtime.ResourceDesignerAttribute",
-                new CodeAttributeArgument(new CodeSnippetExpression("\"__embeddinator__.Resource\"")),
-                new CodeAttributeArgument("IsApplication", new CodeSnippetExpression("true"))));
-
-            var ns = new CodeNamespace("__embeddinator__");
-            ns.Imports.Add(new CodeNamespaceImport("System"));
-            ns.Imports.Add(new CodeNamespaceImport("Android.Runtime"));
-            unit.Namespaces.Add(ns);
-
-            var resource = new CodeTypeDeclaration("Resource")
-            {
-                Attributes = MemberAttributes.Public,
-            };
-            ns.Types.Add(resource);
-
-            resource.CustomAttributes.Add(new CodeAttributeDeclaration("System.CodeDom.Compiler.GeneratedCodeAttribute",
-                new CodeAttributeArgument(new CodeSnippetExpression("\"Xamarin.Android.Build.Tasks\"")),
-                new CodeAttributeArgument(new CodeSnippetExpression("\"1.0.0.0\""))));
-            
-            var readFieldInt = new CodeMemberMethod
-            {
-                Name = "ReadFieldInt",
-                Attributes = MemberAttributes.Private | MemberAttributes.Static,
-                ReturnType = new CodeTypeReference("Int32"),
-            };
-            readFieldInt.Parameters.Add(new CodeParameterDeclarationExpression("IntPtr", "R"));
-            readFieldInt.Parameters.Add(new CodeParameterDeclarationExpression("String", "fieldName"));
-            resource.Members.Add(readFieldInt);
-
-            readFieldInt.Statements.Add(new CodeAssignStatement(
-                new CodeSnippetExpression("IntPtr fieldId"),
-                new CodeSnippetExpression("JNIEnv.GetStaticFieldID(R, fieldName, \"I\")")));
-            readFieldInt.Statements.Add(new CodeMethodReturnStatement(new CodeSnippetExpression("JNIEnv.GetStaticIntField(R, fieldId)")));
-
-            var readFieldArray = new CodeMemberMethod
-            {
-                Name = "ReadFieldArray",
-                Attributes = MemberAttributes.Private | MemberAttributes.Static,
-                ReturnType = new CodeTypeReference("Int32[]"),
-            };
-            readFieldArray.Parameters.Add(new CodeParameterDeclarationExpression("IntPtr", "R"));
-            readFieldArray.Parameters.Add(new CodeParameterDeclarationExpression("String", "fieldName"));
-            resource.Members.Add(readFieldArray);
-
-            readFieldArray.Statements.Add(new CodeAssignStatement(
-                new CodeSnippetExpression("IntPtr fieldId"),
-                new CodeSnippetExpression("JNIEnv.GetStaticFieldID(R, fieldName, \"[I\")")));
-            readFieldArray.Statements.Add(new CodeAssignStatement(
-                new CodeSnippetExpression("IntPtr value"),
-                new CodeSnippetExpression("JNIEnv.GetStaticObjectField(R, fieldId)")));
-            readFieldArray.Statements.Add(new CodeMethodReturnStatement(new CodeSnippetExpression("JNIEnv.GetArray<Int32>(value)")));
-
-            var updateIdValues = new CodeMemberMethod
-            {
-                Name = "UpdateIdValues",
-                Attributes = MemberAttributes.Public | MemberAttributes.Static,
-            };
-            resource.Members.Add(updateIdValues);
-
-            updateIdValues.Statements.Add(new CodeVariableDeclarationStatement("IntPtr", "R"));
-
-            foreach (var assembly in assemblies)
-            {
-                foreach (var type in assembly.DefinedTypes)
-                {
-                    if (type.Name == "Resource" &&
-                        type.CustomAttributes.Any(a =>
-                                                  a.AttributeType.FullName == "System.CodeDom.Compiler.GeneratedCodeAttribute" &&
-                                                  a.ConstructorArguments.Count > 0 &&
-                                                  a.ConstructorArguments[0].Value.ToString() == "Xamarin.Android.Build.Tasks"))
-                    {
-                        foreach (var nested in type.DeclaredNestedTypes)
-                        {
-                            if (nested.DeclaredFields.Any())
-                            {
-                                string innerClass = nested.Name == "Attribute" ? "attr" : nested.Name.ToLowerInvariant();
-                                updateIdValues.Statements.Add(new CodeAssignStatement(
-                                    new CodeSnippetExpression("R"),
-                                    new CodeSnippetExpression($"JNIEnv.FindClass(\"{packageName}.R${innerClass}\")")));
-
-                                foreach (var field in nested.DeclaredFields)
-                                {
-                                    CodeSnippetExpression right, left = new CodeSnippetExpression(type.FullName + "." + nested.Name + "." + field.Name);
-                                    if (field.FieldType.FullName == "System.Int32")
-                                    {
-                                        right = new CodeSnippetExpression($"{readFieldInt.Name}(R, \"{ToJavaName(field.Name)}\")");
-                                    }
-                                    else if (field.FieldType.FullName == "System.Int32[]")
-                                    {
-                                        right = new CodeSnippetExpression($"{readFieldArray.Name}(R, \"{ToJavaName(field.Name)}\")");
-                                    }
-                                    else
-                                    {
-                                        throw new Exception($"Type {field.FieldType.FullName} from member {nested.FullName}.{field.Name} not supported for Resource fields!");
-                                    }
-                                    updateIdValues.Statements.Add(new CodeAssignStatement(left, right));
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            var csc = new Microsoft.CSharp.CSharpCodeProvider();
-            var parameters = new CompilerParameters
-            {
-                //NOTE: we place this assembly in the output directory, the linker will move it to the final folder
-                OutputAssembly = Path.Combine(outputDirectory, "Resource.designer.dll"),
-            };
-            parameters.ReferencedAssemblies.Add(Path.Combine(monoDroidPath, "lib", "xbuild-frameworks", "MonoAndroid", "v1.0", "System.dll"));
-            parameters.ReferencedAssemblies.Add(Path.Combine(monoDroidPath, "lib", "xbuild-frameworks", "MonoAndroid", "v1.0", "Facades", "System.Runtime.dll"));
-            parameters.ReferencedAssemblies.Add(Path.Combine(monoDroidPath, "lib", "xbuild-frameworks", "MonoAndroid", "v1.0", "Java.Interop.dll"));
-            parameters.ReferencedAssemblies.Add(Path.Combine(monoDroidPath, "lib", "xbuild-frameworks", "MonoAndroid", TargetFrameworkVersion, "Mono.Android.dll"));
-            parameters.ReferencedAssemblies.Add(mainAssembly);
-
-            var results = csc.CompileAssemblyFromDom(parameters, unit);
-            if (results.Errors.HasErrors)
-            {
-                foreach (var error in results.Errors)
-                {
-                    Diagnostics.Error("Error: {0}", error);
-                }
-
-                //Let's generate CS if this failed
-                string resourcePath = Path.Combine(outputDirectory, "Resource.designer.cs");
-                using (var stream = File.Create(resourcePath))
-                using (var writer = new StreamWriter(stream))
-                {
-                    csc.GenerateCodeFromCompileUnit(unit, writer, new CodeGeneratorOptions());
-                }
-
-                throw new Exception($"Resource.designer.dll compilation failed! See {resourcePath} for details.");
-            }
-        }
 
         /// <summary>
         /// Generates a Package.proj file for MSBuild to invoke
@@ -221,7 +72,19 @@ namespace MonoEmbeddinator4000
             var target = project.AddTarget("Build");
 
             //Generate Resource.designer.dll
-            GenerateResourceDesigner(assemblies, monoDroidPath, mainAssembly, outputDirectory, packageName);
+            var resourceDesigner = new ResourceDesignerGenerator
+            {
+                Assemblies = assemblies,
+                MonoDroidPath = monoDroidPath,
+                MainAssembly = mainAssembly,
+                OutputDirectory = outputDirectory,
+                PackageName = packageName,
+            };
+            if (!resourceDesigner.WriteAssembly())
+            {
+                //Let's generate CS if this failed
+                resourceDesigner.WriteSource();
+            }
 
             //ResolveAssemblies Task
             ResolveAssemblies(target, monoDroidPath, mainAssembly);

@@ -45,6 +45,9 @@
     <Reference Include="Microsoft.Build.Framework" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="../../binder/AssemblyInfo.cs">
+      <Link>binder/AssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="../../binder/CLI.cs">
       <Link>binder/CLI.cs</Link>
     </Compile>
@@ -155,6 +158,9 @@
     </Compile>
     <Compile Include="../../binder/Utils/XamarinAndroidBuild.cs">
       <Link>binder/Utils/XamarinAndroidBuild.cs</Link>
+    </Compile>
+    <Compile Include="../../binder/Utils/ResourceDesignerGenerator.cs">
+      <Link>binder/Utils/ResourceDesignerGenerator.cs</Link>
     </Compile>
   </ItemGroup>
   <ItemGroup>
