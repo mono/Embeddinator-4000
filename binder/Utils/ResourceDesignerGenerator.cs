@@ -33,13 +33,16 @@ namespace MonoEmbeddinator4000
 
         public string PackageName { get; set; }
 
-        public static string ToJavaName(string name)
+        public static class Java
         {
-            //NOTE: aapt seems to modify the names for Java, examples so far:
-            // customView -> customview
-            // Theme -> Theme
-            // Theme_hello -> Theme_hello
-            return name[0] + name.Substring(1, name.Length - 1).ToLowerInvariant();
+            public static string ToJavaName(string name)
+            {
+                //NOTE: aapt seems to modify the names for Java, examples so far:
+                // customView -> customview
+                // Theme -> Theme
+                // Theme_hello -> Theme_hello
+                return name[0] + name.Substring(1, name.Length - 1).ToLowerInvariant();
+            }
         }
 
         public void Generate()
@@ -129,11 +132,11 @@ namespace MonoEmbeddinator4000
                                     CodeSnippetExpression right, left = new CodeSnippetExpression(type.FullName + "." + nested.Name + "." + field.Name);
                                     if (field.FieldType.FullName == "System.Int32")
                                     {
-                                        right = new CodeSnippetExpression($"{readFieldInt.Name}(R, \"{ToJavaName(field.Name)}\")");
+                                        right = new CodeSnippetExpression($"{readFieldInt.Name}(R, \"{Java.ToJavaName(field.Name)}\")");
                                     }
                                     else if (field.FieldType.FullName == "System.Int32[]")
                                     {
-                                        right = new CodeSnippetExpression($"{readFieldArray.Name}(R, \"{ToJavaName(field.Name)}\")");
+                                        right = new CodeSnippetExpression($"{readFieldArray.Name}(R, \"{Java.ToJavaName(field.Name)}\")");
                                     }
                                     else
                                     {

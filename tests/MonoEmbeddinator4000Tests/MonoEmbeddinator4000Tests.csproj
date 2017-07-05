@@ -31,6 +31,15 @@
     <Reference Include="nunit.framework">
       <HintPath>..\..\packages\NUnit.3.6.1\lib\net45\nunit.framework.dll</HintPath>
     </Reference>
+    <Reference Include="ApprovalUtilities">
+      <HintPath>..\..\packages\ApprovalUtilities.3.0.13\lib\net45\ApprovalUtilities.dll</HintPath>
+    </Reference>
+    <Reference Include="ApprovalUtilities.Net45">
+      <HintPath>..\..\packages\ApprovalUtilities.3.0.13\lib\net45\ApprovalUtilities.Net45.dll</HintPath>
+    </Reference>
+    <Reference Include="ApprovalTests">
+      <HintPath>..\..\packages\ApprovalTests.3.0.13\lib\net40\ApprovalTests.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -52,6 +61,7 @@
   <ItemGroup>
     <Compile Include="ResourceDesignerTest.cs" />
     <Compile Include="Helpers\Samples.cs" />
+    <Compile Include="JavaNameTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="ResourceDesigner\" />

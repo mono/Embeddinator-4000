@@ -1,10 +1,15 @@
-﻿using NUnit.Framework;
-using System;
+﻿using System;
 using System.IO;
+using ApprovalTests;
+using ApprovalTests.Reporters;
+using NUnit.Framework;
 
 namespace MonoEmbeddinator4000.Tests
 {
-    [TestFixture]
+    /// <summary>
+    /// These are a set of integration/approval tests validating that we are getting expected C# code from ResourceDesignerGenerator
+    /// </summary>
+    [TestFixture, UseReporter(typeof(NUnitReporter))]
     public class ResourceDesignerTest
     {
         ResourceDesignerGenerator generator;
@@ -23,36 +28,34 @@ namespace MonoEmbeddinator4000.Tests
         [TearDown]
         public void TearDown()
         {
-            try
-            {
-                //Temp file
-                File.Delete(generator.MainAssembly);
-            }
-            catch { }
+            //Temp file
+            File.Delete(generator.MainAssembly);
+        }
+
+        void LoadAndGenerate(string resourceFile)
+        {
+            var assembly = Samples.LoadFile(resourceFile);
+            generator.Assemblies = new[] { assembly };
+            generator.MainAssembly = assembly.Location;
+            generator.Generate();
         }
 
         [Test]
         public void String()
         {
-            var assembly = Samples.LoadFile("String");
-            generator.Assemblies = new[] { assembly };
-            generator.MainAssembly = assembly.Location;
-            generator.Generate();
+            LoadAndGenerate("String");
 
             string source = generator.ToSource();
-            Assert.AreNotEqual("", source);
+            Approvals.Verify(source);
         }
 
         [Test]
         public void Full()
         {
-            var assembly = Samples.LoadFile("Full");
-            generator.Assemblies = new[] { assembly };
-            generator.MainAssembly = assembly.Location;
-            generator.Generate();
+            LoadAndGenerate("Full");
 
             string source = generator.ToSource();
-            Assert.AreNotEqual("", source);
+            Approvals.Verify(source);
         }
     }
 }
