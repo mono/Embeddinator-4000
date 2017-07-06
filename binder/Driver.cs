@@ -1,4 +1,4 @@
-﻿﻿using System;
+﻿﻿﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
@@ -199,7 +199,7 @@ namespace MonoEmbeddinator4000
                               ca.ConstructorArguments.FirstOrDefault().Value.ToString().StartsWith("MonoAndroid,", StringComparison.Ordinal))))
                 {
                     Diagnostics.Message("Generating Java stubs...");
-                    var project = XamarinAndroidBuild.GenerateJavaStubsProject(Assemblies, XamarinAndroid.Path, Options.OutputDir);
+                    var project = XamarinAndroidBuild.GenerateJavaStubsProject(Assemblies, Options.OutputDir);
                     if (!MSBuild(project))
                         return false;
                 }

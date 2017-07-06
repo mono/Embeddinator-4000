@@ -25,8 +25,6 @@ namespace MonoEmbeddinator4000
 
         public IList<IKVM.Reflection.Assembly> Assemblies { get; set; }
 
-        public string MonoDroidPath { get; set; }
-
         public string MainAssembly { get; set; }
 
         public string OutputDirectory { get; set; }
@@ -160,10 +158,11 @@ namespace MonoEmbeddinator4000
                 //NOTE: we place this assembly in the output directory, the linker will move it to the final folder
                 OutputAssembly = Path.Combine(OutputDirectory, "Resource.designer.dll"),
             };
-            parameters.ReferencedAssemblies.Add(Path.Combine(MonoDroidPath, "lib", "xbuild-frameworks", "MonoAndroid", "v1.0", "System.dll"));
-            parameters.ReferencedAssemblies.Add(Path.Combine(MonoDroidPath, "lib", "xbuild-frameworks", "MonoAndroid", "v1.0", "Facades", "System.Runtime.dll"));
-            parameters.ReferencedAssemblies.Add(Path.Combine(MonoDroidPath, "lib", "xbuild-frameworks", "MonoAndroid", "v1.0", "Java.Interop.dll"));
-            parameters.ReferencedAssemblies.Add(Path.Combine(MonoDroidPath, "lib", "xbuild-frameworks", "MonoAndroid", XamarinAndroid.TargetFrameworkVersion, "Mono.Android.dll"));
+            string monoDroidPath = XamarinAndroid.Path;
+            parameters.ReferencedAssemblies.Add(Path.Combine(monoDroidPath, "lib", "xbuild-frameworks", "MonoAndroid", "v1.0", "System.dll"));
+            parameters.ReferencedAssemblies.Add(Path.Combine(monoDroidPath, "lib", "xbuild-frameworks", "MonoAndroid", "v1.0", "Facades", "System.Runtime.dll"));
+            parameters.ReferencedAssemblies.Add(Path.Combine(monoDroidPath, "lib", "xbuild-frameworks", "MonoAndroid", "v1.0", "Java.Interop.dll"));
+            parameters.ReferencedAssemblies.Add(Path.Combine(monoDroidPath, "lib", "xbuild-frameworks", "MonoAndroid", XamarinAndroid.TargetFrameworkVersion, "Mono.Android.dll"));
             parameters.ReferencedAssemblies.Add(MainAssembly);
 
             var results = csc.CompileAssemblyFromDom(parameters, unit);

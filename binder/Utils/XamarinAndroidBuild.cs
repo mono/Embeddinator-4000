@@ -15,8 +15,9 @@ namespace MonoEmbeddinator4000
     {
         const string LinkMode = "SdkOnly";
 
-        static ProjectRootElement CreateProject(string monoDroidPath)
+        static ProjectRootElement CreateProject()
         {
+            var monoDroidPath = XamarinAndroid.Path;
             var msBuildPath = Path.Combine(monoDroidPath, "lib", "xbuild", "Xamarin", "Android");
             if (!msBuildPath.EndsWith(Path.DirectorySeparatorChar.ToString(), StringComparison.OrdinalIgnoreCase))
                 msBuildPath = msBuildPath + Path.DirectorySeparatorChar;
@@ -31,10 +32,10 @@ namespace MonoEmbeddinator4000
             return project;
         }
 
-        static void ResolveAssemblies(ProjectTargetElement target, string monoDroidPath, string mainAssembly)
+        static void ResolveAssemblies(ProjectTargetElement target, string mainAssembly)
         {
             //NOTE: [Export] requires Mono.Android.Export.dll
-            string monoAndroidExport = Path.Combine(monoDroidPath, "lib", "xbuild-frameworks", "MonoAndroid", XamarinAndroid.TargetFrameworkVersion, "Mono.Android.Export.dll");
+            string monoAndroidExport = Path.Combine(XamarinAndroid.Path, "lib", "xbuild-frameworks", "MonoAndroid", XamarinAndroid.TargetFrameworkVersion, "Mono.Android.Export.dll");
 
             var resolveAssemblies = target.AddTask("ResolveAssemblies");
             resolveAssemblies.SetParameter("Assemblies", mainAssembly + ";" + monoAndroidExport);
@@ -55,7 +56,7 @@ namespace MonoEmbeddinator4000
         /// - Invokes aapt to generate R.txt
         /// - One day I would like to get rid of the temp files, but I could not get the MSBuild APIs to work in-process
         /// </summary>
-        public static string GeneratePackageProject(List<IKVM.Reflection.Assembly> assemblies, string monoDroidPath, string outputDirectory, string assembliesDirectory)
+        public static string GeneratePackageProject(List<IKVM.Reflection.Assembly> assemblies, string outputDirectory, string assembliesDirectory)
         {
             var mainAssembly = assemblies[0].Location;
             outputDirectory = Path.GetFullPath(outputDirectory);
@@ -67,14 +68,13 @@ namespace MonoEmbeddinator4000
             var resourceDir = Path.Combine(androidDir, "res");
             var manifestPath = Path.Combine(androidDir, "AndroidManifest.xml");
             var packageName = "com." + Path.GetFileNameWithoutExtension(mainAssembly).Replace('-', '_') + "_dll";
-            var project = CreateProject(monoDroidPath);
+            var project = CreateProject();
             var target = project.AddTarget("Build");
 
             //Generate Resource.designer.dll
             var resourceDesigner = new ResourceDesignerGenerator
             {
                 Assemblies = assemblies,
-                MonoDroidPath = monoDroidPath,
                 MainAssembly = mainAssembly,
                 OutputDirectory = outputDirectory,
                 PackageName = packageName,
@@ -89,7 +89,7 @@ namespace MonoEmbeddinator4000
             }
 
             //ResolveAssemblies Task
-            ResolveAssemblies(target, monoDroidPath, mainAssembly);
+            ResolveAssemblies(target, mainAssembly);
 
             //LinkAssemblies Task
             var linkAssemblies = target.AddTask("LinkAssemblies");
@@ -180,7 +180,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
         /// - Generates AndroidManifest.xml
         /// - One day I would like to get rid of the temp files, but I could not get the MSBuild APIs to work in-process
         /// </summary>
-        public static string GenerateJavaStubsProject(List<IKVM.Reflection.Assembly> assemblies, string monoDroidPath, string outputDirectory)
+        public static string GenerateJavaStubsProject(List<IKVM.Reflection.Assembly> assemblies, string outputDirectory)
         {
             var mainAssembly = assemblies[0].Location;
             outputDirectory = Path.GetFullPath(outputDirectory);
@@ -195,11 +195,11 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
             //AndroidManifest.xml template
             GenerateAndroidManifest(assemblies, manifestPath, false);
 
-            var project = CreateProject(monoDroidPath);
+            var project = CreateProject();
             var target = project.AddTarget("Build");
 
             //ResolveAssemblies Task
-            ResolveAssemblies(target, monoDroidPath, mainAssembly);
+            ResolveAssemblies(target, mainAssembly);
 
             //GenerateJavaStubs Task
             var generateJavaStubs = target.AddTask("GenerateJavaStubs");

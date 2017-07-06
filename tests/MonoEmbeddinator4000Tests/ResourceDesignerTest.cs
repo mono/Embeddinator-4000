@@ -17,7 +17,6 @@ namespace MonoEmbeddinator4000.Tests
         {
             generator = new ResourceDesignerGenerator
             {
-                MonoDroidPath = Samples.MonoDroidPath,
                 OutputDirectory = Environment.CurrentDirectory,
                 PackageName = "com.mono.embeddinator",
             };
