@@ -584,8 +584,6 @@ namespace MonoEmbeddinator4000
             var classesDir = Path.Combine(Options.OutputDir, "classes");
             var androidDir = Path.Combine(Options.OutputDir, "android");
             var name = Path.GetFileNameWithoutExtension(Project.Assemblies[0]).Replace('-', '_');
-            var monoDroidPath = XamarinAndroid.Path;
-            var monoDroidLibPath = XamarinAndroid.LibraryPath;
 
             var args = new List<string> {
                 "cvf",
@@ -597,7 +595,7 @@ namespace MonoEmbeddinator4000
             const string libMonoSgen = "libmonosgen-2.0.so";
             const string libMonoAndroid = "libmono-android.release.so";
 
-            foreach (var abi in Directory.GetDirectories(monoDroidLibPath))
+            foreach (var abi in Directory.GetDirectories(XamarinAndroid.LibraryPath))
             {
                 var abiDir = Path.Combine(androidDir, "jni", Path.GetFileName(abi));
 
