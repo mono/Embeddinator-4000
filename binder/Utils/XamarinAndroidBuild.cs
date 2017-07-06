@@ -79,6 +79,8 @@ namespace MonoEmbeddinator4000
                 OutputDirectory = outputDirectory,
                 PackageName = packageName,
             };
+            resourceDesigner.Generate();
+
             if (!resourceDesigner.WriteAssembly())
             {
                 //Let's generate CS if this failed
