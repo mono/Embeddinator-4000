@@ -156,6 +156,9 @@
     <Compile Include="../../binder/Utils/Utils.cs">
       <Link>binder/Utils/Utils.cs</Link>
     </Compile>
+    <Compile Include="../../binder/Utils/XamarinAndroid.cs">
+      <Link>binder/Utils/XamarinAndroid.cs</Link>
+    </Compile>
     <Compile Include="../../binder/Utils/XamarinAndroidBuild.cs">
       <Link>binder/Utils/XamarinAndroidBuild.cs</Link>
     </Compile>

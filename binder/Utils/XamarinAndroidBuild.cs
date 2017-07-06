@@ -8,11 +8,11 @@ using Xamarin.Android.Tools;
 
 namespace MonoEmbeddinator4000
 {
+    /// <summary>
+    /// Contains everything MSBuild-related for Xamarin.Android
+    /// </summary>
     static class XamarinAndroidBuild
     {
-        public const string TargetFrameworkVersion = "v2.3";
-        public const string MinSdkVersion = "9";
-        public const string TargetSdkVersion = "25";
         const string LinkMode = "SdkOnly";
 
         static ProjectRootElement CreateProject(string monoDroidPath)
@@ -25,7 +25,7 @@ namespace MonoEmbeddinator4000
             project.AddProperty("TargetFrameworkDirectory", string.Join(";", 
                 Path.Combine(monoDroidPath, "lib", "xbuild-frameworks", "MonoAndroid", "v1.0"),
                 Path.Combine(monoDroidPath, "lib", "xbuild-frameworks", "MonoAndroid", "v1.0", "Facades"),
-                Path.Combine(monoDroidPath, "lib", "xbuild-frameworks", "MonoAndroid", TargetFrameworkVersion)));
+                Path.Combine(monoDroidPath, "lib", "xbuild-frameworks", "MonoAndroid", XamarinAndroid.TargetFrameworkVersion)));
             project.AddImport(ProjectCollection.Escape(Path.Combine(msBuildPath, "Xamarin.Android.CSharp.targets")));
 
             return project;
@@ -34,7 +34,7 @@ namespace MonoEmbeddinator4000
         static void ResolveAssemblies(ProjectTargetElement target, string monoDroidPath, string mainAssembly)
         {
             //NOTE: [Export] requires Mono.Android.Export.dll
-            string monoAndroidExport = Path.Combine(monoDroidPath, "lib", "xbuild-frameworks", "MonoAndroid", TargetFrameworkVersion, "Mono.Android.Export.dll");
+            string monoAndroidExport = Path.Combine(monoDroidPath, "lib", "xbuild-frameworks", "MonoAndroid", XamarinAndroid.TargetFrameworkVersion, "Mono.Android.Export.dll");
 
             var resolveAssemblies = target.AddTask("ResolveAssemblies");
             resolveAssemblies.SetParameter("Assemblies", mainAssembly + ";" + monoAndroidExport);
@@ -44,7 +44,6 @@ namespace MonoEmbeddinator4000
             resolveAssemblies.AddOutputItem("ResolvedUserAssemblies", "ResolvedUserAssemblies");
             resolveAssemblies.AddOutputItem("ResolvedFrameworkAssemblies", "ResolvedFrameworkAssemblies");
         }
-
 
 
         /// <summary>
@@ -137,7 +136,7 @@ namespace MonoEmbeddinator4000
             aapt.SetParameter("ResourceDirectory", resourceDir);
             aapt.SetParameter("ToolPath", AndroidSdk.GetBuildToolsPaths().First());
             aapt.SetParameter("ToolExe", "aapt");
-            aapt.SetParameter("ApiLevel", TargetSdkVersion);
+            aapt.SetParameter("ApiLevel", XamarinAndroid.TargetSdkVersion);
             aapt.SetParameter("ExtraArgs", "--output-text-symbols " + androidDir);
 
             //There is an extra /manifest/AndroidManifest.xml file created
@@ -165,7 +164,7 @@ namespace MonoEmbeddinator4000
             File.WriteAllText(path,
 $@"<?xml version=""1.0"" encoding=""utf-8""?>
 <manifest xmlns:android=""http://schemas.android.com/apk/res/android"" package=""com.{name}_dll"">
-    <uses-sdk android:minSdkVersion=""{MinSdkVersion}"" android:targetSdkVersion=""{TargetSdkVersion}"" />
+    <uses-sdk android:minSdkVersion=""{XamarinAndroid.MinSdkVersion}"" android:targetSdkVersion=""{XamarinAndroid.TargetSdkVersion}"" />
     <application>
         <meta-data android:name=""mono.embeddinator.mainassembly"" android:value=""{name}"" />
         {provider}
@@ -206,7 +205,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
             generateJavaStubs.SetParameter("ResolvedUserAssemblies", "@(ResolvedUserAssemblies)");
             generateJavaStubs.SetParameter("ManifestTemplate", manifestPath);
             generateJavaStubs.SetParameter("MergedAndroidManifestOutput", manifestPath);
-            generateJavaStubs.SetParameter("AndroidSdkPlatform", TargetSdkVersion); //TODO: should be an option
+            generateJavaStubs.SetParameter("AndroidSdkPlatform", XamarinAndroid.TargetSdkVersion); //TODO: should be an option
             generateJavaStubs.SetParameter("AndroidSdkDir", AndroidSdk.AndroidSdkPath);
             generateJavaStubs.SetParameter("OutputDirectory", outputDirectory);
             generateJavaStubs.SetParameter("ResourceDirectory", "$(MonoAndroidResDirIntermediate)");

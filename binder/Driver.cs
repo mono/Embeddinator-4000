@@ -51,9 +51,9 @@ namespace MonoEmbeddinator4000
             var parser = new Parser();
             if (Options.Compilation.Platform == TargetPlatform.Android)
             {
-                var monoDroidPath = GetMonoDroidPath();
+                var monoDroidPath = XamarinAndroid.Path;
                 parser.AddAssemblyResolveDirectory(Path.Combine(monoDroidPath, "lib", "xbuild-frameworks", "MonoAndroid", "v1.0"));
-                parser.AddAssemblyResolveDirectory(Path.Combine(monoDroidPath, "lib", "xbuild-frameworks", "MonoAndroid", "v2.3"));
+                parser.AddAssemblyResolveDirectory(Path.Combine(monoDroidPath, "lib", "xbuild-frameworks", "MonoAndroid", XamarinAndroid.TargetFrameworkVersion));
             }
 
             parser.OnAssemblyParsed += HandleAssemblyParsed;
@@ -198,10 +198,8 @@ namespace MonoEmbeddinator4000
                         ca => ca.AttributeType.FullName == "System.Runtime.Versioning.TargetFrameworkAttribute" &&
                               ca.ConstructorArguments.FirstOrDefault().Value.ToString().StartsWith("MonoAndroid,", StringComparison.Ordinal))))
                 {
-                    RefreshAndroidSdk();
-
                     Diagnostics.Message("Generating Java stubs...");
-                    var project = XamarinAndroidBuild.GenerateJavaStubsProject(Assemblies, GetMonoDroidPath(), Options.OutputDir);
+                    var project = XamarinAndroidBuild.GenerateJavaStubsProject(Assemblies, XamarinAndroid.Path, Options.OutputDir);
                     if (!MSBuild(project))
                         return false;
                 }

@@ -62,6 +62,7 @@
     <Compile Include="ResourceDesignerTest.cs" />
     <Compile Include="Helpers\Samples.cs" />
     <Compile Include="JavaNameTest.cs" />
+    <Compile Include="XamarinAndroidTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="ResourceDesigner\" />

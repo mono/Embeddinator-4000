@@ -71,5 +71,18 @@ namespace MonoEmbeddinator4000
                 CopyAll(sourceSubDir, nextTargetSubDir);
             }
         }
+
+        public static string FindDirectory(string dir)
+        {
+            for (int i = 0; i <= 3; i++)
+            {
+                if (Directory.Exists(dir))
+                    return Path.GetFullPath(dir);
+
+                dir = Path.Combine("..", dir);
+            }
+
+            throw new Exception($"Cannot find {Path.GetFileName(dir)}!");
+        }
     }
 }
