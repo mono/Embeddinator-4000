@@ -70,8 +70,12 @@ Task("Clean")
         CleanDirectory(buildDir);
     });
 
+Task("NuGet-Restore")
+    .Does(() => NuGetRestore("./generator.sln"));
+
 Task("Build-Binder")
     .IsDependentOn("Clean")
+    .IsDependentOn("NuGet-Restore")
     .Does(() =>
     {
         MSBuild("./build/projects/MonoEmbeddinator4000.csproj", settings => settings.SetConfiguration(configuration).SetVerbosity(Verbosity.Minimal));
@@ -79,6 +83,7 @@ Task("Build-Binder")
 
 Task("Build-Managed")
     .IsDependentOn("Clean")
+    .IsDependentOn("NuGet-Restore")
     .Does(() =>
     {
         MSBuild("./tests/managed/generic/managed-generic.csproj", settings => settings.SetConfiguration(configuration).SetVerbosity(Verbosity.Minimal));
@@ -86,6 +91,7 @@ Task("Build-Managed")
 
 Task("Build-Android")
     .IsDependentOn("Clean")
+    .IsDependentOn("NuGet-Restore")
     .Does(() =>
     {
         MSBuild("./tests/managed/android/managed-android.csproj", settings => settings.SetConfiguration(configuration).SetVerbosity(Verbosity.Minimal));
@@ -93,6 +99,7 @@ Task("Build-Android")
 
 Task("Build-PCL")
     .IsDependentOn("Clean")
+    .IsDependentOn("NuGet-Restore")
     .Does(() =>
     {
         MSBuild("./tests/managed/pcl/managed-pcl.csproj", settings => settings.SetConfiguration(configuration).SetVerbosity(Verbosity.Minimal));
@@ -203,6 +210,8 @@ Task("Generate-Android-PCL")
     });
 
 Task("Build-CSharp-Tests")
+    .IsDependentOn("Build-Binder")
+    .IsDependentOn("Build-Managed")
     .Does(() =>
     {
         MSBuild("./tests/MonoEmbeddinator4000Tests/MonoEmbeddinator4000Tests.csproj", settings => settings.SetConfiguration(configuration).SetVerbosity(Verbosity.Minimal));
