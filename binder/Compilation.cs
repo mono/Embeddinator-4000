@@ -431,7 +431,7 @@ namespace MonoEmbeddinator4000
                 var maxVersion = AndroidSdk.GetInstalledPlatformVersions().Select(m => m.ApiLevel).Max();
                 var androidDir = AndroidSdk.GetPlatformDirectory(maxVersion);
                 var androidJar = Path.Combine(androidDir, "android.jar");
-                var monoAndroidJar = Path.Combine(XamarinAndroid.Path, "lib", "xbuild-frameworks", "MonoAndroid", XamarinAndroid.TargetFrameworkVersion, "mono.android.jar");
+                var monoAndroidJar = XamarinAndroid.FindAssembly("mono.android.jar");
                 var delimiter = Platform.IsWindows ? ";" : ":";
                 args.Add("\"" + string.Join(delimiter, jnaJar, androidJar, monoAndroidJar) + "\"");
             }
@@ -544,7 +544,7 @@ namespace MonoEmbeddinator4000
             //Embed mono.android.jar into our jar file
             if (Options.Compilation.Platform == TargetPlatform.Android)
             {
-                using (var stream = File.OpenRead(Path.Combine(XamarinAndroid.Path, "lib", "xbuild-frameworks", "MonoAndroid", XamarinAndroid.TargetFrameworkVersion, "mono.android.jar")))
+                using (var stream = File.OpenRead(XamarinAndroid.FindAssembly("mono.android.jar")))
                 using (var zip = new ZipArchive(stream))
                 {
                     foreach (var entry in zip.Entries)

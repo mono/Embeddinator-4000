@@ -23,10 +23,7 @@ namespace MonoEmbeddinator4000
                 msBuildPath = msBuildPath + Path.DirectorySeparatorChar;
 
             var project = ProjectRootElement.Create();
-            project.AddProperty("TargetFrameworkDirectory", string.Join(";", 
-                Path.Combine(monoDroidPath, "lib", "xbuild-frameworks", "MonoAndroid", "v1.0"),
-                Path.Combine(monoDroidPath, "lib", "xbuild-frameworks", "MonoAndroid", "v1.0", "Facades"),
-                Path.Combine(monoDroidPath, "lib", "xbuild-frameworks", "MonoAndroid", XamarinAndroid.TargetFrameworkVersion)));
+            project.AddProperty("TargetFrameworkDirectory", string.Join(";", XamarinAndroid.TargetFrameworkDirectories));
             project.AddImport(ProjectCollection.Escape(Path.Combine(msBuildPath, "Xamarin.Android.CSharp.targets")));
 
             return project;
@@ -34,18 +31,15 @@ namespace MonoEmbeddinator4000
 
         static void ResolveAssemblies(ProjectTargetElement target, string mainAssembly)
         {
-            //NOTE: [Export] requires Mono.Android.Export.dll
-            string monoAndroidExport = Path.Combine(XamarinAndroid.Path, "lib", "xbuild-frameworks", "MonoAndroid", XamarinAndroid.TargetFrameworkVersion, "Mono.Android.Export.dll");
-
             var resolveAssemblies = target.AddTask("ResolveAssemblies");
-            resolveAssemblies.SetParameter("Assemblies", mainAssembly + ";" + monoAndroidExport);
+            //NOTE: [Export] requires Mono.Android.Export.dll
+            resolveAssemblies.SetParameter("Assemblies", mainAssembly + ";" + XamarinAndroid.FindAssembly("Mono.Android.Export.dll"));
             resolveAssemblies.SetParameter("LinkMode", LinkMode);
             resolveAssemblies.SetParameter("ReferenceAssembliesDirectory", "$(TargetFrameworkDirectory)");
             resolveAssemblies.AddOutputItem("ResolvedAssemblies", "ResolvedAssemblies");
             resolveAssemblies.AddOutputItem("ResolvedUserAssemblies", "ResolvedUserAssemblies");
             resolveAssemblies.AddOutputItem("ResolvedFrameworkAssemblies", "ResolvedFrameworkAssemblies");
         }
-
 
         /// <summary>
         /// Generates a Package.proj file for MSBuild to invoke

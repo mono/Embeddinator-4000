@@ -51,9 +51,10 @@ namespace MonoEmbeddinator4000
             var parser = new Parser();
             if (Options.Compilation.Platform == TargetPlatform.Android)
             {
-                var monoDroidPath = XamarinAndroid.Path;
-                parser.AddAssemblyResolveDirectory(Path.Combine(monoDroidPath, "lib", "xbuild-frameworks", "MonoAndroid", "v1.0"));
-                parser.AddAssemblyResolveDirectory(Path.Combine(monoDroidPath, "lib", "xbuild-frameworks", "MonoAndroid", XamarinAndroid.TargetFrameworkVersion));
+                foreach (var dir in XamarinAndroid.TargetFrameworkDirectories)
+                {
+                    parser.AddAssemblyResolveDirectory(dir);
+                }
             }
 
             parser.OnAssemblyParsed += HandleAssemblyParsed;

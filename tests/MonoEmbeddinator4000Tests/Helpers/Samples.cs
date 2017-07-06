@@ -24,9 +24,8 @@ namespace MonoEmbeddinator4000.Tests
             {
                 OutputAssembly = temp,
             };
-            var monoDroidPath = XamarinAndroid.Path;
-            parameters.ReferencedAssemblies.Add(Path.Combine(monoDroidPath, "lib", "xbuild-frameworks", "MonoAndroid", "v1.0", "System.dll"));
-            parameters.ReferencedAssemblies.Add(Path.Combine(monoDroidPath, "lib", "xbuild-frameworks", "MonoAndroid", XamarinAndroid.TargetFrameworkVersion, "Mono.Android.dll"));
+            parameters.ReferencedAssemblies.Add(XamarinAndroid.FindAssembly("System.dll"));
+            parameters.ReferencedAssemblies.Add(XamarinAndroid.FindAssembly("Mono.Android.dll"));
 
             var results = csc.CompileAssemblyFromSource(parameters, source);
 

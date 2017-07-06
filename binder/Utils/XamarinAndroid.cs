@@ -76,5 +76,33 @@ namespace MonoEmbeddinator4000
         {
             get { return libraryPath.Value; }
         }
+
+        static Lazy<string[]> targetFrameworks = new Lazy<string[]>(() => new[]
+        {
+            Combine(Path, "lib", "xbuild-frameworks", "MonoAndroid", "v1.0"),
+            Combine(Path, "lib", "xbuild-frameworks", "MonoAndroid", "v1.0", "Facades"),
+            Combine(Path, "lib", "xbuild-frameworks", "MonoAndroid", TargetFrameworkVersion)
+        });
+
+        public static string[] TargetFrameworkDirectories
+        {
+            get { return targetFrameworks.Value; }
+        }
+
+        /// <summary>
+        /// Finds a Xamarin.Android assembly in v1.0, v1.0/Facades, or TargetFrameworkVersion
+        /// NOTE: that this will also work for mono.android.jar
+        /// </summary>
+        public static string FindAssembly(string assemblyName)
+        {
+            foreach (var dir in TargetFrameworkDirectories)
+            {
+                string assemblyPath = Combine(dir, assemblyName);
+                if (File.Exists(assemblyPath))
+                    return assemblyPath;
+            }
+
+            throw new FileNotFoundException("Unable to find assembly!", assemblyName);
+        }
     }
 }
