@@ -1,7 +1,5 @@
-﻿using System;
+﻿﻿using System;
 using System.IO;
-using ApprovalTests;
-using ApprovalTests.Reporters;
 using NUnit.Framework;
 
 namespace MonoEmbeddinator4000.Tests
@@ -9,7 +7,7 @@ namespace MonoEmbeddinator4000.Tests
     /// <summary>
     /// These are a set of integration/approval tests validating that we are getting expected C# code from ResourceDesignerGenerator
     /// </summary>
-    [TestFixture, UseReporter(typeof(NUnitReporter))]
+    [TestFixture]
     public class ResourceDesignerTest
     {
         ResourceDesignerGenerator generator;
