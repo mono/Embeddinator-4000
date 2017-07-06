@@ -1,6 +1,8 @@
 ﻿﻿using System;
+using System.CodeDom.Compiler;
 using System.IO;
 using IKVM.Reflection;
+using Microsoft.CSharp;
 using NUnit.Framework;
 
 namespace MonoEmbeddinator4000.Tests
@@ -36,9 +38,42 @@ namespace MonoEmbeddinator4000.Tests
             File.Delete(generator.MainAssembly);
         }
 
+        Assembly LoadAssembly(string resourceFile)
+        {
+            var csc = new CSharpCodeProvider();
+            var temp = Path.GetTempFileName();
+
+            string source;
+            using (var stream = GetType().Assembly.GetManifestResourceStream($"MonoEmbeddinator4000.Tests.ResourceDesigner.{resourceFile}.cs"))
+            using (var reader = new StreamReader(stream))
+            {
+                source = reader.ReadToEnd();
+            }
+
+            var parameters = new CompilerParameters
+            {
+                OutputAssembly = temp,
+            };
+            parameters.ReferencedAssemblies.Add(XamarinAndroid.FindAssembly("System.dll"));
+            parameters.ReferencedAssemblies.Add(XamarinAndroid.FindAssembly("Mono.Android.dll"));
+
+            var results = csc.CompileAssemblyFromSource(parameters, source);
+
+            if (results.Errors.HasErrors)
+            {
+                throw new Exception(results.Errors[0].ToString());
+            }
+
+            foreach (var reference in parameters.ReferencedAssemblies)
+            {
+                universe.LoadFile(reference);
+            }
+            return universe.LoadFile(temp);
+        }
+
         void LoadAndGenerate(string resourceFile)
         {
-            var assembly = Samples.LoadFile(universe, resourceFile);
+            var assembly = LoadAssembly(resourceFile);
             generator.Assemblies = new[] { assembly };
             generator.MainAssembly = assembly.Location;
             generator.Generate();
