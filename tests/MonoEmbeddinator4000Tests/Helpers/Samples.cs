@@ -8,7 +8,7 @@ namespace MonoEmbeddinator4000.Tests
 {
     public static class Samples
     {
-        public static Assembly LoadFile(string resourceFile)
+        public static Assembly LoadFile(Universe universe, string resourceFile)
         {
             var csc = new CSharpCodeProvider();
             var temp = Path.GetTempFileName();
@@ -34,12 +34,11 @@ namespace MonoEmbeddinator4000.Tests
                 throw new Exception(results.Errors[0].ToString());
             }
 
-            var u = new Universe();
             foreach (var reference in parameters.ReferencedAssemblies)
             {
-                u.LoadFile(reference);
+                universe.LoadFile(reference);
             }
-            return u.LoadFile(temp);
+            return universe.LoadFile(temp);
         }
     }
 }

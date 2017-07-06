@@ -1,5 +1,6 @@
 ﻿﻿using System;
 using System.IO;
+using IKVM.Reflection;
 using NUnit.Framework;
 
 namespace MonoEmbeddinator4000.Tests
@@ -11,10 +12,13 @@ namespace MonoEmbeddinator4000.Tests
     public class ResourceDesignerTest
     {
         ResourceDesignerGenerator generator;
+        Universe universe;
 
         [SetUp]
         public void SetUp()
         {
+            universe = new Universe();
+
             generator = new ResourceDesignerGenerator
             {
                 OutputDirectory = Environment.CurrentDirectory,
@@ -25,13 +29,16 @@ namespace MonoEmbeddinator4000.Tests
         [TearDown]
         public void TearDown()
         {
+            //Locks files on Windows
+            universe.Dispose();
+
             //Temp file
             File.Delete(generator.MainAssembly);
         }
 
         void LoadAndGenerate(string resourceFile)
         {
-            var assembly = Samples.LoadFile(resourceFile);
+            var assembly = Samples.LoadFile(universe, resourceFile);
             generator.Assemblies = new[] { assembly };
             generator.MainAssembly = assembly.Location;
             generator.Generate();
