@@ -19,7 +19,7 @@ public class AndroidRuntimeProvider extends android.content.ContentProvider {
         try {
             ApplicationInfo appInfo = context.getPackageManager().getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA);
             String mainAssembly = appInfo.metaData.getString("mono.embeddinator.mainassembly");
-            String className = mainAssembly + "_dll.Native_" + mainAssembly + "_dll";
+            String className = mainAssembly.toLowerCase() + "_dll.Native_" + mainAssembly + "_dll";
             Class.forName(className);
         } catch (PackageManager.NameNotFoundException e) {
             throw new RuntimeException(e);
