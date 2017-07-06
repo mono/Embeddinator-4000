@@ -1,4 +1,5 @@
 #!mono .cake/Cake/Cake.exe
+#tool "nuget:?package=NUnit.ConsoleRunner"
 
 var target = Argument("target", "Default");
 var configuration = Argument("configuration", "Release");
@@ -201,6 +202,12 @@ Task("Generate-Android-PCL")
         Exec(embeddinator, $"-gen=Java -out={output} -platform=Android -compile -target=shared {pclDll}");
     });
 
+Task("Build-CSharp-Tests")
+    .Does(() =>
+    {
+        MSBuild("./tests/MonoEmbeddinator4000Tests/MonoEmbeddinator4000Tests.csproj", settings => settings.SetConfiguration(configuration).SetVerbosity(Verbosity.Minimal));
+    });
+
 Task("Build-Java-Tests")
     .IsDependentOn("Generate-Java")
     .Does(() =>
@@ -231,6 +238,16 @@ Task("Build-Android-PCL-Tests")
 
 Task("Install-Android-Tests")
     .Does(() => Gradle("installDebug"));
+
+Task("Run-CSharp-Tests")
+    .IsDependentOn("Build-CSharp-Tests")
+    .Does(() =>
+    {
+        NUnit3($"./tests/MonoEmbeddinator4000Tests/bin/{configuration}/MonoEmbeddinator4000Tests.dll", new NUnit3Settings
+        {
+            NoResults = true
+        });
+    });
 
 Task("Run-Java-Tests")
     .IsDependentOn("Build-Java-Tests")
