@@ -214,7 +214,7 @@ Task("Build-CSharp-Tests")
     .IsDependentOn("Build-Managed")
     .Does(() =>
     {
-        MSBuild("./tests/MonoEmbeddinator4000Tests/MonoEmbeddinator4000Tests.csproj", settings => settings.SetConfiguration(configuration).SetVerbosity(Verbosity.Minimal));
+        MSBuild("./tests/MonoEmbeddinator4000.Tests/MonoEmbeddinator4000.Tests.csproj", settings => settings.SetConfiguration(configuration).SetVerbosity(Verbosity.Minimal));
     });
 
 Task("Build-Java-Tests")
@@ -252,7 +252,7 @@ Task("Run-CSharp-Tests")
     .IsDependentOn("Build-CSharp-Tests")
     .Does(() =>
     {
-        NUnit3($"./tests/MonoEmbeddinator4000Tests/bin/{configuration}/MonoEmbeddinator4000Tests.dll", new NUnit3Settings
+        NUnit3($"./tests/MonoEmbeddinator4000.Tests/bin/{configuration}/MonoEmbeddinator4000.Tests.dll", new NUnit3Settings
         {
             NoResults = true
         });

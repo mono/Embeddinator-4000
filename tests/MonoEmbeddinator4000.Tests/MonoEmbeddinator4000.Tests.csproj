@@ -6,7 +6,7 @@
     <ProjectGuid>{8B817EDA-6575-4C17-8255-85652BDD1366}</ProjectGuid>
     <OutputType>Library</OutputType>
     <RootNamespace>MonoEmbeddinator4000.Tests</RootNamespace>
-    <AssemblyName>MonoEmbeddinator4000Tests</AssemblyName>
+    <AssemblyName>MonoEmbeddinator4000.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">

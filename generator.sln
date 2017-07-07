@@ -27,7 +27,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "managed-pcl", "tests\manage
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "managed-android", "tests\managed\android\managed-android.csproj", "{10E2D025-DED3-490D-8EC6-E99B30FE3E4F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoEmbeddinator4000Tests", "tests\MonoEmbeddinator4000Tests\MonoEmbeddinator4000Tests.csproj", "{8B817EDA-6575-4C17-8255-85652BDD1366}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoEmbeddinator4000.Tests", "tests\MonoEmbeddinator4000.Tests\MonoEmbeddinator4000.Tests.csproj", "{8B817EDA-6575-4C17-8255-85652BDD1366}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoEmbeddinator4000", "build\projects\MonoEmbeddinator4000.csproj", "{509699E3-3C25-23AD-E543-37A8D1B13353}"
 EndProject
