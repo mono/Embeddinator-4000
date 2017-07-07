@@ -1,4 +1,5 @@
-﻿using Android.App;
+﻿using System;
+using Android.App;
 using Android.Content;
 using Android.OS;
 using Android.Runtime;
@@ -60,6 +61,18 @@ namespace Android
         public string GetText()
         {
             return Resources.GetString(R.String.hello);
+        }
+    }
+
+    [Register("mono.embeddinator.android.AndroidAssertions")]
+    public class AndroidAssertions : Java.Lang.Object
+    {
+        [Export("applicationContext")]
+        public static void ApplicationContext()
+        {
+            var context = Application.Context;
+            if (context == null)
+                throw new Exception("Application.Context must not be null!");
         }
     }
 }
