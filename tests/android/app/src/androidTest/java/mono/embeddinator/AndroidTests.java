@@ -95,4 +95,9 @@ public class AndroidTests {
     public void asyncAwait() {
         AndroidAssertions.asyncAwait();
     }
+
+    @Test
+    public void webRequest() {
+        AndroidAssertions.webRequest();
+    }
 }
