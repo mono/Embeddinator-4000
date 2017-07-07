@@ -171,6 +171,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
 
             var intermediateDir = Path.Combine(outputDirectory, "obj");
             var androidDir = Path.Combine(outputDirectory, "android");
+            var javaSourceDir = Path.Combine(outputDirectory, "src");
             var assetsDir = Path.Combine(androidDir, "assets");
             var resourceDir = Path.Combine(androidDir, "res");
             var manifestPath = Path.Combine(androidDir, "AndroidManifest.xml");
@@ -212,6 +213,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
 
             //Create ItemGroup of Android files
             var androidResources = target.AddItemGroup();
+            androidResources.AddItem("AndroidJavaSource", Path.Combine(intermediateDir, "*", "library_project_imports", "java", "**", "*.java"));
             androidResources.AddItem("AndroidAsset", @"%(ResolvedAssetDirectories.Identity)\**\*").Condition = "'@(ResolvedAssetDirectories)' != ''";
             androidResources.AddItem("AndroidResource", @"%(ResolvedResourceDirectories.Identity)\**\*").Condition = "'@(ResolvedAssetDirectories)' != ''";
 
@@ -224,6 +226,11 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
             copy = target.AddTask("Copy");
             copy.SetParameter("SourceFiles", "@(AndroidResource)");
             copy.SetParameter("DestinationFiles", $"@(AndroidResource->'{resourceDir + Path.DirectorySeparatorChar}%(RecursiveDir)%(Filename)%(Extension)')");
+
+            //Copy Task, to copy AndroidJavaSource files
+            copy = target.AddTask("Copy");
+            copy.SetParameter("SourceFiles", "@(AndroidJavaSource)");
+            copy.SetParameter("DestinationFiles", $"@(AndroidJavaSource->'{javaSourceDir + Path.DirectorySeparatorChar}%(RecursiveDir)%(Filename)%(Extension)')");
 
             //XmlPoke to fix up AndroidManifest
             var xmlPoke = target.AddTask("XmlPoke");

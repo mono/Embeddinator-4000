@@ -77,12 +77,16 @@
   <ItemGroup>
     <Folder Include="Resources\layout\" />
     <Folder Include="Assets\" />
+    <Folder Include="Java\" />
   </ItemGroup>
   <ItemGroup>
     <AndroidAsset Include="Assets\test.txt" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidJavaSource Include="Java\IJavaCallback.java" />
   </ItemGroup>
   <Import Project="..\managed-shared.projitems" Label="Shared" Condition="Exists('..\managed-shared.projitems')" />
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
