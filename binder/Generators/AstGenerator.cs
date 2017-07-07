@@ -713,17 +713,27 @@ namespace MonoEmbeddinator4000.Generators
 
         public static bool IsAndroidSubclass (this IKVM.Reflection.Type type)
         {
+            foreach (var @interface in type.GetInterfaces())
+            {
+                if (@interface.Assembly.IsAndroidAssembly())
+                    return true;
+            }
+
             do
             {
                 if (type == null)
                     return false;
-                if (type.Assembly.FullName.StartsWith("Mono.Android, ", StringComparison.Ordinal) ||
-                    type.Assembly.FullName.StartsWith("Java.Interop, ", StringComparison.Ordinal))
+                if (type.Assembly.IsAndroidAssembly())
                     return true;
 
                 type = type.BaseType;
 
             } while (true);
+        }
+
+        public static bool IsAndroidAssembly(this Assembly assembly)
+        {
+            return assembly.FullName.StartsWith("Mono.Android, ", StringComparison.Ordinal) || assembly.FullName.StartsWith("Java.Interop, ", StringComparison.Ordinal);
         }
     }
 }
