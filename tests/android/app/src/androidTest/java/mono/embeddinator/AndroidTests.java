@@ -90,4 +90,9 @@ public class AndroidTests {
     public void applicationContext() {
         AndroidAssertions.applicationContext();
     }
+
+    @Test
+    public void asyncAwait() {
+        AndroidAssertions.asyncAwait();
+    }
 }

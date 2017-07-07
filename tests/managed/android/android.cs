@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
 using Android.OS;
@@ -73,6 +74,17 @@ namespace Android
             var context = Application.Context;
             if (context == null)
                 throw new Exception("Application.Context must not be null!");
+        }
+
+        [Export("asyncAwait")]
+        public static async void AsyncAwait()
+        {
+            var looper = Looper.MyLooper();
+
+            await Task.Delay(1);
+
+            if (looper != Looper.MyLooper())
+                throw new Exception("We should be on the same thread!");
         }
     }
 }
