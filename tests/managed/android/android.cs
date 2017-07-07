@@ -113,10 +113,55 @@ namespace Android
         }
     }
 
-    [Register("mono.embeddinator.android.IJavaCallback")]
+    [Register("mono.embeddinator.android.IJavaCallback", DoNotGenerateAcw = true)]
     public interface IJavaCallback : IJavaObject
     {
         [Export("send")]
         void Send(string text);
+    }
+
+    class IJavaCallbackInvoker : Java.Lang.Object, IJavaCallback
+    {
+        public static IJavaCallback GetObject(IntPtr handle, JniHandleOwnership transfer)
+        {
+            return new IJavaCallbackInvoker(handle, transfer);
+        }
+
+        IntPtr class_ref;
+
+        public IJavaCallbackInvoker(IntPtr handle, JniHandleOwnership transfer) : base(handle, transfer)
+        {
+            IntPtr lref = JNIEnv.GetObjectClass(Handle);
+            class_ref = JNIEnv.NewGlobalRef(lref);
+            JNIEnv.DeleteLocalRef(lref);
+        }
+
+        protected override Type ThresholdType
+        {
+            get { return typeof(IJavaCallbackInvoker); }
+        }
+
+        protected override IntPtr ThresholdClass
+        {
+            get { return class_ref; }
+        }
+
+        static IntPtr id_send;
+
+        public void Send(string text)
+        {
+            if (id_send == IntPtr.Zero)
+                id_send = JNIEnv.GetMethodID(class_ref, "send", "(Ljava/lang/String;)V");
+            JNIEnv.CallVoidMethod(Handle, id_send, new JValue(new Java.Lang.String(text)));
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (class_ref != IntPtr.Zero)
+                JNIEnv.DeleteGlobalRef(class_ref);
+            class_ref = IntPtr.Zero;
+
+            base.Dispose(disposing);
+        }
     }
 }
