@@ -108,4 +108,20 @@ public class AndroidTests {
         LocalBroadcastManager manager = AndroidAssertions.callIntoSupportLibrary();
         assertNotNull(manager);
     }
+
+    String callbackResult;
+
+    @Test
+    public void interfaceCallback() {
+        callbackResult = null;
+
+        JavaCallbacks.interfaceCallback(new IJavaCallback() {
+            @Override
+            public void send(String text) {
+                callbackResult = text;
+            }
+        }, "test");
+
+        assertEquals("test", callbackResult);
+    }
 }

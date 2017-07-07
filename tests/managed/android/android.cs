@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Net;
 using System.Threading.Tasks;
 using Android.App;
@@ -101,5 +101,22 @@ namespace Android
         {
             return LocalBroadcastManager.GetInstance(Application.Context);
         }
+    }
+
+    [Register("mono.embeddinator.android.JavaCallbacks")]
+    public class JavaCallbacks : Java.Lang.Object
+    {
+        [Export("interfaceCallback")]
+        public static void InterfaceCallback(IJavaCallback callback, string text)
+        {
+            callback.Send(text);
+        }
+    }
+
+    [Register("mono.embeddinator.android.IJavaCallback")]
+    public interface IJavaCallback : IJavaObject
+    {
+        [Export("send")]
+        void Send(string text);
     }
 }
