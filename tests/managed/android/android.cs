@@ -127,7 +127,7 @@ namespace Android
             return new IJavaCallbackInvoker(handle, transfer);
         }
 
-        IntPtr class_ref;
+        IntPtr class_ref, id_send;
 
         public IJavaCallbackInvoker(IntPtr handle, JniHandleOwnership transfer) : base(handle, transfer)
         {
@@ -145,8 +145,6 @@ namespace Android
         {
             get { return class_ref; }
         }
-
-        static IntPtr id_send;
 
         public void Send(string text)
         {
