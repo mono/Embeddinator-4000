@@ -20,7 +20,6 @@ obj/
 *.sdf
 *.opensdf
 *.pdb
-*.config
 *.filters
 *.metagen
 *.ilk

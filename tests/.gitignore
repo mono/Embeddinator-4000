@@ -7,3 +7,4 @@
 **/*.Tests
 *.dylib
 *.jar
+!MonoEmbeddinator4000.Tests

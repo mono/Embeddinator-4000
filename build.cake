@@ -1,4 +1,5 @@
 #!mono .cake/Cake/Cake.exe
+#tool "nuget:?package=NUnit.ConsoleRunner"
 
 var target = Argument("target", "Default");
 var configuration = Argument("configuration", "Release");
@@ -69,8 +70,12 @@ Task("Clean")
         CleanDirectory(buildDir);
     });
 
+Task("NuGet-Restore")
+    .Does(() => NuGetRestore("./generator.sln"));
+
 Task("Build-Binder")
     .IsDependentOn("Clean")
+    .IsDependentOn("NuGet-Restore")
     .Does(() =>
     {
         MSBuild("./build/projects/MonoEmbeddinator4000.csproj", settings => settings.SetConfiguration(configuration).SetVerbosity(Verbosity.Minimal));
@@ -78,6 +83,7 @@ Task("Build-Binder")
 
 Task("Build-Managed")
     .IsDependentOn("Clean")
+    .IsDependentOn("NuGet-Restore")
     .Does(() =>
     {
         MSBuild("./tests/managed/generic/managed-generic.csproj", settings => settings.SetConfiguration(configuration).SetVerbosity(Verbosity.Minimal));
@@ -85,6 +91,7 @@ Task("Build-Managed")
 
 Task("Build-Android")
     .IsDependentOn("Clean")
+    .IsDependentOn("NuGet-Restore")
     .Does(() =>
     {
         MSBuild("./tests/managed/android/managed-android.csproj", settings => settings.SetConfiguration(configuration).SetVerbosity(Verbosity.Minimal));
@@ -92,6 +99,7 @@ Task("Build-Android")
 
 Task("Build-PCL")
     .IsDependentOn("Clean")
+    .IsDependentOn("NuGet-Restore")
     .Does(() =>
     {
         MSBuild("./tests/managed/pcl/managed-pcl.csproj", settings => settings.SetConfiguration(configuration).SetVerbosity(Verbosity.Minimal));
@@ -201,6 +209,14 @@ Task("Generate-Android-PCL")
         Exec(embeddinator, $"-gen=Java -out={output} -platform=Android -compile -target=shared {pclDll}");
     });
 
+Task("Build-CSharp-Tests")
+    .IsDependentOn("Build-Binder")
+    .IsDependentOn("Build-Managed")
+    .Does(() =>
+    {
+        MSBuild("./tests/MonoEmbeddinator4000.Tests/MonoEmbeddinator4000.Tests.csproj", settings => settings.SetConfiguration(configuration).SetVerbosity(Verbosity.Minimal));
+    });
+
 Task("Build-Java-Tests")
     .IsDependentOn("Generate-Java")
     .Does(() =>
@@ -231,6 +247,16 @@ Task("Build-Android-PCL-Tests")
 
 Task("Install-Android-Tests")
     .Does(() => Gradle("installDebug"));
+
+Task("Run-CSharp-Tests")
+    .IsDependentOn("Build-CSharp-Tests")
+    .Does(() =>
+    {
+        NUnit3($"./tests/MonoEmbeddinator4000.Tests/bin/{configuration}/MonoEmbeddinator4000.Tests.dll", new NUnit3Settings
+        {
+            NoResults = true
+        });
+    });
 
 Task("Run-Java-Tests")
     .IsDependentOn("Build-Java-Tests")
