@@ -12,6 +12,7 @@ public class AndroidImpl extends DesktopImpl {
 
     public AndroidImpl(Context context) {
         this.context = context;
+        mono.MonoPackageManager.Context = context;
     }
 
     @Override
