@@ -81,6 +81,14 @@ public static class Type_String
 	public static string NonEmptyString { get { return "Hello World"; } }
 }
 
+/// <summary>
+/// NOTE: DateTime types are not exposed, this is for verifying DateTime.Now works
+/// </summary>
+public static class Type_DateTime
+{
+    public static string Now { get { return DateTime.Now.ToString(); } }
+}
+
 // objc: this type won't be generated (Exception is not supported) but the generation will succeed (with warnings)
 public class MyException : Exception {
 }

@@ -17,6 +17,11 @@ public class AndroidImpl extends DesktopImpl {
 
     @Override
     public RuntimeLibrary initialize(String library) {
+        android.content.IntentFilter timezoneChangedFilter  = new android.content.IntentFilter (
+                android.content.Intent.ACTION_TIMEZONE_CHANGED
+        );
+        context.registerReceiver (new mono.android.app.NotifyTimeZoneChanges(), timezoneChangedFilter);
+
         System.loadLibrary("monodroid");
         System.loadLibrary(library);
         setAssemblyPrefix();
