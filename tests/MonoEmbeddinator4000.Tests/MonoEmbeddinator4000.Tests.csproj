@@ -80,12 +80,14 @@
     <Compile Include="Helpers\AssemblyGenerator.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="ResourceDesigner\" />
+    <Folder Include="Samples\" />
     <Folder Include="Helpers\" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="ResourceDesigner\Full.cs" />
-    <EmbeddedResource Include="ResourceDesigner\String.cs" />
+    <EmbeddedResource Include="Samples\Resource.Full.cs" />
+    <EmbeddedResource Include="Samples\Resource.String.cs" />
+    <EmbeddedResource Include="Samples\Hello.cs" />
+    <EmbeddedResource Include="Samples\HelloUpper.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

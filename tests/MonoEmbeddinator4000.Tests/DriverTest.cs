@@ -18,15 +18,6 @@ namespace MonoEmbeddinator4000.Tests
         Options options;
         Driver driver;
 
-        const string HelloWorldSource = @"
-namespace Example { 
-    public class Hello { 
-        public string World() { 
-            return ""Hello, World!""; 
-        } 
-    } 
-}";
-
         [TearDown]
         public void TearDown()
         {
@@ -34,13 +25,13 @@ namespace Example {
                 File.Delete(temp);
         }
 
-        void RunFromSource(string sourceCode)
+        void RunDriver(string resourceFile)
         {
             var parameters = new CompilerParameters
             {
                 OutputAssembly = temp,
             };
-            AssemblyGenerator.CreateFromSource(sourceCode, parameters);
+            AssemblyGenerator.CreateFromResource(resourceFile, parameters);
 
             project = new Project();
             options = new Options
@@ -69,7 +60,7 @@ namespace Example {
         [Test]
         public void HelloFiles()
         {
-            RunFromSource(HelloWorldSource);
+            RunDriver("Hello");
 
             var builder = new StringBuilder();
             foreach (var file in driver.Output.Files.Keys)
@@ -82,7 +73,7 @@ namespace Example {
         [Test]
         public void Hello_java()
         {
-            RunFromSource(HelloWorldSource);
+            RunDriver("Hello");
 
             string path = Path.Combine(options.OutputDir, driver.Output.Files.Keys.First());
             string java = File.ReadAllText(path);
@@ -92,7 +83,7 @@ namespace Example {
         [Test]
         public void Native_hello_dll_java()
         {
-            RunFromSource(HelloWorldSource);
+            RunDriver("Hello");
 
             string path = Path.Combine(options.OutputDir, driver.Output.Files.Keys.Last());
             string java = File.ReadAllText(path);
@@ -102,14 +93,7 @@ namespace Example {
         [Test]
         public void UpperCase_java()
         {
-            RunFromSource(@"
-namespace Example { 
-    public class HELLO { 
-        public string WORLD() { 
-            return ""Hello, World!""; 
-        } 
-    } 
-}");
+            RunDriver("HelloUpper");
 
             string path = Path.Combine(options.OutputDir, driver.Output.Files.Keys.First());
             string java = File.ReadAllText(path);

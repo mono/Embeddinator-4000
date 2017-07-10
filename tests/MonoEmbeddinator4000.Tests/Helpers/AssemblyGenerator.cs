@@ -10,7 +10,7 @@ namespace MonoEmbeddinator4000.Tests
         public static void CreateFromResource(string resourceFile, CompilerParameters parameters)
         {
             string sourceCode;
-            using (var stream = typeof(AssemblyGenerator).Assembly.GetManifestResourceStream($"MonoEmbeddinator4000.Tests.ResourceDesigner.{resourceFile}.cs"))
+            using (var stream = typeof(AssemblyGenerator).Assembly.GetManifestResourceStream($"MonoEmbeddinator4000.Tests.Samples.{resourceFile}.cs"))
             using (var reader = new StreamReader(stream))
             {
                 sourceCode = reader.ReadToEnd();

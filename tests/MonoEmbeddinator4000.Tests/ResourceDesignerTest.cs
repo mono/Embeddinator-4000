@@ -68,7 +68,7 @@ namespace MonoEmbeddinator4000.Tests
         [Test]
         public void String()
         {
-            LoadAndGenerate("String");
+            LoadAndGenerate("Resource.String");
 
             string source = generator.ToSource();
             Approvals.Verify(source);
@@ -77,7 +77,7 @@ namespace MonoEmbeddinator4000.Tests
         [Test]
         public void Full()
         {
-            LoadAndGenerate("Full");
+            LoadAndGenerate("Resource.Full");
 
             string source = generator.ToSource();
             Approvals.Verify(source);
