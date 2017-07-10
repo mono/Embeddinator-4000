@@ -324,5 +324,8 @@ public class Tests {
         assertEquals(Character.MIN_VALUE, Type_Char.getMin());
         assertEquals(Character.MAX_VALUE, Type_Char.getMax());
         assertEquals(0, Type_Char.getZero());
+
+        //Just validate this doesn't crash for now
+        assertNotNull(Type_DateTime.getNow());
     }
 }
