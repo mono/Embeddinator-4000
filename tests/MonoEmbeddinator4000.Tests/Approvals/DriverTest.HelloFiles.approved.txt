@@ -1,2 +1,2 @@
-hello_dll/example/Hello.java
-hello_dll/Native_hello_dll.java
+hello/example/Hello.java
+hello/Native_hello.java

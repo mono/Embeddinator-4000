@@ -6,7 +6,7 @@
  * </auto-generated>
  * ----------------------------------------------------------------------------
  */
-package hello_dll.example;
+package hello.example;
 
 import mono.embeddinator.*;
 import com.sun.jna.*;
@@ -17,12 +17,12 @@ public class Hello {
     public Hello(com.sun.jna.Pointer object) { this.__object = object; }
 
     public Hello() {
-        __object = hello_dll.Native_hello_dll.INSTANCE.Example_Hello_new();
+        __object = hello.Native_hello.INSTANCE.Example_Hello_new();
         mono.embeddinator.Runtime.checkExceptions();
     }
 
     public String world() {
-        String __ret = hello_dll.Native_hello_dll.INSTANCE.Example_Hello_World(__object);
+        String __ret = hello.Native_hello.INSTANCE.Example_Hello_World(__object);
         mono.embeddinator.Runtime.checkExceptions();
         return __ret;
     }
