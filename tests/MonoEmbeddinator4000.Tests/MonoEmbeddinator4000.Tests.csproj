@@ -50,12 +50,34 @@
       <Project>{83A10A50-EF0D-C64A-B801-5EA8242DE8B2}</Project>
       <Name>Xamarin.Android.Tools</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\build\projects\CppSharp.csproj">
+      <Project>{C600C309-B2CD-1D15-DBE6-0BBDC71253A3}</Project>
+      <Name>CppSharp</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\build\projects\CppSharp.AST.csproj">
+      <Project>{BC4C5C41-A8AF-EBE5-5135-249C3D77B768}</Project>
+      <Name>CppSharp.AST</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\build\projects\CppSharp.Generator.csproj">
+      <Project>{1BD1FEC4-07B5-BF1A-7015-BA6D5C18AA9C}</Project>
+      <Name>CppSharp.Generator</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\build\projects\CppSharp.Parser.csproj">
+      <Project>{C105FD61-2D91-6A26-36A2-ED1AA2ACC626}</Project>
+      <Name>CppSharp.Parser</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\build\projects\CppSharp.Parser.CSharp.csproj">
+      <Project>{70148081-5C0E-A9D3-457B-3FE431140F40}</Project>
+      <Name>CppSharp.Parser.CSharp</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ResourceDesignerTest.cs" />
     <Compile Include="JavaNameTest.cs" />
     <Compile Include="XamarinAndroidTest.cs" />
     <Compile Include="Helpers\Approvals.cs" />
+    <Compile Include="DriverTest.cs" />
+    <Compile Include="Helpers\AssemblyGenerator.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="ResourceDesigner\" />
