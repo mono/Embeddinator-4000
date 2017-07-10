@@ -10,7 +10,7 @@ import android.content.*;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import java.io.*;
-import managed_dll.Native_managed_dll;
+import managed_dll.*;
 import mono.embeddinator.testrunner.MainActivity;
 import mono.embeddinator.android.*;
 
@@ -84,5 +84,20 @@ public class AndroidTests {
         } finally {
             reader.close();
         }
+    }
+
+    @Test
+    public void applicationContext() {
+        AndroidAssertions.applicationContext();
+    }
+
+    @Test
+    public void asyncAwait() {
+        AndroidAssertions.asyncAwait();
+    }
+
+    @Test
+    public void webRequest() {
+        AndroidAssertions.webRequest();
     }
 }

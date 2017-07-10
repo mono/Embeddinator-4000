@@ -1,4 +1,7 @@
-﻿using Android.App;
+﻿using System;
+using System.Net;
+using System.Threading.Tasks;
+using Android.App;
 using Android.Content;
 using Android.OS;
 using Android.Runtime;
@@ -6,6 +9,8 @@ using Android.Util;
 using Android.Widget;
 using Java.Interop;
 using R = managedandroid.Resource;
+
+[assembly: UsesPermission("android.permission.INTERNET")]
 
 namespace Android
 {
@@ -60,6 +65,39 @@ namespace Android
         public string GetText()
         {
             return Resources.GetString(R.String.hello);
+        }
+    }
+
+    [Register("mono.embeddinator.android.AndroidAssertions")]
+    public class AndroidAssertions : Java.Lang.Object
+    {
+        [Export("applicationContext")]
+        public static void ApplicationContext()
+        {
+            var context = Application.Context;
+            if (context == null)
+                throw new Exception("Application.Context must not be null!");
+        }
+
+        [Export("asyncAwait")]
+        public static async void AsyncAwait()
+        {
+            var looper = Looper.MyLooper();
+
+            await Task.Delay(1);
+
+            if (looper != Looper.MyLooper())
+                throw new Exception("We should be on the same thread!");
+        }
+
+        [Export("webRequest")]
+        public static void WebRequest()
+        {
+            var client = new WebClient();
+
+            string html = client.DownloadString("https://www.google.com");
+            if (string.IsNullOrEmpty(html))
+                throw new Exception("String should not be blank!");
         }
     }
 }
