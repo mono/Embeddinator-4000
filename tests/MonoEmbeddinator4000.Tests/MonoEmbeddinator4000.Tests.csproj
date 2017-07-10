@@ -78,6 +78,7 @@
     <Compile Include="Helpers\Approvals.cs" />
     <Compile Include="DriverTest.cs" />
     <Compile Include="Helpers\AssemblyGenerator.cs" />
+    <Compile Include="XamarinAndroidBuildTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Samples\" />

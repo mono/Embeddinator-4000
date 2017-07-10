@@ -148,7 +148,7 @@ namespace MonoEmbeddinator4000
         /// <summary>
         /// Generates AndroidManifest.xml
         /// </summary>
-        public static void GenerateAndroidManifest(List<IKVM.Reflection.Assembly> assemblies, string path, bool includeProvider = true)
+        public static void GenerateAndroidManifest(IList<IKVM.Reflection.Assembly> assemblies, string path, bool includeProvider = true)
         {
             string name = assemblies[0].GetName().Name.Replace('-', '_');
             string provider = string.Empty;
