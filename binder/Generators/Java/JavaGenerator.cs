@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using CppSharp;
 using CppSharp.AST;
 using CppSharp.Generators;
@@ -12,8 +13,10 @@ namespace MonoEmbeddinator4000.Generators
     {
         public static string IntPtrType = "com.sun.jna.Pointer";
 
-        public static string GetNativeLibPackageName(TranslationUnit unit) =>
-            unit.FileName.Replace('.', '_').Replace('-', '_').ToLowerInvariant();
+        public static string GetNativeLibPackageName(TranslationUnit unit) => GetNativeLibPackageName(unit.FileName);
+
+        public static string GetNativeLibPackageName(string fileName) =>
+            Path.GetFileNameWithoutExtension(fileName).Replace('.', '_').Replace('-', '_').ToLowerInvariant();
 
         public JavaTypePrinter TypePrinter;
 

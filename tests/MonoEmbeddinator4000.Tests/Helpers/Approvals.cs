@@ -44,7 +44,7 @@ namespace MonoEmbeddinator4000.Tests
 #endif
             string approved = GetPath(sourceFile, member, "approved");
             File.WriteAllText(approved, text);
-            Verify(text, member, sourceFile);
+            Verify(text, sourceFile, member);
         }
     }
 }

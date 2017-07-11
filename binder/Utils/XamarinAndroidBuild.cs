@@ -61,7 +61,7 @@ namespace MonoEmbeddinator4000
             var assetsDir = Path.Combine(androidDir, "assets");
             var resourceDir = Path.Combine(androidDir, "res");
             var manifestPath = Path.Combine(androidDir, "AndroidManifest.xml");
-            var packageName = "com." + Path.GetFileNameWithoutExtension(mainAssembly).Replace('-', '_') + "_dll";
+            var packageName = Generators.JavaGenerator.GetNativeLibPackageName(mainAssembly);
             var project = CreateProject();
             var target = project.AddTarget("Build");
 
@@ -148,9 +148,11 @@ namespace MonoEmbeddinator4000
         /// <summary>
         /// Generates AndroidManifest.xml
         /// </summary>
-        public static void GenerateAndroidManifest(List<IKVM.Reflection.Assembly> assemblies, string path, bool includeProvider = true)
+        public static void GenerateAndroidManifest(IList<IKVM.Reflection.Assembly> assemblies, string path, bool includeProvider = true)
         {
-            string name = assemblies[0].GetName().Name.Replace('-', '_');
+            var mainAssembly = assemblies[0].Location;
+            var packageName = Generators.JavaGenerator.GetNativeLibPackageName(mainAssembly);
+            var className = Generators.JavaNative.GetNativeLibClassName(mainAssembly);
             string provider = string.Empty;
             if (includeProvider)
             {
@@ -159,10 +161,10 @@ namespace MonoEmbeddinator4000
 
             File.WriteAllText(path,
 $@"<?xml version=""1.0"" encoding=""utf-8""?>
-<manifest xmlns:android=""http://schemas.android.com/apk/res/android"" package=""com.{name}_dll"">
+<manifest xmlns:android=""http://schemas.android.com/apk/res/android"" package=""{packageName}"">
     <uses-sdk android:minSdkVersion=""{XamarinAndroid.MinSdkVersion}"" android:targetSdkVersion=""{XamarinAndroid.TargetSdkVersion}"" />
     <application>
-        <meta-data android:name=""mono.embeddinator.mainassembly"" android:value=""{name}"" />
+        <meta-data android:name=""mono.embeddinator.classname"" android:value=""{packageName}.{className}"" />
         {provider}
     </application>
 </manifest>");
@@ -181,7 +183,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
 
             var androidDir = Path.Combine(outputDirectory, "android");
             var manifestPath = Path.Combine(androidDir, "AndroidManifest.xml");
-            var packageName = "com." + Path.GetFileNameWithoutExtension(mainAssembly).Replace('-', '_') + "_dll";
+            var packageName = Generators.JavaGenerator.GetNativeLibPackageName(mainAssembly);
 
             if (!Directory.Exists(androidDir))
                 Directory.CreateDirectory(androidDir);

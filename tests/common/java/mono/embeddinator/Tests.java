@@ -1,16 +1,16 @@
 package mono.embeddinator;
 
-import managed_dll.*;
-import managed_dll.properties.*;
-import managed_dll.first.*;
-import managed_dll.first.second.*;
-import managed_dll.exceptions.*;
-import managed_dll.constructors.*;
-import managed_dll.enums.*;
-import managed_dll.fields.*;
-import managed_dll.interfaces.*;
-import managed_dll.methods.*;
-import managed_dll.structs.*;
+import managed.*;
+import managed.properties.*;
+import managed.first.*;
+import managed.first.second.*;
+import managed.exceptions.*;
+import managed.constructors.*;
+import managed.enums.*;
+import managed.fields.*;
+import managed.interfaces.*;
+import managed.methods.*;
+import managed.structs.*;
 
 import static org.junit.Assert.*;
 import org.junit.*;
@@ -51,7 +51,7 @@ public class Tests {
         ClassWithNestedNamespace nestednamespaces = new ClassWithNestedNamespace();
         assertEquals(nestednamespaces.toString(), "First.Second.ClassWithNestedNamespace");
 
-        managed_dll.first.second.third.ClassWithNestedNamespace nestednamespaces2 = new managed_dll.first.second.third.ClassWithNestedNamespace();
+        managed.first.second.third.ClassWithNestedNamespace nestednamespaces2 = new managed.first.second.third.ClassWithNestedNamespace();
         assertEquals(nestednamespaces2.toString(), "First.Second.Third.ClassWithNestedNamespace");
     }
 
@@ -211,48 +211,48 @@ public class Tests {
 
     @Test
     public void testFieldsInReferences() {
-        assertEquals(Long.MAX_VALUE, managed_dll.fields.Class.get_MaxLong());
+        assertEquals(Long.MAX_VALUE, managed.fields.Class.get_MaxLong());
 
-        assertEquals(0, managed_dll.fields.Class.get_Integer());
-        managed_dll.fields.Class.set_Integer(1);
-        assertEquals(1, managed_dll.fields.Class.get_Integer());
+        assertEquals(0, managed.fields.Class.get_Integer());
+        managed.fields.Class.set_Integer(1);
+        assertEquals(1, managed.fields.Class.get_Integer());
 
-        assertTrue(managed_dll.fields.Class.get_Scratch().get_Boolean());
+        assertTrue(managed.fields.Class.get_Scratch().get_Boolean());
 
-        managed_dll.fields.Class.set_Scratch(new managed_dll.fields.Class(false));
-        assertFalse(managed_dll.fields.Class.get_Scratch().get_Boolean());
+        managed.fields.Class.set_Scratch(new managed.fields.Class(false));
+        assertFalse(managed.fields.Class.get_Scratch().get_Boolean());
 
-        managed_dll.fields.Class ref1 = new managed_dll.fields.Class(true);
+        managed.fields.Class ref1 = new managed.fields.Class(true);
         assertTrue(ref1.get_Boolean());
         ref1.set_Boolean(false);
         assertFalse(ref1.get_Boolean());
 
         assertNotNull(ref1.get_Structure());
         assertFalse(ref1.get_Structure().get_Boolean());
-        ref1.set_Structure(new managed_dll.fields.Struct(true));
+        ref1.set_Structure(new managed.fields.Struct(true));
         assertTrue(ref1.get_Structure().get_Boolean());
 
-        managed_dll.fields.Class ref2 = new managed_dll.fields.Class(false);
+        managed.fields.Class ref2 = new managed.fields.Class(false);
         assertNotNull(ref2.get_Structure());
         assertFalse(ref2.get_Structure().get_Boolean());
     }
 
     @Test
     public void testFieldsInValueTypes() {
-        assertEquals(0, managed_dll.fields.Struct.get_Integer());
-        managed_dll.fields.Struct.set_Integer(1);
-        assertEquals(1, managed_dll.fields.Struct.get_Integer());
+        assertEquals(0, managed.fields.Struct.get_Integer());
+        managed.fields.Struct.set_Integer(1);
+        assertEquals(1, managed.fields.Struct.get_Integer());
 
-        assertFalse(managed_dll.fields.Struct.get_Scratch().get_Boolean());
+        assertFalse(managed.fields.Struct.get_Scratch().get_Boolean());
 
-        managed_dll.fields.Struct.set_Scratch(new managed_dll.fields.Struct(true));
-        assertTrue(managed_dll.fields.Struct.get_Scratch().get_Boolean());
+        managed.fields.Struct.set_Scratch(new managed.fields.Struct(true));
+        assertTrue(managed.fields.Struct.get_Scratch().get_Boolean());
 
-        managed_dll.fields.Struct empty = managed_dll.fields.Struct.get_Empty();
+        managed.fields.Struct empty = managed.fields.Struct.get_Empty();
         assertNotNull(empty);
         assertNull(empty.get_Class());
 
-        managed_dll.fields.Struct struct1 = new managed_dll.fields.Struct(true);
+        managed.fields.Struct struct1 = new managed.fields.Struct(true);
         assertTrue(struct1.get_Boolean());
         struct1.set_Boolean(false);
         assertFalse(struct1.get_Boolean());
@@ -261,10 +261,10 @@ public class Tests {
         assertFalse(struct1.get_Class().get_Boolean());
         struct1.set_Class(null);
         assertNull(struct1.get_Class());
-        struct1.set_Class(new managed_dll.fields.Class(true));
+        struct1.set_Class(new managed.fields.Class(true));
         assertTrue(struct1.get_Class().get_Boolean());
 
-        managed_dll.fields.Struct struct2 = new managed_dll.fields.Struct(false);
+        managed.fields.Struct struct2 = new managed.fields.Struct(false);
         assertNotNull(struct2.get_Class());
         assertFalse(struct2.get_Boolean());
     }

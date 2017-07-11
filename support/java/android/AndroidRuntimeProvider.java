@@ -14,12 +14,11 @@ public class AndroidRuntimeProvider extends android.content.ContentProvider {
         Runtime.setImplementation(new AndroidImpl(context));
 
         //NOTE: this looks a bit weird, but here is what is happening
-        //  We put the main assembly name, "managed" for example, in AndroidManifest.xml metadata as mono.embeddinator.mainassembly
-        //  We need managed_dll.Native_managed_dll's static constructor to run, we can do this via Class.forName
+        //  We put the name of the main class, "managed.Native_managed" for example, in AndroidManifest.xml metadata as mono.embeddinator.classname
+        //  We need managed.Native_managed's static constructor to run, we can do this via Class.forName
         try {
             ApplicationInfo appInfo = context.getPackageManager().getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA);
-            String mainAssembly = appInfo.metaData.getString("mono.embeddinator.mainassembly");
-            String className = mainAssembly.toLowerCase() + "_dll.Native_" + mainAssembly + "_dll";
+            String className = appInfo.metaData.getString("mono.embeddinator.classname");
             Class.forName(className);
         } catch (PackageManager.NameNotFoundException e) {
             throw new RuntimeException(e);

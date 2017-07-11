@@ -10,7 +10,6 @@ import android.content.*;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import java.io.*;
-import managed_dll.*;
 import mono.embeddinator.testrunner.MainActivity;
 import mono.embeddinator.android.*;
 
@@ -50,27 +49,27 @@ public class AndroidTests {
 
     @Test
     public void resourceString() {
-        String actual = rule.getActivity().getResources().getString(com.managed_dll.R.string.hello);
+        String actual = rule.getActivity().getResources().getString(managed.R.string.hello);
         assertEquals("Hello from C#!", actual);
     }
 
     @Test
     public void resourceLayout() {
-        View view = rule.getActivity().getLayoutInflater().inflate(com.managed_dll.R.layout.hello, null);
+        View view = rule.getActivity().getLayoutInflater().inflate(managed.R.layout.hello, null);
         assertNotNull(view);
     }
 
     @Test
     public void resourceId() {
-        View view = rule.getActivity().getLayoutInflater().inflate(com.managed_dll.R.layout.hello, null);
-        TextView text = (TextView)view.findViewById(com.managed_dll.R.id.text);
+        View view = rule.getActivity().getLayoutInflater().inflate(managed.R.layout.hello, null);
+        TextView text = (TextView)view.findViewById(managed.R.id.text);
         assertNotNull(text);
         assertEquals("Hello from C#!", text.getText());
     }
 
     @Test
     public void resourceCustomView() {
-        TextView text = (TextView)rule.getActivity().getLayoutInflater().inflate(com.managed_dll.R.layout.customview, null);
+        TextView text = (TextView)rule.getActivity().getLayoutInflater().inflate(managed.R.layout.customview, null);
         assertEquals("World!", text.getText());
     }
 

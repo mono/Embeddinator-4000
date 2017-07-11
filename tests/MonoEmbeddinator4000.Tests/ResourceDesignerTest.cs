@@ -40,16 +40,7 @@ namespace MonoEmbeddinator4000.Tests
 
         Assembly LoadAssembly(string resourceFile)
         {
-            var csc = new CSharpCodeProvider();
             var temp = Path.GetTempFileName();
-
-            string source;
-            using (var stream = GetType().Assembly.GetManifestResourceStream($"MonoEmbeddinator4000.Tests.ResourceDesigner.{resourceFile}.cs"))
-            using (var reader = new StreamReader(stream))
-            {
-                source = reader.ReadToEnd();
-            }
-
             var parameters = new CompilerParameters
             {
                 OutputAssembly = temp,
@@ -57,12 +48,7 @@ namespace MonoEmbeddinator4000.Tests
             parameters.ReferencedAssemblies.Add(XamarinAndroid.FindAssembly("System.dll"));
             parameters.ReferencedAssemblies.Add(XamarinAndroid.FindAssembly("Mono.Android.dll"));
 
-            var results = csc.CompileAssemblyFromSource(parameters, source);
-
-            if (results.Errors.HasErrors)
-            {
-                throw new Exception(results.Errors[0].ToString());
-            }
+            AssemblyGenerator.CreateFromResource(resourceFile, parameters);
 
             foreach (var reference in parameters.ReferencedAssemblies)
             {
@@ -82,7 +68,7 @@ namespace MonoEmbeddinator4000.Tests
         [Test]
         public void String()
         {
-            LoadAndGenerate("String");
+            LoadAndGenerate("Resource.String");
 
             string source = generator.ToSource();
             Approvals.Verify(source);
@@ -91,7 +77,7 @@ namespace MonoEmbeddinator4000.Tests
         [Test]
         public void Full()
         {
-            LoadAndGenerate("Full");
+            LoadAndGenerate("Resource.Full");
 
             string source = generator.ToSource();
             Approvals.Verify(source);
