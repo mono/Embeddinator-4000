@@ -96,5 +96,19 @@ namespace MonoEmbeddinator4000.Tests
             string file = XamarinAndroid.FindAssembly("mono.android.jar");
             FileAssert.Exists(file);
         }
+
+        [Test]
+        public void PlatformDirectory()
+        {
+            string dir = XamarinAndroid.PlatformDirectory;
+            DirectoryAssert.Exists(dir);
+        }
+
+        [Test]
+        public void AndroidJar()
+        {
+            string file = Path.Combine(XamarinAndroid.PlatformDirectory, "android.jar");
+            FileAssert.Exists(file);
+        }
     }
 }
