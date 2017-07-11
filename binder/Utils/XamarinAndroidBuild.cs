@@ -60,7 +60,6 @@ namespace MonoEmbeddinator4000
             outputDirectory = Path.GetFullPath(outputDirectory);
             assembliesDirectory = Path.GetFullPath(assembliesDirectory);
 
-            var intermediateDir = Path.Combine(outputDirectory, "obj");
             var androidDir = Path.Combine(outputDirectory, "android");
             var assetsDir = Path.Combine(androidDir, "assets");
             var resourceDir = Path.Combine(androidDir, "res");
@@ -98,31 +97,6 @@ namespace MonoEmbeddinator4000
             linkAssemblies.SetParameter("ResolvedAssemblies", "@(ResolvedAssemblies);" + Path.Combine(outputDirectory, "Resource.designer.dll"));
             linkAssemblies.SetParameter("MainAssembly", mainAssembly);
             linkAssemblies.SetParameter("OutputDirectory", assembliesDirectory);
-
-            //ResolveLibraryProjectImports Task, extracts Android resources
-            var resolveLibraryProject = target.AddTask("ResolveLibraryProjectImports");
-            resolveLibraryProject.SetParameter("Assemblies", "@(ResolvedUserAssemblies)");
-            resolveLibraryProject.SetParameter("UseShortFileNames", "False");
-            resolveLibraryProject.SetParameter("ImportsDirectory", intermediateDir);
-            resolveLibraryProject.SetParameter("OutputDirectory", intermediateDir);
-            resolveLibraryProject.SetParameter("OutputImportDirectory", intermediateDir);
-            resolveLibraryProject.AddOutputItem("ResolvedAssetDirectories", "ResolvedAssetDirectories");
-            resolveLibraryProject.AddOutputItem("ResolvedResourceDirectories", "ResolvedResourceDirectories");
-
-            //Create ItemGroup of Android files
-            var androidResources = target.AddItemGroup();
-            androidResources.AddItem("AndroidAsset", @"%(ResolvedAssetDirectories.Identity)\**\*").Condition = "'@(ResolvedAssetDirectories)' != ''";
-            androidResources.AddItem("AndroidResource", @"%(ResolvedResourceDirectories.Identity)\**\*").Condition = "'@(ResolvedAssetDirectories)' != ''";
-
-            //Copy Task, to copy AndroidAsset files
-            var copy = target.AddTask("Copy");
-            copy.SetParameter("SourceFiles", "@(AndroidAsset)");
-            copy.SetParameter("DestinationFiles", $"@(AndroidAsset->'{assetsDir + Path.DirectorySeparatorChar}%(RecursiveDir)%(Filename)%(Extension)')");
-
-            //Copy Task, to copy AndroidResource files
-            copy = target.AddTask("Copy");
-            copy.SetParameter("SourceFiles", "@(AndroidResource)");
-            copy.SetParameter("DestinationFiles", $"@(AndroidResource->'{resourceDir + Path.DirectorySeparatorChar}%(RecursiveDir)%(Filename)%(Extension)')");
 
             //Aapt Task to generate R.txt
             var aapt = target.AddTask("Aapt");
@@ -185,7 +159,10 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
             var mainAssembly = assemblies[0].Location;
             outputDirectory = Path.GetFullPath(outputDirectory);
 
+            var intermediateDir = Path.Combine(outputDirectory, "obj");
             var androidDir = Path.Combine(outputDirectory, "android");
+            var assetsDir = Path.Combine(androidDir, "assets");
+            var resourceDir = Path.Combine(androidDir, "res");
             var manifestPath = Path.Combine(androidDir, "AndroidManifest.xml");
             var packageName = Generators.JavaGenerator.GetNativeLibPackageName(mainAssembly);
 
@@ -212,6 +189,31 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
             generateJavaStubs.SetParameter("OutputDirectory", outputDirectory);
             generateJavaStubs.SetParameter("ResourceDirectory", "$(MonoAndroidResDirIntermediate)");
             generateJavaStubs.SetParameter("AcwMapFile", "$(MonoAndroidIntermediate)acw-map.txt");
+
+            //ResolveLibraryProjectImports Task, extracts Android resources
+            var resolveLibraryProject = target.AddTask("ResolveLibraryProjectImports");
+            resolveLibraryProject.SetParameter("Assemblies", "@(ResolvedUserAssemblies)");
+            resolveLibraryProject.SetParameter("UseShortFileNames", "False");
+            resolveLibraryProject.SetParameter("ImportsDirectory", intermediateDir);
+            resolveLibraryProject.SetParameter("OutputDirectory", intermediateDir);
+            resolveLibraryProject.SetParameter("OutputImportDirectory", intermediateDir);
+            resolveLibraryProject.AddOutputItem("ResolvedAssetDirectories", "ResolvedAssetDirectories");
+            resolveLibraryProject.AddOutputItem("ResolvedResourceDirectories", "ResolvedResourceDirectories");
+
+            //Create ItemGroup of Android files
+            var androidResources = target.AddItemGroup();
+            androidResources.AddItem("AndroidAsset", @"%(ResolvedAssetDirectories.Identity)\**\*").Condition = "'@(ResolvedAssetDirectories)' != ''";
+            androidResources.AddItem("AndroidResource", @"%(ResolvedResourceDirectories.Identity)\**\*").Condition = "'@(ResolvedAssetDirectories)' != ''";
+
+            //Copy Task, to copy AndroidAsset files
+            var copy = target.AddTask("Copy");
+            copy.SetParameter("SourceFiles", "@(AndroidAsset)");
+            copy.SetParameter("DestinationFiles", $"@(AndroidAsset->'{assetsDir + Path.DirectorySeparatorChar}%(RecursiveDir)%(Filename)%(Extension)')");
+
+            //Copy Task, to copy AndroidResource files
+            copy = target.AddTask("Copy");
+            copy.SetParameter("SourceFiles", "@(AndroidResource)");
+            copy.SetParameter("DestinationFiles", $"@(AndroidResource->'{resourceDir + Path.DirectorySeparatorChar}%(RecursiveDir)%(Filename)%(Extension)')");
 
             //XmlPoke to fix up AndroidManifest
             var xmlPoke = target.AddTask("XmlPoke");
