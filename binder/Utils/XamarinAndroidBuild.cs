@@ -130,7 +130,7 @@ namespace MonoEmbeddinator4000
             aapt.SetParameter("OutputImportDirectory", outputDirectory);
             aapt.SetParameter("ManifestFiles", manifestPath);
             aapt.SetParameter("ApplicationName", packageName);
-            aapt.SetParameter("JavaPlatformJarPath", Path.Combine(AndroidSdk.GetPlatformDirectory(AndroidSdk.GetInstalledPlatformVersions().Select(v => v.ApiLevel).Max()), "android.jar"));
+            aapt.SetParameter("JavaPlatformJarPath", Path.Combine(XamarinAndroid.PlatformDirectory, "android.jar"));
             aapt.SetParameter("JavaDesignerOutputDirectory", outputDirectory);
             aapt.SetParameter("AssetDirectory", assetsDir);
             aapt.SetParameter("ResourceDirectory", resourceDir);

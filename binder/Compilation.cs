@@ -387,9 +387,7 @@ namespace MonoEmbeddinator4000
 
             if (Options.Compilation.Platform == TargetPlatform.Android)
             {
-                var maxVersion = AndroidSdk.GetInstalledPlatformVersions().Select(m => m.ApiLevel).Max();
-                var androidDir = AndroidSdk.GetPlatformDirectory(maxVersion);
-                bootClassPath = Path.Combine(androidDir, "android.jar");
+                bootClassPath = Path.Combine(XamarinAndroid.PlatformDirectory, "android.jar");
             }
 
             var javaFiles = files.Select(file => Path.GetFullPath(file)).ToList();
@@ -425,9 +423,7 @@ namespace MonoEmbeddinator4000
             var jnaJar = Path.Combine(Helpers.FindDirectory("external"), "jna", "jna-4.4.0.jar");
             if (Options.Compilation.Platform == TargetPlatform.Android)
             {
-                var maxVersion = AndroidSdk.GetInstalledPlatformVersions().Select(m => m.ApiLevel).Max();
-                var androidDir = AndroidSdk.GetPlatformDirectory(maxVersion);
-                var androidJar = Path.Combine(androidDir, "android.jar");
+                var androidJar = Path.Combine(XamarinAndroid.PlatformDirectory, "android.jar");
                 var monoAndroidJar = XamarinAndroid.FindAssembly("mono.android.jar");
                 var delimiter = Platform.IsWindows ? ";" : ":";
                 args.Add("\"" + string.Join(delimiter, jnaJar, androidJar, monoAndroidJar) + "\"");
@@ -858,7 +854,7 @@ namespace MonoEmbeddinator4000
                 }
 
                 var clangBin = NdkUtil.GetNdkClangBin(Path.Combine(ndkPath, "toolchains"), targetArch);
-                var systemInclude = NdkUtil.GetNdkPlatformIncludePath(ndkPath, targetArch, 24); //NOTE: 24 should be an option?
+                var systemInclude = NdkUtil.GetNdkPlatformIncludePath(ndkPath, targetArch, XamarinAndroid.ApiLevel);
                 var monoDroidPath = Path.Combine(XamarinAndroid.LibraryPath, abi);
                 var abiDir = Path.Combine(Options.OutputDir, "android", "jni", abi);
                 var outputPath = Path.Combine(abiDir, libName);

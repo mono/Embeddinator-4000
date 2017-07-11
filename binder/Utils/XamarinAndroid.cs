@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.IO;
 using CppSharp;
 using Xamarin.Android.Tools;
@@ -103,6 +104,26 @@ namespace MonoEmbeddinator4000
             }
 
             throw new FileNotFoundException("Unable to find assembly!", assemblyName);
+        }
+
+        static Lazy<int> apiLevel = new Lazy<int>(() => AndroidSdk.GetInstalledPlatformVersions().Select(m => m.ApiLevel).Max());
+
+        /// <summary>
+        /// Right now we are choosing the max API level installed
+        /// </summary>
+        public static int ApiLevel
+        {
+            get { return apiLevel.Value; }
+        }
+
+        static Lazy<string> platformDirectory = new Lazy<string>(() => AndroidSdk.GetPlatformDirectory(ApiLevel));
+
+        /// <summary>
+        /// Gets the platform directory based on the max API level installed
+        /// </summary>
+        public static string PlatformDirectory
+        {
+            get { return platformDirectory.Value; }
         }
     }
 }
