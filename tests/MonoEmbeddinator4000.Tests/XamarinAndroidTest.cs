@@ -6,15 +6,12 @@ using System.IO;
 namespace MonoEmbeddinator4000.Tests
 {
     [TestFixture]
-    public class XamarinAndroidTest
+    public class XamarinAndroidTest : CurrentDirectoryTest
     {
-        string cwd;
-
         [SetUp]
-        public void SetUp()
+        public override void SetUp()
         {
-            cwd = Environment.CurrentDirectory;
-            Environment.CurrentDirectory = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(GetType().Assembly.Location), "..", ".."));
+            base.SetUp();
 
             AndroidLogger.Error += AndroidLogger_Error;
             AndroidLogger.Warning += AndroidLogger_Error;
@@ -22,9 +19,9 @@ namespace MonoEmbeddinator4000.Tests
         }
 
         [TearDown]
-        public void TearDown()
+        public override void TearDown()
         {
-            Environment.CurrentDirectory = cwd;
+            base.TearDown();
 
             AndroidLogger.Error -= AndroidLogger_Error;
             AndroidLogger.Warning -= AndroidLogger_Error;
