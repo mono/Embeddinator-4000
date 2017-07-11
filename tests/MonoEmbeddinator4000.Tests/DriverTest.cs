@@ -65,7 +65,8 @@ namespace MonoEmbeddinator4000.Tests
             var builder = new StringBuilder();
             foreach (var file in driver.Output.Files.Keys)
             {
-                builder.AppendLine(file);
+                //NOTE: replace \ so this works on Windows
+                builder.AppendLine(file.Replace('\\', '/'));
             }
             Approvals.Verify(builder.ToString());
         }
