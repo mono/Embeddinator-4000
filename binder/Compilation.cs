@@ -367,9 +367,6 @@ namespace MonoEmbeddinator4000
 
         string GetJavaSdkPath()
         {
-            if (Options.Compilation.Platform == TargetPlatform.Android)
-                return AndroidSdk.JavaSdkPath;
-
             // If we are running on macOS, invoke java_home to figure out Java path.
             if (Platform.IsMacOS)
                 return Invoke("/usr/libexec/java_home", null, null).StandardOutput.Trim();
