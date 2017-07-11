@@ -94,7 +94,7 @@ Task("Build-Android")
     .IsDependentOn("NuGet-Restore")
     .Does(() =>
     {
-        MSBuild("./tests/managed/android/managed-android.csproj", settings => settings.SetConfiguration(configuration).SetVerbosity(Verbosity.Minimal));
+        MSBuild("./tests/managed/android/managed-android.csproj", settings => settings.SetConfiguration(configuration).SetPlatformTarget(PlatformTarget.MSIL).SetVerbosity(Verbosity.Minimal));
     });
 
 Task("Build-PCL")
