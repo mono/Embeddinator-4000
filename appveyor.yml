@@ -29,6 +29,9 @@ platform:
 configuration:
   - Release
 
+environment:
+  MONO_INSTALLER: mono-5.0.1.1-gtksharp-2.12.44-win32-0.msi
+
 #---------------------------------#
 #    build scripts                #
 #---------------------------------#
@@ -41,6 +44,10 @@ clone_script:
   - cmd: cd %APPVEYOR_BUILD_FOLDER%
   - cmd: git checkout -qf %APPVEYOR_REPO_COMMIT%
   - cmd: git submodule update --init --recursive
+
+install:
+  - cmd: appveyor DownloadFile https://download.mono-project.com/archive/5.0.1/windows-installer/%MONO_INSTALLER%
+  - cmd: msiexec /i %MONO_INSTALLER%
 
 build_script:
   - ps: .\build.ps1 -t Generate-Android -v diagnostic
