@@ -12,7 +12,7 @@ namespace MonoEmbeddinator4000
     /// </summary>
     static class XamarinAndroid
     {
-        public const string TargetFrameworkVersion = "v2.3";
+        public const string TargetFrameworkVersion = "v7.0";
         public const string MinSdkVersion = "9";
         public const string TargetSdkVersion = "25";
 
@@ -82,7 +82,8 @@ namespace MonoEmbeddinator4000
         {
             Combine(Path, "lib", "xbuild-frameworks", "MonoAndroid", "v1.0"),
             Combine(Path, "lib", "xbuild-frameworks", "MonoAndroid", "v1.0", "Facades"),
-            Combine(Path, "lib", "xbuild-frameworks", "MonoAndroid", TargetFrameworkVersion)
+            Combine(Path, "lib", "xbuild-frameworks", "MonoAndroid", TargetFrameworkVersion),
+            Combine(Path, "lib", "xbuild-frameworks", "MonoAndroid", "v2.3"), //Mono.Android.Export.dll is here
         });
 
         public static string[] TargetFrameworkDirectories
