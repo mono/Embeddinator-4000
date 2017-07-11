@@ -1,4 +1,5 @@
 ﻿using System.CodeDom.Compiler;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -11,18 +12,30 @@ namespace MonoEmbeddinator4000.Tests
     /// A set of integration tests / approval tests verifying generated java code
     /// </summary>
     [TestFixture]
-    public class DriverTest
+    public class DriverTest : TempFileTest
     {
-        string temp = Path.Combine(Path.GetTempPath(), "hello.dll");
         Project project;
         Options options;
         Driver driver;
 
-        [TearDown]
-        public void TearDown()
+        [SetUp]
+        public override void SetUp()
         {
-            if (File.Exists(temp))
-                File.Delete(temp);
+            base.SetUp();
+
+            var outputDir = Path.Combine(Path.GetDirectoryName(GetType().Assembly.Location), "output");
+            temp = Path.Combine(Path.GetTempPath(), "hello.dll");
+            tempFiles = new List<string> { temp, outputDir };
+
+            project = new Project();
+            options = new Options
+            {
+                GeneratorKind = GeneratorKind.Java,
+                CompileCode = true,
+            };
+
+            options.OutputDir =
+                project.OutputPath = outputDir;
         }
 
         void RunDriver(string resourceFile)
@@ -33,14 +46,6 @@ namespace MonoEmbeddinator4000.Tests
             };
             AssemblyGenerator.CreateFromResource(resourceFile, parameters);
 
-            project = new Project();
-            options = new Options
-            {
-                GeneratorKind = GeneratorKind.Java,
-            };
-
-            options.OutputDir =
-                project.OutputPath = Path.GetDirectoryName(GetType().Assembly.Location);
             project.Assemblies.Add(temp);
 
             driver = new Driver(project, options);
@@ -77,8 +82,7 @@ namespace MonoEmbeddinator4000.Tests
             RunDriver("Hello");
 
             string path = Path.Combine(options.OutputDir, driver.Output.Files.Keys.First());
-            string java = File.ReadAllText(path);
-            Approvals.Verify(java);
+            Approvals.VerifyFile(path);
         }
 
         [Test]
@@ -87,8 +91,7 @@ namespace MonoEmbeddinator4000.Tests
             RunDriver("Hello");
 
             string path = Path.Combine(options.OutputDir, driver.Output.Files.Keys.Last());
-            string java = File.ReadAllText(path);
-            Approvals.Verify(java);
+            Approvals.VerifyFile(path);
         }
 
         [Test]
@@ -97,8 +100,31 @@ namespace MonoEmbeddinator4000.Tests
             RunDriver("HelloUpper");
 
             string path = Path.Combine(options.OutputDir, driver.Output.Files.Keys.First());
-            string java = File.ReadAllText(path);
-            Approvals.Verify(java); //TODO: I don't know if "String wORLD()" is what we want
+            Approvals.VerifyFile(path); //TODO: I don't know if "String wORLD()" is what we want
+        }
+
+        [Test]
+        public void AssemblyWithDots()
+        {
+            temp = Path.Combine(Path.GetTempPath(), "hello.with.dots.dll");
+            tempFiles.Add(temp);
+
+            RunDriver("Hello");
+
+            string path = Path.Combine(options.OutputDir, driver.Output.Files.Keys.First());
+            Approvals.VerifyFile(path);
+        }
+
+        [Test]
+        public void AssemblyWithUpperCase()
+        {
+            temp = Path.Combine(Path.GetTempPath(), "HELLO.dll");
+            tempFiles.Add(temp);
+
+            RunDriver("Hello");
+
+            string path = Path.Combine(options.OutputDir, driver.Output.Files.Keys.First());
+            Approvals.VerifyFile(path);
         }
     }
 }

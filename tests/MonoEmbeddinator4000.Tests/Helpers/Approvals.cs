@@ -33,6 +33,19 @@ namespace MonoEmbeddinator4000.Tests
         }
 
         /// <summary>
+        /// Verifies an existing file against the approved text on disk.
+        /// - Make sure to call this method directly from the unit test method, so that [CallerFilePath] works properly
+        /// </summary>
+        public static void VerifyFile(string filePath, [CallerFilePath]string sourceFile = null, [CallerMemberName]string member = null)
+        {
+            string received = GetPath(sourceFile, member, "received");
+            string approved = GetPath(sourceFile, member, "approved");
+            File.Copy(filePath, received, true);
+            FileAssert.AreEqual(approved, received);
+            File.Delete(received);
+        }
+
+        /// <summary>
         /// Do not commit code using this method. It should be used temporarily to approve a test.
         /// </summary>
         [Obsolete("Do not commit code using this method. It should be used temporarily to approve a test.")]
@@ -45,6 +58,21 @@ namespace MonoEmbeddinator4000.Tests
             string approved = GetPath(sourceFile, member, "approved");
             File.WriteAllText(approved, text);
             Verify(text, sourceFile, member);
+        }
+
+        /// <summary>
+        /// Do not commit code using this method. It should be used temporarily to approve a test.
+        /// </summary>
+        [Obsolete("Do not commit code using this method. It should be used temporarily to approve a test.")]
+        public static void ApproveFile(string filePath, [CallerFilePath]string sourceFile = null, [CallerMemberName]string member = null)
+        {
+#if !DEBUG
+            //Fail release builds on purpose
+            Assert.Fail("This test is using Approvals.ApproveFile() when it should be using Approvals.VerifyFile()!");
+#endif
+            string approved = GetPath(sourceFile, member, "approved");
+            File.Copy(filePath, approved, true);
+            VerifyFile(filePath, sourceFile, member);
         }
     }
 }

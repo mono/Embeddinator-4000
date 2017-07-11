@@ -11,15 +11,14 @@ namespace MonoEmbeddinator4000.Tests
     /// These are a set of integration/approval tests validating that we are getting expected C# code from ResourceDesignerGenerator
     /// </summary>
     [TestFixture]
-    public class ResourceDesignerTest
+    public class ResourceDesignerTest : UniverseTest
     {
         ResourceDesignerGenerator generator;
-        Universe universe;
 
         [SetUp]
-        public void SetUp()
+        public override void SetUp()
         {
-            universe = new Universe();
+            base.SetUp();
 
             generator = new ResourceDesignerGenerator
             {
@@ -28,19 +27,8 @@ namespace MonoEmbeddinator4000.Tests
             };
         }
 
-        [TearDown]
-        public void TearDown()
-        {
-            //Locks files on Windows
-            universe.Dispose();
-
-            //Temp file
-            File.Delete(generator.MainAssembly);
-        }
-
         Assembly LoadAssembly(string resourceFile)
         {
-            var temp = Path.GetTempFileName();
             var parameters = new CompilerParameters
             {
                 OutputAssembly = temp,

@@ -1,53 +1,62 @@
 ﻿using NUnit.Framework;
 using System.IO;
 using System.CodeDom.Compiler;
-using IKVM.Reflection;
+using System.Collections.Generic;
 
 namespace MonoEmbeddinator4000.Tests
 {
     [TestFixture]
-    public class XamarinAndroidBuildTest
+    public class XamarinAndroidBuildTest : UniverseTest
     {
-        Universe universe;
-        string temp = Path.Combine(Path.GetTempPath(), "hello.dll");
+        string manifestPath;
 
-        [SetUp]
-        public void SetUp()
+        public override void SetUp()
         {
-            universe = new Universe();
+            base.SetUp();
+
+            temp = Path.Combine(Path.GetTempPath(), "hello.dll");
+            manifestPath = Path.GetTempFileName();
+
+            tempFiles = new List<string> { temp, manifestPath };
         }
 
-        [TearDown]
-        public void TearDown()
-        {
-            //Locks files on Windows
-            universe.Dispose();
-
-            if (File.Exists(temp))
-                File.Delete(temp);
-        }
-
-        [Test]
-        public void AndroidManifest()
+        void GenerateAssembly()
         {
             var parameters = new CompilerParameters
             {
                 OutputAssembly = temp,
             };
             AssemblyGenerator.CreateFromResource("Hello", parameters);
+        }
 
-            var assembly = universe.LoadFile(temp);
-            var manifestPath = Path.GetTempFileName();
-            try
-            {
-                XamarinAndroidBuild.GenerateAndroidManifest(new[] { assembly }, manifestPath, true);
+        [Test]
+        public void AndroidManifest()
+        {
+            GenerateAssembly();
+            XamarinAndroidBuild.GenerateAndroidManifest(new[] { universe.LoadFile(temp) }, manifestPath, true);
+            Approvals.VerifyFile(manifestPath);
+        }
 
-                Approvals.Verify(File.ReadAllText(manifestPath));
-            }
-            finally
-            {
-                File.Delete(manifestPath);
-            }
+        [Test]
+        public void AndroidManifestWithDots()
+        {
+            temp = Path.Combine(Path.GetTempPath(), "hello.with.dots.dll");
+            tempFiles.Add(temp);
+
+            GenerateAssembly();
+            XamarinAndroidBuild.GenerateAndroidManifest(new[] { universe.LoadFile(temp) }, manifestPath, true);
+            Approvals.VerifyFile(manifestPath);
+        }
+
+        [Test]
+        public void AndroidManifestWithUpperCase()
+        {
+            temp = Path.Combine(Path.GetTempPath(), "HELLO.dll");
+            tempFiles.Add(temp);
+
+            GenerateAssembly();
+            XamarinAndroidBuild.GenerateAndroidManifest(new[] { universe.LoadFile(temp) }, manifestPath, true);
+            Approvals.VerifyFile(manifestPath);
         }
     }
 }
