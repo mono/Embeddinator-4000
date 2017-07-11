@@ -5,6 +5,7 @@ using Android.App;
 using Android.Content;
 using Android.OS;
 using Android.Runtime;
+using Android.Support.V4.Content;
 using Android.Util;
 using Android.Widget;
 using Java.Interop;
@@ -98,6 +99,14 @@ namespace Android
             string html = client.DownloadString("https://www.google.com");
             if (string.IsNullOrEmpty(html))
                 throw new Exception("String should not be blank!");
+        }
+
+        [Export("callIntoSupportLibrary")]
+        public static void CallIntoSupportLibrary()
+        {
+            var manager = LocalBroadcastManager.GetInstance(Application.Context);
+            if (manager == null)
+                throw new Exception("LocalBroadcastManager should not be null!");
         }
     }
 }
