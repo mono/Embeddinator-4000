@@ -295,4 +295,8 @@ Task("Default")
 Task("Android")
     .IsDependentOn("Run-Android-Tests");
 
+Task("AppVeyor")
+    .IsDependentOn("Generate-Android")
+    .IsDependentOn("Run-CSharp-Tests");
+
 RunTarget(target);

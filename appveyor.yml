@@ -46,4 +46,4 @@ install:
 
 build_script:
   - cmd: git submodule update --init --recursive
-  - ps: .\build.ps1 -t Generate-Android -v diagnostic
+  - ps: .\build.ps1 -t AppVeyor -v diagnostic
