@@ -99,4 +99,9 @@ public class AndroidTests {
     public void webRequest() {
         AndroidAssertions.webRequest();
     }
+
+    @Test
+    public void callIntoSupportLibrary() {
+        AndroidAssertions.callIntoSupportLibrary();
+    }
 }
