@@ -23,6 +23,10 @@ namespace MonoEmbeddinator4000
                 msBuildPath = msBuildPath + Path.DirectorySeparatorChar;
 
             var project = ProjectRootElement.Create();
+            project.AddProperty("Configuration", "Release");
+            project.AddProperty("Platform", "AnyCPU");
+            project.AddProperty("PlatformTarget", "AnyCPU");
+            project.AddProperty("OutputPath", "bin\\Release");
             project.AddProperty("TargetFrameworkDirectory", string.Join(";", XamarinAndroid.TargetFrameworkDirectories));
             project.AddImport(ProjectCollection.Escape(Path.Combine(msBuildPath, "Xamarin.Android.CSharp.targets")));
 
