@@ -58,7 +58,7 @@ Your layout source should look something like this:
 In your activity, make sure you are calling `SetContentView` with your new layout:
 ```csharp
 [Activity(Label = "HelloActivity"), 
-    Register("hello_from_csharp_dll.HelloActivity")]
+    Register("hello_from_csharp.HelloActivity")]
 public class HelloActivity : Activity
 {
     protected override void OnCreate(Bundle savedInstanceState)
@@ -109,7 +109,7 @@ To use the new module from your `app`, right-click and choose `Open Module Setti
 
 In your activity, add a new `onResume` method, and let's do the easiest thing to launch our C# activity:
 ```java
-import hello_from_csharp_dll.*;
+import hello_from_csharp.*;
 
 public class MainActivity extends AppCompatActivity {
     //... Other stuff here ...
