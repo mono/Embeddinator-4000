@@ -47,7 +47,7 @@ clone_script:
 
 install:
   - cmd: appveyor DownloadFile https://download.mono-project.com/archive/5.0.1/windows-installer/%MONO_INSTALLER%
-  - cmd: msiexec /i %MONO_INSTALLER%
+  - cmd: msiexec /i %MONO_INSTALLER% /qn /norestart
 
 build_script:
   - ps: .\build.ps1 -t Generate-Android -v diagnostic
