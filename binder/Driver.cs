@@ -198,21 +198,10 @@ namespace MonoEmbeddinator4000
 
             if (Options.GeneratorKind == GeneratorKind.Java && Options.Compilation.Platform == TargetPlatform.Android)
             {
-                if (Assemblies.Any(
-                    a => a.CustomAttributes.Any(
-                        ca => ca.AttributeType.FullName == "System.Runtime.Versioning.TargetFrameworkAttribute" &&
-                              ca.ConstructorArguments.FirstOrDefault().Value.ToString().StartsWith("MonoAndroid,", StringComparison.Ordinal))))
-                {
-                    Diagnostics.Message("Generating Java stubs...");
-                    var project = XamarinAndroidBuild.GenerateJavaStubsProject(Assemblies, Options.OutputDir);
-                    if (!MSBuild(project))
-                        return false;
-                }
-                else
-                {
-                    //We need a default AndroidManifest.xml otherwise
-                    XamarinAndroidBuild.GenerateAndroidManifest(Assemblies, Path.Combine(Options.OutputDir, "android", "AndroidManifest.xml"));
-                }
+                Diagnostics.Message("Generating Java stubs...");
+                var project = XamarinAndroidBuild.GenerateJavaStubsProject(Assemblies, Options.OutputDir);
+                if (!MSBuild(project))
+                    return false;
             }
 
             return true;
