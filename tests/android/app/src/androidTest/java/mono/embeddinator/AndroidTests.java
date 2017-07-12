@@ -18,7 +18,7 @@ import mono.embeddinator.android.*;
 public class AndroidTests {
     //We need an activity for these tests
     @Rule
-    public ActivityTestRule rule = new ActivityTestRule<>(MainActivity.class);
+    public ActivityTestRule<MainActivity> rule = new ActivityTestRule<>(MainActivity.class);
 
     @Test
     public void createView() throws Throwable {
