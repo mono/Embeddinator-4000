@@ -3,7 +3,9 @@
 In addition to the requirements from our [Getting started with Java](getting-started-java.md) guide you'll also need:
 
 * Xamarin.Android 7.4.99 or later (build from [Jenkins](https://jenkins.mono-project.com/view/Xamarin.Android/job/xamarin-android/lastSuccessfulBuild/Azure/))
-* Android Studio 2.3.2 or later (with [Java 8](https://developer.android.com/guide/platform/j8-jack.html))
+* Android Studio 2.3.2 or later (with [Java 1.8](https://developer.android.com/guide/platform/j8-jack.html))
+
+*NOTE: the state of using Java 1.8 in Android Studio is currently in [flux](https://android-developers.googleblog.com/2017/03/future-of-java-8-language-feature.html) at the moment. At the time of writing, the options are to enable the Jack toolchain in your project or use a preview version of Android Studio.*
 
 As an overview, we will:
 * Clone Embeddinator-4000
