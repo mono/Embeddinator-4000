@@ -5,6 +5,7 @@ using Android.App;
 using Android.Content;
 using Android.OS;
 using Android.Runtime;
+using Android.Support.V4.Content;
 using Android.Util;
 using Android.Widget;
 using Java.Interop;
@@ -72,11 +73,9 @@ namespace Android
     public class AndroidAssertions : Java.Lang.Object
     {
         [Export("applicationContext")]
-        public static void ApplicationContext()
+        public static Context ApplicationContext()
         {
-            var context = Application.Context;
-            if (context == null)
-                throw new Exception("Application.Context must not be null!");
+            return Application.Context;
         }
 
         [Export("asyncAwait")]
@@ -91,13 +90,16 @@ namespace Android
         }
 
         [Export("webRequest")]
-        public static void WebRequest()
+        public static string WebRequest()
         {
-            var client = new WebClient();
+            using (var client = new WebClient())
+                return client.DownloadString("https://www.google.com");
+        }
 
-            string html = client.DownloadString("https://www.google.com");
-            if (string.IsNullOrEmpty(html))
-                throw new Exception("String should not be blank!");
+        [Export("callIntoSupportLibrary")]
+        public static LocalBroadcastManager CallIntoSupportLibrary()
+        {
+            return LocalBroadcastManager.GetInstance(Application.Context);
         }
     }
 }

@@ -409,7 +409,7 @@ namespace MonoEmbeddinator4000
 
             var args = new List<string> {
                 string.Join(" ", javaFiles),
-                "-source 1.7 -target 1.7",
+                $"-source {XamarinAndroid.JavaVersion} -target {XamarinAndroid.JavaVersion}",
                 $"-bootclasspath \"{bootClassPath}\"",
                 $"-d {classesDir}",
             };
@@ -426,7 +426,19 @@ namespace MonoEmbeddinator4000
                 var androidJar = Path.Combine(XamarinAndroid.PlatformDirectory, "android.jar");
                 var monoAndroidJar = XamarinAndroid.FindAssembly("mono.android.jar");
                 var delimiter = Platform.IsWindows ? ";" : ":";
-                args.Add("\"" + string.Join(delimiter, jnaJar, androidJar, monoAndroidJar) + "\"");
+                var classpath = new List<string> { jnaJar, androidJar, monoAndroidJar };
+
+                //Now we need to add any additional jars from binding projects to the classpath
+                var intermediateDir = Path.Combine(Options.OutputDir, "obj");
+                if (Directory.Exists(intermediateDir))
+                {
+                    foreach (var jar in Directory.GetFiles(intermediateDir, "*.jar", SearchOption.AllDirectories))
+                    {
+                        classpath.Add(jar);
+                    }
+                }
+
+                args.Add("\"" + string.Join(delimiter, classpath) + "\"");
             }
             else
             {

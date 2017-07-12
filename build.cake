@@ -68,6 +68,9 @@ Task("Clean")
     .Does(() =>
     {
         CleanDirectory(buildDir);
+        CleanDirectories(GetDirectories("./tests/**/obj"));
+        CleanDirectories(GetDirectories("./tests/**/bin"));
+        CleanDirectories(GetDirectories("./tests/android/**/build"));
     });
 
 Task("NuGet-Restore")

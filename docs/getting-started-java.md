@@ -5,7 +5,7 @@ This is the getting started page for Java, which covers the basics for all suppo
 ## Requirements
 
 In order to use the embeddinator with Java you will need:
-* Java 1.7 or later
+* Java 1.8 or later
 * [Mono 5.0](http://www.mono-project.com/download/)
 
 For Mac:
@@ -17,7 +17,7 @@ For Windows:
 
 For Android:
 * Xamarin.Android 7.4.99 or later (build from [Jenkins](https://jenkins.mono-project.com/view/Xamarin.Android/job/xamarin-android/lastSuccessfulBuild/Azure/))
-* Android Studio 2.3.2 or later
+* Android Studio 2.3.2 or later (with [Java 1.8](https://developer.android.com/guide/platform/j8-jack.html))
 
 Optionally you can install [Xamarin Studio](https://developer.xamarin.com/guides/cross-platform/xamarin-studio/) or the new [Visual Studio for Mac](https://www.visualstudio.com/vs/visual-studio-mac/) to edit and compile your C# code. The rest of the getting started guide assume you'll be using **Visual Studio for Mac**.
 
@@ -39,7 +39,7 @@ argument to the embeddinator. Currently `macOS` and `Android` are supported. `Wi
 
 ### macOS and Windows
 
-For development, should be able to use any Java IDE that supports Java 1.7. You can even use Android Studio for this if desired, [see here](https://stackoverflow.com/questions/16626810/can-android-studio-be-used-to-run-standard-java-projects). You can use the JAR file output as you would any standard Java jar file.
+For development, should be able to use any Java IDE that supports Java 1.8. You can even use Android Studio for this if desired, [see here](https://stackoverflow.com/questions/16626810/can-android-studio-be-used-to-run-standard-java-projects). You can use the JAR file output as you would any standard Java jar file.
 
 ### Android
 

@@ -49,6 +49,10 @@ namespace MonoEmbeddinator4000
         bool Parse()
         {
             var parser = new Parser();
+            foreach (var assembly in Project.Assemblies)
+            {
+                parser.AddAssemblyResolveDirectory(Path.GetDirectoryName(assembly));
+            }
             if (Options.Compilation.Platform == TargetPlatform.Android)
             {
                 foreach (var dir in XamarinAndroid.TargetFrameworkDirectories)
