@@ -15,6 +15,7 @@ namespace MonoEmbeddinator4000
         public const string TargetFrameworkVersion = "v7.0";
         public const string MinSdkVersion = "9";
         public const string TargetSdkVersion = "25";
+        public const string JavaVersion = "1.8";
 
         static XamarinAndroid()
         {

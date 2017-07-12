@@ -409,7 +409,7 @@ namespace MonoEmbeddinator4000
 
             var args = new List<string> {
                 string.Join(" ", javaFiles),
-                "-source 1.7 -target 1.7",
+                $"-source {XamarinAndroid.JavaVersion} -target {XamarinAndroid.JavaVersion}",
                 $"-bootclasspath \"{bootClassPath}\"",
                 $"-d {classesDir}",
             };
