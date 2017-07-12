@@ -35,12 +35,8 @@ namespace MonoEmbeddinator4000.Generators
 
         TranslationUnit GetTranslationUnit(Assembly assembly)
         {
-            var assemblyName = Path.GetFileName(assembly.Location);
-            return GetTranslationUnit(assemblyName);
-        }
+            var assemblyName = Options.LibraryName ?? Path.GetFileName (assembly.Location);
 
-        TranslationUnit GetTranslationUnit(string assemblyName)
-        {
             var unit = ASTContext.TranslationUnits.Find(m => m.FileName.Equals(assemblyName));
             if (unit != null)
                 return unit;
@@ -55,10 +51,7 @@ namespace MonoEmbeddinator4000.Generators
         {
             CurrentAssembly = assembly;
 
-            var assemblyName = Path.GetFileName (assembly.Location);
-            var name = Options.LibraryName ?? assemblyName;
-
-            var unit = GetTranslationUnit(name);
+            var unit = GetTranslationUnit(assembly);
 
             foreach (var type in assembly.ExportedTypes)
             {
