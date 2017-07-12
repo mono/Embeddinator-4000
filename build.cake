@@ -300,6 +300,7 @@ Task("Android")
 
 Task("AppVeyor")
     .IsDependentOn("Generate-Android")
+    .IsDependentOn("Generate-Android-PCL")
     .IsDependentOn("Build-CSharp-Tests");
 
 RunTarget(target);
