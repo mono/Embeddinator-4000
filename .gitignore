@@ -65,5 +65,6 @@ xcuserdata/
 *.nupkg
 .cake/**
 !.cake/packages.config
+.vscode/
 Resource.designer.cs
 external/Xamarin.Android
