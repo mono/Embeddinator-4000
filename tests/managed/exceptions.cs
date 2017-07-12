@@ -10,7 +10,7 @@ namespace Exceptions {
 		// objc: exceptions are, mostly, terminal but it's _ok_ for `init` to return `nil`
 		public Throwers ()
 		{
-#if PCL
+#if PCL || NETSTANDARD1_6
 			throw new Exception ("Not a finite number!");
 #else
 			throw new NotFiniteNumberException ();
