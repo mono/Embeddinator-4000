@@ -77,6 +77,9 @@ MONO_EMBEDDINATOR_END_DECLS
 typedef void * gpointer;
 typedef uint16_t gunichar2;
 
+typedef struct _GArray GArray;
+typedef struct _GString GString;
+
 /* This is copied from mono's header files */
 
 /* utils/mono-publib.h */
@@ -90,10 +93,6 @@ typedef uint16_t mono_unichar2;
 typedef struct _MonoAssembly MonoAssembly;
 typedef struct _MonoAssemblyName MonoAssemblyName;
 typedef struct _MonoImage MonoImage;
-
-
-typedef struct _GArray GArray;
-typedef struct _GString GString;
 
 /* metadata/metadata.h */
 typedef struct _MonoClass MonoClass;
@@ -116,13 +115,13 @@ typedef struct MonoMethodDesc MonoMethodDesc;
 typedef MonoMethodDesc* (*_mono_method_desc_new_fptr) (const char *name, mono_bool include_namespace);
 typedef void            (*_mono_method_desc_free_fptr) (MonoMethodDesc *desc);
 typedef MonoMethod*     (*_mono_method_desc_search_in_class_fptr) (MonoMethodDesc *desc, MonoClass *klass);
-typedef void            (*_mono_jit_cleanup_fptr)           (MonoDomain *domain);
-typedef MonoAssembly*   (*_mono_domain_assembly_open_fptr)  (MonoDomain *domain, const char *name);
+typedef void            (*_mono_jit_cleanup_fptr) (MonoDomain *domain);
+typedef MonoAssembly*   (*_mono_domain_assembly_open_fptr) (MonoDomain *domain, const char *name);
 typedef int             (*_mono_string_length_fptr) (MonoString *s);
-typedef mono_unichar2*  (*_mono_string_chars_fptr)  (MonoString *s);
+typedef mono_unichar2*  (*_mono_string_chars_fptr) (MonoString *s);
 typedef MonoObject*     (*_mono_field_get_value_object_fptr) (MonoDomain *domain, MonoClassField *field, MonoObject *obj);
 typedef void            (*_mono_field_set_value_fptr) (MonoObject *obj, MonoClassField *field, void *value);
-typedef MonoVTable*     (*_mono_class_vtable_fptr)          (MonoDomain *domain, MonoClass *klass);
+typedef MonoVTable*     (*_mono_class_vtable_fptr) (MonoDomain *domain, MonoClass *klass);
 typedef void            (*_mono_field_static_set_value_fptr) (MonoVTable *vt, MonoClassField *field, void *value);
 typedef MonoString*     (*_mono_object_to_string_fptr) (MonoObject *obj, MonoObject **exc);
 typedef MonoClass*      (*_mono_class_get_fptr) (MonoImage *image, uint32_t type_token);
