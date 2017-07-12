@@ -8,6 +8,7 @@ var embeddinator = buildDir + File("MonoEmbeddinator4000.exe");
 var managedDll = Directory("./tests/managed/generic/bin") + Directory(configuration) + File("managed.dll");
 var androidDll = Directory("./tests/managed/android/bin") + Directory(configuration) + File("managed.dll");
 var pclDll = Directory("./tests/managed/pcl/bin") + Directory(configuration) + File("managed.dll");
+var netStandardDll = Directory("./tests/managed/netstandard/bin") + Directory(configuration) + File("netstandard1.6/managed.dll");
 
 //Java settings
 string javaHome;
@@ -106,6 +107,16 @@ Task("Build-PCL")
     .Does(() =>
     {
         MSBuild("./tests/managed/pcl/managed-pcl.csproj", settings => settings.SetConfiguration(configuration).SetVerbosity(Verbosity.Minimal));
+    });
+
+Task("Build-NetStandard")
+    .IsDependentOn("Clean")
+    .IsDependentOn("NuGet-Restore")
+    .Does(() =>
+    {
+        var project = "./tests/managed/netstandard/managed-netstandard.csproj";
+        DotNetCoreRestore(project);
+        MSBuild(project, settings => settings.SetConfiguration(configuration).SetVerbosity(Verbosity.Minimal));
     });
 
 Task("Generate-C")
@@ -212,6 +223,16 @@ Task("Generate-Android-PCL")
         Exec(embeddinator, $"-gen=Java -out={output} -platform=Android -compile -target=shared {pclDll}");
     });
 
+Task("Generate-Android-NetStandard")
+    .IsDependentOn("Download-Xamarin-Android")
+    .IsDependentOn("Build-Binder")
+    .IsDependentOn("Build-NetStandard")
+    .Does(() =>
+    {
+        var output = buildDir + Directory("netstandard");
+        Exec(embeddinator, $"-gen=Java -out={output} -platform=Android -compile -target=shared {netStandardDll}");
+    });
+
 Task("Build-CSharp-Tests")
     .IsDependentOn("Build-Binder")
     .IsDependentOn("Build-Managed")
@@ -301,6 +322,7 @@ Task("Android")
 Task("AppVeyor")
     .IsDependentOn("Generate-Android")
     .IsDependentOn("Generate-Android-PCL")
+    .IsDependentOn("Generate-Android-NetStandard")
     .IsDependentOn("Build-CSharp-Tests");
 
 RunTarget(target);
