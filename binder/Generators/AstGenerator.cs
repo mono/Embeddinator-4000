@@ -27,6 +27,9 @@ namespace MonoEmbeddinator4000.Generators
         public static Dictionary<Declaration, string> ManagedNames
             = new Dictionary<Declaration, string>();
 
+        public static Dictionary<TranslationUnit, Assembly> ManagedAssemblies
+            = new Dictionary<TranslationUnit, Assembly>();
+
         public ASTGenerator(ASTContext context, Options options)
         {
             ASTContext = context;
@@ -43,6 +46,8 @@ namespace MonoEmbeddinator4000.Generators
 
             unit = ASTContext.FindOrCreateTranslationUnit(assemblyName);
             unit.FilePath = assemblyName;
+
+            ManagedAssemblies[unit] = assembly;
 
             return unit;
         }
@@ -445,7 +450,7 @@ namespace MonoEmbeddinator4000.Generators
                     break;
                 }
                 var currentUnit = GetTranslationUnit(CurrentAssembly);
-                if (managedType.Assembly.GetName().Name != currentUnit.FileNameWithoutExtension
+                if (managedType.Assembly != ManagedAssemblies[currentUnit]
                     || managedType.IsGenericType)
                 {
                     type = new UnsupportedType { Description = managedType.FullName };
