@@ -27,6 +27,9 @@ namespace MonoEmbeddinator4000.Generators
         public static Dictionary<Declaration, string> ManagedNames
             = new Dictionary<Declaration, string>();
 
+        public static Dictionary<TranslationUnit, Assembly> ManagedAssemblies
+            = new Dictionary<TranslationUnit, Assembly>();
+
         public ASTGenerator(ASTContext context, Options options)
         {
             ASTContext = context;
@@ -35,18 +38,16 @@ namespace MonoEmbeddinator4000.Generators
 
         TranslationUnit GetTranslationUnit(Assembly assembly)
         {
-            var assemblyName = Path.GetFileName(assembly.Location);
-            return GetTranslationUnit(assemblyName);
-        }
+            var assemblyName = Options.LibraryName ?? Path.GetFileName (assembly.Location);
 
-        TranslationUnit GetTranslationUnit(string assemblyName)
-        {
             var unit = ASTContext.TranslationUnits.Find(m => m.FileName.Equals(assemblyName));
             if (unit != null)
                 return unit;
 
             unit = ASTContext.FindOrCreateTranslationUnit(assemblyName);
             unit.FilePath = assemblyName;
+
+            ManagedAssemblies[unit] = assembly;
 
             return unit;
         }
@@ -55,10 +56,7 @@ namespace MonoEmbeddinator4000.Generators
         {
             CurrentAssembly = assembly;
 
-            var assemblyName = Path.GetFileName (assembly.Location);
-            var name = Options.LibraryName ?? assemblyName;
-
-            var unit = GetTranslationUnit(name);
+            var unit = GetTranslationUnit(assembly);
 
             foreach (var type in assembly.ExportedTypes)
             {
@@ -452,7 +450,7 @@ namespace MonoEmbeddinator4000.Generators
                     break;
                 }
                 var currentUnit = GetTranslationUnit(CurrentAssembly);
-                if (managedType.Assembly.GetName().Name != currentUnit.FileNameWithoutExtension
+                if (managedType.Assembly != ManagedAssemblies[currentUnit]
                     || managedType.IsGenericType)
                 {
                     type = new UnsupportedType { Description = managedType.FullName };
