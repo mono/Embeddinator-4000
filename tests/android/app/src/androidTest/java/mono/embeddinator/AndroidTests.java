@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import android.app.Activity;
+import android.support.v4.content.LocalBroadcastManager;
 import android.view.View;
 import android.widget.TextView;
 import android.content.*;
@@ -87,7 +88,8 @@ public class AndroidTests {
 
     @Test
     public void applicationContext() {
-        AndroidAssertions.applicationContext();
+        Context context = AndroidAssertions.applicationContext();
+        assertNotNull(context);
     }
 
     @Test
@@ -97,11 +99,13 @@ public class AndroidTests {
 
     @Test
     public void webRequest() {
-        AndroidAssertions.webRequest();
+        String html = AndroidAssertions.webRequest();
+        assertNotNull(html);
     }
 
     @Test
     public void callIntoSupportLibrary() {
-        AndroidAssertions.callIntoSupportLibrary();
+        LocalBroadcastManager manager = AndroidAssertions.callIntoSupportLibrary();
+        assertNotNull(manager);
     }
 }

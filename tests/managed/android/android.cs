@@ -73,11 +73,9 @@ namespace Android
     public class AndroidAssertions : Java.Lang.Object
     {
         [Export("applicationContext")]
-        public static void ApplicationContext()
+        public static Context ApplicationContext()
         {
-            var context = Application.Context;
-            if (context == null)
-                throw new Exception("Application.Context must not be null!");
+            return Application.Context;
         }
 
         [Export("asyncAwait")]
@@ -92,21 +90,16 @@ namespace Android
         }
 
         [Export("webRequest")]
-        public static void WebRequest()
+        public static string WebRequest()
         {
-            var client = new WebClient();
-
-            string html = client.DownloadString("https://www.google.com");
-            if (string.IsNullOrEmpty(html))
-                throw new Exception("String should not be blank!");
+            using (var client = new WebClient())
+                return client.DownloadString("https://www.google.com");
         }
 
         [Export("callIntoSupportLibrary")]
-        public static void CallIntoSupportLibrary()
+        public static LocalBroadcastManager CallIntoSupportLibrary()
         {
-            var manager = LocalBroadcastManager.GetInstance(Application.Context);
-            if (manager == null)
-                throw new Exception("LocalBroadcastManager should not be null!");
+            return LocalBroadcastManager.GetInstance(Application.Context);
         }
     }
 }
