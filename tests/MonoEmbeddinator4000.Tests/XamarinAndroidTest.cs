@@ -51,6 +51,12 @@ namespace MonoEmbeddinator4000.Tests
         }
 
         [Test]
+        public void JavaSdkPathExists()
+        {
+            DirectoryAssert.Exists(XamarinAndroid.JavaSdkPath);
+        }
+
+        [Test]
         public void TargetFrameworkDirectories()
         {
             foreach (var dir in XamarinAndroid.TargetFrameworkDirectories)

@@ -1,6 +1,5 @@
 ﻿﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -9,6 +8,7 @@ using CppSharp;
 using CppSharp.Generators;
 using Xamarin.Android.Tools;
 using Xamarin.Android.Tasks;
+using static MonoEmbeddinator4000.Helpers;
 
 namespace MonoEmbeddinator4000
 {
@@ -204,70 +204,6 @@ namespace MonoEmbeddinator4000
             return args.ToString ();
         }
 
-        /// <summary>
-        /// Represents the output of a process invocation.
-        /// </summary>
-        public struct ProcessOutput
-        {
-            public int ExitCode;
-            public string StandardOutput;
-            public string StandardError;
-        }
-
-        ProcessOutput Invoke(string program, string arguments, Dictionary<string, string> envVars = null)
-        {
-            var process = new Process
-            {
-                StartInfo = new ProcessStartInfo
-                {
-                    FileName = program,
-                    Arguments = arguments,
-                    WindowStyle = ProcessWindowStyle.Hidden,
-                    UseShellExecute = false,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true
-                }
-            };
-
-            if (envVars != null)
-                foreach (var kvp in envVars)
-                    process.StartInfo.EnvironmentVariables[kvp.Key] = kvp.Value;
-
-            var standardOut = new StringBuilder();
-            process.OutputDataReceived += (sender, args) => {
-                if (!string.IsNullOrWhiteSpace(args.Data))
-                    standardOut.AppendLine(args.Data);
-            };
-
-            var standardError = new StringBuilder();
-            process.ErrorDataReceived += (sender, args) => {
-                if (!string.IsNullOrWhiteSpace(args.Data))
-                    standardError.AppendLine(args.Data);
-            };
-
-            process.Start();
-            process.BeginOutputReadLine();
-            process.BeginErrorReadLine();
-            process.WaitForExit();
-
-            var output = new ProcessOutput
-            {
-                ExitCode = process.ExitCode,
-                StandardOutput = standardOut.ToString(),
-                StandardError = standardError.ToString()
-            };
-
-            Diagnostics.Debug("Invoking: {0} {1}", program, arguments);
-            Diagnostics.PushIndent();
-            if (standardOut.Length > 0)
-                Diagnostics.Message("{0}", standardOut.ToString());
-            if (standardError.Length > 0)
-                Diagnostics.Message("{0}", standardError.ToString());
-            Diagnostics.PopIndent();
-
-            return output;
-        }
-
         private IEnumerable<string> GetOutputFiles(string pattern)
         {
             return Output.Files.Keys.Select(file => Path.Combine(Options.OutputDir, file))
@@ -364,23 +300,10 @@ namespace MonoEmbeddinator4000
             return true;
         }
 
-
-        string GetJavaSdkPath()
-        {
-            // If we are running on macOS, invoke java_home to figure out Java path.
-            if (Platform.IsMacOS)
-                return Invoke("/usr/libexec/java_home", null, null).StandardOutput.Trim();
-
-            string home = Environment.GetEnvironmentVariable("JAVA_HOME");
-            if (string.IsNullOrEmpty(home))
-                throw new Exception("Cannot find Java SDK: JAVA_HOME environment variable is not set.");
-            return home;
-        }
-
         bool CompileJava(IEnumerable<string> files)
         {
             var executableSuffix = Platform.IsWindows ? ".exe" : string.Empty;
-            var javaSdk = GetJavaSdkPath();
+            var javaSdk = XamarinAndroid.JavaSdkPath;
             var javac = Path.Combine(javaSdk, "bin", "javac" + executableSuffix);
             var classesDir = Path.Combine(Options.OutputDir, "classes");
             var bootClassPath = Path.Combine(javaSdk, "jre", "lib", "rt.jar");
@@ -392,7 +315,7 @@ namespace MonoEmbeddinator4000
 
             var javaFiles = files.Select(file => Path.GetFullPath(file)).ToList();
 
-            var supportFiles = Directory.GetFiles(Helpers.FindDirectory("support"), "*.java", SearchOption.AllDirectories)
+            var supportFiles = Directory.GetFiles(FindDirectory("support"), "*.java", SearchOption.AllDirectories)
                 .Where(f => Options.Compilation.Platform == TargetPlatform.Android || Path.GetFileName(Path.GetDirectoryName(f)) != "android");
             javaFiles.AddRange(supportFiles);
 
@@ -420,7 +343,7 @@ namespace MonoEmbeddinator4000
             //Jar files needed: JNA, android.jar, mono.android.jar
             args.Add("-cp");
 
-            var jnaJar = Path.Combine(Helpers.FindDirectory("external"), "jna", "jna-4.4.0.jar");
+            var jnaJar = Path.Combine(FindDirectory("external"), "jna", "jna-4.4.0.jar");
             if (Options.Compilation.Platform == TargetPlatform.Android)
             {
                 var androidJar = Path.Combine(XamarinAndroid.PlatformDirectory, "android.jar");
@@ -458,7 +381,7 @@ namespace MonoEmbeddinator4000
         bool CreateJar()
         {
             var executableSuffix = Platform.IsWindows ? ".exe" : string.Empty;
-            var jar = $"{Path.Combine(GetJavaSdkPath(), "bin", "jar" + executableSuffix)}";
+            var jar = Path.Combine(XamarinAndroid.JavaSdkPath, "bin", "jar" + executableSuffix);
             var classesDir = Path.Combine(Options.OutputDir, "classes");
             var name = Path.GetFileNameWithoutExtension(Project.Assemblies[0]).Replace('-', '_');
 
@@ -513,7 +436,7 @@ namespace MonoEmbeddinator4000
             }
 
             //Embed JNA into our jar file
-            using (var stream = File.OpenRead(Path.Combine(Helpers.FindDirectory("external"), "jna", "jna-4.4.0.jar")))
+            using (var stream = File.OpenRead(Path.Combine(FindDirectory("external"), "jna", "jna-4.4.0.jar")))
             using (var zip = new ZipArchive(stream))
             {
                 foreach (var entry in zip.Entries)
@@ -585,7 +508,7 @@ namespace MonoEmbeddinator4000
         bool CreateAar()
         {
             var executableSuffix = Platform.IsWindows ? ".exe" : string.Empty;
-            var jar = $"{Path.Combine(GetJavaSdkPath(), "bin", "jar" + executableSuffix)}";
+            var jar = Path.Combine(XamarinAndroid.JavaSdkPath, "bin", "jar" + executableSuffix);
             var classesDir = Path.Combine(Options.OutputDir, "classes");
             var androidDir = Path.Combine(Options.OutputDir, "android");
             var name = Path.GetFileNameWithoutExtension(Project.Assemblies[0]).Replace('-', '_');
@@ -620,7 +543,7 @@ namespace MonoEmbeddinator4000
             }
 
             //Copy JNA native libs
-            foreach (var file in Directory.GetFiles(Path.Combine(Helpers.FindDirectory("external"), "jna"), "android-*"))
+            foreach (var file in Directory.GetFiles(Path.Combine(FindDirectory("external"), "jna"), "android-*"))
             {
                 using (var stream = File.OpenRead(file))
                 using (var zip = new ZipArchive(stream))
