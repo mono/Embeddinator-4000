@@ -106,10 +106,83 @@ namespace Android
     [Register("mono.embeddinator.android.JavaCallbacks")]
     public class JavaCallbacks : Java.Lang.Object
     {
+        [Export("virtualCallback")]
+        public static string VirtualCallback(VirtualClass callback)
+        {
+            return callback.GetText();
+        }
+
+        [Export("abstractCallback")]
+        public static string AbstractCallback(AbstractClass callback)
+        {
+            return callback.GetText();
+        }
+
         [Export("interfaceCallback")]
         public static void InterfaceCallback(IJavaCallback callback, string text)
         {
             callback.Send(text);
+        }
+    }
+
+    [Register("mono.embeddinator.android.VirtualClass")]
+    public class VirtualClass : Java.Lang.Object
+    {
+        public VirtualClass() { }
+
+        public VirtualClass(IntPtr handle, JniHandleOwnership transfer) : base(handle, transfer) { }
+
+        [Export("getText")]
+        public virtual string GetText() { return "C#"; }
+    }
+
+    [Register("mono.embeddinator.android.AbstractClass")]
+    public abstract class AbstractClass : Java.Lang.Object
+    {
+        public AbstractClass() { }
+
+        public AbstractClass(IntPtr handle, JniHandleOwnership transfer) : base(handle, transfer) { }
+
+        [Export("getText")]
+        public abstract string GetText();
+    }
+
+    class AbstractClassInvoker : AbstractClass
+    {
+        IntPtr class_ref, id_gettext;
+
+        public AbstractClassInvoker(IntPtr handle, JniHandleOwnership transfer) : base(handle, transfer)
+        {
+            IntPtr lref = JNIEnv.GetObjectClass(Handle);
+            class_ref = JNIEnv.NewGlobalRef(lref);
+            JNIEnv.DeleteLocalRef(lref);
+        }
+
+        protected override Type ThresholdType
+        {
+            get { return typeof(AbstractClassInvoker); }
+        }
+
+        protected override IntPtr ThresholdClass
+        {
+            get { return class_ref; }
+        }
+
+        public override string GetText()
+        {
+            if (id_gettext == IntPtr.Zero)
+                id_gettext = JNIEnv.GetMethodID(class_ref, "getText", "()Ljava/lang/String;");
+            IntPtr lref = JNIEnv.CallObjectMethod(Handle, id_gettext);
+            return GetObject<Java.Lang.String>(lref, JniHandleOwnership.TransferLocalRef)?.ToString();
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (class_ref != IntPtr.Zero)
+                JNIEnv.DeleteGlobalRef(class_ref);
+            class_ref = IntPtr.Zero;
+
+            base.Dispose(disposing);
         }
     }
 
@@ -122,11 +195,6 @@ namespace Android
 
     class IJavaCallbackInvoker : Java.Lang.Object, IJavaCallback
     {
-        public static IJavaCallback GetObject(IntPtr handle, JniHandleOwnership transfer)
-        {
-            return new IJavaCallbackInvoker(handle, transfer);
-        }
-
         IntPtr class_ref, id_send;
 
         public IJavaCallbackInvoker(IntPtr handle, JniHandleOwnership transfer) : base(handle, transfer)
