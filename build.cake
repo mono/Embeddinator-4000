@@ -106,7 +106,7 @@ Task("Build-PCL")
     .IsDependentOn("NuGet-Restore")
     .Does(() =>
     {
-        MSBuild("./tests/managed/pcl/managed-pcl.csproj", settings => settings.SetConfiguration(configuration).SetVerbosity(Verbosity.Minimal));
+        MSBuild("./tests/managed/pcl/managed-pcl.csproj", settings => settings.SetConfiguration(configuration).SetPlatformTarget(PlatformTarget.MSIL).SetVerbosity(Verbosity.Minimal));
     });
 
 Task("Build-NetStandard")
@@ -116,7 +116,7 @@ Task("Build-NetStandard")
     {
         var project = "./tests/managed/netstandard/managed-netstandard.csproj";
         DotNetCoreRestore(project);
-        MSBuild(project, settings => settings.SetConfiguration(configuration).SetVerbosity(Verbosity.Minimal));
+        MSBuild(project, settings => settings.SetConfiguration(configuration).SetPlatformTarget(PlatformTarget.MSIL).SetVerbosity(Verbosity.Minimal));
     });
 
 Task("Generate-C")
