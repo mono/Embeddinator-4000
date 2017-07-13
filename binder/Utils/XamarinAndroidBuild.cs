@@ -54,11 +54,11 @@ namespace MonoEmbeddinator4000
         /// - Invokes aapt to generate R.txt
         /// - One day I would like to get rid of the temp files, but I could not get the MSBuild APIs to work in-process
         /// </summary>
-        public static string GeneratePackageProject(List<IKVM.Reflection.Assembly> assemblies, string outputDirectory, string assembliesDirectory)
+        public static string GeneratePackageProject(List<IKVM.Reflection.Assembly> assemblies, Options options)
         {
             var mainAssembly = assemblies[0].Location;
-            outputDirectory = Path.GetFullPath(outputDirectory);
-            assembliesDirectory = Path.GetFullPath(assembliesDirectory);
+            var outputDirectory = Path.GetFullPath(options.OutputDir);
+            var assembliesDirectory = Path.Combine(outputDirectory, "android", "assets", "assemblies");
 
             var androidDir = Path.Combine(outputDirectory, "android");
             var assetsDir = Path.Combine(androidDir, "assets");
@@ -97,6 +97,16 @@ namespace MonoEmbeddinator4000
             linkAssemblies.SetParameter("ResolvedAssemblies", "@(ResolvedAssemblies);" + Path.Combine(outputDirectory, "Resource.designer.dll"));
             linkAssemblies.SetParameter("MainAssembly", mainAssembly);
             linkAssemblies.SetParameter("OutputDirectory", assembliesDirectory);
+
+            //If not Debug, delete our PDB files
+            if (!options.Compilation.DebugMode)
+            {
+                var itemGroup = target.AddItemGroup();
+                itemGroup.AddItem("PdbFilesToDelete", Path.Combine(assembliesDirectory, "*.pdb"));
+
+                var delete = target.AddTask("Delete");
+                delete.SetParameter("Files", "@(PdbFilesToDelete)");
+            }
 
             //Aapt Task to generate R.txt
             var aapt = target.AddTask("Aapt");
