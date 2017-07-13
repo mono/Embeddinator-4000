@@ -6,7 +6,7 @@ public static class Platform {
 	// static get-only property
 	public static bool IsWindows {
 		get {
-#if PCL
+#if PCL || NETSTANDARD1_6
 			//NOTE: maybe there is something more precise than this
 			return Environment.NewLine == "\r\n";
 #else
