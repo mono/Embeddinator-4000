@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
+using System.IO.Compression;
 using System.Runtime.CompilerServices;
+using System.Text;
 using NUnit.Framework;
 
 namespace MonoEmbeddinator4000.Tests
@@ -17,6 +19,20 @@ namespace MonoEmbeddinator4000.Tests
         {
             string fileName = string.Join(".", Path.GetFileNameWithoutExtension(sourceFile), member, suffix, "txt");
             return Path.Combine(basePath, fileName);
+        }
+
+        static string ZipFiles(string filePath)
+        {
+            var builder = new StringBuilder();
+            using (var stream = File.OpenRead(filePath))
+            using (var zip = new ZipArchive(stream))
+            {
+                foreach (var entry in zip.Entries)
+                {
+                    builder.AppendLine(entry.FullName);
+                }
+            }
+            return builder.ToString();
         }
 
         /// <summary>
@@ -43,6 +59,15 @@ namespace MonoEmbeddinator4000.Tests
             File.Copy(filePath, received, true);
             FileAssert.AreEqual(approved, received);
             File.Delete(received);
+        }
+
+        /// <summary>
+        /// Verifies the list of filenames in a zip archive against the approved text on disk.
+        /// - Make sure to call this method directly from the unit test method, so that [CallerFilePath] works properly
+        /// </summary>
+        public static void VerifyZipFile(string filePath, [CallerFilePath]string sourceFile = null, [CallerMemberName]string member = null)
+        {
+            Verify(ZipFiles(filePath), sourceFile, member);
         }
 
         /// <summary>
@@ -73,6 +98,21 @@ namespace MonoEmbeddinator4000.Tests
             string approved = GetPath(sourceFile, member, "approved");
             File.Copy(filePath, approved, true);
             VerifyFile(filePath, sourceFile, member);
+        }
+
+        /// <summary>
+        /// Do not commit code using this method. It should be used temporarily to approve a test.
+        /// </summary>
+        [Obsolete("Do not commit code using this method. It should be used temporarily to approve a test.")]
+        public static void ApproveZipFile(string filePath, [CallerFilePath]string sourceFile = null, [CallerMemberName]string member = null)
+        {
+#if !DEBUG
+            //Fail release builds on purpose
+            Assert.Fail("This test is using Approvals.ApproveZipFile() when it should be using Approvals.VerifyZipFile()!");
+#endif
+            string approved = GetPath(sourceFile, member, "approved");
+            File.WriteAllText(approved, ZipFiles(filePath));
+            VerifyZipFile(filePath, sourceFile, member);
         }
     }
 }

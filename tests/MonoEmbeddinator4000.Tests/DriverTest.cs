@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using CppSharp;
 using CppSharp.Generators;
 using NUnit.Framework;
 
@@ -125,6 +126,46 @@ namespace MonoEmbeddinator4000.Tests
 
             string path = Path.Combine(options.OutputDir, driver.Output.Files.Keys.First());
             Approvals.VerifyFile(path);
+        }
+
+        [Test, Category("Slow"), Platform("MacOSX")]
+        public void JarFileContents()
+        {
+            options.Compilation.Platform = TargetPlatform.MacOS;
+            options.GeneratorKind = GeneratorKind.C;
+            RunDriver("Hello");
+            options.GeneratorKind = GeneratorKind.Java;
+            RunDriver("Hello");
+
+            var aar = Path.Combine(options.OutputDir, "Hello.jar");
+            Approvals.VerifyZipFile(aar);
+        }
+
+        [Test, Category("Slow")]
+        public void AarFileContents()
+        {
+            options.Compilation.Platform = TargetPlatform.Android;
+            options.GeneratorKind = GeneratorKind.C;
+            RunDriver("Hello");
+            options.GeneratorKind = GeneratorKind.Java;
+            RunDriver("Hello");
+
+            var aar = Path.Combine(options.OutputDir, "Hello.aar");
+            Approvals.VerifyZipFile(aar);
+        }
+
+        [Test, Category("Slow")]
+        public void AarFileContentsDebug()
+        {
+            options.Compilation.Platform = TargetPlatform.Android;
+            options.GeneratorKind = GeneratorKind.C;
+            options.Compilation.DebugMode = true;
+            RunDriver("Hello");
+            options.GeneratorKind = GeneratorKind.Java;
+            RunDriver("Hello");
+
+            var aar = Path.Combine(options.OutputDir, "Hello.aar");
+            Approvals.VerifyZipFile(aar);
         }
     }
 }
