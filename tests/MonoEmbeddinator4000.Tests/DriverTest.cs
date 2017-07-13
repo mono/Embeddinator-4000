@@ -128,10 +128,10 @@ namespace MonoEmbeddinator4000.Tests
             Approvals.VerifyFile(path);
         }
 
-        [Test, Category("Slow")]
+        [Test, Category("Slow"), Platform("MacOSX")]
         public void JarFileContents()
         {
-            options.Compilation.Platform = Platform.IsWindows ? TargetPlatform.Windows : TargetPlatform.MacOS;
+            options.Compilation.Platform = TargetPlatform.MacOS;
             options.GeneratorKind = GeneratorKind.C;
             RunDriver("Hello");
             options.GeneratorKind = GeneratorKind.Java;
