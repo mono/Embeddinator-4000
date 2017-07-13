@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
+using CppSharp;
 
 namespace MonoEmbeddinator4000
 {
@@ -84,5 +86,69 @@ namespace MonoEmbeddinator4000
 
             throw new Exception($"Cannot find {Path.GetFileName(dir)}!");
         }
+
+        public static ProcessOutput Invoke(string program, string arguments, Dictionary<string, string> envVars = null)
+        {
+            var process = new Process
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = program,
+                    Arguments = arguments,
+                    WindowStyle = ProcessWindowStyle.Hidden,
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true
+                }
+            };
+
+            if (envVars != null)
+                foreach (var kvp in envVars)
+                    process.StartInfo.EnvironmentVariables[kvp.Key] = kvp.Value;
+
+            var standardOut = new StringBuilder();
+            process.OutputDataReceived += (sender, args) => {
+                if (!string.IsNullOrWhiteSpace(args.Data))
+                    standardOut.AppendLine(args.Data);
+            };
+
+            var standardError = new StringBuilder();
+            process.ErrorDataReceived += (sender, args) => {
+                if (!string.IsNullOrWhiteSpace(args.Data))
+                    standardError.AppendLine(args.Data);
+            };
+
+            process.Start();
+            process.BeginOutputReadLine();
+            process.BeginErrorReadLine();
+            process.WaitForExit();
+
+            var output = new ProcessOutput
+            {
+                ExitCode = process.ExitCode,
+                StandardOutput = standardOut.ToString(),
+                StandardError = standardError.ToString()
+            };
+
+            Diagnostics.Debug("Invoking: {0} {1}", program, arguments);
+            Diagnostics.PushIndent();
+            if (standardOut.Length > 0)
+                Diagnostics.Message("{0}", standardOut.ToString());
+            if (standardError.Length > 0)
+                Diagnostics.Message("{0}", standardError.ToString());
+            Diagnostics.PopIndent();
+
+            return output;
+        }
+    }
+
+    /// <summary>
+    /// Represents the output of a process invocation.
+    /// </summary>
+    public struct ProcessOutput
+    {
+        public int ExitCode;
+        public string StandardOutput;
+        public string StandardError;
     }
 }
