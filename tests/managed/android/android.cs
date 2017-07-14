@@ -125,8 +125,11 @@ namespace Android
         }
     }
 
+    /// <summary>
+    /// TODO: marking this class "abstract" is not desired
+    /// </summary>
     [Register("mono.embeddinator.android.VirtualClass")]
-    public class VirtualClass : Java.Lang.Object
+    public abstract class VirtualClass : Java.Lang.Object
     {
         public VirtualClass() { }
 
@@ -134,6 +137,45 @@ namespace Android
 
         [Export("getText")]
         public virtual string GetText() { return "C#"; }
+    }
+
+    class VirtualClassInvoker : VirtualClass
+    {
+        IntPtr class_ref, id_gettext;
+
+        public VirtualClassInvoker(IntPtr handle, JniHandleOwnership transfer) : base(handle, transfer)
+        {
+            IntPtr lref = JNIEnv.GetObjectClass(Handle);
+            class_ref = JNIEnv.NewGlobalRef(lref);
+            JNIEnv.DeleteLocalRef(lref);
+        }
+
+        protected override Type ThresholdType
+        {
+            get { return typeof(VirtualClassInvoker); }
+        }
+
+        protected override IntPtr ThresholdClass
+        {
+            get { return class_ref; }
+        }
+
+        public override string GetText()
+        {
+            if (id_gettext == IntPtr.Zero)
+                id_gettext = JNIEnv.GetMethodID(class_ref, "getText", "()Ljava/lang/String;");
+            IntPtr lref = JNIEnv.CallObjectMethod(Handle, id_gettext);
+            return GetObject<Java.Lang.String>(lref, JniHandleOwnership.TransferLocalRef)?.ToString();
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (class_ref != IntPtr.Zero)
+                JNIEnv.DeleteGlobalRef(class_ref);
+            class_ref = IntPtr.Zero;
+
+            base.Dispose(disposing);
+        }
     }
 
     [Register("mono.embeddinator.android.AbstractClass")]
