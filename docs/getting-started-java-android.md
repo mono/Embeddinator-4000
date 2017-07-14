@@ -197,6 +197,7 @@ Read more about Java integration with Xamarin.Android [here](https://developer.x
 
 ## Further Reading
 
+* [Callbacks on Android](android-callbacks.md)
 * [Preliminary Android Research](android-preliminary-research.md)
 * [Embeddinator Limitations](Limitations.md)
 * [Contributing to the open source project](Contributing.md)
