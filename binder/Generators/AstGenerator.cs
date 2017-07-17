@@ -248,7 +248,7 @@ namespace MonoEmbeddinator4000.Generators
                 if (IsSystemObjectMethod(method))
                     continue;
 
-                var decl = VisitMethod(method, @class);
+                var decl = VisitMethod(method);
                 @class.Declarations.Add(decl);
             }
 
@@ -375,7 +375,7 @@ namespace MonoEmbeddinator4000.Generators
                 method.Name, string.Join(",", @params));
         }
 
-        Method VisitMethod(MethodInfo methodInfo, Class @class)
+        Method VisitMethod(MethodInfo methodInfo)
         {
             var method = VisitMethodBase(methodInfo);
             method.ReturnType = VisitType(methodInfo.ReturnType);
@@ -658,13 +658,13 @@ namespace MonoEmbeddinator4000.Generators
 
             if (propertyInfo.GetMethod != null)
             {
-                property.GetMethod = VisitMethod(propertyInfo.GetMethod, @class);
+                property.GetMethod = VisitMethod(propertyInfo.GetMethod);
                 property.GetMethod.Namespace = property.Namespace;
             }
 
             if (propertyInfo.SetMethod != null)
             {
-                property.SetMethod = VisitMethod(propertyInfo.SetMethod, @class);
+                property.SetMethod = VisitMethod(propertyInfo.SetMethod);
                 property.SetMethod.Namespace = property.Namespace;
             }
 
