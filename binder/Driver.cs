@@ -1,6 +1,5 @@
 ﻿﻿﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.IO;
 using CppSharp;
 using CppSharp.AST;
@@ -8,7 +7,6 @@ using CppSharp.Generators;
 using CppSharp.Passes;
 using MonoEmbeddinator4000.Generators;
 using MonoEmbeddinator4000.Passes;
-using Xamarin.Android.Tools;
 using BindingContext = CppSharp.Generators.BindingContext;
 
 namespace MonoEmbeddinator4000
@@ -49,10 +47,12 @@ namespace MonoEmbeddinator4000
         bool Parse()
         {
             var parser = new Parser();
+
             foreach (var assembly in Project.Assemblies)
             {
                 parser.AddAssemblyResolveDirectory(Path.GetDirectoryName(assembly));
             }
+
             if (Options.Compilation.Platform == TargetPlatform.Android)
             {
                 foreach (var dir in XamarinAndroid.TargetFrameworkDirectories)
