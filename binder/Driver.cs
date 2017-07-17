@@ -1,6 +1,7 @@
 ﻿﻿﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using CppSharp;
 using CppSharp.AST;
 using CppSharp.Generators;
@@ -299,6 +300,15 @@ namespace MonoEmbeddinator4000
         bool HandleAssemblyParsed(ParserResult<IKVM.Reflection.Assembly> result)
         {
             HandleParserResult(result);
+
+            if (result.Output.GetReferencedAssemblies().Any(ass => ass.Name == "Mono.Android") &&
+                Options.Compilation.Platform != TargetPlatform.Android)
+            {
+                Console.Error.WriteLine("Assembly references Mono.Android.dll, plase specify target platform as Android.");
+
+                result.Kind = ParserResultKind.Error;
+                return false;
+            }
 
             if (result.Kind != ParserResultKind.Success)
                 return false;
