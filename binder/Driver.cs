@@ -158,6 +158,9 @@ namespace MonoEmbeddinator4000
                 case GeneratorKind.C:
                     generator = new CGenerator(Context);
                     break;
+                case GeneratorKind.CPlusPlus:
+                    generator = new CppGenerator(Context);
+                    break;
                 case GeneratorKind.ObjectiveC:
                     generator = new ObjCGenerator(Context);
                     break;

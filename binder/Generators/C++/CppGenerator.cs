@@ -9,31 +9,20 @@ using MonoEmbeddinator4000.Passes;
 
 namespace MonoEmbeddinator4000.Generators
 {
-    public class CGenerator : Generator
+    public class CppGenerator : CGenerator
     {
-        public CGenerator(BindingContext context) : base(context)
+        public CppGenerator(BindingContext context) : base(context)
         {
+            Context.Options.GeneratorKind = GeneratorKind.CPlusPlus;
         }
 
         public override List<CodeGenerator> Generate(IEnumerable<TranslationUnit> units)
         {
             var unit = units.First();
-            var headers = new CHeaders(Context, unit);
-            var sources = new CSources(Context, unit);
+            var headers = new CppHeaders(Context, unit);
+            var sources = new CppSources(Context, unit);
 
             return new List<CodeGenerator> { headers, sources };
-        }
-
-        public static string GenId(string id)
-        {
-            return "__" + id.Replace('-', '_');
-        }
-
-        public static string ObjectInstanceId => GenId("object");
-
-        public static string AssemblyId(TranslationUnit unit)
-        {
-            return GenId(unit.FileName).Replace('.', '_').Replace('-', '_');
         }
 
         private static CppTypePrintFlavorKind GetTypePrinterFlavorKind(GeneratorKind kind)
@@ -51,9 +40,9 @@ namespace MonoEmbeddinator4000.Generators
             throw new NotImplementedException();
         }
 
-        public static CManagedToNativeTypePrinter GetCTypePrinter(GeneratorKind kind)
+        public static CppManagedToNativeTypePrinter GetCppTypePrinter(GeneratorKind kind)
         {
-            var typePrinter = new CManagedToNativeTypePrinter
+            var typePrinter = new CppManagedToNativeTypePrinter
             {
                 PrintScopeKind = TypePrintScopeKind.Qualified,
                 PrintFlavorKind = GetTypePrinterFlavorKind(kind),
@@ -63,8 +52,8 @@ namespace MonoEmbeddinator4000.Generators
             return typePrinter;
         }
 
-        public virtual CManagedToNativeTypePrinter TypePrinter =>
-            GetCTypePrinter(GeneratorKind.C);
+        public CppTypePrinter TypePrinter =>
+            GetCppTypePrinter(GeneratorKind.CPlusPlus);
 
         public override bool SetupPasses()
         {
@@ -83,13 +72,13 @@ namespace MonoEmbeddinator4000.Generators
         }
     }
 
-    public abstract class CCodeGenerator : CodeGenerator
+    public abstract class CppCodeGenerator : CodeGenerator
     {
         public TranslationUnit Unit;
 
         Options EmbedOptions => Context.Options as Options; 
 
-        public CCodeGenerator(BindingContext context,
+        public CppCodeGenerator(BindingContext context,
             TranslationUnit unit) : base(context, unit)
         {
             Unit = unit;
@@ -97,16 +86,19 @@ namespace MonoEmbeddinator4000.Generators
 
         public override string GeneratedIdentifier(string id)
         {
-            return CGenerator.GenId(id);
+            return CppGenerator.GenId(id);
         }
 
         public string QualifiedName(Declaration decl)
         {
+            if (Options.GeneratorKind == GeneratorKind.CPlusPlus)
+                return decl.Name;
+
             return decl.QualifiedName;
         }
 
-        public CManagedToNativeTypePrinter CTypePrinter =>
-                CGenerator.GetCTypePrinter(Options.GeneratorKind);
+        public CppTypePrinter CppTypePrinter =>
+                CppGenerator.GetCppTypePrinter(Options.GeneratorKind);
 
         public virtual void WriteHeaders() { }
 
@@ -121,30 +113,37 @@ namespace MonoEmbeddinator4000.Generators
         public static string GetMethodIdentifier(Method method)
         {
             var @class = method.Namespace as Class;
-            return $"{@class.QualifiedName}_{method.Name}";
+            return $"{method.Name}";
         }
 
         public override void GenerateMethodSpecifier(Method method, Class @class)
         {
-            var retType = method.ReturnType.Visit(CTypePrinter);
-
-            Write($"{retType} {GetMethodIdentifier(method)}(");
-
-            Write(CTypePrinter.VisitParameters(method.Parameters));
-
+            var methodName = string.Empty;
+            if (method.IsConstructor)
+            {
+                methodName = @class.Name;
+                Write($"{method.Namespace}::{methodName}(");
+            }
+            else
+            {
+                methodName = GetMethodIdentifier(method);
+                var retType = method.ReturnType.Visit(CppTypePrinter);
+                Write($"{retType} {@class.Name}::{methodName}(");
+            }
+            Write(CppTypePrinter.VisitParameters(method.Parameters));
             Write(")");
         }
 
         public virtual string GenerateClassObjectAlloc(string type)
         {
-            return $"({type}*) calloc(1, sizeof({type}))";
+            return $"new {type}()";
         }
 
         public override bool VisitTypedefDecl(TypedefDecl typedef)
         {
             PushBlock();
 
-            var typeName = typedef.Type.Visit(CTypePrinter);
+            var typeName = typedef.Type.Visit(CppTypePrinter);
             WriteLine("typedef {0} {1};", typeName, typedef.Name);
 
             var newlineKind = NewLineKind.BeforeNextBlock;
