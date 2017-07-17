@@ -296,16 +296,18 @@ namespace MonoEmbeddinator4000
             }
         }
 
-        void HandleAssemblyParsed(ParserResult<IKVM.Reflection.Assembly> result)
+        bool HandleAssemblyParsed(ParserResult<IKVM.Reflection.Assembly> result)
         {
             HandleParserResult(result);
 
             if (result.Kind != ParserResultKind.Success)
-                return;
+                return false;
 
             //NOTE: this can happen if multiple generators are running
             if (!Assemblies.Contains(result.Output))
                 Assemblies.Add(result.Output);
+
+            return true;
         }
     }
 }
