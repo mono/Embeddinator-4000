@@ -167,5 +167,19 @@ namespace MonoEmbeddinator4000.Tests
             var aar = Path.Combine(options.OutputDir, "Hello.aar");
             Approvals.VerifyZipFile(aar);
         }
+
+        /// <summary>
+        /// NOTE: C and Java generators were failing on a subclass of EventArgs due to EventArgs.Empty
+        /// </summary>
+        [Test, Category("Slow")]
+        public void EventArgsEmpty()
+        {
+            options.Compilation.Platform = TargetPlatform.Android;
+            options.GeneratorKind = GeneratorKind.C;
+            options.Compilation.DebugMode = true;
+            RunDriver("EventArgsEmpty");
+            options.GeneratorKind = GeneratorKind.Java;
+            RunDriver("EventArgsEmpty");
+        }
     }
 }
