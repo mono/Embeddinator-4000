@@ -108,4 +108,45 @@ public class AndroidTests {
         LocalBroadcastManager manager = AndroidAssertions.callIntoSupportLibrary();
         assertNotNull(manager);
     }
+
+    @Test
+    public void virtualCallback() throws Throwable {
+        VirtualClass callback = new VirtualClass() {
+            @Override
+            public String getText() {
+                return "Java";
+            }
+        };
+
+        assertEquals("Java", callback.getText());
+        assertEquals("Java", JavaCallbacks.virtualCallback(callback));
+    }
+
+    @Test
+    public void abstractCallback() throws Throwable {
+        AbstractClass callback = new AbstractClass() {
+            @Override
+            public String getText() {
+                return "Java";
+            }
+        };
+
+        assertEquals("Java", callback.getText());
+        assertEquals("Java", JavaCallbacks.abstractCallback(callback));
+    }
+
+    class ConcreteCallback implements IJavaCallback {
+        public String text;
+        @Override
+        public void send(String text) {
+            this.text = text;
+        }
+    }
+
+    @Test
+    public void interfaceCallback() {
+        ConcreteCallback callback = new ConcreteCallback();
+        JavaCallbacks.interfaceCallback(callback, "test");
+        assertEquals("test", callback.text);
+    }
 }

@@ -50,6 +50,7 @@ Android Studio is recommended for development, but other IDEs should work as lon
 ## Further Reading
 
 * [Getting Started on Android](getting-started-java-android.md)
+* [Callbacks on Android](android-callbacks.md)
 * [Preliminary Android Research](android-preliminary-research.md)
 * [Embeddinator Limitations](Limitations.md)
 * [Contributing to the open source project](Contributing.md)
