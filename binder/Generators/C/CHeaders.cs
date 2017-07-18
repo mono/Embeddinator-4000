@@ -165,7 +165,7 @@ namespace MonoEmbeddinator4000.Generators
 
         public override bool VisitProperty(Property property)
         {
-            if (property.Field == null)
+            if (property.Field == null || property.Type is UnsupportedType)
                 return false;
 
             var getter = property.GetMethod;
