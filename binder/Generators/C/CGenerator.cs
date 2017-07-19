@@ -127,6 +127,11 @@ namespace MonoEmbeddinator4000.Generators
             return $"{@class.QualifiedName}_{method.Name}";
         }
 
+        public override bool VisitDeclaration(Declaration decl)
+        {
+            return decl.IsGenerated && !AlreadyVisited(decl);
+        }
+
         public override void GenerateMethodSpecifier(Method method, Class @class)
         {
             var retType = method.ReturnType.Visit(CTypePrinter);
@@ -145,6 +150,9 @@ namespace MonoEmbeddinator4000.Generators
 
         public override bool VisitTypedefDecl(TypedefDecl typedef)
         {
+            if (!VisitDeclaration(typedef))
+                return false;
+
             PushBlock();
 
             var typeName = typedef.Type.Visit(CTypePrinter);

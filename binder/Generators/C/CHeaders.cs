@@ -87,6 +87,9 @@ namespace MonoEmbeddinator4000.Generators
 
         public override bool VisitDeclContext(DeclarationContext context)
         {
+            if (!VisitDeclaration(@context))
+                return false;
+
             foreach (var decl in context.Declarations.Where(d => !(d is Enumeration)))
                 if (decl.IsGenerated)
                     decl.Visit(this);
@@ -96,6 +99,9 @@ namespace MonoEmbeddinator4000.Generators
 
         public override bool VisitEnumDecl(Enumeration @enum)
         {
+            if (!VisitDeclaration(@enum))
+                return false;
+
             PushBlock();
 
             var enumName = Options.GeneratorKind != GeneratorKind.CPlusPlus ?
@@ -141,6 +147,9 @@ namespace MonoEmbeddinator4000.Generators
 
         public override bool VisitClassDecl(Class @class)
         {
+            if (!VisitDeclaration(@class))
+                return false;
+
             PushBlock();
 
             VisitDeclContext(@class);
@@ -152,6 +161,9 @@ namespace MonoEmbeddinator4000.Generators
 
         public override bool VisitMethodDecl(Method method)
         {
+            if (!VisitDeclaration(@method))
+                return false;
+
             PushBlock();
 
             Write("MONO_EMBEDDINATOR_API ");
@@ -165,7 +177,10 @@ namespace MonoEmbeddinator4000.Generators
 
         public override bool VisitProperty(Property property)
         {
-            if (property.Field == null || property.Type is UnsupportedType)
+            if (!VisitDeclaration(@property))
+                return false;
+
+            if (property.Field == null)
                 return false;
 
             var getter = property.GetMethod;

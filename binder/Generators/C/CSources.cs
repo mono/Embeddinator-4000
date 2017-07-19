@@ -69,6 +69,9 @@ namespace MonoEmbeddinator4000.Generators
 
         public override bool VisitClassDecl(Class @class)
         {
+            if (!VisitDeclaration(@class))
+                return false;
+
             GenerateClassLookup(@class);
 
             VisitDeclContext(@class);
@@ -327,6 +330,9 @@ namespace MonoEmbeddinator4000.Generators
 
         public override bool VisitMethodDecl(Method method)
         {
+            if (!VisitDeclaration(method))
+                return false;
+
             PushBlock();
 
             GenerateMethodSpecifier(method, method.Namespace as Class);
@@ -400,7 +406,10 @@ namespace MonoEmbeddinator4000.Generators
 
         public override bool VisitProperty(Property property)
         {
-            if (property.Field == null || property.Type is UnsupportedType)
+            if (!VisitDeclaration(@property))
+                return false;
+
+            if (property.Field == null)
                 return false;
 
             GenerateFieldGetter(property);
