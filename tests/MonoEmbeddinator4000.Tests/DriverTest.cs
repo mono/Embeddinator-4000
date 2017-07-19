@@ -192,5 +192,16 @@ namespace MonoEmbeddinator4000.Tests
             options.GeneratorKind = GeneratorKind.Java;
             RunDriver("Enums");
         }
+
+        [Test, Category("Slow")]
+        public void Interfaces()
+        {
+            options.Compilation.Platform = TargetPlatform.Android;
+            options.GeneratorKind = GeneratorKind.C;
+            options.Compilation.DebugMode = true;
+            RunDriver("Interfaces");
+            options.GeneratorKind = GeneratorKind.Java;
+            RunDriver("Interfaces");
+        }
     }
 }
