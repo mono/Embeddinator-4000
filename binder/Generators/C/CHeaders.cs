@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿using CppSharp;
+﻿﻿﻿﻿﻿﻿﻿using CppSharp;
 using CppSharp.AST;
 using CppSharp.Generators;
 using CppSharp.Generators.AST;
@@ -87,9 +87,6 @@ namespace MonoEmbeddinator4000.Generators
 
         public override bool VisitDeclContext(DeclarationContext context)
         {
-            if (!VisitDeclaration(@context))
-                return false;
-
             foreach (var decl in context.Declarations.Where(d => !(d is Enumeration)))
                 if (decl.IsGenerated)
                     decl.Visit(this);
@@ -161,7 +158,7 @@ namespace MonoEmbeddinator4000.Generators
 
         public override bool VisitMethodDecl(Method method)
         {
-            if (!VisitDeclaration(@method))
+            if (!VisitDeclaration(method))
                 return false;
 
             PushBlock();

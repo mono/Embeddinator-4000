@@ -32,7 +32,6 @@ namespace MonoEmbeddinator4000.Passes
                 Access = field.Access,
                 Field = field,
                 IsStatic = field.IsStatic,
-                GenerationKind = field.GenerationKind
             };
 
             var setter = new Method
@@ -43,7 +42,6 @@ namespace MonoEmbeddinator4000.Passes
                 Access = field.Access,
                 Field = field,
                 IsStatic = field.IsStatic,
-                GenerationKind = field.GenerationKind
             };
 
             var param = new Parameter
