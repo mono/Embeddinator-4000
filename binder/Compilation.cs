@@ -799,6 +799,7 @@ namespace MonoEmbeddinator4000
 
                 var args = new List<string> {
                     $"--sysroot=\"{systemInclude}\"{extra}",
+                    "-fdiagnostics-color",
                     $"-D{DLLExportDefine}",
                     $"-I\"{monoPath}\"",
                     $"-L\"{monoDroidPath}\" -lmonosgen-2.0 -lmono-android.release",
