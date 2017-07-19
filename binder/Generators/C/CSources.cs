@@ -213,20 +213,21 @@ namespace MonoEmbeddinator4000.Generators
         {
             var @class = method.Namespace as Class;
             var instanceId = GeneratedIdentifier("instance");
+            var objectId = GeneratedIdentifier("object");
 
             if (method.IsConstructor)
             {
                 var alloc = GenerateClassObjectAlloc(@class.QualifiedName);
-                WriteLine($"{@class.QualifiedName}* object = {alloc};");
+                WriteLine($"{@class.QualifiedName}* {objectId} = {alloc};");
 
                 var classId = $"class_{@class.QualifiedName}";
                 WriteLine("MonoObject* {0} = mono_object_new({1}.domain, {2});",
                     instanceId, GeneratedIdentifier("mono_context"), classId);
 
                 if (Options.GeneratorKind == GeneratorKind.C)
-                    WriteLine($"mono_embeddinator_init_object(object, {instanceId});");
+                    WriteLine($"mono_embeddinator_init_object({objectId}, {instanceId});");
                 else
-                    WriteLine("object->{0} = ({1}*) mono_embeddinator_create_object({2});",
+                    WriteLine($"{objectId}->{0} = ({1}*) mono_embeddinator_create_object({2});",
                         CGenerator.ObjectInstanceId, GenerateObjectTypesPass.MonoEmbedObject.Name,
                         instanceId);
             }
@@ -308,7 +309,7 @@ namespace MonoEmbeddinator4000.Generators
             WriteStartBraceIndent();
 
             if (method.IsConstructor)
-                WriteLine("free(object);");
+                WriteLine($"free({GeneratedIdentifier("object")});");
 
             WriteLine($"mono_embeddinator_throw_exception({exceptionId});");
 
@@ -364,7 +365,7 @@ namespace MonoEmbeddinator4000.Generators
             }
             else
             {
-                returnCode = "object";
+                returnCode = GeneratedIdentifier("object");
             }
 
             if (method.IsConstructor || needsReturn)
