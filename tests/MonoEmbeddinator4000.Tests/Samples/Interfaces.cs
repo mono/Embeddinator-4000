@@ -11,4 +11,11 @@ namespace Example
     {
         void World();
     }
+
+    public class MoreExplicit : IMore
+    {
+        void IBase.Hello() { }
+
+        void IMore.World() { }
+    }
 }
