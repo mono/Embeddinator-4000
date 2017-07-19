@@ -237,7 +237,7 @@ namespace MonoEmbeddinator4000.Generators
             else if (!method.IsStatic)
             {
                 var handle = GetMonoObjectField(Options, MonoObjectFieldUsage.Instance,
-                    FixMethodParametersPass.ObjectParameterId, "_handle");
+                    method.Parameters[0].Name, "_handle");
                 WriteLine($"MonoObject* {instanceId} = mono_gchandle_get_target({handle});");
             }
         }

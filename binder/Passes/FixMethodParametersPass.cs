@@ -1,6 +1,7 @@
 using CppSharp.AST;
 using CppSharp.Generators;
 using CppSharp.Passes;
+using System.Linq;
 
 namespace MonoEmbeddinator4000.Passes
 {
@@ -13,9 +14,15 @@ namespace MonoEmbeddinator4000.Passes
             var ptrType = new QualifiedType(
                 new PointerType(new QualifiedType(new TagType(@class))));
 
+            var objectId = ObjectParameterId;
+
+            // Check if the method already provides a parameter named "object"
+            if (method.Parameters.Any(p => p.Name == ObjectParameterId))
+                objectId = $"__{objectId}";
+
             var param = new Parameter
             {
-                Name = ObjectParameterId,
+                Name = objectId,
                 Namespace = @class,
                 QualifiedType = ptrType,
                 IsImplicit = true
