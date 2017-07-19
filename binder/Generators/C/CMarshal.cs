@@ -141,6 +141,19 @@ namespace MonoEmbeddinator4000.Generators
             return VisitPrimitiveType(builtin.Type);
         }
 
+        public override bool VisitPointerType(PointerType pointer, TypeQualifiers quals)
+        {
+            var pointee = pointer.Pointee;
+
+            if (pointee.IsPrimitiveType(out PrimitiveType primitive))
+            {
+                Context.Return.Write("{0}", Context.ArgName);
+                return true;
+            }
+
+            return base.VisitPointerType(pointer, quals);
+        }
+
         public bool VisitPrimitiveType(PrimitiveType primitive)
         {
             switch (primitive)
@@ -459,6 +472,13 @@ namespace MonoEmbeddinator4000.Generators
             {
                 // TODO: Handle out/ref array types.
                 Context.Return.Write("0");
+                return true;
+            }
+
+            PrimitiveType primitive;
+            if (pointee.IsPrimitiveType(out primitive))
+            {
+                Context.Return.Write("{0}", Context.ArgName);
                 return true;
             }
 
