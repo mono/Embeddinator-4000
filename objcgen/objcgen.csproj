@@ -349,10 +349,6 @@
       <Link>support\mono_embeddinator.h</Link>
       <LogicalName>mono_embeddinator.h</LogicalName>
     </EmbeddedResource>
-    <EmbeddedResource Include="..\support\main.c">
-      <Link>support\main.c</Link>
-      <LogicalName>main.c</LogicalName>
-    </EmbeddedResource>
     <EmbeddedResource Include="..\support\mono-support.h">
       <Link>support\mono-support.h</Link>
       <LogicalName>mono-support.h</LogicalName>
