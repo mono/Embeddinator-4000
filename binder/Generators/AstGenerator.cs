@@ -244,19 +244,9 @@ namespace MonoEmbeddinator4000.Generators
 
             foreach (var method in type.DeclaredMethods)
             {
-                bool isExplicit = false;
-                if (!method.IsPublic)
+                if (!method.IsPublic && !method.IsExplicitInterfaceMethod())
                 {
-                    //NOTE: Explicit interface implementations will be IsVirtual=True and IsFinal=True
-                    // See https://msdn.microsoft.com/en-us/library/system.reflection.methodbase.isfinal(v=vs.110).aspx
-                    if  (method.IsVirtual && method.IsFinal)
-                    {
-                        isExplicit = true;
-                    }
-                    else
-                    {
-                        continue;
-                    }
+                    continue;
                 }
 
                 if (method.IsGenericMethod)
@@ -266,13 +256,6 @@ namespace MonoEmbeddinator4000.Generators
                     continue;
 
                 var decl = VisitMethod(method);
-                if (isExplicit)
-                {
-                    //NOTE: if this is an explicit interface method, mark it public and modify the name
-                    decl.Access = AccessSpecifier.Public;
-                    decl.OriginalName =
-                        decl.Name = decl.Name.Split('.').Last();
-                }
                 @class.Declarations.Add(decl);
             }
 
@@ -586,6 +569,14 @@ namespace MonoEmbeddinator4000.Generators
             var accessMask = (methodBase.Attributes & MethodAttributes.MemberAccessMask);
             method.Access = ConvertMemberAttributesToAccessSpecifier(accessMask);
 
+            //NOTE: if this is an explicit interface method, mark it public and modify the name
+            if (methodBase.IsExplicitInterfaceMethod())
+            {
+                method.Access = AccessSpecifier.Public;
+                method.OriginalName =
+                    method.Name = method.Name.Split('.').Last();
+            }
+
             return method;
         }
 
@@ -737,6 +728,15 @@ namespace MonoEmbeddinator4000.Generators
                     return true;
             }
             return false;
+        }
+
+        /// <summary>
+        /// NOTE: Explicit interface implementations will be IsVirtual=True and IsFinal=True
+        /// See https://msdn.microsoft.com/en-us/library/system.reflection.methodbase.isfinal(v=vs.110).aspx
+        /// </summary>
+        public static bool IsExplicitInterfaceMethod(this MethodBase method)
+        {
+            return !method.IsPublic && method.IsVirtual && method.IsFinal;
         }
 
         public static bool IsAndroidSubclass (this IKVM.Reflection.Type type)
