@@ -351,7 +351,7 @@ namespace MonoEmbeddinator4000.Generators
             string returnCode = "0";
 
             // Marshal the method result to native code.
-            if (!method.IsConstructor)
+            if (!method.IsConstructor && needsReturn)
             {
                 var resultId = GeneratedIdentifier("result");
                 var ctx = new MarshalContext(Context)
