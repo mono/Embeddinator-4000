@@ -7,7 +7,7 @@ namespace MonoEmbeddinator4000
 {
     public class CheckReservedKeywords : TranslationUnitPass
     {
-        readonly List<string> ReservedKeywords = new List<string> {
+        static readonly List<string> ReservedKeywords = new List<string> {
             // C99 6.4.1: Keywords.
             "auto", "break", "case", "char", "const", "continue", "default",
             "do", "double", "else", "enum", "extern", "float", "for", "goto",
@@ -32,7 +32,7 @@ namespace MonoEmbeddinator4000
              "thread_local"
         };
 
-        readonly List<string> JavaReservedKeywords = new List<string> {
+        static readonly List<string> JavaReservedKeywords = new List<string> {
             "abstract", "assert", "boolean", "break", "byte",
             "case", "catch", "char", "class", "const",
             "continue", "default", "do", "double", "else",
@@ -47,19 +47,35 @@ namespace MonoEmbeddinator4000
             "while"
         };
 
-        static void CheckKeywords(IList<string> keywords, Parameter parameter)
+        static void CheckKeywords(IList<string> keywords, Declaration decl)
         {
-            if (keywords.Contains(parameter.Name))
-                parameter.Name = string.Format("_{0}", parameter.Name);
+            if (keywords.Contains(decl.Name))
+                decl.Name = $"_{decl.Name}";
+        }
+
+        void CheckKeywords(Declaration decl)
+        {
+            CheckKeywords(ReservedKeywords, decl);
+
+            if (Options.GeneratorKind == GeneratorKind.Java)
+                CheckKeywords(JavaReservedKeywords, decl);
+        }
+
+        public override bool VisitFunctionDecl(Function function)
+        {
+            CheckKeywords(function);
+            return base.VisitFunctionDecl(function);
+        }
+
+        public override bool VisitMethodDecl(Method method)
+        {
+            CheckKeywords(method);
+            return base.VisitMethodDecl(method);
         }
 
         public override bool VisitParameterDecl (Parameter parameter)
         {
-            CheckKeywords(ReservedKeywords, parameter);
-
-            if (Options.GeneratorKind == GeneratorKind.Java)
-                CheckKeywords(JavaReservedKeywords, parameter);
-
+            CheckKeywords(parameter);
             return true;
         }
     }

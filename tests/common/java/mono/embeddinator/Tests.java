@@ -11,6 +11,7 @@ import managed.fields.*;
 import managed.interfaces.*;
 import managed.methods.*;
 import managed.structs.*;
+import managed.keywords.*;
 
 import static org.junit.Assert.*;
 import org.junit.*;
@@ -327,5 +328,11 @@ public class Tests {
 
         //Just validate this doesn't crash for now
         assertNotNull(Type_DateTime.getNow());
+    }
+
+    @Test
+    public void testKeywords() {
+        Keywords keywords = new Keywords();
+        keywords._assert();
     }
 }

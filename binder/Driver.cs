@@ -89,6 +89,7 @@ namespace MonoEmbeddinator4000
 
             Context.TranslationUnitPasses.Passes.AddRange(new TranslationUnitPass[]
             {
+                new CheckReservedKeywords(),
                 new RenameDuplicatedDeclsPass(),
                 new CheckDuplicatedNamesPass()
             });
