@@ -98,6 +98,9 @@ namespace MonoEmbeddinator4000.Generators
             if (decl != null)
                 return decl;
 
+            if (typeInfo.IsGenericType && !typeInfo.IsGenericTypeDefinition)
+                return Visit(typeInfo.GetGenericTypeDefinition().GetTypeInfo());
+
             if (typeInfo.IsEnum)
                 decl = VisitEnum(typeInfo);
             else if (typeInfo.IsClass || typeInfo.IsInterface || typeInfo.IsValueType)
@@ -636,6 +639,9 @@ namespace MonoEmbeddinator4000.Generators
                 IsStatic = fieldInfo.IsStatic
             };
 
+            if (field.Type is UnsupportedType)
+                field.Ignore = true;
+
             var accessMask = (fieldInfo.Attributes & FieldAttributes.FieldAccessMask);
             field.Access = ConvertFieldAttributesToAccessSpecifier(accessMask);
 
@@ -655,6 +661,9 @@ namespace MonoEmbeddinator4000.Generators
                 Namespace = Visit(propertyInfo.DeclaringType.GetTypeInfo()) as Class,
                 QualifiedType = VisitType(propertyInfo.PropertyType),
             };
+
+            if (property.Type is UnsupportedType)
+                property.Ignore = true;
 
             if (propertyInfo.GetMethod != null)
             {

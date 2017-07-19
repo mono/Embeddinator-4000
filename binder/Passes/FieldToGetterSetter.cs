@@ -17,6 +17,9 @@ namespace MonoEmbeddinator4000.Passes
             if (field.IsImplicit)
                 return false;
 
+            if (!field.IsGenerated)
+                return false;
+
             field.GenerationKind = GenerationKind.None;
 
             var @class = field.Namespace as Class;
@@ -28,7 +31,7 @@ namespace MonoEmbeddinator4000.Passes
                 ReturnType = field.QualifiedType,
                 Access = field.Access,
                 Field = field,
-                IsStatic = field.IsStatic
+                IsStatic = field.IsStatic,
             };
 
             var setter = new Method
@@ -38,7 +41,7 @@ namespace MonoEmbeddinator4000.Passes
                 ReturnType = new QualifiedType(new BuiltinType(PrimitiveType.Void)),
                 Access = field.Access,
                 Field = field,
-                IsStatic = field.IsStatic
+                IsStatic = field.IsStatic,
             };
 
             var param = new Parameter
