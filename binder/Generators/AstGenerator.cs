@@ -244,8 +244,10 @@ namespace MonoEmbeddinator4000.Generators
 
             foreach (var method in type.DeclaredMethods)
             {
-                if (!method.IsPublic)
+                if (!method.IsPublic && !method.IsExplicitInterfaceMethod())
+                {
                     continue;
+                }
 
                 if (method.IsGenericMethod)
                     continue;
@@ -567,6 +569,19 @@ namespace MonoEmbeddinator4000.Generators
             var accessMask = (methodBase.Attributes & MethodAttributes.MemberAccessMask);
             method.Access = ConvertMemberAttributesToAccessSpecifier(accessMask);
 
+            //NOTE: if this is an explicit interface method, mark it public and modify the name
+            if (methodBase.IsExplicitInterfaceMethod())
+            {
+                //We also need to check for collisions
+                string name = method.Name.Split('.').Last();
+                if (!methodBase.DeclaringType.GetMethods().Any(m => m.IsPublic && m.Name == name))
+                {
+                    method.Access = AccessSpecifier.Public;
+                    method.OriginalName =
+                        method.Name = name;
+                }
+            }
+
             return method;
         }
 
@@ -718,6 +733,15 @@ namespace MonoEmbeddinator4000.Generators
                     return true;
             }
             return false;
+        }
+
+        /// <summary>
+        /// NOTE: Explicit interface implementations will be IsVirtual=True and IsFinal=True
+        /// See https://msdn.microsoft.com/en-us/library/system.reflection.methodbase.isfinal(v=vs.110).aspx
+        /// </summary>
+        public static bool IsExplicitInterfaceMethod(this MethodBase method)
+        {
+            return !method.IsPublic && method.IsVirtual && method.IsFinal;
         }
 
         public static bool IsAndroidSubclass (this IKVM.Reflection.Type type)

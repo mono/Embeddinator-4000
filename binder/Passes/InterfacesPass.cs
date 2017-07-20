@@ -56,9 +56,18 @@ namespace MonoEmbeddinator4000.Passes
             var @base = new BaseClassSpecifier { Type = new TagType(@interface) };
             impl.Bases.Add(@base);
 
-            var methods = @interface.Declarations.Where(d => d is Method).Cast<Method>();
+            var methods = new List<Method>(@interface.Declarations.OfType<Method>());
+            foreach (var baseInterface in @interface.Bases)
+            {
+                methods.AddRange(baseInterface.Class.Declarations.OfType<Method>());
+            }
+
             foreach (var method in methods)
             {
+                //NOTE: skip methods such as __getObject
+                if (method.IsImplicit)
+                    continue;
+
                 var methodImpl = new Method(method)
                 {
                     IsPure = false,
