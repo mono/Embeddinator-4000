@@ -3,9 +3,9 @@
 In addition to the requirements from our [Getting started with Java](getting-started-java.md) guide you'll also need:
 
 * Xamarin.Android 7.4.99 or later (build from [Jenkins](https://jenkins.mono-project.com/view/Xamarin.Android/job/xamarin-android/lastSuccessfulBuild/Azure/))
-* Android Studio 2.3.2 or later (with [Java 1.8](https://developer.android.com/guide/platform/j8-jack.html))
+* Android Studio 2.3.x or later (with [Java 1.8](https://developer.android.com/guide/platform/j8-jack.html))
 
-*NOTE: the state of using Java 1.8 in Android Studio is currently in [flux](https://android-developers.googleblog.com/2017/03/future-of-java-8-language-feature.html) at the moment. At the time of writing, the options are to enable the Jack toolchain in your project or use a preview version of Android Studio.*
+*NOTE: the state of using Java 1.8 in Android Studio is currently in [flux](https://android-developers.googleblog.com/2017/03/future-of-java-8-language-feature.html) at the moment. At the time of writing, the best option is to enable the Jack toolchain in the stable version of Android Studio. Details below.*
 
 As an overview, we will:
 * Clone Embeddinator-4000
@@ -129,9 +129,9 @@ public class MainActivity extends AppCompatActivity {
 One further change is required for Embeddinator in your Android Studio project.
 
 Open your app's `build.gradle` file and add the following change:
-```gradle
+```groovy
 android {
-    // ... Other stuff here ...
+    // ...
     aaptOptions {
         noCompress 'dll'
     }
@@ -160,6 +160,29 @@ So for this sample to work, all the following are setup in the final APK:
 * `AndroidManifest.xml` modifications for your C# activities, etc.
 * Android Resources and Assets from .NET libraries
 * [Android Callable Wrappers](https://developer.xamarin.com/guides/android/advanced_topics/java_integration_overview/android_callable_wrappers/) for any `Java.Lang.Object` subclass
+
+## Using Java 1.8
+
+As of writing this, the best option is to use Android Studio 2.3.x stable and enable the Jack toolchain.
+
+So in your app module's `build.gradle` file:
+```groovy
+android {
+    // ..
+    defaultConfig {
+        // ...
+        jackOptions.enabled true
+    }
+    // ...
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+```
+You can also take a look at our Android Studio test project [here](https://github.com/mono/Embeddinator-4000/blob/master/tests/android/app/build.gradle) for more details.
+
+Eventually Android Studio 3.0 should be the preferred option; however, Android Studio 3.0 currently has the limitation of not being able to use local AAR files. See an issue on this [here](https://github.com/mono/Embeddinator-4000/issues/448).
 
 ## Current Limitations on Android
 
