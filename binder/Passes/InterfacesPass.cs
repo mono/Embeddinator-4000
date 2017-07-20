@@ -64,7 +64,8 @@ namespace MonoEmbeddinator4000.Passes
 
             foreach (var method in methods)
             {
-                if (method.Name == "__getObject")
+                //NOTE: skip methods such as __getObject
+                if (method.IsImplicit)
                     continue;
 
                 var methodImpl = new Method(method)
