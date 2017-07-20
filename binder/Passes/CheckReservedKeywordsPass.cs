@@ -55,6 +55,11 @@ namespace MonoEmbeddinator4000
 
         void CheckKeywords(Declaration decl)
         {
+            // Ignore the "new" keyword unless we're targetting C++, because its used
+            // in C as the identifier for managed constructors.
+            if (decl.Name == "new" && Options.GeneratorKind != GeneratorKind.CPlusPlus)
+                return;
+
             CheckKeywords(ReservedKeywords, decl);
 
             if (Options.GeneratorKind == GeneratorKind.Java)
