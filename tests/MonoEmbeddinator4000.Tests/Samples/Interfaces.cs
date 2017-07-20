@@ -18,4 +18,16 @@ namespace Example
 
         void IMore.World() { }
     }
+
+    public interface IConflict
+    {
+        void Hello();
+    }
+
+    public class Conflicted : IBase, IConflict
+    {
+        void IBase.Hello() { }
+
+        void IConflict.Hello() { }
+    }
 }
