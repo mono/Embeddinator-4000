@@ -29,5 +29,7 @@ namespace Example
         void IBase.Hello() { }
 
         void IConflict.Hello() { }
+
+        public void Hello() { }
     }
 }

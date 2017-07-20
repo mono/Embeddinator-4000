@@ -572,9 +572,14 @@ namespace MonoEmbeddinator4000.Generators
             //NOTE: if this is an explicit interface method, mark it public and modify the name
             if (methodBase.IsExplicitInterfaceMethod())
             {
-                method.Access = AccessSpecifier.Public;
-                method.OriginalName =
-                    method.Name = method.Name.Split('.').Last();
+                //We also need to check for collisions
+                string name = method.Name.Split('.').Last();
+                if (!methodBase.DeclaringType.GetMethods().Any(m => m.IsPublic && m.Name == name))
+                {
+                    method.Access = AccessSpecifier.Public;
+                    method.OriginalName =
+                        method.Name = name;
+                }
             }
 
             return method;
