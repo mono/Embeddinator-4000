@@ -32,11 +32,14 @@ configuration:
 environment:
   MONO_INSTALLER: mono-5.0.1.1-gtksharp-2.12.44-win32-0.msi
   JAVA_HOME: C:\Program Files\Java\jdk1.8.0
+  ANDROID_HOME: C:\android-sdk-windows
+  ANDROID_TOOLS_URL: "https://dl.google.com/android/repository/tools_r25.2.3-windows.zip"
 
 cache:
   - packages -> **\packages.config
   - .cake -> build.cake, .cake\packages.config
   - external\Xamarin.Android -> build.cake
+  - C:\android-sdk-windows -> appveyor.yml
 
 #---------------------------------#
 #    build scripts                #
@@ -44,10 +47,19 @@ cache:
 
 init:
   - git config --global core.autocrlf true
+  - appveyor DownloadFile %ANDROID_TOOLS_URL% -FileName android-tools.zip
+  - 7z x android-tools.zip -o"%ANDROID_HOME%" > nul
 
 install:
   - cmd: appveyor DownloadFile https://download.mono-project.com/archive/5.0.1/windows-installer/%MONO_INSTALLER%
   - cmd: msiexec /i %MONO_INSTALLER% /qn /norestart
+  - mkdir %ANDROID_HOME%\licenses
+  - ps: 'Add-Content -Value "`n8933bad161af4178b1185d1a37fbf41ea5269c55" -Path $env:ANDROID_HOME\licenses\android-sdk-license -Encoding ASCII'
+  - ps: 'Add-Content -Value "`n84831b9409646a918e30573bab4c9c91346d8abd`n504667f4c0de7af1a06de9f4b1727b84351f2910" -Path $env:ANDROID_HOME\licenses\android-sdk-preview-license -Encoding ASCII'
+  - '%ANDROID_HOME%\tools\bin\sdkmanager.bat tools'
+  - '%ANDROID_HOME%\tools\bin\sdkmanager.bat platform-tools'
+  - '%ANDROID_HOME%\tools\bin\sdkmanager.bat build-tools;25.0.3'
+  - '%ANDROID_HOME%\tools\bin\sdkmanager.bat platforms;android-24'
 
 build_script:
   - cmd: git submodule update --init --recursive
