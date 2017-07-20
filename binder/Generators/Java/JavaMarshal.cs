@@ -74,7 +74,7 @@ namespace MonoEmbeddinator4000.Generators
             marshal = value;
 
             if (isEnum)
-                marshal = $"{@enum.Name}.fromOrdinal({value})";
+                marshal = $"{@enum.Visit(TypePrinter)}.fromOrdinal({value})";
 
             if (type == PrimitiveType.Bool)
                 marshal = $"{value} != 0";
@@ -158,7 +158,7 @@ namespace MonoEmbeddinator4000.Generators
 
         public override bool VisitEnumDecl(Enumeration @enum)
         {
-            Context.Return.Write($"{@enum.Name}.fromOrdinal({Context.ReturnVarName})");
+            Context.Return.Write($"{@enum.Visit(TypePrinter)}.fromOrdinal({Context.ReturnVarName})");
             return true;
         }
 

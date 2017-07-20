@@ -43,6 +43,9 @@ namespace MonoEmbeddinator4000.Passes
             if (decl is TranslationUnit)
                 return false;
 
+            if (decl is Parameter || decl is Property)
+                return true;
+
             if (decl is Class || decl is Enumeration || decl is TypedefDecl)
                 Declarations.Add(decl);
 
