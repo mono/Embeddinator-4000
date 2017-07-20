@@ -209,6 +209,8 @@ namespace MonoEmbeddinator4000.Generators
                 @enum.AddItem(enumItem);
             }
 
+            ManagedNames[@enum] = type.FullName;
+
             return @enum;
         }
 
