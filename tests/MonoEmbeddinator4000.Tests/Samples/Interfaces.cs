@@ -21,6 +21,10 @@ namespace Example
 
     public interface IConflict
     {
+        string TestProperty { get; }
+
+        string TestField { get; }
+
         void Hello();
     }
 
@@ -31,5 +35,22 @@ namespace Example
         void IConflict.Hello() { }
 
         public void Hello() { }
+
+        string IConflict.TestProperty
+        {
+            get { return "IConflict.TestProperty"; }
+        }
+
+        public static string TestProperty
+        {
+            get { return "TestProperty"; }
+        }
+
+        string IConflict.TestField
+        {
+            get { return "IConflict.TestField"; }
+        }
+
+        public static string TestField = "TestField";
     }
 }

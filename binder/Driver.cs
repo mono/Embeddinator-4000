@@ -82,6 +82,8 @@ namespace MonoEmbeddinator4000
                 new GenerateObjectTypesPass(),
                 new GenerateArrayTypes(),
                 new CheckIgnoredDeclsPass { CheckDecayedTypes = false },
+                new RenameDuplicatedDeclsPass(),
+                new CheckDuplicatedNamesPass(),
                 new FieldToGetterSetterPropertyPass()
             });
 
@@ -90,8 +92,6 @@ namespace MonoEmbeddinator4000
             Context.TranslationUnitPasses.Passes.AddRange(new TranslationUnitPass[]
             {
                 new CheckReservedKeywords(),
-                new RenameDuplicatedDeclsPass(),
-                new CheckDuplicatedNamesPass()
             });
 
             Context.RunPasses();

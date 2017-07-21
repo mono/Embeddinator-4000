@@ -565,16 +565,16 @@ namespace MonoEmbeddinator4000.Generators
             method.IsStatic = methodBase.IsStatic;
             method.IsVirtual = methodBase.IsVirtual;
             method.IsPure = methodBase.IsAbstract;
-            //method.IsFinal = methodBase.IsFinal;
+
             var accessMask = (methodBase.Attributes & MethodAttributes.MemberAccessMask);
             method.Access = ConvertMemberAttributesToAccessSpecifier(accessMask);
 
             //NOTE: if this is an explicit interface method, mark it public and modify the name
-            if (methodBase.IsExplicitInterfaceMethod())
+            if (!methodBase.DeclaringType.IsAndroidSubclass() && methodBase.IsExplicitInterfaceMethod())
             {
                 //We also need to check for collisions
                 string name = method.Name.Split('.').Last();
-                if (!methodBase.DeclaringType.GetMethods().Any(m => m.IsPublic && m.Name == name))
+                if (!methodBase.DeclaringType.GetMethods().Any(m => m.IsPublic && !m.IsStatic && m.Name == name))
                 {
                     method.Access = AccessSpecifier.Public;
                     method.OriginalName =
