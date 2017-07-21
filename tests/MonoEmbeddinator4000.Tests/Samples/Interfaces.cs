@@ -21,6 +21,8 @@ namespace Example
 
     public interface IConflict
     {
+        string Test { get; }
+
         void Hello();
     }
 
@@ -31,5 +33,15 @@ namespace Example
         void IConflict.Hello() { }
 
         public void Hello() { }
+
+        string IConflict.Test
+        {
+            get { return "IConflict.Test"; }
+        }
+
+        public static string Test
+        {
+            get { return "Test"; }
+        }
     }
 }
