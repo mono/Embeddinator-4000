@@ -28,9 +28,9 @@ public abstract class AbstractClass : Java.Lang.Object
 So let's identify the details that make this work:
 - `[Register]` generates a nice package name in Java--you will get an auto-generated package name without it.
 - Subclassing `Java.Lang.Object` signals Embeddinator to run the class through Xamarin.Android's Java generator.
-- Empty constructor: is the one you want Java to be using.
+- Empty constructor: is what you will want to use from Java code.
 - `(IntPtr, JniHandleOwnership)` constructor: is what Xamarin.Android will use for creating the C#-equivalent of Java objects.
-- `[Export]` is just needed if you want to make the method name different in Java, since the Java world likes to use lower case methods.
+- `[Export]` signals Xamarin.Android to expose the method to Java. We can also change the method name, since the Java world likes to use lower case methods.
 
 Next let's make a C# method to test the scenario:
 ```csharp
