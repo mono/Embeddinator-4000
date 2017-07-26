@@ -243,6 +243,8 @@ namespace MonoEmbeddinator4000.Generators
                     WriteLine($"{objectId}->{0} = ({1}*) mono_embeddinator_create_object({2});",
                         CGenerator.ObjectInstanceId, GenerateObjectTypesPass.MonoEmbedObject.Name,
                         instanceId);
+
+                NeedNewLine();
             }
             else if (!method.IsStatic)
             {
@@ -255,7 +257,7 @@ namespace MonoEmbeddinator4000.Generators
         public void GenerateMethodInvocation(Method method)
         {
             GenerateMethodInitialization(method);
-            NewLine();
+            NewLineIfNeeded();
 
             var paramsToMarshal = method.Parameters.Where(p => !p.IsImplicit);
             var numParamsToMarshal = paramsToMarshal.Count();
@@ -288,13 +290,13 @@ namespace MonoEmbeddinator4000.Generators
                     Write(marshal.Context.SupportBefore);
 
                 WriteLine($"{argsId}[{paramIndex++}] = {marshal.Context.Return};");
+                NeedNewLine();
             }
+
+            NewLineIfNeeded();
 
             var exceptionId = GeneratedIdentifier("exception");
             WriteLine($"MonoObject* {exceptionId} = 0;");
-
-            var resultId = GeneratedIdentifier("result");
-            WriteLine($"MonoObject* {resultId};");
 
             var methodId = GeneratedIdentifier("method");
             var instanceId = method.IsStatic ? "0" : GeneratedIdentifier("instance");
@@ -314,22 +316,25 @@ namespace MonoEmbeddinator4000.Generators
                 instanceId = unboxedId;
             }
 
-            WriteLine("{0} = mono_runtime_invoke({1}, {2}, {3}, &{4});", resultId,
-                methodId, instanceId, argsId, exceptionId);
+            Write($"MonoObject* {GeneratedIdentifier("result")} = ");
+            WriteLine($"mono_runtime_invoke({methodId}, {instanceId}, {argsId}, &{exceptionId});");
+
             NewLine();
-
             WriteLine($"if ({exceptionId})");
-            WriteStartBraceIndent();
 
             if (method.IsConstructor)
-                WriteLine($"free({GeneratedIdentifier("object")});");
+            {
+                WriteLine("{");
+                WriteLineIndent($"free({GeneratedIdentifier("object")});");
+            }
 
-            WriteLine($"mono_embeddinator_throw_exception({exceptionId});");
+            WriteLineIndent($"mono_embeddinator_throw_exception({exceptionId});");
 
             if (method.IsConstructor)
-                WriteLine("return 0;");
-
-            WriteCloseBraceIndent();
+            {
+                WriteLineIndent("return 0;");
+                WriteLine("}");
+            }
 
             foreach (var marshalContext in contexts)
             {
