@@ -15,6 +15,9 @@ namespace MonoEmbeddinator4000
     /// </summary>
     static class XamarinAndroidBuild
     {
+        public const string IntermediateDir = "obj";
+        public const string AdditionalJarsFile = "AdditionalJavaLibraryReferences.txt";
+
         const string LinkMode = "SdkOnly";
 
         static ProjectRootElement CreateProject()
@@ -171,7 +174,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
             var mainAssembly = assemblies[0].Location;
             outputDirectory = Path.GetFullPath(outputDirectory);
 
-            var intermediateDir = Path.Combine(outputDirectory, "obj");
+            var intermediateDir = Path.Combine(outputDirectory, IntermediateDir);
             var androidDir = Path.Combine(outputDirectory, "android");
             var javaSourceDir = Path.Combine(outputDirectory, "src");
             var assetsDir = Path.Combine(androidDir, "assets");
@@ -212,6 +215,26 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
             resolveLibraryProject.SetParameter("OutputImportDirectory", intermediateDir);
             resolveLibraryProject.AddOutputItem("ResolvedAssetDirectories", "ResolvedAssetDirectories");
             resolveLibraryProject.AddOutputItem("ResolvedResourceDirectories", "ResolvedResourceDirectories");
+
+            //GetAdditionalResourcesFromAssemblies Task, for JavaLibraryReferenceAttribute, etc.
+            var getAdditionalResources = target.AddTask("GetAdditionalResourcesFromAssemblies");
+            getAdditionalResources.SetParameter("AndroidSdkDirectory", AndroidSdk.AndroidSdkPath);
+            getAdditionalResources.SetParameter("AndroidNdkDirectory", AndroidSdk.AndroidNdkPath);
+            getAdditionalResources.SetParameter("Assemblies", "@(ResolvedUserAssemblies)");
+            getAdditionalResources.SetParameter("CacheFile", Path.Combine(intermediateDir, "resourcepaths.cache"));
+
+            //ReadAdditionalResourcesFromAssemblyCache Task, builds upon GetAdditionalResourcesFromAssemblies
+            var readAdditionalResources = target.AddTask("ReadAdditionalResourcesFromAssemblyCache");
+            readAdditionalResources.SetParameter("CacheFile", Path.Combine(intermediateDir, "resourcepaths.cache"));
+            readAdditionalResources.AddOutputItem("AdditionalAndroidResourcePaths", "AdditionalAndroidResourcePaths");
+            readAdditionalResources.AddOutputItem("AdditionalJavaLibraryReferences", "AdditionalJavaLibraryReferences");
+            readAdditionalResources.AddOutputItem("AdditionalNativeLibraryReferences", "AdditionalNativeLibraryReferences");
+
+            //Write AdditionalJavaLibraryReferences to file, so we can use these values from C#
+            var writeLines = target.AddTask("WriteLinesToFile");
+            writeLines.SetParameter("File", Path.Combine(intermediateDir, AdditionalJarsFile));
+            writeLines.SetParameter("Lines", "@(AdditionalJavaLibraryReferences)");
+            writeLines.SetParameter("Overwrite", "True");
 
             //Create ItemGroup of Android files
             var androidResources = target.AddItemGroup();

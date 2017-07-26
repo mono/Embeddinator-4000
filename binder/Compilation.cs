@@ -129,6 +129,17 @@ namespace MonoEmbeddinator4000
                     }
                 }
 
+                //There are yet, another set of jar files
+                string additionalJars = Path.Combine(Options.OutputDir, XamarinAndroidBuild.IntermediateDir, XamarinAndroidBuild.AdditionalJarsFile);
+                if (File.Exists(additionalJars))
+                {
+                    using (var reader = File.OpenText(additionalJars))
+                    {
+                        while (!reader.EndOfStream)
+                            classpath.Add(reader.ReadLine().Trim());
+                    }
+                }
+
                 args.Add("\"" + string.Join(delimiter, classpath) + "\"");
             }
             else
