@@ -146,9 +146,7 @@ namespace MonoEmbeddinator4000.Generators
                 decl.QualifiedName.Split('.').Select(n => string.Format("\"{0}\"", n)));
 
             var monoImageName = string.Format("{0}_image", CGenerator.AssemblyId(decl.TranslationUnit));
-
-            // Replace + with / since that's what mono_class_from_name expects for nested types.
-            var managedName = decl.ManagedQualifiedName().Replace("+", "/");
+            var managedName = decl.ManagedQualifiedName();
 
             var dotIndex = managedName.LastIndexOf(".", StringComparison.Ordinal);
             if (dotIndex > 0)
