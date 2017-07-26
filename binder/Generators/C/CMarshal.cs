@@ -391,7 +391,8 @@ namespace MonoEmbeddinator4000.Generators
 
         public override bool VisitEnumDecl(Enumeration @enum)
         {
-            Context.Return.Write("&{0}", Context.ArgName);
+            var byValue = PrimitiveValuesByValue ? string.Empty : "&";
+            Context.Return.Write($"{byValue}{Context.ArgName}");
             return true;
         }
 

@@ -54,6 +54,17 @@ namespace Arrays {
 		public void ValueHolderArrRef (ref ValueHolder [] valueArr) => valueArr = valueArr?.Reverse ().ToArray ();
 		public void IMakeItUpArrRef (ref IMakeItUp [] interArr) => interArr = interArr != null ? new [] { Supplier.Create () } : null;
 
+		public enum Enum
+		{
+			A = 0,
+			B,
+			C
+		}
+
+		public static Enum EnumArrayLast (Enum[] array)
+		{
+			return array.Last();
+		}
 		public static int SumByteArray (byte[] array)
 		{
 			return array.Sum(n => n); 

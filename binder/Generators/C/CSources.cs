@@ -83,8 +83,9 @@ namespace MonoEmbeddinator4000.Generators
             var referencedClasses = new GetReferencedDecls();
             Unit.Visit(referencedClasses);
 
-            var classNames = referencedClasses.Classes
+            var classNames = referencedClasses.Declarations
                 .Where(c => c != GenerateObjectTypesPass.MonoEmbedObject)
+                .Where(c => c is Class || c is Enumeration)
                 .Select(c => c.QualifiedName)
                 .Distinct();
 
