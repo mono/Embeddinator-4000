@@ -291,16 +291,8 @@ namespace MonoEmbeddinator4000.Generators
                 var tagType = type as TagType;
                 var decl = tagType.Declaration;
 
-                var @namespace = string.Empty;
-                var ids = string.Join(", ",
-                    decl.QualifiedName.Split('.').Select(n => $"\"{n}\""));
-
-                var unit = decl.TranslationUnit;
-
                 var classId = $"class_{decl.QualifiedName}";
-                var monoImageName = $"{CGenerator.AssemblyId(unit)}_image";
-                gen.WriteLine("{0} = mono_class_from_name({1}, \"{2}\", \"{3}\");",
-                    classId, monoImageName, @namespace, decl.ManagedQualifiedName());
+                gen.WriteLine($"{classId} = {CSources.GenerateMonoClassFromNameCall(decl)}");
 
                 return classId;
             }
@@ -399,7 +391,8 @@ namespace MonoEmbeddinator4000.Generators
 
         public override bool VisitEnumDecl(Enumeration @enum)
         {
-            Context.Return.Write("&{0}", Context.ArgName);
+            var byValue = PrimitiveValuesByValue ? string.Empty : "&";
+            Context.Return.Write($"{byValue}{Context.ArgName}");
             return true;
         }
 

@@ -392,6 +392,15 @@ TEST_CASE("Arrays.C", "[C][Arrays]") {
     REQUIRE(strcmp(g_array_index(_string.array, gchar*, 0), "1") == 0);
     REQUIRE(strcmp(g_array_index(_string.array, gchar*, 1), "2") == 0);
     REQUIRE(strcmp(g_array_index(_string.array, gchar*, 2), "3") == 0);
+
+    Arrays_Enum _enum_arr[] = { Arrays_Enum_A, Arrays_Enum_B, Arrays_Enum_C };
+    _Arrays_EnumArray _enum;
+    _enum.array = g_array_sized_new(/*zero_terminated=*/false,
+        /*clear=*/true, sizeof(Arrays_Enum), G_N_ELEMENTS(_enum_arr));
+    g_array_append_vals (_enum.array, _enum_arr, G_N_ELEMENTS(_enum_arr));
+
+    Arrays_Enum _last = Arrays_Arr_EnumArrayLast(_enum);
+    REQUIRE(_last == Arrays_Enum_C);
 }
 
 int main( int argc, char* argv[] )

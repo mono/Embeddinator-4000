@@ -1,4 +1,5 @@
-﻿﻿﻿﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using CppSharp;
 using CppSharp.AST;
@@ -16,8 +17,6 @@ namespace MonoEmbeddinator4000.Generators
         }
 
         public override string FileExtension => "c";
-
-        public string AssemblyId => CGenerator.AssemblyId(Unit);
 
         Options EmbedOptions => Options as Options;
 
@@ -46,7 +45,7 @@ namespace MonoEmbeddinator4000.Generators
 
             PushBlock();
             WriteLine("mono_embeddinator_context_t {0};", GeneratedIdentifier("mono_context"));
-            WriteLine("MonoImage* {0}_image;", AssemblyId);
+            WriteLine("MonoImage* {0}_image;", CGenerator.AssemblyId(Unit));
             PopBlock(NewLineKind.BeforeNextBlock);
 
             GenerateObjectDeclarations();
@@ -84,8 +83,9 @@ namespace MonoEmbeddinator4000.Generators
             var referencedClasses = new GetReferencedDecls();
             Unit.Visit(referencedClasses);
 
-            var classNames = referencedClasses.Classes
+            var classNames = referencedClasses.Declarations
                 .Where(c => c != GenerateObjectTypesPass.MonoEmbedObject)
+                .Where(c => c is Class || c is Enumeration)
                 .Select(c => c.QualifiedName)
                 .Distinct();
 
@@ -125,7 +125,7 @@ namespace MonoEmbeddinator4000.Generators
             WriteLine($"static void {assemblyLookupId}()");
             WriteStartBraceIndent();
 
-            var monoImageName = string.Format("{0}_image", AssemblyId);
+            var monoImageName = string.Format("{0}_image", CGenerator.AssemblyId(Unit));
             WriteLine("if ({0})", monoImageName);
             WriteLineIndent("return;");
 
@@ -134,6 +134,25 @@ namespace MonoEmbeddinator4000.Generators
 
             WriteCloseBraceIndent();
             PopBlock(NewLineKind.BeforeNextBlock);
+        }
+
+        public static string GenerateMonoClassFromNameCall(Declaration decl)
+        {
+            var namespaces = Declaration.GatherNamespaces(decl.Namespace)
+                .Where(ns => !(ns is TranslationUnit));
+
+            var @namespace = string.Join(".", namespaces);
+            var ids = string.Join(", ",
+                decl.QualifiedName.Split('.').Select(n => string.Format("\"{0}\"", n)));
+
+            var monoImageName = string.Format("{0}_image", CGenerator.AssemblyId(decl.TranslationUnit));
+            var managedName = decl.ManagedQualifiedName();
+
+            var dotIndex = managedName.LastIndexOf(".", StringComparison.Ordinal);
+            if (dotIndex > 0)
+                managedName = managedName.Substring(managedName.LastIndexOf(".", StringComparison.Ordinal) + 1);
+
+            return $"mono_class_from_name({monoImageName}, \"{@namespace}\", \"{managedName}\");";
         }
 
         public void GenerateClassLookup(Class @class)
@@ -154,16 +173,7 @@ namespace MonoEmbeddinator4000.Generators
             var assemblyLookupId = GeneratedIdentifier($"lookup_assembly_{assemblyName.Replace('.', '_')}");
             WriteLine($"{assemblyLookupId}();");
 
-            var namespaces = Declaration.GatherNamespaces(@class.Namespace)
-                .Where(ns => !(ns is TranslationUnit));
-
-            var @namespace = string.Join(".", namespaces);
-            var ids = string.Join(", ",
-                @class.QualifiedName.Split('.').Select(n => string.Format("\"{0}\"", n)));
-
-            var monoImageName = string.Format("{0}_image", AssemblyId);
-            WriteLine("{0} = mono_class_from_name({1}, \"{2}\", \"{3}\");",
-                classId, monoImageName, @namespace, @class.OriginalName);
+            WriteLine($"{classId} = {GenerateMonoClassFromNameCall(@class)}");
             WriteCloseBraceIndent();
             WriteCloseBraceIndent();
 
