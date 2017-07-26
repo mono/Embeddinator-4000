@@ -122,7 +122,14 @@ namespace MonoEmbeddinator4000
                 var path = GetSupportDirectory();
 
                 foreach (var file in Directory.EnumerateFiles(path))
+                {
+                    // Skip Objective-C support files if we are not targetting it.
+                    if (Options.GeneratorKind != GeneratorKind.ObjectiveC &&
+                        (Path.GetExtension(file) == ".m" || file.Contains("objc")))
+                        continue;
+
                     Output.WriteOutput(Path.GetFileName(file), File.ReadAllText(file));
+                }
             }
             catch (Exception)
             {
