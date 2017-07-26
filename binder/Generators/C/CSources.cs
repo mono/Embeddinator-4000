@@ -18,8 +18,6 @@ namespace MonoEmbeddinator4000.Generators
 
         public override string FileExtension => "c";
 
-        public string AssemblyId => CGenerator.AssemblyId(Unit);
-
         Options EmbedOptions => Options as Options;
 
         public override void WriteHeaders()
@@ -47,7 +45,7 @@ namespace MonoEmbeddinator4000.Generators
 
             PushBlock();
             WriteLine("mono_embeddinator_context_t {0};", GeneratedIdentifier("mono_context"));
-            WriteLine("MonoImage* {0}_image;", AssemblyId);
+            WriteLine("MonoImage* {0}_image;", CGenerator.AssemblyId(Unit));
             PopBlock(NewLineKind.BeforeNextBlock);
 
             GenerateObjectDeclarations();
@@ -126,7 +124,7 @@ namespace MonoEmbeddinator4000.Generators
             WriteLine($"static void {assemblyLookupId}()");
             WriteStartBraceIndent();
 
-            var monoImageName = string.Format("{0}_image", AssemblyId);
+            var monoImageName = string.Format("{0}_image", CGenerator.AssemblyId(Unit));
             WriteLine("if ({0})", monoImageName);
             WriteLineIndent("return;");
 
