@@ -27,6 +27,12 @@ namespace managedandroid
 		public partial class String
 		{
 
+			// aapt resource value: 0x7f030003
+			public static int THIS_IS_CAPS = 2130903043;
+
+			// aapt resource value: 0x7f030002
+			public static int applicationName = 2130903042;
+
 			// aapt resource value: 0x7f030001
 			public static int hello = 2130903041;
 

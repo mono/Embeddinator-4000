@@ -2,4 +2,6 @@
 <resources>
 	<string name="library_name">managed-android</string>
 	<string name="hello">Hello from C#!</string>
+	<string name="applicationName">embeddinator</string>
+	<string name="THIS_IS_CAPS">caps</string>
 </resources>

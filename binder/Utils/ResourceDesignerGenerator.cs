@@ -127,14 +127,16 @@ namespace MonoEmbeddinator4000
 
                                 foreach (var field in nested.DeclaredFields)
                                 {
+                                    string javaName = nested.Name == "String" ? field.Name : Java.ToJavaName(field.Name);
+
                                     CodeSnippetExpression right, left = new CodeSnippetExpression(type.FullName + "." + nested.Name + "." + field.Name);
                                     if (field.FieldType.FullName == "System.Int32")
                                     {
-                                        right = new CodeSnippetExpression($"{readFieldInt.Name}(R, \"{Java.ToJavaName(field.Name)}\")");
+                                        right = new CodeSnippetExpression($"{readFieldInt.Name}(R, \"{javaName}\")");
                                     }
                                     else if (field.FieldType.FullName == "System.Int32[]")
                                     {
-                                        right = new CodeSnippetExpression($"{readFieldArray.Name}(R, \"{Java.ToJavaName(field.Name)}\")");
+                                        right = new CodeSnippetExpression($"{readFieldArray.Name}(R, \"{javaName}\")");
                                     }
                                     else
                                     {

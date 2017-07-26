@@ -299,4 +299,32 @@ namespace Android
             }
         }
     }
+
+    [Register("mono.embeddinator.android.Resources")]
+    public class Resources : Java.Lang.Object
+    {
+        public static string Hello
+        {
+            [Export("getHello")]
+            get { return Application.Context.GetString(R.String.hello);  }
+        }
+
+        public static string LibraryName
+        {
+            [Export("getLibraryName")]
+            get { return Application.Context.GetString(R.String.library_name); }
+        }
+
+        public static string ApplicationName
+        {
+            [Export("getApplicationName")]
+            get { return Application.Context.GetString(R.String.applicationName); }
+        }
+
+        public static string ThisIsCaps
+        {
+            [Export("getThisIsCaps")]
+            get { return Application.Context.GetString(R.String.THIS_IS_CAPS); }
+        }
+    }
 }
