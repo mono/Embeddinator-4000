@@ -149,4 +149,10 @@ public class AndroidTests {
         JavaCallbacks.interfaceCallback(callback, "test");
         assertEquals("test", callback.text);
     }
+
+    @Test
+    public void sqlite() {
+        int result = SQLite.connect();
+        assertEquals(0, result);
+    }
 }

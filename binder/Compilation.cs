@@ -387,6 +387,9 @@ namespace MonoEmbeddinator4000
             if (!MSBuild(project))
                 return false;
 
+            //Runs some final processing on .NET assemblies
+            XamarinAndroidBuild.ProcessAssemblies(Options.OutputDir);
+
             var invocation = string.Join(" ", args);
             var output = Invoke(jar, invocation);
             return output.ExitCode == 0;
