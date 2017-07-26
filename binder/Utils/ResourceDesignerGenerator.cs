@@ -106,7 +106,7 @@ namespace MonoEmbeddinator4000
                     {
                         foreach (var nested in type.DeclaredNestedTypes)
                         {
-                            if (nested.DeclaredFields.Any())
+                            if (nested.DeclaredFields.Any(f => !f.IsLiteral && !f.IsInitOnly))
                             {
                                 string innerClass = nested.Name == "Attribute" ? "attr" : nested.Name.ToLowerInvariant();
                                 updateIdValues.Statements.Add(new CodeAssignStatement(
@@ -115,10 +115,14 @@ namespace MonoEmbeddinator4000
 
                                 foreach (var field in nested.DeclaredFields)
                                 {
+                                    //Skip if const or readonly
+                                    if (field.IsLiteral || field.IsInitOnly)
+                                        continue;
+
                                     //NOTE: Layout files get changed to ToLowerInvariant() during build process
                                     string javaName = nested.Name == "Layout" ? field.Name.ToLowerInvariant() : field.Name;
 
-                                    CodeSnippetExpression right, left = new CodeSnippetExpression(type.FullName + "." + nested.Name + "." + field.Name);
+                                    CodeExpression right, left = new CodeFieldReferenceExpression(new CodeSnippetExpression(type.FullName + "." + nested.Name), field.Name);
                                     if (field.FieldType.FullName == "System.Int32")
                                     {
                                         right = new CodeSnippetExpression($"{readFieldInt.Name}(R, \"{javaName}\")");

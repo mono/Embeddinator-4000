@@ -30,6 +30,12 @@ namespace managedandroid
 			// aapt resource value: 0x7f010000
 			public static int hello = 2130771968;
 
+			// breaks due to readonly
+			public static readonly int break_readonly = 1;
+
+			// breaks due to const
+			public const int break_const = 1;
+
 			static Attribute()
 			{
 				global::Android.Runtime.ResourceIdManager.UpdateIdValues();
@@ -45,6 +51,9 @@ namespace managedandroid
 
 			// aapt resource value: 0x7f040000
 			public static int text = 2130968576;
+
+			// breaks due to "fixed" keyword
+			public static int @fixed = 2131165240;
 
 			static Id()
 			{

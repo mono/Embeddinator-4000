@@ -70,5 +70,13 @@ namespace MonoEmbeddinator4000.Tests
             string source = generator.ToSource();
             Approvals.Verify(source);
         }
+
+        [Test]
+        public void FullCompile()
+        {
+            LoadAndGenerate("Resource.Full");
+
+            Assert.IsTrue(generator.WriteAssembly(), "Assembly should compile!");
+        }
     }
 }

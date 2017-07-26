@@ -35,6 +35,7 @@ namespace @__embeddinator__ {
             managedandroid.Resource.Attribute.hello = ReadFieldInt(R, "hello");
             R = JNIEnv.FindClass("com.mono.embeddinator.R$id");
             managedandroid.Resource.Id.text = ReadFieldInt(R, "text");
+            managedandroid.Resource.Id.@fixed = ReadFieldInt(R, "fixed");
             R = JNIEnv.FindClass("com.mono.embeddinator.R$layout");
             managedandroid.Resource.Layout.customView = ReadFieldInt(R, "customview");
             managedandroid.Resource.Layout.hello = ReadFieldInt(R, "hello");
