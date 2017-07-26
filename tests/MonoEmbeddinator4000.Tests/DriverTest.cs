@@ -39,12 +39,13 @@ namespace MonoEmbeddinator4000.Tests
                 project.OutputPath = outputDir;
         }
 
-        void RunDriver(string resourceFile)
+        void RunDriver(string resourceFile, CompilerParameters parameters = null)
         {
-            var parameters = new CompilerParameters
+            if (parameters == null)
             {
-                OutputAssembly = temp,
-            };
+                parameters = new CompilerParameters();
+            }
+            parameters.OutputAssembly = temp;
             AssemblyGenerator.CreateFromResource(resourceFile, parameters);
 
             project.Assemblies.Add(temp);
@@ -202,6 +203,23 @@ namespace MonoEmbeddinator4000.Tests
             RunDriver("Interfaces");
             options.GeneratorKind = GeneratorKind.Java;
             RunDriver("Interfaces");
+        }
+
+        [Test, Category("Slow")]
+        public void AndroidNativeLibraries()
+        {
+            var nativeLibrariesZip = Path.Combine(Path.GetDirectoryName(GetType().Assembly.Location), "..", "..", "Samples", "__AndroidNativeLibraries__.zip");
+            var parameters = new CompilerParameters();
+            parameters.EmbeddedResources.Add(nativeLibrariesZip);
+
+            options.Compilation.Platform = TargetPlatform.Android;
+            options.GeneratorKind = GeneratorKind.C;
+            RunDriver("Hello", parameters);
+            options.GeneratorKind = GeneratorKind.Java;
+            RunDriver("Hello", parameters);
+
+            var aar = Path.Combine(options.OutputDir, "Hello.aar");
+            Approvals.VerifyZipFile(aar);
         }
     }
 }

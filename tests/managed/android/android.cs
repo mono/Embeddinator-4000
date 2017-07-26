@@ -271,5 +271,32 @@ namespace Android
 
             base.Dispose(disposing);
         }
+
+        [Register("mono.embeddinator.android.SQLite")]
+        public class SQLite : Java.Lang.Object
+        {
+            [Export("connect")]
+            public static int Connect()
+            {
+                //All these Init() ensure the linker doesn't strip assemblies we need
+                SQLitePCL.Batteries_V2.Init();
+                SQLitePCL.lib.embedded.Init();
+
+                //Sets the provider to load libe_sqlite3.so for SQLite
+                SQLitePCL.raw.SetProvider(new SQLitePCL.SQLite3Provider_e_sqlite3());
+
+                SQLitePCL.sqlite3 db = null;
+                try
+                {
+                    //Open an in-memory db, and just return the result code, 0 is OK
+                    return SQLitePCL.raw.sqlite3_open(":memory:", out db);
+                }
+                finally
+                {
+                    if (db != null)
+                        db.Dispose();
+                }
+            }
+        }
     }
 }

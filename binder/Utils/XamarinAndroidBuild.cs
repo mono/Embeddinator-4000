@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using Microsoft.Build.Construction;
 using Microsoft.Build.Evaluation;
+using Mono.Cecil;
 using Xamarin.Android.Tools;
 
 namespace MonoEmbeddinator4000
@@ -256,6 +258,70 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
             var projectFile = Path.Combine(outputDirectory, "GenerateJavaStubs.proj");
             project.Save(projectFile);
             return projectFile;
+        }
+
+        /// <summary>
+        /// For each linked assembly:
+        /// - We need to extract __AndroidNativeLibraries__.zip into the AAR directory
+        /// - We need to strip __AndroidLibraryProjects__.zip and __AndroidNativeLibraries__.zip
+        /// </summary>
+        public static void ProcessAssemblies(string outputDirectory)
+        {
+            var assembliesDir = Path.Combine(outputDirectory, "android", "assets", "assemblies");
+            var jniDir = Path.Combine(outputDirectory, "android", "jni");
+
+            foreach (var assemblyFile in Directory.GetFiles(assembliesDir, "*.dll"))
+            {
+                var assemblyModified = false;
+                var assembly = AssemblyDefinition.ReadAssembly(assemblyFile);
+
+                foreach (var module in assembly.Modules)
+                {
+                    //NOTE: ToArray() so foreach does not get InvalidOperationException
+                    foreach (EmbeddedResource resource in module.Resources.ToArray())
+                    {
+                        if (resource.Name == "__AndroidNativeLibraries__.zip")
+                        {
+                            var data = resource.GetResourceData();
+                            using (var resourceStream = new MemoryStream(data))
+                            {
+                                using (var zip = new ZipArchive(resourceStream))
+                                {
+                                    foreach (var entry in zip.Entries)
+                                    {
+                                        //Skip directories
+                                        if (string.IsNullOrEmpty(entry.Name))
+                                            continue;
+
+                                        var fileName = entry.Name;
+                                        var abi = Path.GetFileName(Path.GetDirectoryName(entry.FullName));
+
+                                        using (var zipStream = entry.Open())
+                                        using (var fileStream = File.Create(Path.Combine(jniDir, abi, fileName)))
+                                        {
+                                            zipStream.CopyTo(fileStream);
+                                        }
+                                    }
+                                }
+                            }
+
+                            module.Resources.Remove(resource);
+                            assemblyModified = true;
+                        }
+                        else if (resource.Name == "__AndroidLibraryProjects__.zip")
+                        {
+                            module.Resources.Remove(resource);
+                            assemblyModified = true;
+                        }
+                    }
+                }
+
+                //Only write the assembly if we removed a resource
+                if (assemblyModified)
+                {
+                    assembly.Write(assemblyFile);
+                }
+            }
         }
     }
 }
