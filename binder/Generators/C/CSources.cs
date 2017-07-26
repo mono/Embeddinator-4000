@@ -1,4 +1,5 @@
-﻿﻿﻿﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using CppSharp;
 using CppSharp.AST;
@@ -136,6 +137,27 @@ namespace MonoEmbeddinator4000.Generators
             PopBlock(NewLineKind.BeforeNextBlock);
         }
 
+        public static string GenerateMonoClassFromNameCall(Declaration decl)
+        {
+            var namespaces = Declaration.GatherNamespaces(decl.Namespace)
+                .Where(ns => !(ns is TranslationUnit));
+
+            var @namespace = string.Join(".", namespaces);
+            var ids = string.Join(", ",
+                decl.QualifiedName.Split('.').Select(n => string.Format("\"{0}\"", n)));
+
+            var monoImageName = string.Format("{0}_image", CGenerator.AssemblyId(decl.TranslationUnit));
+
+            // Replace + with / since that's what mono_class_from_name expects for nested types.
+            var managedName = decl.ManagedQualifiedName().Replace("+", "/");
+
+            var dotIndex = managedName.LastIndexOf(".", StringComparison.Ordinal);
+            if (dotIndex > 0)
+                managedName = managedName.Substring(managedName.LastIndexOf(".", StringComparison.Ordinal) + 1);
+
+            return $"mono_class_from_name({monoImageName}, \"{@namespace}\", \"{managedName}\");";
+        }
+
         public void GenerateClassLookup(Class @class)
         {
             PushBlock();
@@ -154,16 +176,7 @@ namespace MonoEmbeddinator4000.Generators
             var assemblyLookupId = GeneratedIdentifier($"lookup_assembly_{assemblyName.Replace('.', '_')}");
             WriteLine($"{assemblyLookupId}();");
 
-            var namespaces = Declaration.GatherNamespaces(@class.Namespace)
-                .Where(ns => !(ns is TranslationUnit));
-
-            var @namespace = string.Join(".", namespaces);
-            var ids = string.Join(", ",
-                @class.QualifiedName.Split('.').Select(n => string.Format("\"{0}\"", n)));
-
-            var monoImageName = string.Format("{0}_image", AssemblyId);
-            WriteLine("{0} = mono_class_from_name({1}, \"{2}\", \"{3}\");",
-                classId, monoImageName, @namespace, @class.OriginalName);
+            WriteLine($"{classId} = {GenerateMonoClassFromNameCall(@class)}");
             WriteCloseBraceIndent();
             WriteCloseBraceIndent();
 
