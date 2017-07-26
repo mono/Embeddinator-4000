@@ -32,6 +32,8 @@ namespace @__embeddinator__ {
         public static void UpdateIdValues() {
             IntPtr R;
             R = JNIEnv.FindClass("com.mono.embeddinator.R$string");
+            managedandroid.Resource.String.THIS_IS_CAPS = ReadFieldInt(R, "THIS_IS_CAPS");
+            managedandroid.Resource.String.applicationName = ReadFieldInt(R, "applicationName");
             managedandroid.Resource.String.hello = ReadFieldInt(R, "hello");
         }
     }

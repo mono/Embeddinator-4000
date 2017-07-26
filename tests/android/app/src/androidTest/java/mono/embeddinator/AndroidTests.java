@@ -75,6 +75,21 @@ public class AndroidTests {
     }
 
     @Test
+    public void resourcesFromCSharp() {
+        assertEquals("Hello from C#!", mono.embeddinator.android.Resources.getHello());
+        assertEquals("managed-android", mono.embeddinator.android.Resources.getLibraryName());
+        assertEquals("embeddinator", mono.embeddinator.android.Resources.getApplicationName());
+        assertEquals("caps", mono.embeddinator.android.Resources.getThisIsCaps());
+    }
+
+    @Test
+    public void resourceIdsFromCSharp() {
+        View view = rule.getActivity().getLayoutInflater().inflate(managed.R.layout.this_is_caps, null);
+        assertEquals("embeddinator", mono.embeddinator.android.Resources.findApplicationName(view).getText());
+        assertEquals("caps", mono.embeddinator.android.Resources.findThisIsCaps(view).getText());
+    }
+
+    @Test
     public void asset() throws IOException {
         InputStream stream = rule.getActivity().getAssets().open("test.txt");
         BufferedReader reader = new BufferedReader(new InputStreamReader(stream));

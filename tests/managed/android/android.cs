@@ -8,6 +8,7 @@ using Android.Runtime;
 using Android.Support.V4.Content;
 using Android.Util;
 using Android.Widget;
+using Android.Views;
 using Java.Interop;
 using R = managedandroid.Resource;
 
@@ -271,32 +272,72 @@ namespace Android
 
             base.Dispose(disposing);
         }
+    }
 
-        [Register("mono.embeddinator.android.SQLite")]
-        public class SQLite : Java.Lang.Object
+    [Register("mono.embeddinator.android.SQLite")]
+    public class SQLite : Java.Lang.Object
+    {
+        [Export("connect")]
+        public static int Connect()
         {
-            [Export("connect")]
-            public static int Connect()
+            //All these Init() ensure the linker doesn't strip assemblies we need
+            SQLitePCL.Batteries_V2.Init();
+            SQLitePCL.lib.embedded.Init();
+
+            //Sets the provider to load libe_sqlite3.so for SQLite
+            SQLitePCL.raw.SetProvider(new SQLitePCL.SQLite3Provider_e_sqlite3());
+
+            SQLitePCL.sqlite3 db = null;
+            try
             {
-                //All these Init() ensure the linker doesn't strip assemblies we need
-                SQLitePCL.Batteries_V2.Init();
-                SQLitePCL.lib.embedded.Init();
-
-                //Sets the provider to load libe_sqlite3.so for SQLite
-                SQLitePCL.raw.SetProvider(new SQLitePCL.SQLite3Provider_e_sqlite3());
-
-                SQLitePCL.sqlite3 db = null;
-                try
-                {
-                    //Open an in-memory db, and just return the result code, 0 is OK
-                    return SQLitePCL.raw.sqlite3_open(":memory:", out db);
-                }
-                finally
-                {
-                    if (db != null)
-                        db.Dispose();
-                }
+                //Open an in-memory db, and just return the result code, 0 is OK
+                return SQLitePCL.raw.sqlite3_open(":memory:", out db);
             }
+            finally
+            {
+                if (db != null)
+                    db.Dispose();
+            }
+        }
+    }
+
+    [Register("mono.embeddinator.android.Resources")]
+    public class Resources : Java.Lang.Object
+    {
+        public static string Hello
+        {
+            [Export("getHello")]
+            get { return Application.Context.GetString(R.String.hello);  }
+        }
+
+        public static string LibraryName
+        {
+            [Export("getLibraryName")]
+            get { return Application.Context.GetString(R.String.library_name); }
+        }
+
+        public static string ApplicationName
+        {
+            [Export("getApplicationName")]
+            get { return Application.Context.GetString(R.String.applicationName); }
+        }
+
+        public static string ThisIsCaps
+        {
+            [Export("getThisIsCaps")]
+            get { return Application.Context.GetString(R.String.THIS_IS_CAPS); }
+        }
+
+        [Export("findApplicationName")]
+        public static TextView FindApplicationName(View layout)
+        {
+            return layout.FindViewById<TextView>(R.Id.applicationName);
+        }
+
+        [Export("findThisIsCaps")]
+        public static TextView FindThisIsCaps(View layout)
+        {
+            return layout.FindViewById<TextView>(R.Id.THIS_IS_CAPS);
         }
     }
 }
