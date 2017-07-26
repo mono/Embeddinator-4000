@@ -33,9 +33,35 @@ namespace MonoEmbeddinator4000.Generators
 
         public override bool VisitClassDecl(Class @class)
         {
+            var @object = IsByRefParameter ? $"{Context.ArgName}.get()" : Context.ArgName;
             var objectRef = @class.IsInterface ? "__getObject()" : "__object";
+
+            if (IsByRefParameter)
+            {
+                CheckRefOutParameter(true);
+
+                TypePrinter.PushContext(TypePrinterContextKind.Native);
+                var typeName = Context.Parameter.Visit(TypePrinter);
+                TypePrinter.PopContext();
+
+                var varName = JavaGenerator.GeneratedIdentifier(Context.ArgName);
+                var marshal = $"{@object}.{objectRef}";
+                Context.SupportBefore.WriteLine($"{typeName} {varName} = {marshal};");
+
+                Context.Return.Write(varName);
+                return true;
+            }
+
             Context.Return.Write($"{Context.ArgName} == null ? null : {Context.ArgName}.{objectRef}");
             return true;
+        }
+
+        public void CheckRefOutParameter(bool nullCheck)
+        {
+            // Perform null checking for all primitive value types.
+            string extraCheck = nullCheck ? $" || {Context.ArgName}.get() == null" : string.Empty;
+            Context.SupportBefore.WriteLine($"if ({Context.ArgName} == null{extraCheck})");
+            Context.SupportBefore.WriteLineIndent($"throw new NullRefParameterException(\"{Context.Parameter.Name}\");");
         }
 
         public void HandleRefOutPrimitiveType(PrimitiveType type, Enumeration @enum = null)
@@ -44,11 +70,7 @@ namespace MonoEmbeddinator4000.Generators
             var typeName = Context.Parameter.Visit(TypePrinter);
             TypePrinter.PopContext();
 
-            // Perform null checking for all primitive value types.
-            string extraCheck = (type != PrimitiveType.String && Context.Parameter.IsInOut) ?
-                $" || {Context.ArgName}.get() == null" : string.Empty;
-            Context.SupportBefore.WriteLine($"if ({Context.ArgName} == null{extraCheck})");
-            Context.SupportBefore.WriteLineIndent($"throw new NullRefParameterException(\"{Context.Parameter.Name}\");");
+            CheckRefOutParameter(type != PrimitiveType.String && Context.Parameter.IsInOut);
 
             string marshal = $"{Context.ArgName}.get()";
 

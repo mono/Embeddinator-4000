@@ -43,6 +43,16 @@ namespace Methods {
 			length = @string == null ? 0 : @string.Length;
 			upper =  @string == null ? null : @string.ToUpperInvariant ();
 		}
+
+		public static int RefClass (ref Static @static)
+		{
+			return @static.Id;
+		}
+
+		public static void OutClass (out Static @static, int Id)
+		{
+			@static = Static.Create(Id);
+		}
 	}
 
 	public class Item {

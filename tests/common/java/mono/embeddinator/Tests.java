@@ -149,6 +149,9 @@ public class Tests {
         assertEquals(new Integer(7), l.get());
         assertEquals("XAMARIN", os.get());
 
+        int refId = Parameters.refClass(new Ref(static_method));
+        assertEquals(static_method.getId(), refId);
+
         Item item = Factory.createItem(1);
         assertEquals(1, item.getInteger());
 
