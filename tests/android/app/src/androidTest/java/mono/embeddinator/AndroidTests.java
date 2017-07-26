@@ -83,6 +83,13 @@ public class AndroidTests {
     }
 
     @Test
+    public void resourceIdsFromCSharp() {
+        View view = rule.getActivity().getLayoutInflater().inflate(managed.R.layout.this_is_caps, null);
+        assertEquals("embeddinator", mono.embeddinator.android.Resources.findApplicationName(view).getText());
+        assertEquals("caps", mono.embeddinator.android.Resources.findThisIsCaps(view).getText());
+    }
+
+    @Test
     public void asset() throws IOException {
         InputStream stream = rule.getActivity().getAssets().open("test.txt");
         BufferedReader reader = new BufferedReader(new InputStreamReader(stream));

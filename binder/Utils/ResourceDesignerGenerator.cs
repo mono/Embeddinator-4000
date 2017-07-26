@@ -31,18 +31,6 @@ namespace MonoEmbeddinator4000
 
         public string PackageName { get; set; }
 
-        public static class Java
-        {
-            public static string ToJavaName(string name)
-            {
-                //NOTE: aapt seems to modify the names for Java, examples so far:
-                // customView -> customview
-                // Theme -> Theme
-                // Theme_hello -> Theme_hello
-                return name[0] + name.Substring(1, name.Length - 1).ToLowerInvariant();
-            }
-        }
-
         public void Generate()
         {
             unit.AssemblyCustomAttributes.Add(new CodeAttributeDeclaration("Android.Runtime.ResourceDesignerAttribute",
@@ -127,7 +115,8 @@ namespace MonoEmbeddinator4000
 
                                 foreach (var field in nested.DeclaredFields)
                                 {
-                                    string javaName = nested.Name == "String" ? field.Name : Java.ToJavaName(field.Name);
+                                    //NOTE: Layout files get changed to ToLowerInvariant() during build process
+                                    string javaName = nested.Name == "Layout" ? field.Name.ToLowerInvariant() : field.Name;
 
                                     CodeSnippetExpression right, left = new CodeSnippetExpression(type.FullName + "." + nested.Name + "." + field.Name);
                                     if (field.FieldType.FullName == "System.Int32")

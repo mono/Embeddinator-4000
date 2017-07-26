@@ -75,7 +75,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ResourceDesignerTest.cs" />
-    <Compile Include="JavaNameTest.cs" />
     <Compile Include="XamarinAndroidTest.cs" />
     <Compile Include="Helpers\Approvals.cs" />
     <Compile Include="DriverTest.cs" />

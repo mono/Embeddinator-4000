@@ -88,6 +88,7 @@
     <AndroidResource Include="Resources\layout\hello.axml" />
     <AndroidResource Include="Resources\values\Attributes.xml" />
     <AndroidResource Include="Resources\layout\customView.axml" />
+    <AndroidResource Include="Resources\layout\THIS_IS_CAPS.axml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\layout\" />

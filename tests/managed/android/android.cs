@@ -8,6 +8,7 @@ using Android.Runtime;
 using Android.Support.V4.Content;
 using Android.Util;
 using Android.Widget;
+using Android.Views;
 using Java.Interop;
 using R = managedandroid.Resource;
 
@@ -325,6 +326,18 @@ namespace Android
         {
             [Export("getThisIsCaps")]
             get { return Application.Context.GetString(R.String.THIS_IS_CAPS); }
+        }
+
+        [Export("findApplicationName")]
+        public static TextView FindApplicationName(View layout)
+        {
+            return layout.FindViewById<TextView>(R.Id.applicationName);
+        }
+
+        [Export("findThisIsCaps")]
+        public static TextView FindThisIsCaps(View layout)
+        {
+            return layout.FindViewById<TextView>(R.Id.THIS_IS_CAPS);
         }
     }
 }
