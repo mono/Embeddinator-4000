@@ -63,6 +63,15 @@ namespace MonoEmbeddinator4000.Tests
         }
 
         [Test]
+        public void Anim()
+        {
+            LoadAndGenerate("Resource.Anim");
+
+            string source = generator.ToSource();
+            Approvals.Verify(source);
+        }
+
+        [Test]
         public void Full()
         {
             LoadAndGenerate("Resource.Full");

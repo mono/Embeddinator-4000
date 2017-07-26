@@ -108,7 +108,21 @@ namespace MonoEmbeddinator4000
                         {
                             if (nested.DeclaredFields.Any(f => !f.IsLiteral && !f.IsInitOnly))
                             {
-                                string innerClass = nested.Name == "Attribute" ? "attr" : nested.Name.ToLowerInvariant();
+                                //NOTE: Android uses shorter names for some resources in Java
+                                string innerClass;
+                                switch (nested.Name)
+                                {
+                                case "Attribute":
+                                    innerClass = "attr";
+                                    break;
+                                case "Animation":
+                                    innerClass = "anim";
+                                    break;
+                                default:
+                                    innerClass = nested.Name.ToLowerInvariant();
+                                    break;
+                                }
+
                                 updateIdValues.Statements.Add(new CodeAssignStatement(
                                     new CodeSnippetExpression("R"),
                                     new CodeSnippetExpression($"JNIEnv.FindClass(\"{PackageName}.R${innerClass}\")")));

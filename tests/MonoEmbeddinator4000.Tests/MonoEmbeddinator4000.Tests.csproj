@@ -96,6 +96,7 @@
     <EmbeddedResource Include="Samples\EventArgsEmpty.cs" />
     <EmbeddedResource Include="Samples\Enums.cs" />
     <EmbeddedResource Include="Samples\Interfaces.cs" />
+    <EmbeddedResource Include="Samples\Resource.Anim.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
