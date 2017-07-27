@@ -105,7 +105,8 @@ namespace MonoEmbeddinator4000.Generators
         public override TypePrinterResult VisitClassDecl(Class @class)
         {
             if (ContextKind == TypePrinterContextKind.Native)
-                return JavaGenerator.IntPtrType;
+                return IsByRefParameter ? VisitPrimitiveType(PrimitiveType.IntPtr)
+                    : JavaGenerator.IntPtrType;
 
             return VisitDeclaration(@class);
         }
@@ -118,7 +119,7 @@ namespace MonoEmbeddinator4000.Generators
         }
 
         public override TypePrinterResult VisitPrimitiveType(PrimitiveType primitive,
-            TypeQualifiers quals)
+            TypeQualifiers quals = new TypeQualifiers())
         {
             if (ContextKind == TypePrinterContextKind.Native)
             {

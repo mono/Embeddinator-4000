@@ -42,7 +42,7 @@ namespace MonoEmbeddinator4000.Generators
                 TypePrinter.PopContext();
 
                 var varName = JavaGenerator.GeneratedIdentifier(Context.ArgName);
-                var marshal = $"{@object}.{objectRef}";
+                var marshal = $"new {typeName}({@object}.{objectRef})";
                 Context.SupportBefore.WriteLine($"{typeName} {varName} = {marshal};");
 
                 Context.Return.Write(varName);
