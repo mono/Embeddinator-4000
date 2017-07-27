@@ -16,7 +16,7 @@ namespace MonoEmbeddinator4000
     static class XamarinAndroidBuild
     {
         public const string IntermediateDir = "obj";
-        public const string AdditionalJarsFile = "AdditionalJavaLibraryReferences.txt";
+        public const string AdditionalJars = "AdditionalJavaLibraryReferences.txt";
         public const string AdditionalResources = "AdditionalAndroidResourcePaths.txt";
 
         const string LinkMode = "SdkOnly";
@@ -245,7 +245,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
 
             //Write AdditionalJavaLibraryReferences to file, so we can use these values from C#
             writeLines = target.AddTask("WriteLinesToFile");
-            writeLines.SetParameter("File", Path.Combine(intermediateDir, AdditionalJarsFile));
+            writeLines.SetParameter("File", Path.Combine(intermediateDir, AdditionalJars));
             writeLines.SetParameter("Lines", "@(AdditionalJavaLibraryReferences)");
             writeLines.SetParameter("Overwrite", "True");
 

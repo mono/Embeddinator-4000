@@ -130,7 +130,7 @@ namespace MonoEmbeddinator4000
                 }
 
                 //There are yet, another set of jar files
-                string additionalJars = Path.Combine(Options.OutputDir, XamarinAndroidBuild.IntermediateDir, XamarinAndroidBuild.AdditionalJarsFile);
+                string additionalJars = Path.Combine(Options.OutputDir, XamarinAndroidBuild.IntermediateDir, XamarinAndroidBuild.AdditionalJars);
                 if (File.Exists(additionalJars))
                 {
                     using (var reader = File.OpenText(additionalJars))
