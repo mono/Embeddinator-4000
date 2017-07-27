@@ -1,3 +1,8 @@
 ﻿int attr hello 0x7f010000
 int id text 0x7f040000
 int layout hello 0x7f020001
+int[] styleable THIS_IS_CAPS { 0x7f010001, 0x7f010002 }
+int styleable THIS_IS_CAPS_THIS_IS_CAPS 1
+int styleable THIS_IS_CAPS_camelCase 0
+int[] styleable Theme { 0x7f010000 }
+int styleable Theme_hello 0

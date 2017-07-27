@@ -51,9 +51,11 @@ namespace MonoEmbeddinator4000
                 {
                     while (!reader.EndOfStream)
                     {
-                        //File is of the form: int drawable icon 0x7f020001
+                        //File is of the form: 
+                        //    int drawable icon 0x7f020001
+                        //    int[] styleable Theme { 0x7f010000 }
                         var split = reader.ReadLine().Split(' ');
-                        if (split.Length == 4)
+                        if (split.Length >= 4)
                         {
                             string className = split[1], resourceName = split[2];
 
