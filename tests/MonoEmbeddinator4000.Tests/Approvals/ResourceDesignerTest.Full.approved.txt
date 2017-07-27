@@ -43,6 +43,9 @@ namespace @__embeddinator__ {
             managedandroid.Resource.String.hello = ReadFieldInt(R, "hello");
             managedandroid.Resource.String.library_name = ReadFieldInt(R, "library_name");
             R = JNIEnv.FindClass("com.mono.embeddinator.R$styleable");
+            managedandroid.Resource.Styleable.THIS_IS_CAPS = ReadFieldArray(R, "THIS_IS_CAPS");
+            managedandroid.Resource.Styleable.THIS_IS_CAPS_THIS_IS_CAPS = ReadFieldInt(R, "THIS_IS_CAPS_THIS_IS_CAPS");
+            managedandroid.Resource.Styleable.THIS_IS_CAPS_camelCase = ReadFieldInt(R, "THIS_IS_CAPS_camelCase");
             managedandroid.Resource.Styleable.Theme = ReadFieldArray(R, "Theme");
             managedandroid.Resource.Styleable.Theme_hello = ReadFieldInt(R, "Theme_hello");
         }
