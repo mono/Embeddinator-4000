@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Xml;
 using CppSharp;
 using CppSharp.Generators;
-using Xamarin.Android.Tools;
 using Xamarin.Android.Tasks;
+using Xamarin.Android.Tools;
 using static MonoEmbeddinator4000.Helpers;
 
 namespace MonoEmbeddinator4000
@@ -130,13 +131,14 @@ namespace MonoEmbeddinator4000
                 }
 
                 //There are yet, another set of jar files
-                string additionalJars = Path.Combine(Options.OutputDir, XamarinAndroidBuild.IntermediateDir, XamarinAndroidBuild.AdditionalJars);
-                if (File.Exists(additionalJars))
+                string resourcePaths = Path.Combine(Options.OutputDir, XamarinAndroidBuild.IntermediateDir, XamarinAndroidBuild.ResourcePaths);
+                if (File.Exists(resourcePaths))
                 {
-                    using (var reader = File.OpenText(additionalJars))
+                    var document = new XmlDocument();
+                    document.Load(resourcePaths);
+                    foreach (XmlNode node in document.SelectNodes("/Paths/AdditionalJavaLibraryReferences/AdditionalJavaLibraryReference"))
                     {
-                        while (!reader.EndOfStream)
-                            classpath.Add(reader.ReadLine().Trim());
+                        classpath.Add(node.InnerText);
                     }
                 }
 

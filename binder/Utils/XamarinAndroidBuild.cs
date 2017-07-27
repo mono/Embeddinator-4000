@@ -16,7 +16,7 @@ namespace MonoEmbeddinator4000
     static class XamarinAndroidBuild
     {
         public const string IntermediateDir = "obj";
-        public const string AdditionalJars = "AdditionalJavaLibraryReferences.txt";
+        public const string ResourcePaths = "resourcepaths.cache";
         public const string AdditionalResources = "AdditionalAndroidResourcePaths.txt";
 
         const string LinkMode = "SdkOnly";
@@ -208,20 +208,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
             getAdditionalResources.SetParameter("AndroidSdkDirectory", AndroidSdk.AndroidSdkPath);
             getAdditionalResources.SetParameter("AndroidNdkDirectory", AndroidSdk.AndroidNdkPath);
             getAdditionalResources.SetParameter("Assemblies", "@(ResolvedUserAssemblies)");
-            getAdditionalResources.SetParameter("CacheFile", Path.Combine(intermediateDir, "resourcepaths.cache"));
-
-            //ReadAdditionalResourcesFromAssemblyCache Task, builds upon GetAdditionalResourcesFromAssemblies
-            var readAdditionalResources = target.AddTask("ReadAdditionalResourcesFromAssemblyCache");
-            readAdditionalResources.SetParameter("CacheFile", Path.Combine(intermediateDir, "resourcepaths.cache"));
-            readAdditionalResources.AddOutputItem("AdditionalAndroidResourcePaths", "AdditionalAndroidResourcePaths");
-            readAdditionalResources.AddOutputItem("AdditionalJavaLibraryReferences", "AdditionalJavaLibraryReferences");
-            readAdditionalResources.AddOutputItem("AdditionalNativeLibraryReferences", "AdditionalNativeLibraryReferences");
-
-            //Write AdditionalJavaLibraryReferences to file, so we can use these values from C#
-            var writeLines = target.AddTask("WriteLinesToFile");
-            writeLines.SetParameter("File", Path.Combine(intermediateDir, AdditionalJars));
-            writeLines.SetParameter("Lines", "@(AdditionalJavaLibraryReferences)");
-            writeLines.SetParameter("Overwrite", "True");
+            getAdditionalResources.SetParameter("CacheFile", Path.Combine(intermediateDir, ResourcePaths));
 
             //Create ItemGroup of Android files
             var androidResources = target.AddItemGroup();
