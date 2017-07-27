@@ -112,11 +112,17 @@ namespace MonoEmbeddinator4000
                                 string innerClass;
                                 switch (nested.Name)
                                 {
+                                case "Animation":
+                                    innerClass = "anim";
+                                    break;
                                 case "Attribute":
                                     innerClass = "attr";
                                     break;
-                                case "Animation":
-                                    innerClass = "anim";
+                                case "Boolean":
+                                    innerClass = "bool";
+                                    break;
+                                case "Dimension":
+                                    innerClass = "dimen";
                                     break;
                                 default:
                                     innerClass = nested.Name.ToLowerInvariant();
