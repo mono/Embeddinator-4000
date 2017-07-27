@@ -117,11 +117,6 @@ namespace MonoEmbeddinator4000
                 delete.SetParameter("Files", "@(PdbFilesToDelete)");
             }
 
-            //ReadLinesFromFile Task to pull in AdditionalAndroidResourcePaths.txt
-            var readLines = target.AddTask("ReadLinesFromFile");
-            readLines.SetParameter("File", Path.Combine(outputDirectory, IntermediateDir, AdditionalResources));
-            readLines.AddOutputItem("Lines", "AdditionalAndroidResourcePaths");
-
             //Aapt Task to generate R.txt
             var aapt = target.AddTask("Aapt");
             aapt.SetParameter("ImportsDirectory", outputDirectory);
@@ -132,7 +127,6 @@ namespace MonoEmbeddinator4000
             aapt.SetParameter("JavaDesignerOutputDirectory", outputDirectory);
             aapt.SetParameter("AssetDirectory", assetsDir);
             aapt.SetParameter("ResourceDirectory", resourceDir);
-            aapt.SetParameter("AdditionalAndroidResourcePaths", "@(AdditionalAndroidResourcePaths)");
             aapt.SetParameter("ToolPath", AndroidSdk.GetBuildToolsPaths().First());
             aapt.SetParameter("ToolExe", "aapt");
             aapt.SetParameter("ApiLevel", XamarinAndroid.TargetSdkVersion);
@@ -240,14 +234,8 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
             readAdditionalResources.AddOutputItem("AdditionalJavaLibraryReferences", "AdditionalJavaLibraryReferences");
             readAdditionalResources.AddOutputItem("AdditionalNativeLibraryReferences", "AdditionalNativeLibraryReferences");
 
-            //Write AdditionalAndroidResourcePaths to file, so we can use these values in the Package.proj MSBuild project
-            var writeLines = target.AddTask("WriteLinesToFile");
-            writeLines.SetParameter("File", Path.Combine(intermediateDir, AdditionalResources));
-            writeLines.SetParameter("Lines", "@(AdditionalAndroidResourcePaths)");
-            writeLines.SetParameter("Overwrite", "True");
-
             //Write AdditionalJavaLibraryReferences to file, so we can use these values from C#
-            writeLines = target.AddTask("WriteLinesToFile");
+            var writeLines = target.AddTask("WriteLinesToFile");
             writeLines.SetParameter("File", Path.Combine(intermediateDir, AdditionalJars));
             writeLines.SetParameter("Lines", "@(AdditionalJavaLibraryReferences)");
             writeLines.SetParameter("Overwrite", "True");
