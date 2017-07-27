@@ -77,23 +77,6 @@ namespace MonoEmbeddinator4000
             var project = CreateProject();
             var target = project.AddTarget("Build");
 
-            //Generate Resource.designer.dll
-            var resourceDesigner = new ResourceDesignerGenerator
-            {
-                Assemblies = assemblies,
-                MainAssembly = mainAssembly,
-                OutputDirectory = outputDirectory,
-                PackageName = packageName,
-            };
-            resourceDesigner.Generate();
-
-            if (!resourceDesigner.WriteAssembly())
-            {
-                //Let's generate CS if this failed
-                string resourcePath = resourceDesigner.WriteSource();
-                throw new Exception($"Resource.designer.dll compilation failed! See {resourcePath} for details.");
-            }
-
             //ResolveAssemblies Task
             ResolveAssemblies(target, mainAssembly);
 

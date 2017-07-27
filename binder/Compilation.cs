@@ -398,6 +398,24 @@ namespace MonoEmbeddinator4000
             if (!MSBuild(project))
                 return false;
 
+            //Generate Resource.designer.dll
+            var resourceDesigner = new ResourceDesignerGenerator
+            {
+                Assemblies = Assemblies,
+                MainAssembly = Assemblies[0].Location,
+                OutputDirectory = assembliesDir,
+                JavaResourceFile = Path.Combine(androidDir, "R.txt"),
+            };
+            resourceDesigner.Generate();
+
+            if (!resourceDesigner.WriteAssembly())
+            {
+                //Let's generate CS if this failed
+                string resourcePath = Path.Combine(Options.OutputDir, "Resource.designer.cs");
+                resourceDesigner.WriteSource(resourcePath);
+                throw new Exception($"Resource.designer.dll compilation failed! See {resourcePath} for details.");
+            }
+
             //Runs some final processing on .NET assemblies
             XamarinAndroidBuild.ProcessAssemblies(Options.OutputDir);
 

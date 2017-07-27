@@ -38,6 +38,7 @@
   <ItemGroup>
     <None Include="packages.config" />
     <None Include="Samples\__AndroidNativeLibraries__.zip" />
+    <None Include="Samples\R.txt" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\build\projects\MonoEmbeddinator4000.csproj">

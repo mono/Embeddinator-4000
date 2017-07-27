@@ -45,9 +45,9 @@ namespace MonoEmbeddinator4000.Tests
             return universe.LoadFile(temp);
         }
 
-        void LoadAndGenerate(string resourceFile)
+        void LoadAndGenerate(string csFile)
         {
-            var assembly = LoadAssembly(resourceFile);
+            var assembly = LoadAssembly(csFile);
             generator.Assemblies = new[] { assembly };
             generator.MainAssembly = assembly.Location;
             generator.Generate();
@@ -86,6 +86,16 @@ namespace MonoEmbeddinator4000.Tests
             LoadAndGenerate("Resource.Full");
 
             Assert.IsTrue(generator.WriteAssembly(), "Assembly should compile!");
+        }
+
+        [Test]
+        public void FullWithResourceFile()
+        {
+            generator.JavaResourceFile = Path.Combine(Path.GetDirectoryName(GetType().Assembly.Location), "..", "..", "Samples", "R.txt");
+            LoadAndGenerate("Resource.Full");
+
+            string source = generator.ToSource();
+            Approvals.Verify(source);
         }
     }
 }

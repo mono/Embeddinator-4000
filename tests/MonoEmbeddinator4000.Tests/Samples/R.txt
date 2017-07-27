@@ -1,0 +1,3 @@
+﻿int attr hello 0x7f010000
+int id text 0x7f040000
+int layout hello 0x7f020001
