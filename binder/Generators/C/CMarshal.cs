@@ -7,6 +7,9 @@ namespace MonoEmbeddinator4000.Generators
 {
     public class CMarshalPrinter : MarshalPrinter<MarshalContext>
     {
+        public bool IsByRefParameter => (Context.Parameter != null) &&
+            (Context.Parameter.IsOut || Context.Parameter.IsInOut);
+
         public CMarshalPrinter(MarshalContext marshalContext)
             : base(marshalContext)
         {
@@ -504,8 +507,7 @@ namespace MonoEmbeddinator4000.Generators
                 case PrimitiveType.Null:
                 {
                     var prefix = "&";
-                    if ((param != null && (param.IsInOut || param.IsOut))
-                        || PrimitiveValuesByValue)
+                    if (IsByRefParameter || PrimitiveValuesByValue)
                         prefix = string.Empty;
                     Context.Return.Write ("{0}{1}", prefix, Context.ArgName);
                     return true;
@@ -516,8 +518,7 @@ namespace MonoEmbeddinator4000.Generators
                     var contextId = CGenerator.GenId("mono_context");
                     var @string = Context.ArgName;
 
-                    var isByRef = param != null && (param.IsOut || param.IsInOut);
-                    if (isByRef)
+                    if (IsByRefParameter)
                     {
                         @string = $"{Context.ArgName}->str";
                         Context.SupportAfter.WriteLine("mono_embeddinator_marshal_string_to_gstring({0}, {1});",
@@ -526,7 +527,7 @@ namespace MonoEmbeddinator4000.Generators
 
                     Context.SupportBefore.WriteLine("MonoString* {0} = ({2}) ? mono_string_new({1}.domain, {2}) : 0;",
                         argId, contextId, @string);
-                    Context.Return.Write("{0}{1}", isByRef ? "&" : string.Empty, argId);
+                    Context.Return.Write("{0}{1}", IsByRefParameter ? "&" : string.Empty, argId);
                     return true;
                 }
             }

@@ -7,9 +7,6 @@ namespace MonoEmbeddinator4000.Generators
     {
         public JavaTypePrinter TypePrinter;
 
-        public bool IsByRefParameter => (Context.Parameter != null) &&
-            (Context.Parameter.IsOut || Context.Parameter.IsInOut);
-
         public JavaMarshalPrinter(MarshalContext marshalContext)
             : base(marshalContext)
         {
