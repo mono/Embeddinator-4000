@@ -49,6 +49,21 @@ namespace Methods {
 			return @static.Id;
 		}
 
+		public static void RefClassAssignPlus (ref Static @static, int plus)
+		{
+			@static = Static.Create(@static.Id + plus);
+		}
+
+		public static void RefClassRetNull (ref Static @static)
+		{
+			@static = null;
+		}
+
+		public static bool RefClassPassNull (ref Static @static)
+		{
+			return @static == null;
+		}
+
 		public static void OutClass (out Static @static, int Id)
 		{
 			@static = Static.Create(Id);
