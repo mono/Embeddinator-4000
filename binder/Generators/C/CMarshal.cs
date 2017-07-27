@@ -1,4 +1,4 @@
-﻿using CppSharp;
+﻿﻿using CppSharp;
 using CppSharp.AST;
 using CppSharp.AST.Extensions;
 using System.Linq;
@@ -399,17 +399,41 @@ namespace MonoEmbeddinator4000.Generators
             return true;
         }
 
+        public static string GenParamId(MarshalContext ctx)
+        {
+            return $"{CGenerator.GenId(ctx.ArgName)}_{ctx.ParameterIndex}";
+        }
+
         public override bool VisitClassDecl(Class @class)
         {
+            var arg = IsByRefParameter ? $"(*{Context.ArgName})" : Context.ArgName;
             var handle = CSources.GetMonoObjectField(Options, CSources.MonoObjectFieldUsage.Parameter,
-                Context.ArgName, "_handle");
+                arg, "_handle");
 
-            var @object = $"{Context.ArgName} ? mono_gchandle_get_target({handle}) : 0";
+            var @object = $"{arg} ? mono_gchandle_get_target({handle}) : 0";
 
             if (@class.IsValueType)
                 @object = $"mono_object_unbox({@object})";
 
-            Context.Return.Write("{0}", @object);
+            if (IsByRefParameter)
+            {
+                var argId = GenParamId(Context);
+                var objId = $"{argId}_obj";
+
+                Context.SupportBefore.WriteLine($"MonoObject* {objId} = {@object};");
+                Context.SupportBefore.WriteLine($"MonoObject* {argId} = {objId};");
+
+                Context.SupportAfter.WriteLine($"if ({objId} != {argId})");
+                Context.SupportAfter.WriteStartBraceIndent();
+                Context.SupportAfter.WriteLine($"mono_embeddinator_destroy_object({arg});");
+                Context.SupportAfter.WriteLine($"{arg} = ({argId} != 0) ? mono_embeddinator_create_object({argId}) : 0;");
+                Context.SupportAfter.WriteCloseBraceIndent();
+
+                Context.Return.Write($"&{argId}");
+                return true;
+            }
+
+            Context.Return.Write($"{@object}");
             return true;
         }
 
@@ -514,7 +538,7 @@ namespace MonoEmbeddinator4000.Generators
                 }
                 case PrimitiveType.String:
                 {
-                    var argId = $"{CGenerator.GenId(Context.ArgName)}_{Context.ParameterIndex}";
+                    var argId = GenParamId(Context);
                     var contextId = CGenerator.GenId("mono_context");
                     var @string = Context.ArgName;
 
