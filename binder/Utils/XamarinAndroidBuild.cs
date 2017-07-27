@@ -17,7 +17,6 @@ namespace MonoEmbeddinator4000
     {
         public const string IntermediateDir = "obj";
         public const string ResourcePaths = "resourcepaths.cache";
-        public const string AdditionalResources = "AdditionalAndroidResourcePaths.txt";
 
         const string LinkMode = "SdkOnly";
 
