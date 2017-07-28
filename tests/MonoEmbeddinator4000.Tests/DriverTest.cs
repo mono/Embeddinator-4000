@@ -25,7 +25,10 @@ namespace MonoEmbeddinator4000.Tests
             base.SetUp();
 
             var outputDir = Path.Combine(Path.GetDirectoryName(GetType().Assembly.Location), "output");
-            temp = Path.Combine(Path.GetTempPath(), "hello.dll");
+            if (!Directory.Exists(outputDir))
+                Directory.CreateDirectory(outputDir);
+
+            temp = Path.Combine(outputDir, "hello.dll");
             tempFiles = new List<string> { temp, outputDir };
 
             project = new Project();

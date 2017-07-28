@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Xml;
 using CppSharp;
 using CppSharp.Generators;
-using Xamarin.Android.Tools;
 using Xamarin.Android.Tasks;
+using Xamarin.Android.Tools;
 using static MonoEmbeddinator4000.Helpers;
 
 namespace MonoEmbeddinator4000
@@ -126,6 +127,18 @@ namespace MonoEmbeddinator4000
                     foreach (var jar in Directory.GetFiles(intermediateDir, "*.jar", SearchOption.AllDirectories))
                     {
                         classpath.Add(jar);
+                    }
+                }
+
+                //There are yet, another set of jar files
+                string resourcePaths = Path.Combine(Options.OutputDir, XamarinAndroidBuild.IntermediateDir, XamarinAndroidBuild.ResourcePaths);
+                if (File.Exists(resourcePaths))
+                {
+                    var document = new XmlDocument();
+                    document.Load(resourcePaths);
+                    foreach (XmlNode node in document.SelectNodes("/Paths/AdditionalJavaLibraryReferences/AdditionalJavaLibraryReference"))
+                    {
+                        classpath.Add(node.InnerText);
                     }
                 }
 
@@ -386,6 +399,24 @@ namespace MonoEmbeddinator4000
             var project = XamarinAndroidBuild.GeneratePackageProject(Assemblies, Options);
             if (!MSBuild(project))
                 return false;
+
+            //Generate Resource.designer.dll
+            var resourceDesigner = new ResourceDesignerGenerator
+            {
+                Assemblies = Assemblies,
+                MainAssembly = Assemblies[0].Location,
+                OutputDirectory = assembliesDir,
+                JavaResourceFile = Path.Combine(androidDir, "R.txt"),
+            };
+            resourceDesigner.Generate();
+
+            if (!resourceDesigner.WriteAssembly())
+            {
+                //Let's generate CS if this failed
+                string resourcePath = Path.Combine(Options.OutputDir, "Resource.designer.cs");
+                resourceDesigner.WriteSource(resourcePath);
+                throw new Exception($"Resource.designer.dll compilation failed! See {resourcePath} for details.");
+            }
 
             //Runs some final processing on .NET assemblies
             XamarinAndroidBuild.ProcessAssemblies(Options.OutputDir);

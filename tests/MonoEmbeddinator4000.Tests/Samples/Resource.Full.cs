@@ -30,6 +30,12 @@ namespace managedandroid
 			// aapt resource value: 0x7f010000
 			public static int hello = 2130771968;
 
+			// breaks due to readonly
+			public static readonly int break_readonly = 1;
+
+			// breaks due to const
+			public const int break_const = 1;
+
 			static Attribute()
 			{
 				global::Android.Runtime.ResourceIdManager.UpdateIdValues();
@@ -45,6 +51,9 @@ namespace managedandroid
 
 			// aapt resource value: 0x7f040000
 			public static int text = 2130968576;
+
+			// breaks due to "fixed" keyword
+			public static int @fixed = 2131165240;
 
 			static Id()
 			{
@@ -96,10 +105,20 @@ namespace managedandroid
 
 		public partial class Styleable
 		{
-
+			
+			public static int[] THIS_IS_CAPS = new int[] {
+					2130771969,
+					2130771970};
+			
+			// aapt resource value: 1
+			public static int THIS_IS_CAPS_THIS_IS_CAPS = 1;
+			
+			// aapt resource value: 0
+			public static int THIS_IS_CAPS_camelCase = 0;
+			
 			public static int[] Theme = new int[] {
-										2130771968};
-
+					2130771968};
+			
 			// aapt resource value: 0
 			public static int Theme_hello = 0;
 

@@ -15,6 +15,9 @@ namespace MonoEmbeddinator4000
     /// </summary>
     static class XamarinAndroidBuild
     {
+        public const string IntermediateDir = "obj";
+        public const string ResourcePaths = "resourcepaths.cache";
+
         const string LinkMode = "SdkOnly";
 
         static ProjectRootElement CreateProject()
@@ -69,23 +72,6 @@ namespace MonoEmbeddinator4000
             var packageName = Generators.JavaGenerator.GetNativeLibPackageName(mainAssembly);
             var project = CreateProject();
             var target = project.AddTarget("Build");
-
-            //Generate Resource.designer.dll
-            var resourceDesigner = new ResourceDesignerGenerator
-            {
-                Assemblies = assemblies,
-                MainAssembly = mainAssembly,
-                OutputDirectory = outputDirectory,
-                PackageName = packageName,
-            };
-            resourceDesigner.Generate();
-
-            if (!resourceDesigner.WriteAssembly())
-            {
-                //Let's generate CS if this failed
-                string resourcePath = resourceDesigner.WriteSource();
-                throw new Exception($"Resource.designer.dll compilation failed! See {resourcePath} for details.");
-            }
 
             //ResolveAssemblies Task
             ResolveAssemblies(target, mainAssembly);
@@ -171,7 +157,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
             var mainAssembly = assemblies[0].Location;
             outputDirectory = Path.GetFullPath(outputDirectory);
 
-            var intermediateDir = Path.Combine(outputDirectory, "obj");
+            var intermediateDir = Path.Combine(outputDirectory, IntermediateDir);
             var androidDir = Path.Combine(outputDirectory, "android");
             var javaSourceDir = Path.Combine(outputDirectory, "src");
             var assetsDir = Path.Combine(androidDir, "assets");
@@ -212,6 +198,13 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
             resolveLibraryProject.SetParameter("OutputImportDirectory", intermediateDir);
             resolveLibraryProject.AddOutputItem("ResolvedAssetDirectories", "ResolvedAssetDirectories");
             resolveLibraryProject.AddOutputItem("ResolvedResourceDirectories", "ResolvedResourceDirectories");
+
+            //GetAdditionalResourcesFromAssemblies Task, for JavaLibraryReferenceAttribute, etc.
+            var getAdditionalResources = target.AddTask("GetAdditionalResourcesFromAssemblies");
+            getAdditionalResources.SetParameter("AndroidSdkDirectory", AndroidSdk.AndroidSdkPath);
+            getAdditionalResources.SetParameter("AndroidNdkDirectory", AndroidSdk.AndroidNdkPath);
+            getAdditionalResources.SetParameter("Assemblies", "@(ResolvedUserAssemblies)");
+            getAdditionalResources.SetParameter("CacheFile", Path.Combine(intermediateDir, ResourcePaths));
 
             //Create ItemGroup of Android files
             var androidResources = target.AddItemGroup();

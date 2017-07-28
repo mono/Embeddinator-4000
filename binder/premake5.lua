@@ -13,6 +13,7 @@
       "System",
       "System.Core",
       "System.IO.Compression",
+      "System.Xml",
       "IKVM.Reflection",
       "CppSharp",
       "CppSharp.AST",

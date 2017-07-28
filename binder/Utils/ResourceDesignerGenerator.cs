@@ -31,8 +31,47 @@ namespace MonoEmbeddinator4000
 
         public string PackageName { get; set; }
 
+        /// <summary>
+        /// Path to an R.txt file to validate against
+        /// </summary>
+        public string JavaResourceFile { get; set; }
+
         public void Generate()
         {
+            string packageName = string.IsNullOrEmpty(PackageName) ? Generators.JavaGenerator.GetNativeLibPackageName(MainAssembly) : PackageName;
+
+            //A map of valid Java resource names, null if missing
+            Dictionary<string, List<string>> resourceMap = null;
+
+            if (!string.IsNullOrEmpty(JavaResourceFile) && File.Exists(JavaResourceFile))
+            {
+                resourceMap = new Dictionary<string, List<string>>();
+
+                using (var reader = File.OpenText(JavaResourceFile))
+                {
+                    while (!reader.EndOfStream)
+                    {
+                        //File is of the form: 
+                        //    int drawable icon 0x7f020001
+                        //    int[] styleable Theme { 0x7f010000 }
+                        var split = reader.ReadLine().Split(' ');
+                        if (split.Length >= 4)
+                        {
+                            string className = split[1], resourceName = split[2];
+
+                            List<string> list;
+                            if (!resourceMap.TryGetValue(className, out list))
+                            {
+                                resourceMap[className] = list = new List<string>();
+                            }
+
+                            if (!list.Contains(resourceName))
+                                list.Add(resourceName);
+                        }
+                    }
+                }
+            }
+
             unit.AssemblyCustomAttributes.Add(new CodeAttributeDeclaration("Android.Runtime.ResourceDesignerAttribute",
                 new CodeAttributeArgument(new CodeSnippetExpression("\"__embeddinator__.Resource\"")),
                 new CodeAttributeArgument("IsApplication", new CodeSnippetExpression("true"))));
@@ -106,19 +145,56 @@ namespace MonoEmbeddinator4000
                     {
                         foreach (var nested in type.DeclaredNestedTypes)
                         {
-                            if (nested.DeclaredFields.Any())
+                            if (nested.DeclaredFields.Any(f => !f.IsLiteral && !f.IsInitOnly))
                             {
-                                string innerClass = nested.Name == "Attribute" ? "attr" : nested.Name.ToLowerInvariant();
+                                //NOTE: Android uses shorter names for some resources in Java
+                                string innerClass;
+                                switch (nested.Name)
+                                {
+                                case "Animation":
+                                    innerClass = "anim";
+                                    break;
+                                case "Attribute":
+                                    innerClass = "attr";
+                                    break;
+                                case "Boolean":
+                                    innerClass = "bool";
+                                    break;
+                                case "Dimension":
+                                    innerClass = "dimen";
+                                    break;
+                                default:
+                                    innerClass = nested.Name.ToLowerInvariant();
+                                    break;
+                                }
+
+                                List<string> list = null;
+                                if (resourceMap != null && !resourceMap.TryGetValue(innerClass, out list))
+                                {
+                                    //This class is not in R.txt
+                                    continue;
+                                }
+
                                 updateIdValues.Statements.Add(new CodeAssignStatement(
                                     new CodeSnippetExpression("R"),
-                                    new CodeSnippetExpression($"JNIEnv.FindClass(\"{PackageName}.R${innerClass}\")")));
+                                    new CodeSnippetExpression($"JNIEnv.FindClass(\"{packageName}.R${innerClass}\")")));
 
                                 foreach (var field in nested.DeclaredFields)
                                 {
+                                    //Skip if const or readonly
+                                    if (field.IsLiteral || field.IsInitOnly)
+                                        continue;
+
                                     //NOTE: Layout files get changed to ToLowerInvariant() during build process
                                     string javaName = nested.Name == "Layout" ? field.Name.ToLowerInvariant() : field.Name;
 
-                                    CodeSnippetExpression right, left = new CodeSnippetExpression(type.FullName + "." + nested.Name + "." + field.Name);
+                                    if (list != null && !list.Contains(javaName))
+                                    {
+                                        //This field is not in R.txt
+                                        continue;
+                                    }
+
+                                    CodeExpression right, left = new CodeFieldReferenceExpression(new CodeSnippetExpression(type.FullName + "." + nested.Name), field.Name);
                                     if (field.FieldType.FullName == "System.Int32")
                                     {
                                         right = new CodeSnippetExpression($"{readFieldInt.Name}(R, \"{javaName}\")");
@@ -168,15 +244,16 @@ namespace MonoEmbeddinator4000
             return true;
         }
 
-        public string WriteSource()
+        public void WriteSource(string resourcePath = null)
         {
-            string resourcePath = Path.Combine(OutputDirectory, "Resource.designer.cs");
+            if (string.IsNullOrEmpty(resourcePath))
+                resourcePath = Path.Combine(OutputDirectory, "Resource.designer.cs");
+
             using (var stream = File.Create(resourcePath))
             using (var writer = new StreamWriter(stream))
             {
                 csc.GenerateCodeFromCompileUnit(unit, writer, options);
             }
-            return resourcePath;
         }
 
         public string ToSource()
