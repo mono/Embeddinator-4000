@@ -346,8 +346,6 @@ namespace MonoEmbeddinator4000.Generators
                     Write(marshalContext.SupportAfter);
                 }
             }
-
-            ResetNewLine();
         }
 
         public override bool VisitMethodDecl(Method method)
@@ -384,6 +382,8 @@ namespace MonoEmbeddinator4000.Generators
 
                 var marshal = new CMarshalManagedToNative(EmbedOptions, ctx);
                 retType.Visit(marshal);
+
+                NewLineIfNeeded();
 
                 if (!string.IsNullOrWhiteSpace(marshal.Context.SupportBefore))
                     Write(marshal.Context.SupportBefore);
