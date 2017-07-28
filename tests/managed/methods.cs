@@ -38,6 +38,26 @@ namespace Methods {
 			@string = @string == null ? "hello" : null;
 		}
 
+		public static void RefUnsignedCharPlusOne (ref byte val)
+		{
+			val++;
+		}
+
+		public static void RefUnsignedShortPlusOne (ref ushort val)
+		{
+			val++;
+		}
+
+		public static void RefUnsignedIntPlusOne (ref uint val)
+		{
+			val++;
+		}
+
+		public static void RefUnsignedLongPlusOne (ref ulong val)
+		{
+			val++;
+		}
+
 		public static void Out (string @string, out int length, out string upper)
 		{
 			length = @string == null ? 0 : @string.Length;

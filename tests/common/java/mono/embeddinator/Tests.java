@@ -139,6 +139,22 @@ public class Tests {
         assertTrue(b.get());
         assertEquals(null, s.get());
 
+        Ref<UnsignedByte> refUChar = new Ref<UnsignedByte>(new UnsignedByte(1));
+        Parameters.refUnsignedCharPlusOne(refUChar);
+        assertEquals(2, refUChar.get().intValue());
+
+        Ref<UnsignedShort> refUShort = new Ref<UnsignedShort>(new UnsignedShort(1));
+        Parameters.refUnsignedShortPlusOne(refUShort);
+        assertEquals(2, refUShort.get().intValue());
+
+        Ref<UnsignedInt> refUInt = new Ref<UnsignedInt>(new UnsignedInt(1));
+        Parameters.refUnsignedIntPlusOne(refUInt);
+        assertEquals(2, refUInt.get().intValue());
+
+        Ref<UnsignedLong> refULong = new Ref<UnsignedLong>(new UnsignedLong(1));
+        Parameters.refUnsignedLongPlusOne(refULong);
+        assertEquals(2, refULong.get().intValue());
+
         Out<Integer> l = new Out<Integer>();
         Out<String> os = new Out<String>();
         Parameters.out(null, l, os);
