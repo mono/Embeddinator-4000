@@ -227,6 +227,24 @@ TEST_CASE("Methods.C", "[C][Methods]") {
     REQUIRE(l == 7);
     REQUIRE(strcmp(s->str, "XAMARIN") == 0);
 
+    Methods_Static* ref_static = static_method;
+    int refClassId = Methods_Parameters_RefClass(&ref_static);
+    REQUIRE(refClassId == Methods_Static_get_Id(ref_static));
+
+    Methods_Parameters_RefClassAssignPlus(&ref_static, 2);
+    REQUIRE(Methods_Static_get_Id(ref_static) == 3);
+
+    Methods_Parameters_RefClassRetNull(&ref_static);
+    REQUIRE(ref_static == NULL);
+
+    Methods_Static* null_static = 0;
+    bool isNull = Methods_Parameters_RefClassPassNull(&null_static);
+    REQUIRE(isNull == true);
+
+    Methods_Static* out_static = 0;
+    Methods_Parameters_OutClass(&out_static, 1);
+    REQUIRE(Methods_Static_get_Id(out_static) == 1);
+
     Methods_Item* item = Methods_Factory_CreateItem(1);
     REQUIRE(Methods_Item_get_Integer(item) == 1);
 

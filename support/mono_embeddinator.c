@@ -356,6 +356,7 @@ void mono_embeddinator_init_object(MonoEmbedObject* object, MonoObject* instance
 
 void mono_embeddinator_destroy_object(MonoEmbedObject* object)
 {
+    if (object == 0) return;
     mono_gchandle_free (object->_handle);
     g_free (object);
 }

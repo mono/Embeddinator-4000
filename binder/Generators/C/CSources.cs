@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using CppSharp;
@@ -336,10 +336,15 @@ namespace MonoEmbeddinator4000.Generators
                 WriteLine("}");
             }
 
+            NeedNewLine();
+
             foreach (var marshalContext in contexts)
             {
                 if (!string.IsNullOrWhiteSpace(marshalContext.SupportAfter))
+                {
+                    NewLineIfNeeded();
                     Write(marshalContext.SupportAfter);
+                }
             }
         }
 
@@ -361,7 +366,6 @@ namespace MonoEmbeddinator4000.Generators
             var needsReturn = !retType.Type.IsPrimitiveType(PrimitiveType.Void);
 
             GenerateMethodInvocation(method);
-            NewLine();
 
             string returnCode = "0";
 
@@ -379,6 +383,8 @@ namespace MonoEmbeddinator4000.Generators
                 var marshal = new CMarshalManagedToNative(EmbedOptions, ctx);
                 retType.Visit(marshal);
 
+                NewLineIfNeeded();
+
                 if (!string.IsNullOrWhiteSpace(marshal.Context.SupportBefore))
                     Write(marshal.Context.SupportBefore);
 
@@ -390,7 +396,10 @@ namespace MonoEmbeddinator4000.Generators
             }
 
             if (method.IsConstructor || needsReturn)
+            {
+                NewLine();
                 WriteLine("return {0};", returnCode);
+            }
 
             WriteCloseBraceIndent();
             PopBlock(NewLineKind.BeforeNextBlock);

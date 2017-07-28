@@ -9,6 +9,8 @@ namespace MonoEmbeddinator4000.Generators
     {
         Parameter param;
 
+        public bool IsByRefParameter => param != null && (param.IsOut || param.IsInOut);
+
         public override string VisitDecayedType(DecayedType decayed,
             TypeQualifiers quals)
         {
@@ -23,6 +25,12 @@ namespace MonoEmbeddinator4000.Generators
         {
             throw new System.NotImplementedException(
                 string.Format("Unhandled .NET type: {0}", type.Type));
+        }
+
+        public override string VisitClassDecl(Class @class)
+        {
+            var type = base.VisitClassDecl(@class);
+            return IsByRefParameter ? $"{type}*" : type;
         }
 
         public override string VisitParameter(Parameter arg, bool hasName = true)
