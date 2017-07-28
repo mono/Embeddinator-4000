@@ -1,4 +1,4 @@
-﻿﻿using CppSharp.AST;
+﻿﻿﻿using CppSharp.AST;
 using CppSharp.AST.Extensions;
 
 namespace MonoEmbeddinator4000.Generators
@@ -73,6 +73,38 @@ namespace MonoEmbeddinator4000.Generators
             Context.SupportBefore.WriteLineIndent($"throw new NullRefParameterException(\"{Context.Parameter.Name}\");");
         }
 
+        static bool IsReferenceIntegerType(PrimitiveType type)
+        {
+            switch(type)
+            {
+            case PrimitiveType.UChar:
+            case PrimitiveType.UShort:
+            case PrimitiveType.UInt:
+            case PrimitiveType.ULong:
+            case PrimitiveType.ULongLong:
+                return true;
+            }
+            return false;
+        }
+
+        static PrimitiveType GetSignedIntegerType(PrimitiveType type)
+        {
+            switch(type)
+            {
+            case PrimitiveType.UChar:
+                return PrimitiveType.SChar;
+            case PrimitiveType.UShort:
+                return PrimitiveType.Short;
+            case PrimitiveType.UInt:
+                return PrimitiveType.Int;
+            case PrimitiveType.ULong:
+                return PrimitiveType.Long;
+            case PrimitiveType.ULongLong:
+                return PrimitiveType.LongLong;
+            }
+            throw new System.NotImplementedException();
+        }
+
         public void HandleRefOutPrimitiveType(PrimitiveType type, Enumeration @enum = null)
         {
             TypePrinter.PushContext(TypePrinterContextKind.Native);
@@ -90,11 +122,17 @@ namespace MonoEmbeddinator4000.Generators
             if (type == PrimitiveType.Bool)
                 marshal = $"((byte) ({marshal} ? 1 : 0))";
 
+            if (IsReferenceIntegerType(type))
+            {
+                var integerTypeName = TypePrinter.VisitPrimitiveType(GetSignedIntegerType(type));
+                marshal = $"({integerTypeName}){marshal}.intValue()";
+            }
+
             var varName = JavaGenerator.GeneratedIdentifier(Context.ArgName);
 
             Context.SupportBefore.Write($"{typeName} {varName} = ");
 
-            if (isEnum || type == PrimitiveType.Bool)
+            if (isEnum || type == PrimitiveType.Bool || IsReferenceIntegerType(type))
                 Context.SupportBefore.WriteLine($"new {typeName}({marshal});");
             else
                 Context.SupportBefore.WriteLine($"({marshal}) != null ? new {typeName}({marshal}) : new {typeName}();");
@@ -109,6 +147,12 @@ namespace MonoEmbeddinator4000.Generators
 
             if (type == PrimitiveType.Bool)
                 marshal = $"{value} != 0";
+
+            if (IsReferenceIntegerType(type))
+            {
+                var integerTypeName = Context.Parameter.Type.Visit(TypePrinter);
+                marshal = $"new {integerTypeName}({value})";
+            }
 
             Context.SupportAfter.WriteLine($"{Context.ArgName}.set({marshal});");
         }
