@@ -40,12 +40,9 @@ namespace MonoEmbeddinator4000
 
         static void ResolveAssemblies(ProjectTargetElement target, string mainAssembly)
         {
-            var itemGroup = target.AddItemGroup();
-            itemGroup.AddItem("FilteredAssemblies", Path.Combine(Path.GetDirectoryName(mainAssembly), "*.dll"));
-            itemGroup.AddItem("FilteredAssemblies", XamarinAndroid.FindAssembly("Mono.Android.Export.dll")); //NOTE: [Export] requires Mono.Android.Export.dll
-
             var resolveAssemblies = target.AddTask("ResolveAssemblies");
-            resolveAssemblies.SetParameter("Assemblies", "@(FilteredAssemblies)");
+            //NOTE: [Export] requires Mono.Android.Export.dll
+            resolveAssemblies.SetParameter("Assemblies", mainAssembly + ";" + XamarinAndroid.FindAssembly("Mono.Android.Export.dll"));
             resolveAssemblies.SetParameter("LinkMode", LinkMode);
             resolveAssemblies.SetParameter("ReferenceAssembliesDirectory", "$(TargetFrameworkDirectory)");
             resolveAssemblies.AddOutputItem("ResolvedAssemblies", "ResolvedAssemblies");
