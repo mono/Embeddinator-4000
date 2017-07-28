@@ -35,15 +35,27 @@ namespace MonoEmbeddinator4000.Generators
 
             if (IsByRefParameter)
             {
-                CheckRefOutParameter(true);
+                CheckRefOutParameter(Context.Parameter.IsInOut);
 
                 TypePrinter.PushContext(TypePrinterContextKind.Native);
                 var typeName = Context.Parameter.Visit(TypePrinter);
                 TypePrinter.PopContext();
 
                 var varName = JavaGenerator.GeneratedIdentifier(Context.ArgName);
-                var marshal = $"new {typeName}({@object}.{objectRef})";
+                var marshal = Context.Parameter.IsInOut ?
+                    $"new {typeName}({@object}.{objectRef})" : $"new {typeName}()";
                 Context.SupportBefore.WriteLine($"{typeName} {varName} = {marshal};");
+
+                var marshalContext = new MarshalContext(Context.Context)
+                {
+                    Parameter = Context.Parameter,
+                    ReturnVarName = $"{varName}.getValue()"
+                };
+                
+                var marshaler = new JavaMarshalNativeToManaged(marshalContext);
+                @class.Visit(marshaler);
+
+                Context.SupportAfter.WriteLine($"{Context.ArgName}.set({marshaler.Context.Return});");
 
                 Context.Return.Write(varName);
                 return true;

@@ -152,6 +152,25 @@ public class Tests {
         int refId = Parameters.refClass(new Ref(static_method));
         assertEquals(static_method.getId(), refId);
 
+        Ref<Static> ref = new Ref<Static>(static_method);
+        Parameters.refClassAssignPlus(ref, 2);
+        assertEquals(3, ref.get().getId());
+
+        Parameters.refClassRetNull(ref);
+        assertEquals(null, ref.get());     
+
+        Throwable e = null;
+        try {
+            Parameters.refClassPassNull(null);
+        } catch(Exception ex) {
+            e = ex;
+        }
+        assertTrue(e instanceof mono.embeddinator.NullRefParameterException);
+
+        Out<Static> out = new Out<Static>();
+        Parameters.outClass(out, 2);
+        assertEquals(2, out.get().getId());
+
         Item item = Factory.createItem(1);
         assertEquals(1, item.getInteger());
 
