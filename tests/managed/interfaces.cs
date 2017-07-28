@@ -79,4 +79,17 @@ namespace Interfaces {
 			return String.Format (provider, "{0}", value);
 		}
 	}
+
+	public interface GenericInterface<T>
+	{
+
+	}
+
+	public class ClassWithGenericInterface : GenericInterface<int>, IOperations
+	{
+		public int AddInt (int a, int b)
+		{
+			return a + b;
+		}	
+	}
 }

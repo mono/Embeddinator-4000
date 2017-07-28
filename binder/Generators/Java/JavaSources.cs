@@ -220,10 +220,7 @@ namespace MonoEmbeddinator4000.Generators
             if (keywords.Count != 0)
                 Write("{0}", string.Join(" ", keywords));
 
-            var bases = new List<BaseClassSpecifier>();
-
-            if (@class.NeedsBase)
-                bases.AddRange(@class.Bases.Where(@base => @base.IsClass));
+            var bases = @class.Bases.Where(@base => @base.IsClass && @base.Class.IsGenerated).ToList();
 
             if (bases.Count > 0 && !@class.IsStatic)
             {
