@@ -18,6 +18,7 @@ namespace MonoEmbeddinator4000
         public const string IntermediateDir = "obj";
         public const string ResourcePaths = "resourcepaths.cache";
 
+        const string LibraryProjectDir = "library_project_imports";
         const string LinkMode = "SdkOnly";
 
         static ProjectRootElement CreateProject()
@@ -211,9 +212,13 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
 
             //Create ItemGroup of Android files
             var androidResources = target.AddItemGroup();
-            androidResources.AddItem("AndroidJavaSource", Path.Combine(intermediateDir, "*", "library_project_imports", "java", "**", "*.java"));
-            androidResources.AddItem("AndroidAsset", @"%(ResolvedAssetDirectories.Identity)\**\*").Condition = "'@(ResolvedAssetDirectories)' != ''";
-            androidResources.AddItem("AndroidResource", @"%(ResolvedResourceDirectories.Identity)\**\*").Condition = "'@(ResolvedAssetDirectories)' != ''";
+            foreach (var assembly in assemblies)
+            {
+                var assemblyName = assembly.GetName().Name;
+                androidResources.AddItem("AndroidAsset", Path.Combine(intermediateDir, assemblyName, LibraryProjectDir, "assets", "**", "*"));
+                androidResources.AddItem("AndroidJavaSource", Path.Combine(intermediateDir, assemblyName, LibraryProjectDir, "java", "**", "*.java"));
+                androidResources.AddItem("AndroidResource", Path.Combine(intermediateDir, assemblyName, LibraryProjectDir, "res", "**", "*"));
+            }
 
             //Copy Task, to copy AndroidAsset files
             var copy = target.AddTask("Copy");
