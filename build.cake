@@ -374,7 +374,7 @@ Task("Publish-Package")
         NuGetPush(nupkg, new NuGetPushSettings
         {
             Verbosity = NuGetVerbosity.Detailed,
-            Source = "nuget.org",
+            Source = "https://www.nuget.org/api/v2/package",
             ApiKey = apiKey
         });
     });
