@@ -348,6 +348,7 @@ Task("Create-Package")
             new NuSpecContent { Source = buildDir.ToString() + "/*.exe", Target = "tools/" },
             new NuSpecContent { Source = buildDir.ToString() + "/*.dll", Target = "tools/" },
             new NuSpecContent { Source = buildDir.ToString() + "/*.pdb", Target = "tools/" },
+            new NuSpecContent { Source = Directory("./external/jna").ToString() + "/**", Target = "external/jna" },
             new NuSpecContent { Source = Directory("./external/Xamarin.Android").ToString() + "/**", Target = "external/Xamarin.Android" },
             new NuSpecContent { Source = Directory("./support").ToString() + "/**", Target = "support/" },
         };
