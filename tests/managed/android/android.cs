@@ -3,13 +3,15 @@ using System.Net;
 using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
+using Android.Gms.Common.Apis;
 using Android.OS;
 using Android.Runtime;
 using Android.Support.V4.Content;
 using Android.Util;
-using Android.Widget;
 using Android.Views;
+using Android.Widget;
 using Java.Interop;
+using Games = Android.Gms.Games.GamesClass;
 using R = managedandroid.Resource;
 
 [assembly: UsesPermission("android.permission.INTERNET")]
@@ -338,6 +340,19 @@ namespace Android
         public static TextView FindThisIsCaps(View layout)
         {
             return layout.FindViewById<TextView>(R.Id.THIS_IS_CAPS);
+        }
+    }
+
+    [Register("mono.embeddinator.android.GooglePlayServices")]
+    public class GooglePlayServices : Java.Lang.Object
+    {
+        [Export("createClient")]
+        public static GoogleApiClient CreateClient()
+        {
+            return new GoogleApiClient.Builder(Application.Context)
+                                      .AddApi(Games.API)
+                                      .AddScope(Games.ScopeGames)
+                                      .Build();
         }
     }
 }

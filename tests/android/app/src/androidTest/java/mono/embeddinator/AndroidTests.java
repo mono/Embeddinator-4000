@@ -170,4 +170,9 @@ public class AndroidTests {
         int result = SQLite.connect();
         assertEquals(0, result);
     }
+
+    @Test
+    public void googlePlayServices() {
+        assertNotNull(GooglePlayServices.createClient());
+    }
 }
