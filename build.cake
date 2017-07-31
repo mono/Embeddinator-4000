@@ -3,6 +3,7 @@
 
 var target = Argument("target", "Default");
 var configuration = Argument("configuration", "Release");
+var version = Argument("version", "0.1");
 var buildDir = Directory("./build/lib") + Directory(configuration);
 var embeddinator = buildDir + File("MonoEmbeddinator4000.exe");
 var managedDll = Directory("./tests/managed/generic/bin") + Directory(configuration) + File("managed.dll");
@@ -337,5 +338,45 @@ Task("AppVeyor")
     .IsDependentOn("Generate-Android-PCL")
     .IsDependentOn("Generate-Android-NetStandard")
     .IsDependentOn("Build-CSharp-Tests");
+
+Task("Create-Package")
+    .IsDependentOn("Build-Binder")
+    .Does(() =>
+    {
+        var files = new []
+        {
+            new NuSpecContent { Source = buildDir.ToString() + "/*.exe", Target = "tools/" },
+            new NuSpecContent { Source = buildDir.ToString() + "/*.dll", Target = "tools/" },
+            new NuSpecContent { Source = buildDir.ToString() + "/*.pdb", Target = "tools/" },
+            new NuSpecContent { Source = Directory("./external/jna").ToString() + "/**", Target = "external/jna" },
+            new NuSpecContent { Source = Directory("./external/Xamarin.Android").ToString() + "/**", Target = "external/Xamarin.Android" },
+            new NuSpecContent { Source = Directory("./support").ToString() + "/**", Target = "support/" },
+        };
+
+        var settings = new NuGetPackSettings
+        {
+            Verbosity = NuGetVerbosity.Detailed,
+            Version = version,
+            Files = files,
+            OutputDirectory = Directory("./build"),
+            NoPackageAnalysis = true
+        };
+
+        NuGetPack("./Embeddinator-4000.nuspec", settings);
+    });
+
+Task("Publish-Package")
+    .Does(() =>
+    {
+        var apiKey = System.IO.File.ReadAllText ("./.nuget/.nugetapikey");
+        var nupkg = "./build/Embeddinator-4000." + version + ".nupkg";
+
+        NuGetPush(nupkg, new NuGetPushSettings
+        {
+            Verbosity = NuGetVerbosity.Detailed,
+            Source = "https://www.nuget.org/api/v2/package",
+            ApiKey = apiKey
+        });
+    });
 
 RunTarget(target);
