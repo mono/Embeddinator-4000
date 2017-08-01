@@ -229,7 +229,10 @@ namespace MonoEmbeddinator4000
             parameters.ReferencedAssemblies.Add(XamarinAndroid.FindAssembly("System.Runtime.dll"));
             parameters.ReferencedAssemblies.Add(XamarinAndroid.FindAssembly("Java.Interop.dll"));
             parameters.ReferencedAssemblies.Add(XamarinAndroid.FindAssembly("Mono.Android.dll"));
-            parameters.ReferencedAssemblies.Add(MainAssembly);
+            foreach (var assembly in Assemblies)
+            {
+                parameters.ReferencedAssemblies.Add(assembly.Location);
+            }
 
             var results = csc.CompileAssemblyFromDom(parameters, unit);
             if (results.Errors.HasErrors)
