@@ -97,29 +97,12 @@ namespace MonoEmbeddinator4000
             Context.RunPasses();
         }
 
-        public static string GetSupportDirectory()
-        {
-            var directory = new DirectoryInfo (Directory.GetCurrentDirectory());
-
-            while (directory != null)
-            {
-                var path = Path.Combine(directory.FullName, "support");
-
-                if (Directory.Exists(path))
-                    return path;
-
-                directory = directory.Parent;
-            }
-
-            throw new Exception("Support directory was not found");
-        }
-
         void GenerateSupportFiles()
         {
             // Search for the location of support directory and bundle files with output.
             try
             {
-                var path = GetSupportDirectory();
+                var path = Helpers.FindDirectory("support");
 
                 foreach (var file in Directory.EnumerateFiles(path))
                 {
