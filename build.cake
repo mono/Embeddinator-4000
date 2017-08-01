@@ -85,6 +85,7 @@ Task("NuGet-Restore")
 
 Task("Build-Binder")
     .IsDependentOn("Clean")
+    .IsDependentOn("Generate-Project-Files")
     .IsDependentOn("NuGet-Restore")
     .Does(() =>
     {
