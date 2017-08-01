@@ -1,6 +1,6 @@
 ![Embeddinator-4000 Logo](e4000-logo.png)
 
-| windows-vs-x86            | osx-clang-x86               |
+| Windows                   | macOS                       |
 |---------------------------|-----------------------------|
 | [![windows-vs-x86][1]][2] | [![osx-clang-x86][3]][4]
 
