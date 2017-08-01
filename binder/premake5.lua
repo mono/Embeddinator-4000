@@ -1,4 +1,4 @@
-  project "MonoEmbeddinator4000"
+  project "Embeddinator-4000"
     SetupManagedProject()
 
     kind "ConsoleApp"

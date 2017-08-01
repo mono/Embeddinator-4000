@@ -17,7 +17,7 @@ newoption {
    description = "Enables development mode"
 }
 
-workspace "MonoEmbeddinator4000"
+workspace "Embeddinator-4000"
 
   configurations { "Debug", "Release" }
   architecture "x86_64"
@@ -42,7 +42,7 @@ workspace "MonoEmbeddinator4000"
   objdir (path.join("./", action, "obj"))
   targetdir (path.join("./", action, "lib", "%{cfg.buildcfg}"))
 
-  startproject "MonoEmbeddinator4000"
+  startproject "Embeddinator-4000"
 
   include ("../binder")
 

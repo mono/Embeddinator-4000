@@ -1,6 +1,6 @@
 MAKEFLAGS += --no-builtin-rules
 
-EMBEDDINATOR_EXE=../../build/lib/Debug/MonoEmbeddinator4000.exe
+EMBEDDINATOR_EXE=../../build/lib/Debug/Embeddinator-4000.exe
 
 MANAGED_DLL=../managed/generic/bin/Debug/managed.dll
 MANAGED_PCL_DLL=../managed/pcl/bin/Debug/managed.dll

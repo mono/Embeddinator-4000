@@ -2,7 +2,7 @@
 
 local supportdir = path.getabsolute("../support")
 local catchdir = path.getabsolute("../external/catch")
-local exepath = "../../../build/lib/Debug/MonoEmbeddinator4000.exe"
+local exepath = "../../../build/lib/Debug/Embeddinator-4000.exe"
 
 function SetupTestProject(name, extraFiles)
   objdir("!obj")

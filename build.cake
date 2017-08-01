@@ -5,7 +5,7 @@ var target = Argument("target", "Default");
 var configuration = Argument("configuration", "Release");
 var version = Argument("version", "0.1");
 var buildDir = Directory("./build/lib") + Directory(configuration);
-var embeddinator = buildDir + File("MonoEmbeddinator4000.exe");
+var embeddinator = buildDir + File("Embeddinator-4000.exe");
 var managedDll = Directory("./tests/managed/generic/bin") + Directory(configuration) + File("managed.dll");
 var androidDll = Directory("./tests/managed/android/bin") + Directory(configuration) + File("managed.dll");
 var pclDll = Directory("./tests/managed/pcl/bin") + Directory(configuration) + File("managed.dll");
@@ -88,7 +88,7 @@ Task("Build-Binder")
     .IsDependentOn("NuGet-Restore")
     .Does(() =>
     {
-        MSBuild("./build/projects/MonoEmbeddinator4000.csproj", settings => settings.SetConfiguration(configuration).SetVerbosity(Verbosity.Minimal));
+        MSBuild("./build/projects/Embeddinator-4000.csproj", settings => settings.SetConfiguration(configuration).SetVerbosity(Verbosity.Minimal));
     });
 
 Task("Build-Managed")
