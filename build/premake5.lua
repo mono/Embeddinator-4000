@@ -17,10 +17,25 @@ newoption {
    description = "Enables development mode"
 }
 
+function managed_project(name)
+  if name ~= nil then
+    local proj = project(name)
+  end
+
+  if not os.istarget("macosx") then
+    filter { "action:vs*" }
+      location "."
+    filter {}
+  end
+
+  return proj
+end
+
 workspace "Embeddinator-4000"
 
   configurations { "Debug", "Release" }
   architecture "x86_64"
+  dotnetframework "4.6"
 
   filter "system:windows"
     architecture "x86"
@@ -29,7 +44,7 @@ workspace "Embeddinator-4000"
     architecture "x86"
 
   filter "configurations:Release"
-    flags { "Optimize" }
+    optimize "On"
 
   filter {}
 
@@ -63,8 +78,7 @@ workspace "Embeddinator-4000"
     IncludeTests()
   end
 
-  project "IKVM.Reflection"
-    SetupManagedProject()
+  managed_project "IKVM.Reflection"
 
     kind "SharedLib"
     language "C#"
@@ -72,8 +86,7 @@ workspace "Embeddinator-4000"
     files { "../external/ikvm/reflect/**.cs" }
     links { "System", "System.Core", "System.Security" }
 
-  project "Xamarin.MacDev"
-    SetupManagedProject()
+  managed_project "Xamarin.MacDev"
 
     kind "SharedLib"
     language "C#"
@@ -89,8 +102,7 @@ workspace "Embeddinator-4000"
       "Mono.Posix"
     }
 
-  project "Xamarin.Android.Tools"
-    SetupManagedProject()
+  managed_project "Xamarin.Android.Tools"
 
     kind "SharedLib"
     language "C#"
@@ -104,9 +116,9 @@ workspace "Embeddinator-4000"
       "System.Xml.Linq"
     }
 
-  if string.startswith(_ACTION, "vs") and os.is("macosx") then
+  if string.startswith(_ACTION, "vs") and os.istarget("macosx") then
     externalproject "objcgen"
-      SetupManagedProject()
+      managed_project()
       location "../objcgen"
       uuid "C166803B-011F-4EAF-B8C2-D7DBBA3CF1EC"
       kind "ConsoleApp"

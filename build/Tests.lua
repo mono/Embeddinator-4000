@@ -19,7 +19,6 @@ function SetupManagedTestProject()
     kind "SharedLib"
     language "C#"  
     clr "Unsafe"
-    SetupManagedProject()
     location "mk"
 end
 
@@ -50,8 +49,7 @@ function SetupTestProjectGeneratorMake(name, dll)
 end
 
 function SetupTestProjectGeneratorVS(name, depends)
-  project(name .. ".Gen")
-    SetupManagedTestProject()
+  managed_project(name .. ".Gen")
     kind "ConsoleApp"
     
     files { name .. ".Gen.cs" }
@@ -185,7 +183,7 @@ function SetupTestProjectObjC(name, depends)
 end
 
 function SetupTestProjectsCSharp(name, depends, extraFiles)
-  project(name .. ".Managed")
+  managed_project(name .. ".Managed")
     SetupManagedTestProject()
 
     files

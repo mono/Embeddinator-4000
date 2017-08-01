@@ -1,5 +1,4 @@
-  project "Embeddinator-4000"
-    SetupManagedProject()
+  managed_project "Embeddinator-4000"
 
     kind "ConsoleApp"
     language "C#"
