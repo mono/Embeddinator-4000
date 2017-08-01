@@ -81,7 +81,11 @@ Task("Clean")
     });
 
 Task("NuGet-Restore")
-    .Does(() => NuGetRestore("./generator.sln"));
+    .Does(() =>
+    {
+        NuGetRestore("./build/Embeddinator-4000.sln");
+        NuGetRestore("./generator.sln");
+    });
 
 Task("Build-Binder")
     .IsDependentOn("Clean")
