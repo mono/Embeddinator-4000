@@ -107,7 +107,7 @@ Task("Build-FSharp-Android")
     .IsDependentOn("NuGet-Restore")
     .Does(() =>
     {
-        MSBuild("./tests/managed/fsharp-android/fsharp-android.fsproj", settings => settings.SetConfiguration(configuration).SetVerbosity(Verbosity.Minimal));
+        MSBuild("./tests/managed/fsharp-android/fsharp-android.fsproj", settings => settings.SetConfiguration(configuration).SetPlatformTarget(PlatformTarget.MSIL).SetVerbosity(Verbosity.Minimal));
     });
 
 Task("Build-PCL")
