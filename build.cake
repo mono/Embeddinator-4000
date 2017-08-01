@@ -363,7 +363,6 @@ Task("Android")
     .IsDependentOn("Run-Android-Tests");
 
 Task("AppVeyor")
-    .IsDependentOn("Run-C-Tests")
     .IsDependentOn("Generate-Android")
     .IsDependentOn("Generate-Android-PCL")
     .IsDependentOn("Generate-Android-NetStandard")
