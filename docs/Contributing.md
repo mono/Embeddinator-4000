@@ -18,18 +18,18 @@ The work on the C and Java generators occurs in the [`master`](https://github.co
 
 Then, if you prefer the command line, you can either:
 
-`> msbuild build/MonoEmbeddinator4000.sln`
+`> msbuild build/Embeddinator-4000.sln`
 
 or run the provided compilation shell script:
 
 `> build/Compile.sh`
 
-If you're more GUI oriented, you can open the solution file at `build/MonoEmbeddinator4000.sln` and hit F5 to build it.
+If you're more GUI oriented, you can open the solution file at `build/Embeddinator-4000.sln` and hit F5 to build it.
 
 Once complete you should be able to run the tool with
 
 ```
-$ mono build/lib/Debug/MonoEmbeddinator4000.exe
+$ mono build/lib/Debug/Embeddinator-4000.exe
 ```
 
 Tests can be executed by running `make` from the `tests/common` directory.
