@@ -76,12 +76,27 @@ namespace MonoEmbeddinator4000
 
         public static string FindDirectory(string dir)
         {
-            for (int i = 0; i <= 3; i++)
-            {
-                if (Directory.Exists(dir))
-                    return Path.GetFullPath(dir);
+            const int searchDepth = 3;
 
-                dir = Path.Combine("..", dir);
+            //Try searching from path of assembly
+            string assemblyDir = Path.GetDirectoryName(typeof(Helpers).Assembly.Location);
+            for (int i = 0; i <= searchDepth; i++)
+            {
+                string searchDir = Path.Combine(assemblyDir, dir);
+                if (Directory.Exists(searchDir))
+                    return Path.GetFullPath(searchDir);
+
+                assemblyDir = Path.Combine(assemblyDir, "..");
+            }
+
+            //Try searching from current directory
+            string currentDir = dir;
+            for (int i = 0; i <= searchDepth; i++)
+            {
+                if (Directory.Exists(currentDir))
+                    return Path.GetFullPath(currentDir);
+
+                currentDir = Path.Combine("..", currentDir);
             }
 
             throw new Exception($"Cannot find {Path.GetFileName(dir)}!");
