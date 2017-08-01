@@ -85,6 +85,7 @@
     <Compile Include="Helpers\UniverseTest.cs" />
     <Compile Include="Helpers\TempFileTest.cs" />
     <Compile Include="Helpers\CurrentDirectoryTest.cs" />
+    <Compile Include="HelpersTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Samples\" />
