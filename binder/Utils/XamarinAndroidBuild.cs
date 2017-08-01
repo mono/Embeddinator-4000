@@ -18,6 +18,7 @@ namespace MonoEmbeddinator4000
         public const string IntermediateDir = "obj";
         public const string ResourcePaths = "resourcepaths.cache";
 
+        const string LibraryProjectDir = "library_project_imports";
         const string LinkMode = "SdkOnly";
 
         static ProjectRootElement CreateProject()
@@ -38,11 +39,14 @@ namespace MonoEmbeddinator4000
             return project;
         }
 
-        static void ResolveAssemblies(ProjectTargetElement target, string mainAssembly)
+        static void ResolveAssemblies(ProjectTargetElement target, List<IKVM.Reflection.Assembly> assemblies)
         {
             var resolveAssemblies = target.AddTask("ResolveAssemblies");
+            var assemblyPaths = assemblies.Select(a => a.Location).ToList();
             //NOTE: [Export] requires Mono.Android.Export.dll
-            resolveAssemblies.SetParameter("Assemblies", mainAssembly + ";" + XamarinAndroid.FindAssembly("Mono.Android.Export.dll"));
+            assemblyPaths.Add(XamarinAndroid.FindAssembly("Mono.Android.Export.dll"));
+
+            resolveAssemblies.SetParameter("Assemblies", string.Join(";", assemblyPaths));
             resolveAssemblies.SetParameter("LinkMode", LinkMode);
             resolveAssemblies.SetParameter("ReferenceAssembliesDirectory", "$(TargetFrameworkDirectory)");
             resolveAssemblies.AddOutputItem("ResolvedAssemblies", "ResolvedAssemblies");
@@ -74,7 +78,7 @@ namespace MonoEmbeddinator4000
             var target = project.AddTarget("Build");
 
             //ResolveAssemblies Task
-            ResolveAssemblies(target, mainAssembly);
+            ResolveAssemblies(target, assemblies);
 
             //LinkAssemblies Task
             var linkAssemblies = target.AddTask("LinkAssemblies");
@@ -175,7 +179,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
             var target = project.AddTarget("Build");
 
             //ResolveAssemblies Task
-            ResolveAssemblies(target, mainAssembly);
+            ResolveAssemblies(target, assemblies);
 
             //GenerateJavaStubs Task
             var generateJavaStubs = target.AddTask("GenerateJavaStubs");
@@ -208,9 +212,13 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
 
             //Create ItemGroup of Android files
             var androidResources = target.AddItemGroup();
-            androidResources.AddItem("AndroidJavaSource", Path.Combine(intermediateDir, "*", "library_project_imports", "java", "**", "*.java"));
-            androidResources.AddItem("AndroidAsset", @"%(ResolvedAssetDirectories.Identity)\**\*").Condition = "'@(ResolvedAssetDirectories)' != ''";
-            androidResources.AddItem("AndroidResource", @"%(ResolvedResourceDirectories.Identity)\**\*").Condition = "'@(ResolvedAssetDirectories)' != ''";
+            foreach (var assembly in assemblies)
+            {
+                var assemblyName = assembly.GetName().Name;
+                androidResources.AddItem("AndroidAsset", Path.Combine(intermediateDir, assemblyName, LibraryProjectDir, "assets", "**", "*"));
+                androidResources.AddItem("AndroidJavaSource", Path.Combine(intermediateDir, assemblyName, LibraryProjectDir, "java", "**", "*.java"));
+                androidResources.AddItem("AndroidResource", Path.Combine(intermediateDir, assemblyName, LibraryProjectDir, "res", "**", "*"));
+            }
 
             //Copy Task, to copy AndroidAsset files
             var copy = target.AddTask("Copy");

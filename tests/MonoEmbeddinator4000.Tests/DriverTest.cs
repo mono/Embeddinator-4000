@@ -15,6 +15,7 @@ namespace MonoEmbeddinator4000.Tests
     [TestFixture]
     public class DriverTest : TempFileTest
     {
+        string outputDir;
         Project project;
         Options options;
         Driver driver;
@@ -24,7 +25,7 @@ namespace MonoEmbeddinator4000.Tests
         {
             base.SetUp();
 
-            var outputDir = Path.Combine(Path.GetDirectoryName(GetType().Assembly.Location), "output");
+            outputDir = Path.Combine(Path.GetDirectoryName(GetType().Assembly.Location), "output");
             if (!Directory.Exists(outputDir))
                 Directory.CreateDirectory(outputDir);
 
@@ -51,7 +52,7 @@ namespace MonoEmbeddinator4000.Tests
             parameters.OutputAssembly = temp;
             AssemblyGenerator.CreateFromResource(resourceFile, parameters);
 
-            project.Assemblies.Add(temp);
+            project.Assemblies.Insert(0, temp);
 
             driver = new Driver(project, options);
             Assert.IsTrue(driver.Run(), "Call to Driver.Run() failed!");
@@ -208,6 +209,9 @@ namespace MonoEmbeddinator4000.Tests
             RunDriver("Interfaces");
         }
 
+        /// <summary>
+        /// Validates we get native libraries from the assembly
+        /// </summary>
         [Test, Category("Slow")]
         public void AndroidNativeLibraries()
         {
@@ -215,6 +219,55 @@ namespace MonoEmbeddinator4000.Tests
             var parameters = new CompilerParameters();
             parameters.EmbeddedResources.Add(nativeLibrariesZip);
 
+            options.Compilation.Platform = TargetPlatform.Android;
+            options.GeneratorKind = GeneratorKind.C;
+            RunDriver("Hello", parameters);
+            options.GeneratorKind = GeneratorKind.Java;
+            RunDriver("Hello", parameters);
+
+            var aar = Path.Combine(options.OutputDir, "Hello.aar");
+            Approvals.VerifyZipFile(aar);
+        }
+
+        /// <summary>
+        /// Validates we get resources/assets from the assembly
+        /// </summary>
+        [Test, Category("Slow")]
+        public void AndroidResources()
+        {
+            var libraryProjectsZip = Path.Combine(Path.GetDirectoryName(GetType().Assembly.Location), "..", "..", "Samples", "__AndroidLibraryProjects__.zip");
+            var parameters = new CompilerParameters();
+            parameters.EmbeddedResources.Add(libraryProjectsZip);
+
+            options.Compilation.Platform = TargetPlatform.Android;
+            options.GeneratorKind = GeneratorKind.C;
+            RunDriver("Hello", parameters);
+            options.GeneratorKind = GeneratorKind.Java;
+            RunDriver("Hello", parameters);
+
+            var aar = Path.Combine(options.OutputDir, "Hello.aar");
+            Approvals.VerifyZipFile(aar);
+        }
+
+        /// <summary>
+        /// Validates we get native libraries and resources/assets from a dependency
+        /// NOTE: the dependent assembly should be passed as an input assembly to E4K
+        /// </summary>
+        [Test, Category("Slow")]
+        public void AndroidDependencies()
+        {
+            var dependency = Path.Combine(outputDir, "dependency.dll");
+            var nativeLibrariesZip = Path.Combine(Path.GetDirectoryName(GetType().Assembly.Location), "..", "..", "Samples", "__AndroidNativeLibraries__.zip");
+            var libraryProjectsZip = Path.Combine(Path.GetDirectoryName(GetType().Assembly.Location), "..", "..", "Samples", "__AndroidLibraryProjects__.zip");
+            var parameters = new CompilerParameters();
+            parameters.OutputAssembly = dependency;
+            parameters.EmbeddedResources.Add(nativeLibrariesZip);
+            parameters.EmbeddedResources.Add(libraryProjectsZip);
+            AssemblyGenerator.CreateFromResource("HelloUpper", parameters);
+            project.Assemblies.Add(dependency);
+
+            parameters = new CompilerParameters();
+            parameters.ReferencedAssemblies.Add(dependency);
             options.Compilation.Platform = TargetPlatform.Android;
             options.GeneratorKind = GeneratorKind.C;
             RunDriver("Hello", parameters);

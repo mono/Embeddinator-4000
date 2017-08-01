@@ -37,6 +37,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="Samples\__AndroidLibraryProjects__.zip" />
     <None Include="Samples\__AndroidNativeLibraries__.zip" />
     <None Include="Samples\R.txt" />
   </ItemGroup>

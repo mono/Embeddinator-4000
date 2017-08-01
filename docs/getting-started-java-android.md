@@ -218,6 +218,39 @@ v.apply("Hello");
 
 Read more about Java integration with Xamarin.Android [here](https://developer.xamarin.com/guides/android/advanced_topics/java_integration_overview/).
 
+## Multiple Assemblies
+
+Embedding a single assembly is straightforward; however, it is much more likely you will have more than one C# assembly. Many times you will have dependencies on NuGet packages such as the Android support libraries or Google Play Services that further complicate things.
+
+This causes a dilemma, since Embeddinator needs to include many types of files into the final AAR such as:
+* Android assets
+* Android resources
+* Android native libraries
+* Android java source
+
+You most likely do not want to include these files from the Android support library or Google Play Services into your AAR, but would rather use the official version from Google in Android Studio.
+
+Here is the recommended approach:
+* Pass Embeddinator any assembly that you own (have source for) and want to call from Java
+* Pass Embeddinator any assembly that you need Android assets, native libraries, or resources from
+* Add Java dependencies like the Android support library or Google Play Services in Android Studio
+
+So your command might be:
+```
+mono MonoEmbeddinator4000.exe --gen=Java --platform=Android -c -o output YourMainAssembly.dll YourDependencyA.dll YourDependencyB.dll
+```
+You should exclude anything from NuGet, unless you find out it contains Android assets, resources, etc. that you will need in your Android Studio project. You can also omit dependencies that you do not need to call from Java, and the linker _should_ include the parts of your library that are needed.
+
+To add any Java dependencies needed in Android Studio, your `build.gradle` file might look like:
+```groovy
+dependencies {
+    // ...
+    compile 'com.android.support:appcompat-v7:25.3.1'
+    compile 'com.google.android.gms:play-services-games:11.0.4'
+    // ...
+}
+```
+
 ## Further Reading
 
 * [Callbacks on Android](android-callbacks.md)
