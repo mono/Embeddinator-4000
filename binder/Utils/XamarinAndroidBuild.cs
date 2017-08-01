@@ -270,11 +270,13 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
         {
             var assembliesDir = Path.Combine(outputDirectory, "android", "assets", "assemblies");
             var jniDir = Path.Combine(outputDirectory, "android", "jni");
+            var resolver = new DefaultAssemblyResolver();
+            resolver.AddSearchDirectory(assembliesDir);
 
             foreach (var assemblyFile in Directory.GetFiles(assembliesDir, "*.dll"))
             {
                 var assemblyModified = false;
-                var assembly = AssemblyDefinition.ReadAssembly(assemblyFile);
+                var assembly = AssemblyDefinition.ReadAssembly(assemblyFile, new ReaderParameters { AssemblyResolver = resolver });
 
                 foreach (var module in assembly.Modules)
                 {
