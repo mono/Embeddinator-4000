@@ -22,6 +22,8 @@ function managed_project(name)
     local proj = project(name)
   end
 
+  language "C#"
+
   if not os.istarget("macosx") then
     filter { "action:vs*" }
       location "."
