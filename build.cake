@@ -348,7 +348,8 @@ void Premake(string file, string args, string action)
 Task("Generate-Project-Files")
     .Does(() =>
     {
-        Premake(File("./build/premake5.lua"), "--outdir=. --os=macosx", "vs2015");
+        var os = IsRunningOnWindows() ? "windows" : "macosx";
+        Premake(File("./build/premake5.lua"), $"--outdir=. --os={os}", "vs2015");
     });
 
 Task("Default")
