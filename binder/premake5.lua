@@ -5,9 +5,13 @@
     language "C#"
 
     files { "../binder/**.cs" }
-
     libdirs { "../deps" }
   
+    nuget
+    {
+      "Mono.Cecil:0.9.6.4"
+    }
+
     links
     {
       "System",
