@@ -10,6 +10,7 @@ var managedDll = Directory("./tests/managed/generic/bin") + Directory(configurat
 var androidDll = Directory("./tests/managed/android/bin") + Directory(configuration) + File("managed.dll");
 var pclDll = Directory("./tests/managed/pcl/bin") + Directory(configuration) + File("managed.dll");
 var netStandardDll = Directory("./tests/managed/netstandard/bin") + Directory(configuration) + File("netstandard1.6/managed.dll");
+var fsharpAndroidDll = Directory("./tests/managed/fsharp-android/bin") + Directory(configuration) + File("managed.dll");
 
 //Java settings
 string javaHome;
@@ -100,6 +101,14 @@ Task("Build-Android")
     .Does(() =>
     {
         MSBuild("./tests/managed/android/managed-android.csproj", settings => settings.SetConfiguration(configuration).SetPlatformTarget(PlatformTarget.MSIL).SetVerbosity(Verbosity.Minimal));
+    });
+
+Task("Build-FSharp-Android")
+    .IsDependentOn("Clean")
+    .IsDependentOn("NuGet-Restore")
+    .Does(() =>
+    {
+        MSBuild("./tests/managed/fsharp-android/fsharp-android.fsproj", settings => settings.SetConfiguration(configuration).SetPlatformTarget(PlatformTarget.MSIL).SetVerbosity(Verbosity.Minimal));
     });
 
 Task("Build-PCL")
@@ -247,6 +256,16 @@ Task("Generate-Android-NetStandard")
         Exec(embeddinator, $"-gen=Java -out={output} -platform=Android -compile -target=shared {netStandardDll}");
     });
 
+Task("Generate-Android-FSharp")
+    .IsDependentOn("Download-Xamarin-Android")
+    .IsDependentOn("Build-Binder")
+    .IsDependentOn("Build-FSharp-Android")
+    .Does(() =>
+    {
+        var output = buildDir + Directory("fsharp");
+        Exec(embeddinator, $"-gen=Java -out={output} -platform=Android -compile -target=shared {fsharpAndroidDll}");
+    });
+
 Task("Build-CSharp-Tests")
     .IsDependentOn("Build-Binder")
     .IsDependentOn("Build-Managed")
@@ -337,6 +356,7 @@ Task("AppVeyor")
     .IsDependentOn("Generate-Android")
     .IsDependentOn("Generate-Android-PCL")
     .IsDependentOn("Generate-Android-NetStandard")
+    .IsDependentOn("Generate-Android-FSharp")
     .IsDependentOn("Build-CSharp-Tests");
 
 Task("Create-Package")
