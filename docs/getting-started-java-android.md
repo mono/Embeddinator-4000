@@ -84,6 +84,21 @@ rm -Rf ../output/
 
 The Android AAR file will be placed in `~/Projects/hello-from-csharp/output/hello_from_csharp.aar`. _NOTE: hyphens are replaced because Java does not support it in package names._
 
+### Running Embeddinator on Windows
+
+We will essentially setup the same thing, but the menus in Visual Studio are a bit different on Windows. The shell commands are also slightly different.
+
+Go to _Project Options | Build Events_ and enter the following into the _Post-build event command line_ box:
+```
+set E4K_OUTPUT="$(SolutionDir)output"
+if exist %E4K_OUTPUT% rmdir /S /Q %E4K_OUTPUT%
+"$(SolutionDir)packages\Embeddinator-4000.0.2.0.80\tools\Embeddinator-4000.exe" "$(TargetPath)" --gen=Java --platform=Android --outdir=%E4K_OUTPUT% -c
+```
+
+Such as the following screenshot:
+
+![Embeddinator on Windows](VisualStudioWindows.png)
+
 ## Use the generated output in an Android Studio project
 
 Open Android Studio and create a new project with an `Empty Activity`.
