@@ -28,14 +28,19 @@ Notes:
 
 ## Installation
 
-There is not currently an installer with Java/Android support. For now you can build from source, see our [git repository](https://github.com/mono/Embeddinator-4000/) and the [contributing](Contributing.md) document for instructions.
+Embeddinator is currently available on [NuGet](https://www.nuget.org/packages/Embeddinator-4000/):
+```
+nuget install Embeddinator-4000
+```
+This will place `Embeddinator-4000.exe` into the `packages/Embeddinator-4000/tools` directory.
+
+Additionally, you can build Embeddinator from source, see our [git repository](https://github.com/mono/Embeddinator-4000/) and the [contributing](Contributing.md) document for instructions.
 
 ## Platforms
 
-Java is currently in a prototype state for macOS and Android.
+Java is currently in a preview state for macOS, Windows, and Android.
 
-The platform is selected by passing the `--platform=<platform>` command-line
-argument to the embeddinator. Currently `macOS` and `Android` are supported. `Windows` will be coming soon, but _might_ currently work to some extent.
+The platform is selected by passing the `--platform=<platform>` command-line argument to the embeddinator. Currently `macOS`, `Windows`, and `Android` are supported.
 
 ### macOS and Windows
 
@@ -43,7 +48,7 @@ For development, should be able to use any Java IDE that supports Java 1.8. You 
 
 ### Android
 
-Please make sure you are already set up to develop Android applications before trying to create one using the embeddinator. The [following instructions](getting-started-java-android.md) assume that you have already successfully built and deployed an Android application from your computer.
+Please make sure you are already set up to develop Android applications before trying to create one using Embeddinator. The [following instructions](getting-started-java-android.md) assume that you have already successfully built and deployed an Android application from your computer.
 
 Android Studio is recommended for development, but other IDEs should work as long as there is support for the [AAR file format](https://developer.android.com/studio/projects/android-library.html). 
 
