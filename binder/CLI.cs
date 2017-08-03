@@ -167,6 +167,12 @@ namespace MonoEmbeddinator4000
                 return false;
             }
 
+            if (Generators.Contains(GeneratorKind.ObjectiveC))
+            {
+                Console.Error.WriteLine("Please use the objcgen tool for Objective-C generation.");
+                return false;
+            }
+
             //NOTE: Choosing Java generator, needs to imply the C generator
             if (Generators.Contains(GeneratorKind.Java) && !Generators.Contains(GeneratorKind.C))
             {
