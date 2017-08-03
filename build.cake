@@ -373,8 +373,13 @@ Task("Create-Package")
     .IsDependentOn("Build-Binder")
     .Does(() =>
     {
+        var objcgenBuildDir = Directory("./objcgen/bin/") + Directory(configuration);
+
         var files = new []
         {
+            new NuSpecContent { Source = objcgenBuildDir.ToString() + "/*.exe", Target = "tools/" },
+            new NuSpecContent { Source = objcgenBuildDir.ToString() + "/*.dll", Target = "tools/" },
+            new NuSpecContent { Source = objcgenBuildDir.ToString() + "/*.pdb", Target = "tools/" },
             new NuSpecContent { Source = buildDir.ToString() + "/*.exe", Target = "tools/" },
             new NuSpecContent { Source = buildDir.ToString() + "/*.dll", Target = "tools/" },
             new NuSpecContent { Source = buildDir.ToString() + "/*.pdb", Target = "tools/" },
