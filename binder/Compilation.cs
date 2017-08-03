@@ -428,8 +428,7 @@ namespace MonoEmbeddinator4000
 
         bool MSBuild(string project)
         {
-            var msbuild = Platform.IsWindows ? "MSBuild.exe" : "/Library/Frameworks/Mono.framework/Versions/Current/Commands/msbuild";
-            var output = Invoke(msbuild, $"/nologo /verbosity:minimal {project}");
+            var output = Invoke(XamarinAndroid.MSBuildPath, $"/nologo /verbosity:minimal {project}");
             return output.ExitCode == 0;
         }
 

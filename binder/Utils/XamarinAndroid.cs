@@ -1,6 +1,7 @@
 using System;
-using System.Linq;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using CppSharp;
 using Xamarin.Android.Tools;
 using static System.IO.Path;
@@ -143,6 +144,28 @@ namespace MonoEmbeddinator4000
         public static string JavaSdkPath
         {
             get { return javaSdkPath.Value; }
+        }
+
+        static Lazy<string> msBuildPath = new Lazy<string>(() =>
+        {
+            if (Platform.IsMacOS)
+                return "/Library/Frameworks/Mono.framework/Versions/Current/Commands/msbuild";
+
+            if (Platform.IsWindows)
+            {
+                List<ToolchainVersion> toolchains;
+                if (!MSVCToolchain.GetMSBuildSdks(out toolchains))
+                    return "MSBuild.exe";
+
+                return Combine(toolchains.OrderByDescending(t => t.Version).Select(t => t.Directory).First(), "MSBuild.exe");
+            }
+
+            throw new NotImplementedException();
+        });
+
+        public static string MSBuildPath
+        {
+            get { return msBuildPath.Value; }
         }
     }
 }
