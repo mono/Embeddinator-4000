@@ -58,7 +58,7 @@ Build the project, the resulting assembly will be saved in `bin/Debug/hello-from
 
 ## Installing Embeddinator-4000 from NuGet
 
-Choose _Add | Add NuGet Packages..._ and install `Embeddinator-4000` from the NuGet package manager:
+Choose _Add > Add NuGet Packages..._ and install `Embeddinator-4000` from the NuGet package manager:
 ![NuGet Package Manager](VisualStudioNuGet.png)
 
 This will install `Embeddinator-4000.exe` into the `packages/Embeddinator-4000/tools` directory.
@@ -67,7 +67,7 @@ This will install `Embeddinator-4000.exe` into the `packages/Embeddinator-4000/t
 
 We will add a post-build step to run Embeddinator and create a native AAR file for the Android library project assembly.
 
-In Visual Studio for Mac, go to _Project Options | Build | Custom Commands_ and add an _After Build_ step.
+In Visual Studio for Mac, go to _Project Options > Build > Custom Commands_ and add an _After Build_ step.
 
 Setup the following commnd:
 ```
@@ -88,7 +88,7 @@ The Android AAR file will be placed in `~/Projects/hello-from-csharp/output/hell
 
 We will essentially setup the same thing, but the menus in Visual Studio are a bit different on Windows. The shell commands are also slightly different.
 
-Go to _Project Options | Build Events_ and enter the following into the _Post-build event command line_ box:
+Go to _Project Options > Build Events_ and enter the following into the _Post-build event command line_ box:
 ```
 set E4K_OUTPUT="$(SolutionDir)output"
 if exist %E4K_OUTPUT% rmdir /S /Q %E4K_OUTPUT%
@@ -103,7 +103,7 @@ Such as the following screenshot:
 
 Open Android Studio and create a new project with an `Empty Activity`.
 
-Right-click on your `app` module and choose `New | Module`. Select `Import .JAR/.AAR Package`. Use the directory browser to locate `~/Projects/hello-from-csharp/output/hello_from_csharp.aar` and hit `Finish`.
+Right-click on your `app` module and choose `New > Module`. Select `Import .JAR/.AAR Package`. Use the directory browser to locate `~/Projects/hello-from-csharp/output/hello_from_csharp.aar` and hit `Finish`.
 
 ![Import AAR into Android Studio](AndroidStudioImport.png)
 
