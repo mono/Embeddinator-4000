@@ -8,29 +8,10 @@ In addition to the requirements from our [Getting started with Java](getting-sta
 *NOTE: the state of using Java 1.8 in Android Studio is currently in [flux](https://android-developers.googleblog.com/2017/03/future-of-java-8-language-feature.html) at the moment. At the time of writing, the best option is to enable the Jack toolchain in the stable version of Android Studio. Details below.*
 
 As an overview, we will:
-* Clone Embeddinator-4000
-* Run Cake build script (downloads a Jenkins build Xamarin.Android)
 * Create a C# Android Library project
+* Install Embeddinator-4000 via NuGet
 * Run Embeddinator on the Android library assembly
 * Use the generated AAR file in a Java project in Android Studio
-
-## Building Embeddinator-4000
-
-Clone the source of Embeddinator 4000 into an easy-to-find directory such as `~/Projects/Embeddinator-4000`. You may also need to run `git submodule init` and `git submodule update`.
-
-To get started, the best option right now is to run the Cake script:
-```
-./build.sh -t Generate-Android -v diagnostic
-```
-On Windows, in Powershell:
-```
-.\build.ps1 -t Generate-Android -v diagnostic
-```
-This will download a master build of Xamarin.Android and extract it into `/external/Xamarin.Android`. 
-
-`MonoEmbeddinator4000.exe` will be compiled to `build/lib/Release`. The Cake script will also run Embeddinator against a test assembly, so you can be sure your system is setup properly.
-
-*NOTE: as soon as a preview build containing our changes for Xamarin.Android is available, we will update these instructions. Follow the [previous guide](getting-started-java.md) for details about building Embeddinator-4000.*
 
 ## Create an Android Library Project
 
@@ -73,25 +54,50 @@ public class HelloActivity : Activity
 ```
 *NOTE: don't forget the `[Register]` attribute, see details under Limitations*
 
-Build the project, the resulting assembly will be saved as `$(ProjectDir)/bin/Debug/hello-from-csharp.dll`.
+Build the project, the resulting assembly will be saved in `bin/Debug/hello-from-csharp.dll`.
+
+## Installing Embeddinator-4000 from NuGet
+
+Choose _Add | Add NuGet Packages..._ and install `Embeddinator-4000` from the NuGet package manager:
+![NuGet Package Manager](VisualStudioNuGet.png)
+
+This will install `Embeddinator-4000.exe` into the `packages/Embeddinator-4000/tools` directory.
 
 ## Run Embeddinator-4000
 
-Run the embeddinator to create a native AAR file for the Android library project assembly.
+We will add a post-build step to run Embeddinator and create a native AAR file for the Android library project assembly.
 
-On OSX:
-```shell
-cd ~/Projects/Embeddinator-4000
-mono build/lib/Release/MonoEmbeddinator4000.exe ~/Projects/hello-from-csharp/hello-from-csharp/bin/Debug/hello-from-csharp.dll --gen=Java --platform=Android --outdir=../hello-from-csharp/output -c
+In Visual Studio for Mac, go to _Project Options | Build | Custom Commands_ and add an _After Build_ step.
+
+Setup the following commnd:
+```
+mono '${SolutionDir}/packages/Embeddinator-4000.0.2.0.80/tools/Embeddinator-4000.exe' '${TargetPath}' --gen=Java --platform=Android --outdir='${SolutionDir}/output' -c
+```
+_NOTE: make sure to use the version number you installed from NuGet_
+
+If you are going to be doing ongoing development on the C# project, you might also add a custom command to clean the `output` directory prior to running Embeddinator:
+```
+rm -Rf '${SolutionDir}/output/'
 ```
 
-Or on Windows, in cmd:
-```
-cd %USERPROFILE%\Projects\Embeddinator-4000
-build\lib\Release\MonoEmbeddinator4000.exe %USERPROFILE%\Projects\hello-from-csharp\hello-from-csharp\bin\Debug\hello-from-csharp.dll --gen=Java --platform=Android --outdir=..\hello-from-csharp\output -c
-```
+![Custom Build Action](VisualStudioCustomBuild.png)
 
 The Android AAR file will be placed in `~/Projects/hello-from-csharp/output/hello_from_csharp.aar`. _NOTE: hyphens are replaced because Java does not support it in package names._
+
+### Running Embeddinator on Windows
+
+We will essentially setup the same thing, but the menus in Visual Studio are a bit different on Windows. The shell commands are also slightly different.
+
+Go to _Project Options | Build Events_ and enter the following into the _Post-build event command line_ box:
+```
+set E4K_OUTPUT="$(SolutionDir)output"
+if exist %E4K_OUTPUT% rmdir /S /Q %E4K_OUTPUT%
+"$(SolutionDir)packages\Embeddinator-4000.0.2.0.80\tools\Embeddinator-4000.exe" "$(TargetPath)" --gen=Java --platform=Android --outdir=%E4K_OUTPUT% -c
+```
+
+Such as the following screenshot:
+
+![Embeddinator on Windows](VisualStudioWindows.png)
 
 ## Use the generated output in an Android Studio project
 
@@ -160,6 +166,10 @@ So for this sample to work, all the following are setup in the final APK:
 * `AndroidManifest.xml` modifications for your C# activities, etc.
 * Android Resources and Assets from .NET libraries
 * [Android Callable Wrappers](https://developer.xamarin.com/guides/android/advanced_topics/java_integration_overview/android_callable_wrappers/) for any `Java.Lang.Object` subclass
+
+If you are looking for an additional walkthrough, check out this video embedding Charles Petzold's [FingerPaint demo](https://developer.xamarin.com/samples/monodroid/ApplicationFundamentals/FingerPaint/) in an Android Studio project here:
+
+[![Embeddinator-4000 for Android](https://img.youtube.com/vi/ZVcrXUpCNpI/0.jpg)](https://www.youtube.com/watch?v=ZVcrXUpCNpI)
 
 ## Using Java 1.8
 

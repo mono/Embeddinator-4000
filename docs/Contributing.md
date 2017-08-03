@@ -38,22 +38,21 @@ Or running the `tests/RunTestsuite.sh` shell script.
 
 ### Cake
 
-We will slowly be moving our build scripts to Cake. We only have a few build targets setup so far.
+We will slowly be moving our build scripts to Cake. We only have a few build targets setup so far. You may also need to run `git submodule update --init` before attempting a build.
 
-To run on Windows, open powershell and run:
+On OS X, you can setup your environment for Android by running a shell script:
 ```
-.\build.ps1
+./build.sh -t Generate-Android -v diagnostic
 ```
-Or cmd in Windows:
+On Windows, in Powershell:
 ```
-powershell -File build.ps1
+.\build.ps1 -t Generate-Android -v diagnostic
 ```
-To run on OS X:
-```
-./build.sh
-```
+This will download a master build of Xamarin.Android and extract it into `/external/Xamarin.Android`. 
 
-To run a specific target, append `-t Generate-Android`, for example.
+`Embeddinator-4000.exe` will be compiled to `build/lib/Release`. The Cake script will also run Embeddinator against a test assembly, so you can be sure your system is setup properly.
+
+*NOTE: as soon as a preview build containing our changes for Xamarin.Android is available, we will update these instructions.*
 
 ## Objective-C
 
