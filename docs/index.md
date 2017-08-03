@@ -18,12 +18,12 @@ iOS.  Other environments do allow JIT compilation, and in those
 enviroments, we opt to JIT compile.
 
 It supports various language consumers, so it surfaces .NET code as
-idiomatic code in the target language.   This is the list of language
-support that we have been working on:
+idiomatic code in the target language.   This is the list of supported 
+languages at present:
 
 * *Objective-C*: mapping .NET to idiomatic Objective-C APIs.
-* *C*: mapping .NET code to an object-oriented like C API (coming soon).
-* *Java*: mapping .NET code to idiomatic Java APIs (coming soon).
+* *Java*: mapping .NET to idiomatic Java APIs.
+* *C*: mapping .NET to an object-oriented like C APIs.
 
 More languages will come later.
 
@@ -32,6 +32,6 @@ More languages will come later.
 To get started, check one of our guides for each of the currently
 supported languages:
 
-* [C](getting-started-c): covers C language on desktop platforms.
 * [Objective-C](getting-started-objective-c): covers macOS and iOS.
 * [Java](getting-started-java): covers macOS and Android.
+* [C](getting-started-c): covers C language on desktop platforms.
