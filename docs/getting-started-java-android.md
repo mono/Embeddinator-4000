@@ -71,13 +71,13 @@ In Visual Studio for Mac, go to _Project Options | Build | Custom Commands_ and 
 
 Setup the following commnd:
 ```
-mono ../packages/Embeddinator-4000.0.2.0.80/tools/Embeddinator-4000.exe ${TargetPath} --gen=Java --platform=Android --outdir=../output -c
+mono '${SolutionDir}/packages/Embeddinator-4000.0.2.0.80/tools/Embeddinator-4000.exe' '${TargetPath}' --gen=Java --platform=Android --outdir='${SolutionDir}/output' -c
 ```
 _NOTE: make sure to use the version number you installed from NuGet_
 
 If you are going to be doing ongoing development on the C# project, you might also add a custom command to clean the `output` directory prior to running Embeddinator:
 ```
-rm -Rf ../output/
+rm -Rf '${SolutionDir}/output/'
 ```
 
 ![Custom Build Action](VisualStudioCustomBuild.png)
