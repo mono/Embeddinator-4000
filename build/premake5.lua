@@ -3,18 +3,11 @@
 -- and calls the build scripts of all the sub-projects.
 
 include "Helpers.lua"
-include "Tests.lua"
 
 newoption {
    trigger     = "outdir",
    value       = "path",
    description = "Output directory for the generated project files"
-}
-
-newoption {
-   trigger     = "dev",
-   value       = "bool",
-   description = "Enables development mode"
 }
 
 function managed_project(name)
@@ -74,12 +67,6 @@ workspace "Embeddinator-4000"
   include_cppsharp_project("Generator")
   include_cppsharp_project("Runtime")
 
-  if _OPTIONS["dev-cppsharp"] then
-    include_cppsharp_project("Generator.Tests")
-    include_cppsharp_project("../build/Tests")
-    IncludeTests()
-  end
-
   managed_project "IKVM.Reflection"
 
     kind "SharedLib"
@@ -118,15 +105,3 @@ workspace "Embeddinator-4000"
       "System.Xml.Linq"
     }
 
-  if string.startswith(_ACTION, "vs") and os.istarget("macosx") then
-    externalproject "objcgen"
-      managed_project()
-      location "../objcgen"
-      uuid "C166803B-011F-4EAF-B8C2-D7DBBA3CF1EC"
-      kind "ConsoleApp"
-  end
-
-  if _OPTIONS["dev"] then
-    print("Searching for tests projects...")
-    IncludeDir("../tests")
-  end
