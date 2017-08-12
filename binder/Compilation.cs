@@ -217,105 +217,22 @@ namespace MonoEmbeddinator4000
             }
 
             //Embed JNA into our jar file
-            using (var stream = File.OpenRead(Path.Combine(FindDirectory("external"), "jna", "jna-4.4.0.jar")))
-            using (var zip = new ZipArchive(stream))
-            {
-                foreach (var entry in zip.Entries)
-                {
-                    //Skip META-INF
-                    if (entry.FullName.StartsWith("META-INF", StringComparison.Ordinal))
-                        continue;
-
-                    var entryPath = Path.Combine(classesDir, entry.FullName);
-
-                    if (string.IsNullOrEmpty(entry.Name))
-                    {
-                        if (!Directory.Exists(entryPath))
-                            Directory.CreateDirectory(entryPath);
-                    }
-                    else
-                    {
-                        //NOTE: *.so files on Android will be packaged in a different way
-                        if (Options.Compilation.Platform == TargetPlatform.Android && entry.Name.EndsWith(".so", StringComparison.Ordinal))
-                        {
-                            continue;
-                        }
-
-                        using (var zipEntryStream = entry.Open())
-                        using (var fileStream = File.Create(entryPath))
-                        {
-                            zipEntryStream.CopyTo(fileStream);
-                        }
-                    }
-                }
-            }
+            var jnaJar = Path.Combine(FindDirectory("external"), "jna", "jna-4.4.0.jar");
+            var filter = Options.Compilation.Platform == TargetPlatform.Android ?
+                         entry => !entry.Name.EndsWith(".so", StringComparison.Ordinal) :
+                         default(Func<ZipArchiveEntry, bool>);
+            XamarinAndroidBuild.ExtractJar(jnaJar, classesDir, filter);
 
             //Embed mono.android.jar into our jar file
             if (Options.Compilation.Platform == TargetPlatform.Android)
             {
-                using (var stream = File.OpenRead(XamarinAndroid.FindAssembly("mono.android.jar")))
-                using (var zip = new ZipArchive(stream))
-                {
-                    foreach (var entry in zip.Entries)
-                    {
-                        //Skip META-INF
-                        if (entry.FullName.StartsWith("META-INF", StringComparison.Ordinal))
-                            continue;
-
-                        var entryPath = Path.Combine(classesDir, entry.FullName);
-
-                        if (string.IsNullOrEmpty(entry.Name))
-                        {
-                            if (!Directory.Exists(entryPath))
-                                Directory.CreateDirectory(entryPath);
-                        }
-                        else
-                        {
-                            using (var zipEntryStream = entry.Open())
-                            using (var fileStream = File.Create(entryPath))
-                            {
-                                zipEntryStream.CopyTo(fileStream);
-                            }
-                        }
-                    }
-                }
+                var monoAndroidJar = XamarinAndroid.FindAssembly("mono.android.jar");
+                XamarinAndroidBuild.ExtractJar(monoAndroidJar, classesDir);
 
                 //Look for other JAR file dependencies from the user's assemblies
                 foreach(var dependency in Directory.GetFiles(Path.Combine(Options.OutputDir, XamarinAndroidBuild.IntermediateDir), "*.jar", SearchOption.AllDirectories))
                 {
-                    Diagnostics.Warning("Jar File: {0}", dependency);
-
-                    using (var stream = File.OpenRead(dependency))
-                    using (var zip = new ZipArchive(stream))
-                    {
-                        foreach (var entry in zip.Entries)
-                        {
-                            //Skip META-INF
-                            if (entry.FullName.StartsWith("META-INF", StringComparison.Ordinal))
-                                continue;
-
-                            var entryPath = Path.Combine(classesDir, entry.FullName);
-
-                            if (string.IsNullOrEmpty(entry.Name))
-                            {
-                                if (!Directory.Exists(entryPath))
-                                    Directory.CreateDirectory(entryPath);
-                            }
-                            else
-                            {
-                                //NOTE: not all JAR files have directory entries such as FormsViewGroup.jar
-                                var directoryPath = Path.GetDirectoryName(entryPath);
-                                if (!Directory.Exists(directoryPath))
-                                    Directory.CreateDirectory(directoryPath);
-
-                                using (var zipEntryStream = entry.Open())
-                                using (var fileStream = File.Create(entryPath))
-                                {
-                                    zipEntryStream.CopyTo(fileStream);
-                                }
-                            }
-                        }
-                    }
+                    XamarinAndroidBuild.ExtractJar(dependency, classesDir);
                 }
             }
 
