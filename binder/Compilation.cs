@@ -279,6 +279,44 @@ namespace MonoEmbeddinator4000
                         }
                     }
                 }
+
+                //Look for other JAR file dependencies from the user's assemblies
+                foreach(var dependency in Directory.GetFiles(Path.Combine(Options.OutputDir, XamarinAndroidBuild.IntermediateDir), "*.jar", SearchOption.AllDirectories))
+                {
+                    Diagnostics.Warning("Jar File: {0}", dependency);
+
+                    using (var stream = File.OpenRead(dependency))
+                    using (var zip = new ZipArchive(stream))
+                    {
+                        foreach (var entry in zip.Entries)
+                        {
+                            //Skip META-INF
+                            if (entry.FullName.StartsWith("META-INF", StringComparison.Ordinal))
+                                continue;
+
+                            var entryPath = Path.Combine(classesDir, entry.FullName);
+
+                            if (string.IsNullOrEmpty(entry.Name))
+                            {
+                                if (!Directory.Exists(entryPath))
+                                    Directory.CreateDirectory(entryPath);
+                            }
+                            else
+                            {
+                                //NOTE: not all JAR files have directory entries such as FormsViewGroup.jar
+                                var directoryPath = Path.GetDirectoryName(entryPath);
+                                if (!Directory.Exists(directoryPath))
+                                    Directory.CreateDirectory(directoryPath);
+
+                                using (var zipEntryStream = entry.Open())
+                                using (var fileStream = File.Create(entryPath))
+                                {
+                                    zipEntryStream.CopyTo(fileStream);
+                                }
+                            }
+                        }
+                    }
+                }
             }
 
             var invocation = string.Join(" ", args);
