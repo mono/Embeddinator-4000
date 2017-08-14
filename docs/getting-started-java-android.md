@@ -3,9 +3,7 @@
 In addition to the requirements from our [Getting started with Java](getting-started-java.md) guide you'll also need:
 
 * Xamarin.Android 7.4.99 or later (build from [Jenkins](https://jenkins.mono-project.com/view/Xamarin.Android/job/xamarin-android/lastSuccessfulBuild/Azure/))
-* Android Studio 2.3.x or later (with [Java 1.8](https://developer.android.com/guide/platform/j8-jack.html))
-
-*NOTE: the state of using Java 1.8 in Android Studio is currently in [flux](https://android-developers.googleblog.com/2017/03/future-of-java-8-language-feature.html) at the moment. At the time of writing, the best option is to enable the Jack toolchain in the stable version of Android Studio. Details below.*
+* [Android Studio 3.x](https://developer.android.com/studio/preview/index.html) with Java 1.8
 
 As an overview, we will:
 * Create a C# Android Library project
@@ -173,16 +171,11 @@ If you are looking for an additional walkthrough, check out this video embedding
 
 ## Using Java 1.8
 
-As of writing this, the best option is to use Android Studio 2.3.x stable and enable the Jack toolchain.
+As of writing this, the best option is to use Android Studio 3.0 beta ([download here](https://developer.android.com/studio/preview/index.html)).
 
-So in your app module's `build.gradle` file:
+To enable Java 1.8 in your app module's `build.gradle` file:
 ```groovy
 android {
-    // ..
-    defaultConfig {
-        // ...
-        jackOptions.enabled true
-    }
     // ...
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -192,7 +185,16 @@ android {
 ```
 You can also take a look at our Android Studio test project [here](https://github.com/mono/Embeddinator-4000/blob/master/tests/android/app/build.gradle) for more details.
 
-Eventually Android Studio 3.0 should be the preferred option; however, Android Studio 3.0 currently has the limitation of not being able to use local AAR files. See an issue on this [here](https://github.com/mono/Embeddinator-4000/issues/448).
+If you are wanting to use Android Studio 2.3.x stable, you will have to enable the deprecated Jack toolchain:
+```groovy
+android {
+    // ..
+    defaultConfig {
+        // ...
+        jackOptions.enabled true
+    }
+}
+```
 
 ## Current Limitations on Android
 
