@@ -160,7 +160,7 @@ namespace MonoEmbeddinator4000
                 return Combine(toolchains.OrderByDescending(t => t.Version).Select(t => t.Directory).First(), "MSBuild.exe");
             }
 
-            throw new NotImplementedException();
+            return "/usr/bin/msbuild";
         });
 
         public static string MSBuildPath

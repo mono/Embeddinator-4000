@@ -647,6 +647,14 @@ namespace MonoEmbeddinator4000
                 }
                 return true;
             }
+            else
+            {
+                switch (Options.Compilation.Platform)
+                {
+                case TargetPlatform.Android:
+                    return CompileNDK(files);
+                }
+            }
 
             throw new NotImplementedException();
         }
