@@ -105,3 +105,5 @@ workspace "Embeddinator-4000"
       "System.Xml.Linq"
     }
 
+-- Override VS solution generation so we do not generate anything.
+--premake.override(premake.vstudio.vs2005, "generateSolution", function(base, wks) end)
