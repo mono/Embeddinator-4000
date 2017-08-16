@@ -6,7 +6,7 @@ workspace "mk"
   symbols "On"
   location "mk"
   SetupTestProjectC("common")
-  if os.is("macosx") then
+  if os.ishost("macosx") then
   SetupTestProjectObjC("common")
   end
   SetupTestProjectsRunner("common")
