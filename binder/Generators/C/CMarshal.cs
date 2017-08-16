@@ -148,7 +148,8 @@ namespace MonoEmbeddinator4000.Generators
         {
             var pointee = pointer.Pointee;
 
-            if (pointee.IsPrimitiveType(out PrimitiveType primitive))
+            PrimitiveType primitive;
+            if (pointee.IsPrimitiveType(out primitive))
             {
                 Context.Return.Write("{0}", Context.ArgName);
                 return true;
