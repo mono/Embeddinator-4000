@@ -231,9 +231,16 @@ namespace MonoEmbeddinator4000
                 XamarinAndroidBuild.ExtractJar(monoAndroidJar, classesDir);
 
                 //Look for other JAR file dependencies from the user's assemblies
-                foreach(var dependency in Directory.GetFiles(Path.Combine(Options.OutputDir, XamarinAndroidBuild.IntermediateDir), "*.jar", SearchOption.AllDirectories))
+                foreach(var assembly in Assemblies)
                 {
-                    XamarinAndroidBuild.ExtractJar(dependency, classesDir);
+                    var intermediateDir = Path.Combine(Options.OutputDir, XamarinAndroidBuild.IntermediateDir, Path.GetFileNameWithoutExtension(assembly.Location));
+                    if (Directory.Exists(intermediateDir))
+                    {
+                        foreach (var dependency in Directory.GetFiles(intermediateDir, "*.jar", SearchOption.AllDirectories))
+                        {
+                            XamarinAndroidBuild.ExtractJar(dependency, classesDir);
+                        }
+                    }
                 }
             }
 
