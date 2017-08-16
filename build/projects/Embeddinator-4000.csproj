@@ -45,14 +45,19 @@
     <Reference Include="Microsoft.Build" />
     <Reference Include="Microsoft.Build.Framework" />
     <Reference Include="Mono.Cecil">
-      <HintPath Condition="Exists('../packages/Mono.Cecil.0.9.6.4/lib/net10/Mono.Cecil.dll')">../packages/Mono.Cecil.0.9.6.4/lib/net10/Mono.Cecil.dll</HintPath>
-      <HintPath Condition="Exists('../packages/Mono.Cecil.0.9.6.4/lib/net11/Mono.Cecil.dll')">../packages/Mono.Cecil.0.9.6.4/lib/net11/Mono.Cecil.dll</HintPath>
-      <HintPath Condition="Exists('../packages/Mono.Cecil.0.9.6.4/lib/net20/Mono.Cecil.dll')">../packages/Mono.Cecil.0.9.6.4/lib/net20/Mono.Cecil.dll</HintPath>
-      <HintPath Condition="Exists('../packages/Mono.Cecil.0.9.6.4/lib/net30/Mono.Cecil.dll')">../packages/Mono.Cecil.0.9.6.4/lib/net30/Mono.Cecil.dll</HintPath>
-      <HintPath Condition="Exists('../packages/Mono.Cecil.0.9.6.4/lib/net35/Mono.Cecil.dll')">../packages/Mono.Cecil.0.9.6.4/lib/net35/Mono.Cecil.dll</HintPath>
-      <HintPath Condition="Exists('../packages/Mono.Cecil.0.9.6.4/lib/net40/Mono.Cecil.dll')">../packages/Mono.Cecil.0.9.6.4/lib/net40/Mono.Cecil.dll</HintPath>
-      <HintPath Condition="Exists('../packages/Mono.Cecil.0.9.6.4/lib/net45/Mono.Cecil.dll')">../packages/Mono.Cecil.0.9.6.4/lib/net45/Mono.Cecil.dll</HintPath>
-      <HintPath Condition="Exists('../packages/Mono.Cecil.0.9.6.4/lib/net46/Mono.Cecil.dll')">../packages/Mono.Cecil.0.9.6.4/lib/net46/Mono.Cecil.dll</HintPath>
+      <HintPath>../packages/Mono.Cecil.0.9.6.4/lib/net45/Mono.Cecil.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Mono.Cecil.Mdb">
+      <HintPath>../packages/Mono.Cecil.0.9.6.4/lib/net45/Mono.Cecil.Mdb.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Mono.Cecil.Pdb">
+      <HintPath>../packages/Mono.Cecil.0.9.6.4/lib/net45/Mono.Cecil.Pdb.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Mono.Cecil.Rocks">
+      <HintPath>../packages/Mono.Cecil.0.9.6.4/lib/net45/Mono.Cecil.Rocks.dll</HintPath>
       <Private>True</Private>
     </Reference>
   </ItemGroup>
@@ -177,6 +182,7 @@
     <Compile Include="../../binder/Utils/XamarinAndroidBuild.cs">
       <Link>binder/Utils/XamarinAndroidBuild.cs</Link>
     </Compile>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="IKVM.Reflection.csproj">
