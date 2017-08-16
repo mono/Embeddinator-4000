@@ -35,7 +35,7 @@ Feel free to join us at our [#managed-interop](https://gitter.im/managed-interop
 
 Clone this repository and initialize/update submodules as well as solution depends on them.
 
-Open the solution in `build/Embeddinator-4000.sln` with Visual Studio or Xamarin Studio and press F7.
+Open the solution file `Embeddinator-4000.sln` with Visual Studio or Xamarin Studio and press F7.
 
 ## Usage
 
