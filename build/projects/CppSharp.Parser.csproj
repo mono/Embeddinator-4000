@@ -46,6 +46,9 @@
     <Compile Include="../../external/CppSharp/src/Parser/ASTConverter.cs">
       <Link>ASTConverter.cs</Link>
     </Compile>
+    <Compile Include="../../external/CppSharp/src/Parser/BuildConfig.cs">
+      <Link>BuildConfig.cs</Link>
+    </Compile>
     <Compile Include="../../external/CppSharp/src/Parser/Parser.cs">
       <Link>Parser.cs</Link>
     </Compile>
@@ -57,9 +60,6 @@
     </Compile>
     <Compile Include="../../external/CppSharp/src/Parser/TargetTriple.cs">
       <Link>TargetTriple.cs</Link>
-    </Compile>
-    <Compile Include="../../external/CppSharp/build/vs2015/BuildConfig.cs">
-      <Link>external/CppSharp/build/vs2015/BuildConfig.cs</Link>
     </Compile>
   </ItemGroup>
   <ItemGroup>

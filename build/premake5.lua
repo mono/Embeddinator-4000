@@ -58,6 +58,7 @@ workspace "Embeddinator-4000"
   include ("../binder")
 
   function include_cppsharp_project(name)
+    generate_build_config = false
     include("../external/CppSharp/src/" .. name)
     location ("%{wks.location}/build/projects")
   end
