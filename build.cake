@@ -74,7 +74,8 @@ void Gradle(string args)
 Task("Clean")
     .Does(() =>
     {
-        CleanDirectory(buildDir);
+        CleanDirectory("./build/lib");
+        CleanDirectory("./build/obj");
         CleanDirectories(GetDirectories("./tests/**/obj"));
         CleanDirectories(GetDirectories("./tests/**/bin"));
         CleanDirectories(GetDirectories("./tests/android/**/build"));
