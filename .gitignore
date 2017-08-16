@@ -37,6 +37,7 @@ bindings.m
 /external/jna
 /external/ikvm
 packages
+.nuget/.nugetapikey
 
 ### Xcode ###
 DerivedData/
