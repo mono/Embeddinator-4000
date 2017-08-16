@@ -16,7 +16,7 @@ function managed_project(name)
   end
 
   language "C#"
-  location ("%{wks.location}/projects")
+  location ("%{wks.location}/build/projects")
 
   if not os.istarget("macosx") then
     filter { "action:vs*" }
@@ -50,8 +50,8 @@ workspace "Embeddinator-4000"
   local action = _OPTIONS["outdir"] or _ACTION
   location (action)
 
-  objdir (path.join("./", action, "obj"))
-  targetdir (path.join("./", action, "lib", "%{cfg.buildcfg}"))
+  objdir ("%{wks.location}/build/obj")
+  targetdir ("%{wks.location}/build/lib/%{cfg.buildcfg}")
 
   startproject "Embeddinator-4000"
 
@@ -59,6 +59,7 @@ workspace "Embeddinator-4000"
 
   function include_cppsharp_project(name)
     include("../external/CppSharp/src/" .. name)
+    location ("%{wks.location}/build/projects")
   end
 
   include_cppsharp_project("Core")
