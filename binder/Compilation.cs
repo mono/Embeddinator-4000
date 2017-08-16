@@ -217,9 +217,10 @@ namespace MonoEmbeddinator4000
             }
 
             //Embed JNA into our jar file
+            //  If on Android, we do not need any native libraries
             var jnaJar = Path.Combine(FindDirectory("external"), "jna", "jna-4.4.0.jar");
             var filter = Options.Compilation.Platform == TargetPlatform.Android ?
-                         entry => !entry.Name.EndsWith(".so", StringComparison.Ordinal) :
+                         entry => entry.Name.EndsWith(".class", StringComparison.Ordinal) :
                          default(Func<ZipArchiveEntry, bool>);
             XamarinAndroidBuild.ExtractJar(jnaJar, classesDir, filter);
 
