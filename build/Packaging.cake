@@ -1,5 +1,7 @@
 #!mono .cake/Cake/Cake.exe
 
+var version = Argument("version", "0.1");
+
 Task("Create-Package")
     .IsDependentOn("Build-Binder")
     .Does(() =>

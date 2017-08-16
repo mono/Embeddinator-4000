@@ -1,3 +1,11 @@
+var buildDir = Directory("./build/lib") + Directory(configuration);
+var embeddinator = buildDir + File("Embeddinator-4000.exe");
+
+var androidDll = Directory("./tests/managed/android/bin") + Directory(configuration) + File("managed.dll");
+var fsharpAndroidDll = Directory("./tests/managed/fsharp-android/bin") + Directory(configuration) + File("managed.dll");
+var pclDll = Directory("./tests/managed/pcl/bin") + Directory(configuration) + File("managed.dll");
+var netStandardDll = Directory("./tests/managed/netstandard/bin") + Directory(configuration) + File("netstandard1.6/managed.dll");
+
 //NOTE: this is a temporary task for downloading a Jenkins build of Xamarin.Android
 Task("Download-Xamarin-Android")
     .Does(() =>

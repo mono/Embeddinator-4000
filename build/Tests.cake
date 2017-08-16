@@ -1,8 +1,4 @@
 var managedDll = Directory("./tests/managed/generic/bin") + Directory(configuration) + File("managed.dll");
-var androidDll = Directory("./tests/managed/android/bin") + Directory(configuration) + File("managed.dll");
-var pclDll = Directory("./tests/managed/pcl/bin") + Directory(configuration) + File("managed.dll");
-var netStandardDll = Directory("./tests/managed/netstandard/bin") + Directory(configuration) + File("netstandard1.6/managed.dll");
-var fsharpAndroidDll = Directory("./tests/managed/fsharp-android/bin") + Directory(configuration) + File("managed.dll");
 
 /// ---------------------------
 /// Managed test projects
@@ -136,7 +132,7 @@ if (IsRunningOnWindows())
     if (string.IsNullOrEmpty(javaHome))
         throw new Exception("Cannot find Java SDK: JAVA_HOME environment variable is not set.");
 }
-else
+else if (FileExists("/usr/libexec/java_home"))
 {
     using (var process = StartAndReturnProcess("/usr/libexec/java_home", new ProcessSettings { RedirectStandardOutput = true }))
     {
@@ -144,6 +140,10 @@ else
 
         javaHome = process.GetStandardOutput().First().Trim();
     }
+}
+else
+{
+    javaHome = EnvironmentVariable("JAVA_HOME");
 }
 
 var classPath = string.Join(IsRunningOnWindows() ? ";" : ":", new[]
