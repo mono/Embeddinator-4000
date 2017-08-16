@@ -16,6 +16,7 @@ function managed_project(name)
   end
 
   language "C#"
+  location ("%{wks.location}/projects")
 
   if not os.istarget("macosx") then
     filter { "action:vs*" }
@@ -106,4 +107,4 @@ workspace "Embeddinator-4000"
     }
 
 -- Override VS solution generation so we do not generate anything.
---premake.override(premake.vstudio.vs2005, "generateSolution", function(base, wks) end)
+premake.override(premake.vstudio.vs2005, "generateSolution", function(base, wks) end)
