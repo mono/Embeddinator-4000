@@ -182,8 +182,6 @@ mono_embeddinator_dylib_mono_free (struct DylibMono *mono_imports);
 MONO_EMBEDDINATOR_API int
 mono_embeddinator_dylib_mono_init (struct DylibMono *mono_imports, const char *libmono_path);
 
-#endif
-
 #include <mono/jit/jit.h>
 #include <mono/metadata/mono-config.h>
 #include <mono/metadata/assembly.h>
@@ -204,6 +202,8 @@ mono_threads_detach_coop (gpointer cookie, gpointer *dummy);
 #define MONO_THREAD_DETACH \
 		mono_threads_detach_coop (__thread_cookie, &__thread_dummy); \
 	} while (0)
+
+#endif
 
 #ifndef MONODECIMAL
 #define MONODECIMAL
