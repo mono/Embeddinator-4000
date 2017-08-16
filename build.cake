@@ -51,4 +51,8 @@ Task("AppVeyor")
     .IsDependentOn("Generate-Android-FSharp")
     .IsDependentOn("Build-CSharp-Tests");
 
+Task("Travis")
+    .IsDependentOn("Build-Binder")
+    .IsDependentOn("Build-C-Tests");
+
 RunTarget(target);
