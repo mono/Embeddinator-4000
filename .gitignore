@@ -39,7 +39,6 @@ bindings.m
 packages
 
 ### Xcode ###
-build/
 DerivedData/
 *.pbxuser
 !default.pbxuser
