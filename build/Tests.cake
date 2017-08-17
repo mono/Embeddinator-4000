@@ -97,7 +97,8 @@ Task("Build-C-Tests")
         // Execute the build files.
         if (IsRunningOnWindows())
             MSBuild(mkDir + File("mk.sln"), settings =>
-                settings.SetConfiguration(configuration).SetVerbosity(Verbosity.Minimal));
+                settings.SetConfiguration(configuration).SetVerbosity(Verbosity.Minimal)
+                        .SetPlatformTarget(PlatformTarget.Win32));
         else
         {
             var envVars = new Dictionary<string, string> ();
