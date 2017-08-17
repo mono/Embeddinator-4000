@@ -53,5 +53,5 @@ install:
 
 build_script:
   - cmd: git submodule update --init --recursive
-  - cmd: %comspec% /k "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars32.bat"
+  - cmd: call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars32.bat"
   - ps: .\build.ps1 -t AppVeyor -v diagnostic
