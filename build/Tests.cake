@@ -101,6 +101,8 @@ Task("Build-C-Tests")
         else
         {
             var envVars = new Dictionary<string, string> ();
+            if (TravisCI.IsRunningOnTravisCI)
+            envVars.Add("verbose", "true");
             var settings = new ProcessSettings
             {
                 Arguments = $"-C {mkDir}",
