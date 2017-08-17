@@ -58,63 +58,65 @@ namespace ObjC {
 				var delayed = new List<Exception> ();
 
 				var attrib = t.GetCustomAttributesData ().SingleOrDefault (a => a.AttributeType.Name.Equals ("RegisterAttribute"));
-				var argsCount = attrib.ConstructorArguments.Count;
-				switch (argsCount) {
-				// case 0 is considered invalid for use here, so handle it the same as the default case.
-				case 1:
-				case 2: {
-						// Since we aren't enforcing RegisterAttribute come from 
-						// a Xamarin-provided assembly, check to ensure the RA we
-						// found conforms to our expectations.
-						var arg = attrib.ConstructorArguments [0].ArgumentType;
-						if (Type.GetTypeCode (arg) == TypeCode.String) {
-							name = (string)attrib.ConstructorArguments [0].Value;
-						} else {
-							delayed.Add (ErrorHelper.CreateWarning (1060, $"Invalid RegisterAttribute found on class '{t.FullName}'. Expected the first constructor parameter to be of type `string` but found type `{arg.FullName}` instead."));
-						}
-						break;
-					}
-				default:
-					delayed.Add (ErrorHelper.CreateWarning (1061, $"Invalid RegisterAttribute found on class '{t.FullName}'. Expected a constructor with either 1 or 2 parameters but found {argsCount} instead."));
-					break;
-				}
-				// Handle cases where some used named properties.
-				// If they mixed both positional and named params,
-				// then assume the more specific one (the named)
-				// parameter is correct, and issue a warning.
-				if (attrib.NamedArguments.Any (a => !a.IsField)) {
-					foreach (var prop in attrib.NamedArguments) {
-						var propName = prop.MemberName;
-						switch (propName) {
-						case "IsWrapper":
-							continue; // Intentionally ignore.
-						case "Name":
-							if (string.IsNullOrWhiteSpace (name)) {
-								name = (string)prop.TypedValue.Value;
+				if (attrib != null) {
+					var argsCount = attrib.ConstructorArguments.Count;
+					switch (argsCount) {
+					// case 0 is considered invalid for use here, so handle it the same as the default case.
+					case 1:
+					case 2: {
+							// Since we aren't enforcing RegisterAttribute come from 
+							// a Xamarin-provided assembly, check to ensure the RA we
+							// found conforms to our expectations.
+							var arg = attrib.ConstructorArguments [0].ArgumentType;
+							if (Type.GetTypeCode (arg) == TypeCode.String) {
+								name = (string)attrib.ConstructorArguments [0].Value;
 							} else {
-								var propVal = (string)prop.TypedValue.Value;
-								if (!name.Equals (propVal)) {
-									delayed.Add (ErrorHelper.CreateWarning (1062, $"Invalid RegisterAttribute found on class '{t.FullName}'. Conflicting values specified for 'Name', using value of named parameter: '{propVal}' instead of constructor parameter: '{name}'."));
-								}
-								name = propVal;
+								delayed.Add (ErrorHelper.CreateWarning (1060, $"Invalid RegisterAttribute found on class '{t.FullName}'. Expected the first constructor parameter to be of type `string` but found type `{arg.FullName}` instead."));
 							}
 							break;
-						case "SkipRegistration":
-							delayed.Add (ErrorHelper.CreateWarning (1063, $"Invalid RegisterAttribute found on class '{t.FullName}'. SkipRegistration is not supported, and will be ignored."));
-							break;
-						default:
-							delayed.Add (ErrorHelper.CreateWarning (1064, $"Invalid RegisterAttribute found on class '{t.FullName}'. Named parameter {propName} is not supported and will be ignored."));
-							break;
+						}
+					default:
+						delayed.Add (ErrorHelper.CreateWarning (1061, $"Invalid RegisterAttribute found on class '{t.FullName}'. Expected a constructor with either 1 or 2 parameters but found {argsCount} instead."));
+						break;
+					}
+					// Handle cases where some used named properties.
+					// If they mixed both positional and named params,
+					// then assume the more specific one (the named)
+					// parameter is correct, and issue a warning.
+					if (attrib.NamedArguments.Any (a => !a.IsField)) {
+						foreach (var prop in attrib.NamedArguments) {
+							var propName = prop.MemberName;
+							switch (propName) {
+							case "IsWrapper":
+								continue; // Intentionally ignore.
+							case "Name":
+								if (string.IsNullOrWhiteSpace (name)) {
+									name = (string)prop.TypedValue.Value;
+								} else {
+									var propVal = (string)prop.TypedValue.Value;
+									if (!name.Equals (propVal)) {
+										delayed.Add (ErrorHelper.CreateWarning (1062, $"Invalid RegisterAttribute found on class '{t.FullName}'. Conflicting values specified for 'Name', using value of named parameter: '{propVal}' instead of constructor parameter: '{name}'."));
+									}
+									name = propVal;
+								}
+								break;
+							case "SkipRegistration":
+								delayed.Add (ErrorHelper.CreateWarning (1063, $"Invalid RegisterAttribute found on class '{t.FullName}'. SkipRegistration is not supported, and will be ignored."));
+								break;
+							default:
+								delayed.Add (ErrorHelper.CreateWarning (1064, $"Invalid RegisterAttribute found on class '{t.FullName}'. Named parameter {propName} is not supported and will be ignored."));
+								break;
+							}
 						}
 					}
-				}
-				if (!string.IsNullOrWhiteSpace (name)) {
+					if (!string.IsNullOrWhiteSpace (name)) {
+						ErrorHelper.Show (delayed);
+						return name;
+					}
+					// Fall back to the default strategy.
+					delayed.Add (ErrorHelper.CreateWarning (1065, $"Invalid RegisterAttribute found on class '{t.FullName}'. No name argument for was provided to the constructor via either position or named parameter. Will use the default class naming convention instead."));
 					ErrorHelper.Show (delayed);
-					return name;
 				}
-				// Fall back to the default strategy.
-				delayed.Add (ErrorHelper.CreateWarning (1065, $"Invalid RegisterAttribute found on class '{t.FullName}'. No name argument for was provided to the constructor via either position or named parameter. Will use the default class naming convention instead."));
-				ErrorHelper.Show (delayed);
 			}
 			return t.FullName.Replace ('.', '_').Replace ("+", "_");
 		}
