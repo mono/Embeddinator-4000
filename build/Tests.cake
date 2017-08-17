@@ -99,7 +99,15 @@ Task("Build-C-Tests")
             MSBuild(mkDir + File("mk.sln"), settings =>
                 settings.SetConfiguration(configuration).SetVerbosity(Verbosity.Minimal));
         else
-            Exec("make", $"-C {mkDir}");
+        {
+            var envVars = new Dictionary<string, string> ();
+            var settings = new ProcessSettings
+            {
+                Arguments = $"-C {mkDir}",
+                EnvironmentVariables = envVars
+            };
+            Exec("make", settings);
+        }
     });
 
 Task("Run-C-Tests")

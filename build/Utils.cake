@@ -1,3 +1,15 @@
+void Exec(string path, ProcessSettings settings)
+{
+    if (path.EndsWith(".exe") && !IsRunningOnWindows())
+    {
+        settings.Arguments.Prepend(path + " ");
+        path = "mono";
+    }
+    var exitCode = StartProcess(path, settings);
+    if (exitCode != 0)
+        throw new Exception(path + " failed!");
+}
+
 void Exec(string path, string args = "", string workingDir = ".")
 {
     var settings = new ProcessSettings
@@ -5,14 +17,7 @@ void Exec(string path, string args = "", string workingDir = ".")
         Arguments = args,
         WorkingDirectory = workingDir,
     };
-    if (path.EndsWith(".exe") && !IsRunningOnWindows())
-    {
-        settings.Arguments = path + " " + args;
-        path = "mono";
-    }
-    var exitCode = StartProcess(path, settings);
-    if (exitCode != 0)
-        throw new Exception(path + " failed!");
+    Exec(path, settings);
 }
 
 void Premake(string file, string args, string action)
