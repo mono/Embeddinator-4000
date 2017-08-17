@@ -125,7 +125,7 @@ Task("Run-C-Tests")
     .Does(() =>
     {
         var binDir = Directory($"./{mkDir}/bin/{configuration}");
-        Exec(binDir + File("common.Tests"));
+        Exec(binDir + File("common.Tests" + (IsRunningOnWindows() ? ".exe" : string.Empty)));
     });
 
 /// ---------------------------
