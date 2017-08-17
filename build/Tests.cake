@@ -82,7 +82,7 @@ Task("Generate-C")
     {
         var platform = IsRunningOnWindows() ? "Windows" : "macOS";
         var output = commonDir + Directory("c");
-        Exec(embeddinator, $"-gen=c -out={output} -platform={platform} -compile -target=shared {managedDll}");
+        Exec(embeddinator, $"-gen=c -out={output} -platform={platform} -compile -target=shared -verbose {managedDll}");
     });
 
 Task("Build-C-Tests")
