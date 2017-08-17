@@ -122,13 +122,13 @@ Task("Build-C-Tests")
         if (IsRunningOnWindows())
         {
             var monoDir = @"C:\Program Files (x86)\Mono";
+            var monoLib = "mono-2.0-sgen.dll";
 
             // Copy the Mono runtime DLL to the output folder.
-            var monoDll = $"{monoDir}\\bin\\mono-2.0-sgen.dll";
-            System.IO.File.Copy(monoDll, $"{mkDir}\\bin\\{configuration}\\{monoDll}");
+            System.IO.File.Copy($"{monoDir}\\bin\\{monoLib}", $"{mkDir}\\bin\\{configuration}\\{monoLib}");
 
             // Create a symbolic link to the Mono class libraries directory.
-            Exec("mklink", $"/D \"{mkDir}\\bin\\lib\" \"{monoDir}\\lib\"");
+            Exec("cmd.exe", $"/c mklink /D \"{mkDir}\\bin\\lib\" \"{monoDir}\\lib\"");
         }
     });
 
