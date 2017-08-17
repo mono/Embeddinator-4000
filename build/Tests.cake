@@ -118,6 +118,18 @@ Task("Build-C-Tests")
         // Copy the managed test DLL to the output folder.
         System.IO.File.Copy(managedDll, $"{mkDir}/bin/{configuration}/" +
             System.IO.Path.GetFileName(managedDll));
+
+        if (IsRunningOnWindows())
+        {
+            var monoDir = @"C:\Program Files (x86)\Mono";
+
+            // Copy the Mono runtime DLL to the output folder.
+            var monoDll = $"{monoDir}\\bin\\mono-2.0-sgen.dll";
+            System.IO.File.Copy(monoDll, $"{mkDir}\\bin\\{configuration}\\{monoDll}");
+
+            // Create a symbolic link to the Mono class libraries directory.
+            Exec("mklink", $"/D \"{mkDir}\\bin\\lib\" \"{monoDir}\\lib\"");
+        }
     });
 
 Task("Run-C-Tests")
