@@ -14,6 +14,9 @@ Task("Clean")
     {
         CleanDirectory("./build/lib");
         CleanDirectory("./build/obj");
+        CleanDirectories("./tests/common/c");
+        CleanDirectories("./tests/common/java");
+        CleanDirectories("./tests/common/mk");
         CleanDirectories(GetDirectories("./tests/**/obj"));
         CleanDirectories(GetDirectories("./tests/**/bin"));
         CleanDirectories(GetDirectories("./tests/android/**/build"));
