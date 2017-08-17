@@ -2,7 +2,7 @@ include "Helpers.lua"
 include "../../build/Tests.lua"
 
 workspace "mk"
-  configurations { "Debug" }
+  configurations { "Debug", "Release" }
   symbols "On"
   location "mk"
   SetupTestProjectC("common")

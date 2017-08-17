@@ -72,13 +72,16 @@ Task("Run-CSharp-Tests")
 /// C tests
 /// ---------------------------
 
+var commonDir = Directory("./tests/common");
+var mkDir = commonDir + Directory("mk");
+
 Task("Generate-C")
     .IsDependentOn("Build-Binder")
     .IsDependentOn("Build-Managed")
     .Does(() =>
     {
         var platform = IsRunningOnWindows() ? "Windows" : "macOS";
-        var output = buildDir + Directory("c");
+        var output = commonDir + Directory("c");
         Exec(embeddinator, $"-gen=c -out={output} -platform={platform} -compile -target=shared {managedDll}");
     });
 
@@ -86,23 +89,23 @@ Task("Build-C-Tests")
     .IsDependentOn("Generate-C")
     .Does(() =>
     {
-        var commonDir = Directory("./tests/common");
-
         // Generate native project build files using Premake.
         var os = IsRunningOnWindows() ? "--os=windows" : "--os=macosx";
         var action = IsRunningOnWindows() ? "vs2015" : "gmake";
         Premake(commonDir + File("premake5.lua"), os, action);
 
         // Execute the build files.
-        var mkDir = commonDir + Directory("mk");
         if (IsRunningOnWindows())
             MSBuild(mkDir + File("mk.sln"), settings =>
                 settings.SetConfiguration(configuration).SetVerbosity(Verbosity.Minimal));
         else
         {
             var envVars = new Dictionary<string, string> ();
+            envVars.Add("config", configuration.ToLowerInvariant());
+
             if (TravisCI.IsRunningOnTravisCI)
-            envVars.Add("verbose", "true");
+                envVars.Add("verbose", "true");
+
             var settings = new ProcessSettings
             {
                 Arguments = $"-C {mkDir}",
@@ -110,13 +113,17 @@ Task("Build-C-Tests")
             };
             Exec("make", settings);
         }
+
+        // Copy the managed test DLL to the output folder.
+        System.IO.File.Copy(managedDll, $"{mkDir}/bin/{configuration}/" +
+            System.IO.Path.GetFileName(managedDll));
     });
 
 Task("Run-C-Tests")
     .IsDependentOn("Build-C-Tests")
     .Does(() =>
     {
-        var binDir = Directory("./tests/common/mk/bin/Debug");
+        var binDir = Directory($"./{mkDir}/bin/{configuration}");
         Exec(binDir + File("common.Tests"));
     });
 
