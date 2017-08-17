@@ -70,8 +70,6 @@ int             mono_array_element_size (MonoClass *ac);
 
 MONO_EMBEDDINATOR_END_DECLS
 
-#else
-
 /* This is copied from glib's header files */
 
 typedef void * gpointer;
@@ -108,6 +106,8 @@ typedef struct _MonoClassField MonoClassField;
 
 /* metadata/debug-helpers.h */
 typedef struct MonoMethodDesc MonoMethodDesc;
+
+#elif !defined(_WIN32)
 
 typedef MonoMethodDesc* (*_mono_method_desc_new_fptr) (const char *name, mono_bool include_namespace);
 typedef void            (*_mono_method_desc_free_fptr) (MonoMethodDesc *desc);
