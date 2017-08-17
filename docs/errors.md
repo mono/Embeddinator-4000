@@ -217,6 +217,53 @@ Selectors on the [NSObjectProtocol](https://developer.apple.com/reference/object
 
 Note: The list of reserved selectors will evolve with new versions of the tool.
 
+<h3><a name="EM1060"/>Invalid `RegisterAttribute` found on class `T`. Expected the first constructor parameter to be of type `string` but found type `U` instead.</h3>
+
+This is a **warning** that the class `T` was decorated with a `RegisterAttribute`, indicating the author wishes to rename the name of generated objective-c class.
+
+When either one or two arguments are passed into the constructor, the first must be of type `System.String` but in this case, some other type was provided instead. For this to happen, the `RegisterAttribute` did not come from Xamarin.iOS or Xamarin.Mac.
+
+If an argument was not also passed for named parameter "Name" then the class will be named according to the default convention.
+
+<h3><a name="EM1061"/>Invalid `RegisterAttribute` found on class `T`. Expected a constructor with either 1 or 2 parameters but found {argsCount} instead..</h3>
+
+This is a **warning** that the class `T` was decorated with a `RegisterAttribute`, indicating the author wishes to rename the name of generated objective-c class.
+
+Either one or two arguments are passed into the constructor, the first must be of type `System.String`. In this case, {argsCount} were found instead. For this to happen, the `RegisterAttribute` did not come from Xamarin.iOS or Xamarin.Mac.
+
+If an argument was not also passed for named parameter "Name" then the class will be named according to the default convention.
+
+<h3><a name="EM1062"/>Invalid `RegisterAttribute` found on class `T`. Conflicting values specified for `Name`, using value of named parameter: '{propVal}' instead of constructor parameter: '{name}'.</h3>
+
+This is a **warning** that the class `T` was decorated with a `RegisterAttribute`, indicating the author wishes to rename the name of generated objective-c class.
+
+However, two conflicting values were given for 'Name': one as a positional argument, the other as a named parameter. For example, consider: `[Register("myFoo", Name = "foo")]`.
+
+The value of the named parameter, 'foo' will be used instead of value provided to the positional parameter: 'myFoo'. If that is not the value intended, remove the named argument.
+
+<h3><a name="EM1063"/>Invalid `RegisterAttribute` found on class `T`. Named parameter `SkipRegistration` is not supported and will be ignored.</h3>
+
+This is a **warning** that the class `T` was decorated with a `RegisterAttribute`, indicating the author wishes to rename the name of generated objective-c class.
+
+Users already familiar with the `RegisterAttribute` might expect `SkipRegistration` to function is it does in Xamarin.iOS or Xamarin.Android. However, this is unsupported and the value of `SkipRegistration` will be ignored.
+
+This warning is informational only. If a custom class name was also passed either via positional argument or a named argument, then the value provided will still be used.
+
+<h3><a name="EM1064"/>Invalid `RegisterAttribute` found on class `T`. Named parameter {propName} is not supported and will be ignored.</h3>
+
+This is a **warning** that the class `T` was decorated with a `RegisterAttribute`, indicating the author wishes to rename the name of generated objective-c class.
+
+The `RegisterAttribute` decorating class `T` included named parameters which were unexpected and unsupported. For this to happen, the `RegisterAttribute` did not come from Xamarin.iOS or Xamarin.Mac.
+
+This warning is informational only. If a custom class name was also passed either via positional argument or a named argument, then the provided value will still be used.
+
+<h3><a name="EM1065"/>Invalid `RegisterAttribute` found on class `T`. No name argument for was provided to the constructor via positional or named parameters. Will use the default class naming convention instead.</h3>
+
+This is a **warning** that the class `T` was decorated with a `RegisterAttribute`, indicating the author wishes to rename the name of generated objective-c class.
+
+However, no value was actually provided to the attribute. This can happen when an attribute is provided without any arguments (`[Register]`).
+
+The class will be named as if it had not been decorated with `RegisterAttribute` to begin with.
 
 <!-- 2xxx: code generation -->
 
