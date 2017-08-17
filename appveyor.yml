@@ -21,7 +21,7 @@ branches:
 matrix:
   fast_finish: true
 
-os: Visual Studio 2017
+image: Visual Studio 2017
 
 platform:
   - x86
@@ -32,6 +32,8 @@ configuration:
 environment:
   MONO_INSTALLER: mono-5.0.1.1-gtksharp-2.12.44-win32-0.msi
   JAVA_HOME: C:\Program Files\Java\jdk1.8.0
+  NUGET_API_KEY:
+    secure: M7FCCdLkTgVrs4rejEtDi8yw6dAJxqFruJlUUWvR2B5f4ABB8SJCROdKaA6doRMV
 
 cache:
   - packages -> **\packages.config

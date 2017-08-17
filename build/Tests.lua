@@ -2,77 +2,17 @@
 
 local supportdir = path.getabsolute("../support")
 local catchdir = path.getabsolute("../external/catch")
-local exepath = "../../../build/lib/Debug/MonoEmbeddinator4000.exe"
-
-function SetupTestProject(name, extraFiles)
-  objdir("!obj")
-  targetdir "."
-
-  SetupTestProjectGenerator(name)
-  SetupTestProjectC(name)
-  SetupTestProjectObjC(name)
-  SetupTestProjectsCSharp(name, nil, extraFiles)
-  SetupTestProjectsRunner(name)
-end
+local exepath = "../../../build/lib/Debug/Embeddinator-4000.exe"
 
 function SetupManagedTestProject()
     kind "SharedLib"
     language "C#"  
     clr "Unsafe"
-    SetupManagedProject()
     location "mk"
 end
 
-function SetupTestProjectGenerator(name)
-  if os.is("windows") then
-    SetupTestProjectGeneratorVS(name)
-  else
-    SetupTestProjectGeneratorMake(name)
-  end
-end
-
-function SetupTestProjectGeneratorMake(name, dll)
-  project (name .. ".Gen")
-     location "mk"
-     kind "Makefile"
-     dependson (name .. ".Managed")
-
-     if dll == nil then
-       dll = name .. "Managed.dll"
-     end
-
-     buildcommands
-     {
-        "mono --debug " .. exepath .. " -gen=c -out=c -p=macos -compile -target=shared " .. dll,
-        "mono --debug " .. exepath .. " -gen=objc -out=objc -p=macos -compile -target=shared " .. dll,
-        "mono --debug " .. exepath .. " -gen=java -out=java -p=macos -target=shared " .. dll
-     }
-end
-
-function SetupTestProjectGeneratorVS(name, depends)
-  project(name .. ".Gen")
-    SetupManagedTestProject()
-    kind "ConsoleApp"
-    
-    files { name .. ".Gen.cs" }
-
-    dependson { name .. ".Managed" }
-
-    linktable = {
-      "System.Core",
-      "CppSharp.Generator",
-      "MonoEmbeddinator4000",
-    }
-
-    if depends ~= nil then
-      table.insert(linktable, depends .. ".Gen")
-    end
-
-    links(linktable)
-end
-
 function SetupTestGeneratorBuildEvent(name)
-  local runtimeExe = os.is("windows") and "" or "mono --debug "
+  local runtimeExe = os.ishost("windows") and "" or "mono --debug "
   if string.starts(action, "vs") then
     local exePath = SafePath("$(TargetDir)" .. name .. ".Gen.exe")
     prebuildcommands { runtimeExe .. exePath }
@@ -106,7 +46,7 @@ function SetupMono()
   includedirs { path.join(monoDir, "include", "mono-2.0") }
   monoLibdir = path.join(monoDir, "lib")
   libdirs { monoLibdir }
-  if(os.is("windows")) then
+  if(os.ishost("windows")) then
     libFiles = os.matchfiles(path.join(monoLibdir, "monosgen-2.0.lib"))
     table.insert(libFiles, os.matchfiles(path.join(monoLibdir, "mono-2.0-sgen.lib")))
     links { libFiles }
@@ -156,7 +96,7 @@ function SetupTestProjectC(name, depends)
 end
 
 function SetupTestProjectObjC(name, depends)
-  if string.starts(action, "vs") and not os.is("windows") then
+  if string.starts(action, "vs") and not os.ishost("windows") then
     return
   end
 
@@ -185,7 +125,7 @@ function SetupTestProjectObjC(name, depends)
 end
 
 function SetupTestProjectsCSharp(name, depends, extraFiles)
-  project(name .. ".Managed")
+  managed_project(name .. ".Managed")
     SetupManagedTestProject()
 
     files

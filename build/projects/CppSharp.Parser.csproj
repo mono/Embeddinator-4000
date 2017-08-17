@@ -46,6 +46,9 @@
     <Compile Include="../../external/CppSharp/src/Parser/ASTConverter.cs">
       <Link>ASTConverter.cs</Link>
     </Compile>
+    <Compile Include="../../external/CppSharp/src/Parser/BuildConfig.cs">
+      <Link>BuildConfig.cs</Link>
+    </Compile>
     <Compile Include="../../external/CppSharp/src/Parser/Parser.cs">
       <Link>Parser.cs</Link>
     </Compile>

@@ -1,1 +1,0 @@
-../external/CppSharp/build/premake5-osx --file=premake5.lua --outdir=. --os=macosx vs2015

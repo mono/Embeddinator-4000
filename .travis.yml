@@ -18,4 +18,4 @@ install:
   - source build/SetupCI.sh
 
 script: |
-  build/Compile.sh && tests/RunTestsuite.sh
+  ./build.sh -t Travis -v diagnostic

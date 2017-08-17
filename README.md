@@ -1,6 +1,6 @@
 ![Embeddinator-4000 Logo](e4000-logo.png)
 
-| windows-vs-x86            | osx-clang-x86               |
+| Windows                   | macOS                       |
 |---------------------------|-----------------------------|
 | [![windows-vs-x86][1]][2] | [![osx-clang-x86][3]][4]
 
@@ -35,18 +35,18 @@ Feel free to join us at our [#managed-interop](https://gitter.im/managed-interop
 
 Clone this repository and initialize/update submodules as well as solution depends on them.
 
-Open the solution in `build/MonoEmbeddinator4000.sln` with Visual Studio or Xamarin Studio and press F7.
+Open the solution file `Embeddinator-4000.sln` with Visual Studio or Xamarin Studio and press F7.
 
 ## Usage
 
-To generate bindings for a managed library you invoke the `MonoEmbeddinator4000.exe` command line tool.
+To generate bindings for a managed library you invoke the `Embeddinator-4000.exe` command line tool.
 
-_Important: please follow the instructions in `objcgen`'s [README](https://github.com/mono/Embeddinator-4000/blob/objc/objcgen/README.md) to use the new and improved Objective-C generator (will eventually fusion with `MonoEmbeddinator4000.exe`._
+_Important: please follow the instructions in `objcgen`'s [README](https://github.com/mono/Embeddinator-4000/blob/objc/objcgen/README.md) to use the new and improved Objective-C generator (will eventually fusion with `Embeddinator-4000.exe`._
 
 If you do not pass any arguments, you will get a list of the tool options:
 
 ```
-MonoEmbeddinator4000.exe [options]+ ManagedAssembly.dll
+Embeddinator-4000.exe [options]+ ManagedAssembly.dll
 Generates target language bindings for interop with managed code.
 
       --gen=VALUE            target generator (C, C++, Obj-C, Java)
@@ -67,5 +67,5 @@ Generates target language bindings for interop with managed code.
 To generate C bindings for a `Xamarin.Foo.dll` assembly you would call
 the tool like:
 
-`MonoEmbeddinator4000.exe -gen=c -out=foo Xamarin.Foo.dll`
+`Embeddinator-4000.exe -gen=c -out=foo Xamarin.Foo.dll`
 

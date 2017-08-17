@@ -37,9 +37,9 @@ bindings.m
 /external/jna
 /external/ikvm
 packages
+.nuget/.nugetapikey
 
 ### Xcode ###
-build/
 DerivedData/
 *.pbxuser
 !default.pbxuser
