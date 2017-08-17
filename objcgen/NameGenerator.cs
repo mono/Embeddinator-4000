@@ -53,6 +53,12 @@ namespace ObjC {
 
 		public static string GetObjCName (Type t)
 		{
+			if (t.IsClass) {
+				var ra = t.GetCustomAttributesData ().SingleOrDefault (a => a.AttributeType.Name.Equals ("RegisterAttribute"));
+				if (ra != null) {
+					return ra.ConstructorArguments.First ().Value.ToString ();
+				}                
+			}
 			return t.FullName.Replace ('.', '_').Replace ("+", "_");
 		}
 
