@@ -439,6 +439,9 @@ namespace MonoEmbeddinator4000
             List<ToolchainVersion> vsSdks;
             MSVCToolchain.GetVisualStudioSdks(out vsSdks);
 
+            foreach (var sdk in vsSdks)
+                System.Console.WriteLine($"{sdk.Version}: {sdk.Directory}");
+
             if (vsSdks.Count == 0)
                 throw new Exception("Visual Studio SDK was not found on your system.");
 
