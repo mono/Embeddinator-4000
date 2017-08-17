@@ -61,6 +61,7 @@ Task("AppVeyor")
 
 Task("Travis")
     .IsDependentOn("Build-Binder")
-    .IsDependentOn("Tests");
+    .IsDependentOn("Build-CSharp-Tests")
+    .IsDependentOn("Run-C-Tests");
 
 RunTarget(target);
