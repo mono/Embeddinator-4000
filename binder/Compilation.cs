@@ -439,8 +439,8 @@ namespace MonoEmbeddinator4000
             List<ToolchainVersion> vsSdks;
             MSVCToolchain.GetVisualStudioSdks(out vsSdks);
 
-            foreach (var sdk in vsSdks)
-                System.Console.WriteLine($"{sdk.Version}: {sdk.Directory}");
+            // Skip TestAgent VS instances as they do not provide native toolchains.
+            vsSdks = vsSdks.Where(sdk => !sdk.Directory.Contains("TestAgent")).ToList();
 
             if (vsSdks.Count == 0)
                 throw new Exception("Visual Studio SDK was not found on your system.");
