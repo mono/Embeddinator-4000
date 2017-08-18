@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MonoEmbeddinator4000.Tests
+namespace Embeddinator.Tests
 {
     public class EventArgsEmpty : EventArgs
     {

@@ -3,7 +3,7 @@ using CppSharp.AST;
 using CppSharp.AST.Extensions;
 using System.Linq;
 
-namespace MonoEmbeddinator4000.Generators
+namespace Embeddinator.Generators
 {
     public class CMarshalPrinter : MarshalPrinter<MarshalContext>
     {

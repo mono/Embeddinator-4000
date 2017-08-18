@@ -7,7 +7,7 @@ using CppSharp.AST;
 using CppSharp.AST.Extensions;
 using CppSharp.Generators;
 
-namespace MonoEmbeddinator4000.Generators
+namespace Embeddinator.Generators
 {
     [DebuggerDisplay("Decl = {Declaration}")]
     public class JavaSources : CodeGenerator

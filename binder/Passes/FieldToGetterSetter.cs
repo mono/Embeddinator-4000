@@ -2,7 +2,7 @@ using CppSharp;
 using CppSharp.AST;
 using CppSharp.Passes;
 
-namespace MonoEmbeddinator4000.Passes
+namespace Embeddinator.Passes
 {
     public class FieldToGetterSetterPropertyPass : TranslationUnitPass
     {

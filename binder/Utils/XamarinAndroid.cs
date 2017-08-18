@@ -6,7 +6,7 @@ using CppSharp;
 using Xamarin.Android.Tools;
 using static System.IO.Path;
 
-namespace MonoEmbeddinator4000
+namespace Embeddinator
 {
     /// <summary>
     /// Contains various path logic for Xamarin.Android

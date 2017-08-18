@@ -5,9 +5,9 @@ using CppSharp.AST;
 using CppSharp.Generators;
 using CppSharp.Passes;
 
-using MonoEmbeddinator4000.Passes;
+using Embeddinator.Passes;
 
-namespace MonoEmbeddinator4000.Generators
+namespace Embeddinator.Generators
 {
     public class JavaGenerator : Generator
     {

@@ -2,7 +2,7 @@
 using System.IO;
 using NUnit.Framework;
 
-namespace MonoEmbeddinator4000.Tests
+namespace Embeddinator.Tests
 {
     /// <summary>
     /// Base class for unit tests that handle deleting temporary files

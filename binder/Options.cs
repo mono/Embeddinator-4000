@@ -1,6 +1,6 @@
 using CppSharp;
 
-namespace MonoEmbeddinator4000
+namespace Embeddinator
 {
     public class Options : DriverOptions
     {

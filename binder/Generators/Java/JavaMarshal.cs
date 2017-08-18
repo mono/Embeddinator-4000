@@ -1,7 +1,7 @@
 ﻿﻿﻿using CppSharp.AST;
 using CppSharp.AST.Extensions;
 
-namespace MonoEmbeddinator4000.Generators
+namespace Embeddinator.Generators
 {
     public class JavaMarshalPrinter : CMarshalPrinter
     {

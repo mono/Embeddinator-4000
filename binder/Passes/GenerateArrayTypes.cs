@@ -1,10 +1,10 @@
 using CppSharp.AST;
 using CppSharp.AST.Extensions;
 using CppSharp.Passes;
-using MonoEmbeddinator4000.Generators;
+using Embeddinator.Generators;
 using System.Collections.Generic;
 
-namespace MonoEmbeddinator4000.Passes
+namespace Embeddinator.Passes
 {
     /// <summary>
     /// This pass is responsible for gathering a unique set of array types,
