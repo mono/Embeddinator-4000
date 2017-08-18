@@ -7,7 +7,7 @@ using CppSharp;
 using CppSharp.Generators;
 using NUnit.Framework;
 
-namespace MonoEmbeddinator4000.Tests
+namespace Embeddinator.Tests
 {
     /// <summary>
     /// A set of integration tests / approval tests verifying generated java code

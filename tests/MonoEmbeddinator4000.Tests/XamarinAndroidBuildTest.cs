@@ -3,7 +3,7 @@ using System.IO;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
 
-namespace MonoEmbeddinator4000.Tests
+namespace Embeddinator.Tests
 {
     [TestFixture]
     public class XamarinAndroidBuildTest : UniverseTest

@@ -5,7 +5,7 @@ using System.Linq;
 using CppSharp;
 using CppSharp.Generators;
 
-namespace MonoEmbeddinator4000
+namespace Embeddinator
 {
     public class CLI
     {

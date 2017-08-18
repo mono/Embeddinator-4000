@@ -3,7 +3,7 @@ using System.CodeDom.Compiler;
 using System.IO;
 using Microsoft.CSharp;
 
-namespace MonoEmbeddinator4000.Tests
+namespace Embeddinator.Tests
 {
     public static class AssemblyGenerator
     {

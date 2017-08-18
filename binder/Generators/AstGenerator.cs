@@ -7,7 +7,7 @@ using CppSharp.AST.Extensions;
 using CppSharp.Generators;
 using IKVM.Reflection;
 
-namespace MonoEmbeddinator4000.Generators
+namespace Embeddinator.Generators
 {
     public static class DeclarationExtensions
     {

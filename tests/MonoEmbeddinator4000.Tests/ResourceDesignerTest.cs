@@ -5,7 +5,7 @@ using IKVM.Reflection;
 using Microsoft.CSharp;
 using NUnit.Framework;
 
-namespace MonoEmbeddinator4000.Tests
+namespace Embeddinator.Tests
 {
     /// <summary>
     /// These are a set of integration/approval tests validating that we are getting expected C# code from ResourceDesignerGenerator

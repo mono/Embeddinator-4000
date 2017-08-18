@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MonoEmbeddinator4000.Tests.Samples
+namespace Embeddinator.Tests.Samples
 {
     public class Enums
     {

@@ -5,7 +5,7 @@ using System.IO;
 using System.Text;
 using CppSharp;
 
-namespace MonoEmbeddinator4000
+namespace Embeddinator
 {
     public static class StringExtensions
     {

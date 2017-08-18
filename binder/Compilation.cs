@@ -8,9 +8,9 @@ using CppSharp;
 using CppSharp.Generators;
 using Xamarin.Android.Tasks;
 using Xamarin.Android.Tools;
-using static MonoEmbeddinator4000.Helpers;
+using static Embeddinator.Helpers;
 
-namespace MonoEmbeddinator4000
+namespace Embeddinator
 {
     public partial class Driver
     {

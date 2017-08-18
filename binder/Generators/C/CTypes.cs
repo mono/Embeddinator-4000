@@ -3,7 +3,7 @@ using CppSharp.AST;
 using System;
 using System.Linq;
 
-namespace MonoEmbeddinator4000.Generators
+namespace Embeddinator.Generators
 {
     public class CManagedToNativeTypePrinter : CppTypePrinter
     {

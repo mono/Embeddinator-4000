@@ -4,9 +4,9 @@ using CppSharp.AST;
 using CppSharp.Generators;
 using CppSharp.Passes;
 using CppSharp.Utils;
-using MonoEmbeddinator4000.Generators;
+using Embeddinator.Generators;
 
-namespace MonoEmbeddinator4000.Passes
+namespace Embeddinator.Passes
 {
     public class GetReferencedDecls : TranslationUnitPass
     {
