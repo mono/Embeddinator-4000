@@ -207,11 +207,8 @@ namespace Embeddinator.Generators
             if (@class.IsAbstract)
                 keywords.Add("abstract");
 
-            if (@class.IsFinal)
+            if (@class.IsFinal || @class.IsStatic)
                 keywords.Add("final");
-
-            if (@class.IsStatic)
-                keywords.Add("static");
 
             keywords.Add(@class.IsInterface ? "interface" : "class");
             keywords.Add(@class.Name);
