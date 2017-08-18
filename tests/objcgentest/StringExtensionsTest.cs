@@ -1,7 +1,7 @@
 ﻿using NUnit.Framework;
 using System;
 
-using Embeddinator;
+using Embeddinator.ObjC;
 
 namespace ObjCGeneratorTest {
 

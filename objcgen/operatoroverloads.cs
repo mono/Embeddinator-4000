@@ -4,7 +4,7 @@ using System.Linq;
 using IKVM.Reflection;
 using Type = IKVM.Reflection.Type;
 
-namespace Embeddinator
+namespace Embeddinator.ObjC
 {
 	public static class OperatorOverloads
 	{
@@ -41,7 +41,7 @@ namespace Embeddinator
 
 		public static bool MatchesOperatorFriendlyName (MethodInfo method)
 		{
-			OperatorInfo possibleMatch = OperatorMapping.FirstOrDefault (x => x.FriendlyName == method.Name && x.ArgumentCount == method.ParameterCount);
+			OperatorInfo possibleMatch = OperatorMapping.FirstOrDefault (x => x.FriendlyName == method.Name && x.ArgumentCount == method.GetParameters ().Length);
 			if (possibleMatch != null) {
 				// To be considered a "friendly" operator it must have first argument and return its type
 				// TODO - Is there a better huristic
@@ -90,7 +90,7 @@ namespace Embeddinator
 			var matches = new Dictionary<OperatorInfo, List<MethodInfo>> ();
 			foreach (var method in methods) {
 				OperatorInfo info;
-				if (OperatorMappingNames.TryGetValue (method.Method.Name, out info) && method.Method.ParameterCount == info.ArgumentCount)
+				if (OperatorMappingNames.TryGetValue (method.Method.Name, out info) && method.Method.GetParameters ().Length == info.ArgumentCount)
 					matches.AddValue (info, method.Method);
 			}
 

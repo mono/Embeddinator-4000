@@ -7,9 +7,7 @@ using System.Text;
 using IKVM.Reflection;
 using Type = IKVM.Reflection.Type;
 
-using Embeddinator;
-
-namespace ObjC {
+namespace Embeddinator.ObjC {
 	
 	public partial class ObjCGenerator : Generator {
 

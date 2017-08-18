@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Embeddinator;
 
-namespace ObjC {
+namespace Embeddinator.ObjC {
 
 	public class ClassHelper {
 

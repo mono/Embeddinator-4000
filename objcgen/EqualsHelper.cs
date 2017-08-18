@@ -1,8 +1,7 @@
 ﻿using System;
-using Embeddinator;
 using Type = IKVM.Reflection.Type;
 
-namespace ObjC {
+namespace Embeddinator.ObjC {
 	public class EqualsHelper : MethodHelper{
 		public Type ParameterType { get; set; }
 

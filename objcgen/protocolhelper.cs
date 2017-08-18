@@ -1,7 +1,6 @@
 ﻿using System;
-using Embeddinator;
 
-namespace ObjC {
+namespace Embeddinator.ObjC {
 
 	public class ProtocolHelper : ClassHelper {
 

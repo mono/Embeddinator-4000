@@ -1,8 +1,6 @@
 ﻿using System;
 
-using Embeddinator;
-
-namespace ObjC {
+namespace Embeddinator.ObjC {
 	public class HashHelper : MethodHelper {
 		public HashHelper (ProcessedMethod method, SourceWriter headers, SourceWriter implementation) :
 			base (method, headers, implementation)

@@ -1,11 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Embeddinator;
 using IKVM.Reflection;
 using Type = IKVM.Reflection.Type;
 
-namespace ObjC {
+namespace Embeddinator.ObjC {
 	public static class NameGenerator {
 		public static Dictionary<string, string> ObjCTypeToArgument = new Dictionary<string, string> {
 			{ "int", "anInt" },

@@ -3,9 +3,9 @@
 using System;
 using System.Collections.Generic;
 
-using ProductException = Embeddinator.EmbeddinatorException;
+using ProductException = Embeddinator.ObjC.EmbeddinatorException;
 
-namespace Embeddinator
+namespace Embeddinator.ObjC
 {
 	static class ErrorHelper
 	{
