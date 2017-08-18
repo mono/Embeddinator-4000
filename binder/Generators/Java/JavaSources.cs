@@ -390,9 +390,12 @@ namespace Embeddinator.Generators
             if (method.IsConstructor)
                 Write("__object = ");
 
-            var unit = method.TranslationUnit;
+            // Get the effective method for synthetized interface method implementations.
+            var effectiveMethod = method.CompleteDeclaration as Method ?? method;
+            var unit = effectiveMethod.TranslationUnit;
             var package = string.Join(".", GetPackageNames(unit));
-            Write($"{package}.{JavaNative.GetNativeLibClassName(unit)}.INSTANCE.{JavaNative.GetCMethodIdentifier(method)}(");
+            var nativeMethodId = JavaNative.GetCMethodIdentifier(effectiveMethod);
+            Write($"{package}.{JavaNative.GetNativeLibClassName(unit)}.INSTANCE.{nativeMethodId}(");
 
             Write(string.Join(", ", @params));
             WriteLine(");");
