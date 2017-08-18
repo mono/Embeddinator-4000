@@ -4,7 +4,7 @@ using System.Linq;
 using IKVM.Reflection;
 using Type = IKVM.Reflection.Type;
 
-namespace Embeddinator
+namespace Embeddinator.ObjC
 {
 	public static class OperatorOverloads
 	{

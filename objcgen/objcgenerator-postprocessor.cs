@@ -5,9 +5,8 @@ using System.Text;
 
 using IKVM.Reflection;
 using Type = IKVM.Reflection.Type;
-using Embeddinator;
 
-namespace ObjC {
+namespace Embeddinator.ObjC {
 	// A set of post-processing steps needed to add hints
 	// to the input of the generation step
 	public partial class ObjCProcessor {

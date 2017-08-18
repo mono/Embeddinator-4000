@@ -2,7 +2,7 @@
 using System.IO;
 
 using NUnit.Framework;
-using Embeddinator;
+using Embeddinator.ObjC;
 
 namespace DriverTest
 {

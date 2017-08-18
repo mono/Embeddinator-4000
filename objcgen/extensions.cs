@@ -5,7 +5,7 @@ using System.Text;
 using IKVM.Reflection;
 using Type = IKVM.Reflection.Type;
 
-namespace Embeddinator {
+namespace Embeddinator.ObjC {
 
 	public static class StringExtensions {
 

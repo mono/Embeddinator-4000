@@ -11,9 +11,7 @@ using System.Xml;
 
 using Mono.Options;
 
-using ObjC;
-
-namespace Embeddinator {
+namespace Embeddinator.ObjC {
 
 	enum Action
 	{
