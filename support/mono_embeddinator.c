@@ -157,7 +157,9 @@ static GString* get_current_executable_path()
 
     return (ret > 0) ? g_string_new(pathbuf) : 0;
 #else
-    g_assert_not_reached();
+    char pathbuf[1024];
+    ssize_t ret = readlink("/proc/self/exe", pathbuf, sizeof(pathbuf));
+    return ret > 0 ? g_string_new(pathbuf) : 0;
 #endif
 }
 
