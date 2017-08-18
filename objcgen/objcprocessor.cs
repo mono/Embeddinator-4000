@@ -375,7 +375,7 @@ namespace ObjC {
 			implement_system_icomparable_t = t.Implements("System", "IComparable`1");
 			implement_system_iequatable_t = t.Implements ("System", "IEquatable`1");
 
-			var constructors = GetConstructors (t).OrderBy ((arg) => arg.ParameterCount).ToList ();
+			var constructors = GetConstructors (t).OrderBy ((arg) => arg.GetParameters ().Length).ToList ();
 			var processedConstructors = PostProcessConstructors (constructors).ToList ();
 			pt.Constructors = processedConstructors;
 
@@ -393,7 +393,7 @@ namespace ObjC {
 					continue;
 
 				// indexers are implemented as methods and object subscripting
-				if ((getter.ParameterCount > 0) || ((setter != null) && setter.ParameterCount > 1)) {
+				if ((getter.GetParameters ().Length > 0) || ((setter != null) && setter.GetParameters ().Length > 1)) {
 					subscriptProps.Add (pi);
 					continue;
 				}

@@ -45,7 +45,7 @@ namespace ObjC {
 		{
 			MethodInfo method = processedMethod.Method;
 			if (IsOperatorOrFriendlyVersion (method)) {
-				string nameOverride = OperatorOverloads.GetObjCName (processedMethod.Method.Name, processedMethod.Method.ParameterCount);
+				string nameOverride = OperatorOverloads.GetObjCName (processedMethod.Method.Name, processedMethod.Method.GetParameters ().Length);
 				if (nameOverride != null)
 					processedMethod.NameOverride = nameOverride;
 			}
