@@ -159,6 +159,22 @@ namespace Embeddinator
             return output.ExitCode == 0;
         }
 
+        string GetJnaPlatformDir()
+        {
+            // TODO: Use {os}-{arch} JNA format once we have better ABI support.
+            switch (Options.Compilation.Platform)
+            {
+                case TargetPlatform.MacOS:
+                    return "darwin";
+                case TargetPlatform.Windows:
+                    return "win32";
+                case TargetPlatform.Linux:
+                    return "linux";
+            }
+
+            throw new NotSupportedException();
+        }
+
         bool CreateJar()
         {
             var executableSuffix = Platform.IsWindows ? ".exe" : string.Empty;
@@ -173,14 +189,15 @@ namespace Embeddinator
             };
 
             // On desktop Java, we need a few more files included
-            if (Options.Compilation.Platform == TargetPlatform.MacOS)
+            if (Options.Compilation.Platform != TargetPlatform.Android)
             {
                 //Copy native libs
-                var platformDir = Path.Combine(classesDir, "darwin");
+                var platformDir = Path.Combine(classesDir, GetJnaPlatformDir());
                 if (!Directory.Exists(platformDir))
                     Directory.CreateDirectory(platformDir);
 
-                var libName = $"lib{name}.dylib";
+                var libName = (Options.Compilation.Platform == TargetPlatform.Windows) ?
+                    $"{name}.dll" : $"lib{name}.dylib";
                 var outputDir = Path.Combine(Options.OutputDir, libName);
                 File.Copy(outputDir, Path.Combine(platformDir, libName), true);
 
