@@ -223,7 +223,7 @@ namespace Embeddinator.Generators
             var typePrinter = new JavaTypePrinter(Context.Context);
             var typeName = @class.Visit(typePrinter);
 
-            if (@class.IsInterface)
+            if (@class.IsInterface || @class.IsAbstract)
                 typeName = $"{typeName}Impl";
 
             Context.Return.Write("({0} == com.sun.jna.Pointer.NULL ? null : new {1}({0}))",

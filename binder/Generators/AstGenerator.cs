@@ -136,11 +136,15 @@ namespace Embeddinator.Generators
 
         public Class VisitRecord(TypeInfo type)
         {
+            var isStatic = type.IsSealed && type.IsAbstract;
+
             var @class = new Class
             {
                 Name = UnmangleTypeName(type.Name),
                 Type = ClassType.RefType,
-                IsFinal = type.IsSealed
+                IsStatic = isStatic,
+                IsFinal = type.IsSealed && !isStatic,
+                IsAbstract = type.IsAbstract && !isStatic
             };
 
             if (type.IsInterface)
