@@ -421,14 +421,23 @@ namespace Embeddinator
                 vsSdk = exactVersion.Value;
             }
 
-            var clBin = String.Empty;
-            if ((int)vsSdk.Version == (int)VisualStudioVersion.VS2017)
+            var clBin = string.Empty;
+            var clLib = string.Empty;
+
+            const string clArch = "x86";
+
+            var isVS2017OrGreater = (int)vsSdk.Version >= (int)VisualStudioVersion.VS2017;
+            if (isVS2017OrGreater)
             {
-                var clFiles = System.IO.Directory.EnumerateFiles(Path.Combine(vsSdk.Directory, @"..\..\VC\Tools\MSVC"), "cl.exe", SearchOption.AllDirectories);
-                clBin = clFiles.Where(s => s.Contains(@"x86\cl.exe")).First();
+                var clBaseDir = Directory.EnumerateDirectories(Path.Combine(vsSdk.Directory, @"..\..\VC\Tools\MSVC")).Last();
+                clBin = Path.Combine(clBaseDir, $"bin\\Hostx86\\{clArch}\\cl.exe");
+                clLib = Path.Combine(clBaseDir, $"lib\\{clArch}");
             }
             else
+            {
                 clBin = Path.GetFullPath(Path.Combine(vsSdk.Directory, "..", "..", "VC", "bin", "cl.exe"));
+                clLib = Path.GetFullPath(Path.Combine(vsSdk.Directory, "..", "..", "VC", "lib"));
+            }
 
             Diagnostics.Debug($"VS path {vsSdk.Directory}");
 
@@ -454,7 +463,8 @@ namespace Embeddinator
             var winSdks = new List<ToolchainVersion>();
             MSVCToolchain.GetWindowsKitsSdks(out winSdks);
 
-            var libParentPath = Directory.GetParent(Directory.EnumerateDirectories(Path.Combine(winSdks.Last().Directory, "lib"), "um", SearchOption.AllDirectories).First());
+            var libParentPath = Directory.GetParent(Directory.EnumerateDirectories(
+                Path.Combine(winSdks.Last().Directory, "lib"), "um", SearchOption.AllDirectories).First());
             var libPaths = libParentPath.EnumerateDirectories();
 
             Dictionary<string, string> envVars = null;
@@ -462,10 +472,8 @@ namespace Embeddinator
             {
                 envVars = new Dictionary<string, string>();
                 envVars["INCLUDE"] = string.Join(";", includes);
-
-                var clLib = Path.GetFullPath(
-                    Path.Combine(vsSdk.Directory, "..", "..", "VC", "lib"));
-                envVars["LIB"] = clLib + ";" + string.Join(";", libPaths.Select(path => Path.Combine(path.FullName, "x86")));
+                envVars["LIB"] = Path.GetFullPath(clLib) + ";" +
+                    string.Join(";", libPaths.Select(path => Path.Combine(path.FullName, clArch)));
             }
 
             var output = Invoke(clBin, invocation, envVars);
