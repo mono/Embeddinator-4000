@@ -199,5 +199,5 @@ Task("Run-Java-Tests")
     .Does(() =>
     {
         var java = Directory(javaHome) + File("bin/java");
-        Exec(java, $"-cp {classPath} -Djna.dump_memory=true org.junit.runner.JUnitCore mono.embeddinator.Tests");
+        Exec(java, $"-cp {classPath} -Djna.dump_memory=true -Djna.nosys=true org.junit.runner.JUnitCore mono.embeddinator.Tests");
     });
