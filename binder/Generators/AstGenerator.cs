@@ -6,6 +6,7 @@ using CppSharp.AST;
 using CppSharp.AST.Extensions;
 using CppSharp.Generators;
 using IKVM.Reflection;
+using System.Text.RegularExpressions;
 
 namespace Embeddinator.Generators
 {
@@ -120,8 +121,8 @@ namespace Embeddinator.Generators
 
         static string UnmangleTypeName(string name)
         {
-            return string.IsNullOrEmpty(name) ? string.Empty :
-                         name.Replace(new char[] {'`', '<', '>' }, "_");
+            return string.IsNullOrEmpty(name) ? string.Empty :  
+                Regex.Replace(name, @"[^\p{L}]+", "_");
         }
 
         public void HandleBaseType(IKVM.Reflection.Type type, Class @class)

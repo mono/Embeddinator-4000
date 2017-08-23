@@ -442,6 +442,7 @@ namespace Embeddinator
                 $"-I\"{monoPath}\\include\\mono-2.0\"",
                 string.Join(" ", files.Select(file => "\""+ Path.GetFullPath(file) + "\"")),
                 $"\"{GetSgenLibPath(monoPath)}\"",
+                "/utf-8",
                 Options.Compilation.CompileSharedLibrary ? "/LD" : string.Empty,
                 $"/Fe{outputPath}"
             };
