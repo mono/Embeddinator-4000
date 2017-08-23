@@ -20,8 +20,9 @@ public class DesktopImpl {
         if (!monoFile.isDirectory()) {
             monoFile.mkdirs();
             monoFile.deleteOnExit();
-            extractAssembly(monoPath, "mscorlib");
         }
+
+        extractAssembly(monoPath, "mscorlib");
 
         return runtimeLibrary;
     }
