@@ -185,7 +185,7 @@ var classPath = string.Join(IsRunningOnWindows() ? ";" : ":", new[]
 });
 
 Task("Build-Java-Tests")
-    //.IsDependentOn("Generate-Java")
+    .IsDependentOn("Generate-Java")
     .Does(() =>
     {
         var output = mkDir + Directory("java");

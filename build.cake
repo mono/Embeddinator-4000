@@ -52,7 +52,8 @@ Task("Tests")
     .IsDependentOn("Generate-Android-NetStandard")
     .IsDependentOn("Generate-Android-FSharp")
     .IsDependentOn("Build-CSharp-Tests")
-    .IsDependentOn("Run-C-Tests");
+    .IsDependentOn("Run-C-Tests")
+    .IsDependentOn("Run-Java-Tests");
 
 Task("AppVeyor")
     .IsDependentOn("Build-Binder")
@@ -61,6 +62,7 @@ Task("AppVeyor")
 Task("Travis")
     .IsDependentOn("Build-Binder")
     .IsDependentOn("Build-CSharp-Tests")
-    .IsDependentOn("Run-C-Tests");
+    .IsDependentOn("Run-C-Tests")
+    .IsDependentOn("Run-Java-Tests");
 
 RunTarget(target);
