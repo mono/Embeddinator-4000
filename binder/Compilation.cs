@@ -231,6 +231,15 @@ namespace Embeddinator
                         File.Copy(referencePath, Path.Combine(assembliesDir, reference + ".dll"), true);
                     }
                 }
+
+                // Copy the Mono runtime shared library to the JAR file
+                var libDir = (Options.Compilation.Platform == TargetPlatform.Windows) ?
+                    "bin" : "lib";
+                libName = (Options.Compilation.Platform == TargetPlatform.Windows) ?
+                    "mono-2.0-sgen.dll" : "libmonosgen-2.0.dylib";
+
+                var monoLib = Path.Combine(monoPath, libDir, libName);
+                File.Copy(monoLib, Path.Combine(platformDir, libName), true);
             }
 
             //Embed JNA into our jar file
