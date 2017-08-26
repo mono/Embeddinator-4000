@@ -24,6 +24,6 @@ void Exec(string path, string args = "", string workingDir = ".")
 void Premake(string file, string args, string action)
 {
     var premakePath = Directory("./external/CppSharp/build/") + (IsRunningOnWindows() ?
-        File("premake5.exe") : File("premake5-osx"));
+        File("premake5.exe") : (System.IO.Directory.Exists("/Applications/Xcode.app") ? File("premake5-osx") : File("premake5-linux-64")));
     Exec(premakePath, $"--file={file} {args} {action}");
 }

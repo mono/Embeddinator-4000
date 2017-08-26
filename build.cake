@@ -39,7 +39,7 @@ Task("Build-Binder")
 Task("Generate-Project-Files")
     .Does(() =>
     {
-        var os = IsRunningOnWindows() ? "windows" : "macosx";
+        var os = IsRunningOnWindows() ? "windows" : System.IO.Directory.Exists("/Applications/Xcode.app") ? "macosx" : "linux";
         Premake(File("./build/premake5.lua"), $"--outdir=.. --os={os}", "vs2015");
     });
 

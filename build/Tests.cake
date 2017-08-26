@@ -91,7 +91,7 @@ Task("Generate-C")
     .IsDependentOn("Build-FSharp-Generic")
     .Does(() =>
     {
-        var platform = IsRunningOnWindows() ? "Windows" : "macOS";
+        var platform = IsRunningOnWindows() ? "Windows" : System.IO.Directory.Exists("/Applications/Xcode.app") ? "macOS" : "linux";
         var output = commonDir + Directory("c");
         Exec(embeddinator, $"-gen=c -out={output} -platform={platform} -target=shared -verbose {managedDll} {fsharpManagedDll}");
     });
@@ -101,7 +101,7 @@ Task("Build-C-Tests")
     .Does(() =>
     {
         // Generate native project build files using Premake.
-        var os = IsRunningOnWindows() ? "--os=windows" : "--os=macosx";
+        var os = IsRunningOnWindows() ? "--os=windows" : System.IO.Directory.Exists("/Applications/Xcode.app") ? "--os=macosx" : "--os=linux";
         var action = IsRunningOnWindows() ? "vs2015" : "gmake";
         Premake(commonDir + File("premake5.lua"), os, action);
 
@@ -162,8 +162,8 @@ Task("Generate-Java")
     .IsDependentOn("Build-Managed")
     .Does(() =>
     {
-        var platform = IsRunningOnWindows() ? "Windows" : "macOS";
-        var output = mkDir + Directory("java");
+        var platform = IsRunningOnWindows() ? "Windows" : System.IO.Directory.Exists("/Applications/Xcode.app") ? "macOS" : "linux";
+        var output = buildDir + Directory("java");
         Exec(embeddinator, $"-gen=Java -out={output} -platform={platform} -compile -target=shared {managedDll}");
     });
 
@@ -214,3 +214,4 @@ Task("Run-Java-Tests")
         var java = Directory(javaHome) + File("bin/java");
         Exec(java, $"-cp {classPath} -Djna.dump_memory=true -Djna.nosys=true org.junit.runner.JUnitCore mono.embeddinator.Tests");
     });
+
