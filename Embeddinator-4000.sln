@@ -57,6 +57,8 @@ Project("{9344BDBB-3E7F-41FC-A0DD-8665D75EE146}") = "objcgen", "objcgen\objcgen.
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "fsharp-shared", "tests\managed\fsharp-shared\fsharp-shared.shproj", "{B46AC5CA-D13A-4F82-8A83-76B32F2F74EF}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "fsharp-generic", "tests\managed\fsharp-generic\fsharp-generic.fsproj", "{1D70C6B6-B63D-49F3-AC02-E6F93BAA4377}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
