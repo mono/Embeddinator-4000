@@ -66,6 +66,8 @@ namespace Embeddinator.Generators
 
             typePrinter.PrintScopeKind = TypePrintScopeKind.Qualified;
             var arrayElementName = array.Array.Type.Visit(typePrinter);
+            if (array.Array.Type.IsClass())
+                arrayElementName += "*";
             var elementSize = $"sizeof({arrayElementName})";
     
             var nativeArrayId = CGenerator.GenId($"{Context.ArgName}_native_array");
@@ -359,9 +361,12 @@ namespace Embeddinator.Generators
             string elementTypeName = elementType.Visit(typePrinter);
 
             var elementId = CGenerator.GenId($"{Context.ArgName}_array_element");
-            support.WriteLine("{0} {1} = g_array_index({2}.array, {0}, {3});",
-                elementTypeName, elementId, Context.ArgName, iteratorId);
-
+            if (elementType.IsClass())
+                support.WriteLine("{0}* {1} = &(g_array_index({2}.array, {0}, {3}));",
+                    elementTypeName, elementId, Context.ArgName, iteratorId);
+            else
+                support.WriteLine("{0} {1} = g_array_index({2}.array, {0}, {3});",
+                    elementTypeName, elementId, Context.ArgName, iteratorId);
             var ctx = new MarshalContext(Context.Context)
             {
                 ArgName = elementId,

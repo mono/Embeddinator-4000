@@ -17,4 +17,8 @@ module FSharp =
 
     let getDefaultUserRecord () =
         { UserDescription = "Cherry" }
+
+    module ArrayTest =
+        let getDefaultUserRecordArray count =
+            [| for i in 0 .. (count - 1) -> getDefaultUserRecord () |]
     

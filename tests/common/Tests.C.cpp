@@ -420,6 +420,14 @@ TEST_CASE("Arrays.C", "[C][Arrays]") {
 
     Arrays_Enum _last = Arrays_Arr_EnumArrayLast(_enum);
     REQUIRE(_last == Arrays_Enum_C);
+    
+    Arrays_Arr* arr = Arrays_Arr_new();
+    _Arrays_ValueHolderArray valueHoldersArray = Arrays_Arr_get_ValueHolderArr(arr);
+    REQUIRE(valueHoldersArray.array->len == 3);
+    for (uint32_t i = 0; i < valueHoldersArray.array->len; i++) {
+        Arrays_ValueHolder* value = g_array_index(valueHoldersArray.array, Arrays_ValueHolder*, i);
+        REQUIRE(Arrays_ValueHolder_get_IntValue(value) == (i + 1));
+    }
 }
 
 TEST_CASE("FSharpTypes.C", "[C][FSharp Types]") {
@@ -427,6 +435,13 @@ TEST_CASE("FSharpTypes.C", "[C][FSharp Types]") {
     REQUIRE(strcmp(managed_UserRecord_get_UserDescription(userRecord), "Test") == 0);
     managed_UserRecord* defaultUserRecord = managed_FSharp_getDefaultUserRecord();
     REQUIRE(strcmp(managed_UserRecord_get_UserDescription(defaultUserRecord), "Cherry") == 0);
+    _Managed_UserRecordArray userRecordArray = managed_ArrayTest_getDefaultUserRecordArray(10);
+    uint32_t length = userRecordArray.array->len;
+    REQUIRE(length == 10);
+    for(uint32_t i = 0; i < length; i++){
+        managed_UserRecord* entry = g_array_index(userRecordArray.array, managed_UserRecord*, i);
+        REQUIRE(strcmp(managed_UserRecord_get_UserDescription(entry), "Cherry") == 0);
+    }
 }
 
 TEST_CASE("FSharpModules.C", "[C][FSharp Modules]") {
