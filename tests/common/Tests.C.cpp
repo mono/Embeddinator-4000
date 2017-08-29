@@ -424,14 +424,14 @@ TEST_CASE("Arrays.C", "[C][Arrays]") {
 
 TEST_CASE("FSharpTypes.C", "[C][FSharp Types]") {
     managed_UserRecord* userRecord = managed_UserRecord_new("Test");
-    REQUIRE(managed_UserRecord_get_UserDescription(userRecord) == "Test");
+    REQUIRE(strcmp(managed_UserRecord_get_UserDescription(userRecord), "Test") == 0);
     managed_UserRecord* defaultUserRecord = managed_FSharp_getDefaultUserRecord();
-    REQUIRE(managed_UserRecord_get_UserDescription(defaultUserRecord) == "Cherry");
+    REQUIRE(strcmp(managed_UserRecord_get_UserDescription(defaultUserRecord), "Cherry") == 0);
 }
 
 TEST_CASE("FSharpModules.C", "[C][FSharp Modules]") {
-    REQUIRE(managed_NestedModuleTest_get_nestedConstant() == "Hello from a nested F# module");
-    REQUIRE(managed_NestedModuleTest_nestedFunction() == "Hello from a nested F# module");
+   REQUIRE(strcmp(managed_NestedModuleTest_get_nestedConstant(), "Hello from a nested F# module") == 0);
+   REQUIRE(strcmp(managed_NestedModuleTest_nestedFunction(), "Hello from a nested F# module") == 0);
 }
 
 int main( int argc, char* argv[] )

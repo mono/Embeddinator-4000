@@ -131,8 +131,6 @@ Task("Build-C-Tests")
             System.IO.Path.GetFileName(managedDll));
         System.IO.File.Copy(fsharpManagedDll, $"{mkDir}/bin/{configuration}/" +
             System.IO.Path.GetFileName(fsharpManagedDll));
-        System.IO.File.Copy(Directory("./tests/managed/fsharp-generic/bin") + Directory(configuration) + File("FSharp.Core.dll"), $"{mkDir}/bin/{configuration}/" +
-            "FSharp.Core.dll");
 
         if (IsRunningOnWindows())
         {
