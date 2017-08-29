@@ -61,7 +61,7 @@ namespace Embeddinator.Generators
 
             foreach (var type in assembly.ExportedTypes)
             {
-                if (!type.IsPublic)
+                if (!type.IsPublic && (type.IsNested && !type.IsNestedPublic))
                     continue;
 
                 var typeInfo = type.GetTypeInfo();

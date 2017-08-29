@@ -2,6 +2,7 @@
 #include <catch.hpp>
 #include <cstdint>
 #include "managed.h"
+#include "fsharpManaged.h"
 #include "glib.h"
 #include "c-support.h"
 
@@ -419,6 +420,18 @@ TEST_CASE("Arrays.C", "[C][Arrays]") {
 
     Arrays_Enum _last = Arrays_Arr_EnumArrayLast(_enum);
     REQUIRE(_last == Arrays_Enum_C);
+}
+
+TEST_CASE("FSharpTypes.C", "[C][FSharp Types]") {
+    managed_UserRecord* userRecord = managed_UserRecord_new("Test");
+    REQUIRE(strcmp(managed_UserRecord_get_UserDescription(userRecord), "Test") == 0);
+    managed_UserRecord* defaultUserRecord = managed_FSharp_getDefaultUserRecord();
+    REQUIRE(strcmp(managed_UserRecord_get_UserDescription(defaultUserRecord), "Cherry") == 0);
+}
+
+TEST_CASE("FSharpModules.C", "[C][FSharp Modules]") {
+   REQUIRE(strcmp(managed_NestedModuleTest_get_nestedConstant(), "Hello from a nested F# module") == 0);
+   REQUIRE(strcmp(managed_NestedModuleTest_nestedFunction(), "Hello from a nested F# module") == 0);
 }
 
 int main( int argc, char* argv[] )

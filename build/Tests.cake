@@ -1,4 +1,5 @@
 var managedDll = Directory("./tests/managed/generic/bin") + Directory(configuration) + File("managed.dll");
+var fsharpManagedDll = Directory("./tests/managed/fsharp-generic/bin") + Directory(configuration) + File("fsharpManaged.dll");
 
 /// ---------------------------
 /// Managed test projects
@@ -28,6 +29,15 @@ Task("Build-FSharp-Android")
     .Does(() =>
     {
         MSBuild("./tests/managed/fsharp-android/fsharp-android.fsproj", settings =>
+            settings.SetConfiguration(configuration).SetPlatformTarget(PlatformTarget.MSIL).SetVerbosity(Verbosity.Minimal));
+    });
+
+Task("Build-FSharp-Generic")
+    .IsDependentOn("Clean")
+    .IsDependentOn("NuGet-Restore")
+    .Does(()=>
+    {
+        MSBuild("./tests/managed/fsharp-generic/fsharp-generic.fsproj", settings =>
             settings.SetConfiguration(configuration).SetPlatformTarget(PlatformTarget.MSIL).SetVerbosity(Verbosity.Minimal));
     });
 
@@ -78,11 +88,12 @@ var mkDir = commonDir + Directory("mk");
 Task("Generate-C")
     .IsDependentOn("Build-Binder")
     .IsDependentOn("Build-Managed")
+    .IsDependentOn("Build-FSharp-Generic")
     .Does(() =>
     {
         var platform = IsRunningOnWindows() ? "Windows" : "macOS";
         var output = commonDir + Directory("c");
-        Exec(embeddinator, $"-gen=c -out={output} -platform={platform} -target=shared -verbose {managedDll}");
+        Exec(embeddinator, $"-gen=c -out={output} -platform={platform} -target=shared -verbose {managedDll} {fsharpManagedDll}");
     });
 
 Task("Build-C-Tests")
@@ -118,6 +129,8 @@ Task("Build-C-Tests")
         // Copy the managed test DLL to the output folder.
         System.IO.File.Copy(managedDll, $"{mkDir}/bin/{configuration}/" +
             System.IO.Path.GetFileName(managedDll));
+        System.IO.File.Copy(fsharpManagedDll, $"{mkDir}/bin/{configuration}/" +
+            System.IO.Path.GetFileName(fsharpManagedDll));
 
         if (IsRunningOnWindows())
         {
