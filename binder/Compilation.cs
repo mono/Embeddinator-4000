@@ -488,7 +488,8 @@ namespace Embeddinator
             var invocation = string.Join(" ", args);
 
             var vsVersion = (VisualStudioVersion)(int)vsSdk.Version;
-            var includes = MSVCToolchain.GetSystemIncludes(vsVersion);
+            VisualStudioVersion foundVsVersion;
+            var includes = MSVCToolchain.GetSystemIncludes(vsVersion, out foundVsVersion);
 
             var winSdks = new List<ToolchainVersion>();
             MSVCToolchain.GetWindowsKitsSdks(out winSdks);
