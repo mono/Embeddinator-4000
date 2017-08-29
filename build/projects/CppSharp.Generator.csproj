@@ -185,9 +185,6 @@
     <Compile Include="../../external/CppSharp/src/Generator/Passes/GenerateAbstractImplementationsPass.cs">
       <Link>Passes/GenerateAbstractImplementationsPass.cs</Link>
     </Compile>
-    <Compile Include="../../external/CppSharp/src/Generator/Passes/GenerateAnonymousDelegatesPass.cs">
-      <Link>Passes/GenerateAnonymousDelegatesPass.cs</Link>
-    </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Passes/GenerateSymbolsPass.cs">
       <Link>Passes/GenerateSymbolsPass.cs</Link>
     </Compile>

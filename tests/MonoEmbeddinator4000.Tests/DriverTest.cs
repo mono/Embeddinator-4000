@@ -112,7 +112,7 @@ namespace Embeddinator.Tests
         [Test]
         public void AssemblyWithDots()
         {
-            temp = Path.Combine(Path.GetTempPath(), "hello.with.dots.dll");
+            temp = Path.Combine(outputDir, "hello.with.dots.dll");
             tempFiles.Add(temp);
 
             RunDriver("Hello");
@@ -124,7 +124,7 @@ namespace Embeddinator.Tests
         [Test]
         public void AssemblyWithUpperCase()
         {
-            temp = Path.Combine(Path.GetTempPath(), "HELLO.dll");
+            temp = Path.Combine(outputDir, "HELLO.dll");
             tempFiles.Add(temp);
 
             RunDriver("Hello");

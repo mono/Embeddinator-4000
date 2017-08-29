@@ -166,7 +166,7 @@ public class Tests {
         assertEquals(new Integer(7), l.get());
         assertEquals("XAMARIN", os.get());
 
-        int refId = Parameters.refClass(new Ref(static_method));
+        int refId = Parameters.refClass(new Ref<Static>(static_method));
         assertEquals(static_method.getId(), refId);
 
         Ref<Static> ref = new Ref<Static>(static_method);

@@ -42,6 +42,9 @@ namespace Embeddinator
             if (Options.Verbose)
                 Diagnostics.Level = DiagnosticKind.Debug;
 
+            if (!Options.Compilation.Platform.HasValue)
+                Options.Compilation.Platform = Platform.Host;
+
             Declaration.QualifiedNameSeparator = "_";
         }
 

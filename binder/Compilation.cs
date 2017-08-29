@@ -159,6 +159,22 @@ namespace Embeddinator
             return output.ExitCode == 0;
         }
 
+        string GetJnaPlatformDir()
+        {
+            // TODO: Use {os}-{arch} JNA format once we have better ABI support.
+            switch (Options.Compilation.Platform)
+            {
+                case TargetPlatform.MacOS:
+                    return "darwin";
+                case TargetPlatform.Windows:
+                    return "win32";
+                case TargetPlatform.Linux:
+                    return "linux";
+            }
+
+            throw new NotSupportedException();
+        }
+
         bool CreateJar()
         {
             var executableSuffix = Platform.IsWindows ? ".exe" : string.Empty;
@@ -173,16 +189,21 @@ namespace Embeddinator
             };
 
             // On desktop Java, we need a few more files included
-            if (Options.Compilation.Platform == TargetPlatform.MacOS)
+            if (Options.Compilation.Platform != TargetPlatform.Android)
             {
                 //Copy native libs
-                var platformDir = Path.Combine(classesDir, "darwin");
+                var platformDir = Path.Combine(classesDir, GetJnaPlatformDir());
                 if (!Directory.Exists(platformDir))
                     Directory.CreateDirectory(platformDir);
 
-                var libName = $"lib{name}.dylib";
-                var outputDir = Path.Combine(Options.OutputDir, libName);
-                File.Copy(outputDir, Path.Combine(platformDir, libName), true);
+                var libName = (Options.Compilation.Platform == TargetPlatform.Windows) ?
+                    $"{name}.dll" : $"lib{name}.dylib";
+                var libFile = Path.Combine(Options.OutputDir, libName);
+                if (File.Exists(libFile))
+                {
+                    var outputFile = Path.Combine(platformDir, libName);
+                    File.Copy(libFile, outputFile, true);
+                }
 
                 //Copy .NET assemblies
                 var assembliesDir = Path.Combine(classesDir, "assemblies");
@@ -214,6 +235,15 @@ namespace Embeddinator
                         File.Copy(referencePath, Path.Combine(assembliesDir, reference + ".dll"), true);
                     }
                 }
+
+                // Copy the Mono runtime shared library to the JAR file
+                var libDir = (Options.Compilation.Platform == TargetPlatform.Windows) ?
+                    "bin" : "lib";
+                libName = (Options.Compilation.Platform == TargetPlatform.Windows) ?
+                    "mono-2.0-sgen.dll" : "libmonosgen-2.0.dylib";
+
+                var monoLib = Path.Combine(monoPath, libDir, libName);
+                File.Copy(monoLib, Path.Combine(platformDir, libName), true);
             }
 
             //Embed JNA into our jar file
@@ -421,14 +451,23 @@ namespace Embeddinator
                 vsSdk = exactVersion.Value;
             }
 
-            var clBin = String.Empty;
-            if ((int)vsSdk.Version == (int)VisualStudioVersion.VS2017)
+            var clBin = string.Empty;
+            var clLib = string.Empty;
+
+            const string clArch = "x86";
+
+            var isVS2017OrGreater = (int)vsSdk.Version >= (int)VisualStudioVersion.VS2017;
+            if (isVS2017OrGreater)
             {
-                var clFiles = System.IO.Directory.EnumerateFiles(Path.Combine(vsSdk.Directory, @"..\..\VC\Tools\MSVC"), "cl.exe", SearchOption.AllDirectories);
-                clBin = clFiles.Where(s => s.Contains(@"x86\cl.exe")).First();
+                var clBaseDir = Directory.EnumerateDirectories(Path.Combine(vsSdk.Directory, @"..\..\VC\Tools\MSVC")).Last();
+                clBin = Path.Combine(clBaseDir, $"bin\\Hostx86\\{clArch}\\cl.exe");
+                clLib = Path.Combine(clBaseDir, $"lib\\{clArch}");
             }
             else
+            {
                 clBin = Path.GetFullPath(Path.Combine(vsSdk.Directory, "..", "..", "VC", "bin", "cl.exe"));
+                clLib = Path.GetFullPath(Path.Combine(vsSdk.Directory, "..", "..", "VC", "lib"));
+            }
 
             Diagnostics.Debug($"VS path {vsSdk.Directory}");
 
@@ -449,12 +488,14 @@ namespace Embeddinator
             var invocation = string.Join(" ", args);
 
             var vsVersion = (VisualStudioVersion)(int)vsSdk.Version;
-            var includes = MSVCToolchain.GetSystemIncludes(vsVersion);
+            VisualStudioVersion foundVsVersion;
+            var includes = MSVCToolchain.GetSystemIncludes(vsVersion, out foundVsVersion);
 
             var winSdks = new List<ToolchainVersion>();
             MSVCToolchain.GetWindowsKitsSdks(out winSdks);
 
-            var libParentPath = Directory.GetParent(Directory.EnumerateDirectories(Path.Combine(winSdks.Last().Directory, "lib"), "um", SearchOption.AllDirectories).First());
+            var libParentPath = Directory.GetParent(Directory.EnumerateDirectories(
+                Path.Combine(winSdks.Last().Directory, "lib"), "um", SearchOption.AllDirectories).First());
             var libPaths = libParentPath.EnumerateDirectories();
 
             Dictionary<string, string> envVars = null;
@@ -462,10 +503,8 @@ namespace Embeddinator
             {
                 envVars = new Dictionary<string, string>();
                 envVars["INCLUDE"] = string.Join(";", includes);
-
-                var clLib = Path.GetFullPath(
-                    Path.Combine(vsSdk.Directory, "..", "..", "VC", "lib"));
-                envVars["LIB"] = clLib + ";" + string.Join(";", libPaths.Select(path => Path.Combine(path.FullName, "x86")));
+                envVars["LIB"] = Path.GetFullPath(clLib) + ";" +
+                    string.Join(";", libPaths.Select(path => Path.Combine(path.FullName, clArch)));
             }
 
             var output = Invoke(clBin, invocation, envVars);

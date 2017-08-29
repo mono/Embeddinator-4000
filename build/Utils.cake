@@ -5,6 +5,7 @@ void Exec(string path, ProcessSettings settings)
         settings.Arguments.Prepend(path + " ");
         path = "mono";
     }
+    Verbose($"Executing: {path} {settings.Arguments.Render()}");
     var exitCode = StartProcess(path, settings);
     if (exitCode != 0)
         throw new Exception(path + " failed!");

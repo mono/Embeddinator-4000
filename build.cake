@@ -46,21 +46,29 @@ Task("Generate-Project-Files")
 Task("Default")
     .IsDependentOn("Build-Binder");
 
-Task("Tests")
+Task("Android-Tests")
     .IsDependentOn("Generate-Android")
     .IsDependentOn("Generate-Android-PCL")
     .IsDependentOn("Generate-Android-NetStandard")
-    .IsDependentOn("Generate-Android-FSharp")
+    .IsDependentOn("Generate-Android-FSharp");
+
+Task("Tests")
+    .IsDependentOn("Android-Tests")
     .IsDependentOn("Build-CSharp-Tests")
-    .IsDependentOn("Run-C-Tests");
+    .IsDependentOn("Run-C-Tests")
+    .IsDependentOn("Run-Java-Tests");
 
 Task("AppVeyor")
     .IsDependentOn("Build-Binder")
-    .IsDependentOn("Tests");
+    .IsDependentOn("Android-Tests")
+    .IsDependentOn("Build-CSharp-Tests")
+    .IsDependentOn("Run-C-Tests")
+    .IsDependentOn("Build-Java-Tests");
 
 Task("Travis")
     .IsDependentOn("Build-Binder")
     .IsDependentOn("Build-CSharp-Tests")
-    .IsDependentOn("Run-C-Tests");
+    .IsDependentOn("Run-C-Tests")
+    .IsDependentOn("Run-Java-Tests");
 
 RunTarget(target);

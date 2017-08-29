@@ -163,7 +163,7 @@ Task("Generate-Java")
     .Does(() =>
     {
         var platform = IsRunningOnWindows() ? "Windows" : "macOS";
-        var output = buildDir + Directory("java");
+        var output = mkDir + Directory("java");
         Exec(embeddinator, $"-gen=Java -out={output} -platform={platform} -compile -target=shared {managedDll}");
     });
 
@@ -193,18 +193,18 @@ var classPath = string.Join(IsRunningOnWindows() ? ";" : ":", new[]
 {
     "./external/junit/hamcrest-core-1.3.jar",
     "./external/junit/junit-4.12.jar",
-    buildDir + Directory("java"),
-    buildDir + File("java/managed.jar"),
+    mkDir + Directory("java"),
+    mkDir + File("java/managed.jar"),
 });
 
 Task("Build-Java-Tests")
     .IsDependentOn("Generate-Java")
     .Does(() =>
     {
-        var output = buildDir + Directory("java");
+        var output = mkDir + Directory("java");
         var tests = File("./tests/common/java/mono/embeddinator/Tests.java");
         var javac = Directory(javaHome) + File("bin/javac");
-        Exec(javac, $"-cp {classPath} -d {output} -Xdiags:verbose -Xlint:deprecation {tests}");
+        Exec(javac, $"-cp {classPath} -d {output} -Xdiags:verbose -Xlint:deprecation -Xlint:unchecked {tests}");
     });
 
 Task("Run-Java-Tests")
@@ -212,5 +212,5 @@ Task("Run-Java-Tests")
     .Does(() =>
     {
         var java = Directory(javaHome) + File("bin/java");
-        Exec(java, $"-cp {classPath} -Djna.dump_memory=true org.junit.runner.JUnitCore mono.embeddinator.Tests");
+        Exec(java, $"-cp {classPath} -Djna.dump_memory=true -Djna.nosys=true org.junit.runner.JUnitCore mono.embeddinator.Tests");
     });
