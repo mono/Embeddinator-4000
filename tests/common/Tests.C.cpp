@@ -428,6 +428,12 @@ TEST_CASE("Arrays.C", "[C][Arrays]") {
         Arrays_ValueHolder* value = g_array_index(valueHoldersArray.array, Arrays_ValueHolder*, i);
         REQUIRE(Arrays_ValueHolder_get_IntValue(value) == (i + 1));
     }
+    _Arrays_ValueHolderArray resultArray = Arrays_Arr_ValueHolderArrMethod_1(arr, valueHoldersArray);
+    REQUIRE(resultArray.array->len == 3);
+    for (uint32_t i = 0; i < resultArray.array->len; i++) {
+        Arrays_ValueHolder* value = g_array_index(resultArray.array, Arrays_ValueHolder*, i);
+        REQUIRE(Arrays_ValueHolder_get_IntValue(value) == (i + 1));
+    }
 }
 
 TEST_CASE("FSharpTypes.C", "[C][FSharp Types]") {

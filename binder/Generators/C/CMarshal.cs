@@ -362,7 +362,7 @@ namespace Embeddinator.Generators
 
             var elementId = CGenerator.GenId($"{Context.ArgName}_array_element");
             if (elementType.IsClass())
-                support.WriteLine("{0}* {1} = &(g_array_index({2}.array, {0}, {3}));",
+                support.WriteLine("{0}* {1} = g_array_index({2}.array, {0}*, {3});",
                     elementTypeName, elementId, Context.ArgName, iteratorId);
             else
                 support.WriteLine("{0} {1} = g_array_index({2}.array, {0}, {3});",
