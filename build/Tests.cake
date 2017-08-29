@@ -191,7 +191,7 @@ Task("Build-Java-Tests")
         var output = mkDir + Directory("java");
         var tests = File("./tests/common/java/mono/embeddinator/Tests.java");
         var javac = Directory(javaHome) + File("bin/javac");
-        Exec(javac, $"-cp {classPath} -d {output} -Xdiags:verbose -Xlint:deprecation {tests}");
+        Exec(javac, $"-cp {classPath} -d {output} -Xdiags:verbose -Xlint:deprecation -Xlint:unchecked {tests}");
     });
 
 Task("Run-Java-Tests")
