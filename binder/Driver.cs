@@ -24,20 +24,6 @@ namespace Embeddinator
 
         public ProjectOutput Output { get; private set; }
 
-        static TargetPlatform GetTargetPlatform()
-        {
-            if (Platform.IsWindows)
-                return TargetPlatform.Windows;
-
-            if (Platform.IsMacOS)
-                return TargetPlatform.MacOS;
-
-            if (Platform.IsLinux)
-                return TargetPlatform.Linux;
-
-            throw new NotImplementedException();
-        }
-
         public Driver(Project project, Options options)
         {
             Project = project;
@@ -56,7 +42,8 @@ namespace Embeddinator
             if (Options.Verbose)
                 Diagnostics.Level = DiagnosticKind.Debug;
 
-            Options.Compilation.Platform = GetTargetPlatform();
+            if (!Options.Compilation.Platform.HasValue)
+                Options.Compilation.Platform = Platform.Host;
 
             Declaration.QualifiedNameSeparator = "_";
         }
