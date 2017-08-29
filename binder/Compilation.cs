@@ -198,8 +198,12 @@ namespace Embeddinator
 
                 var libName = (Options.Compilation.Platform == TargetPlatform.Windows) ?
                     $"{name}.dll" : $"lib{name}.dylib";
-                var outputDir = Path.Combine(Options.OutputDir, libName);
-                File.Copy(outputDir, Path.Combine(platformDir, libName), true);
+                var libFile = Path.Combine(Options.OutputDir, libName);
+                if (File.Exists(libFile))
+                {
+                    var outputFile = Path.Combine(platformDir, libName);
+                    File.Copy(libFile, outputFile, true);
+                }
 
                 //Copy .NET assemblies
                 var assembliesDir = Path.Combine(classesDir, "assemblies");
