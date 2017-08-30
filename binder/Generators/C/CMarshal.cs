@@ -93,12 +93,13 @@ namespace Embeddinator.Generators
             
             if (CMarshalNativeToManaged.IsValueType(array.Array.Type))
             {
+                var addressId = $"mono_array_addr_with_size({arrayId}, {elementSizeId}, {iteratorId})";
                 if (array.Array.Type.IsClass())
-                    support.WriteLine("MonoObject* {0} = mono_value_box({1}.domain, {2}, mono_array_addr_with_size({3}, {4}, {5}));",
-                        elementId, CGenerator.GenId("mono_context"), elementClassId, arrayId, elementSizeId, iteratorId);
+                    support.WriteLine("MonoObject* {0} = mono_value_box({1}.domain, {2}, {3});",
+                        elementId, CGenerator.GenId("mono_context"), elementClassId, addressId);
                 else
-                    support.WriteLine("char* {0} = mono_array_addr_with_size({1}, {2}, {3});",
-                        elementId, arrayId, elementSizeId, iteratorId);
+                    support.WriteLine("char* {0} = {1};",
+                        elementId, addressId);
             }
             else
                 support.WriteLine("MonoObject* {0} = *(MonoObject**) mono_array_addr_with_size({1}, {2}, {3});",
@@ -407,9 +408,8 @@ namespace Embeddinator.Generators
                     support.WriteLine("char* {0} = {1};", srcId, marshal.Context.Return.ToString());
                     support.WriteLine("char* {0} = mono_array_addr_with_size({1}, {2}, {3});", 
                         ptrId, arrayId, elementSizeId, iteratorId);
-                    var subIteratorId = CGenerator.GenId("i");
                     support.WriteLine("memcpy({0}, {1}, {2});",
-                                      ptrId, srcId, elementSizeId);
+                        ptrId, srcId, elementSizeId);
                 }
                 else
                     support.WriteLine("mono_array_set({0}, {1}, {2}, {3});",
