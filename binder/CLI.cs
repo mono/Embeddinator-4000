@@ -124,6 +124,8 @@ namespace Embeddinator
         {
             switch (platform.ToLowerInvariant())
             {
+            case "linux":
+                return TargetPlatform.Linux;
             case "windows":
                 return TargetPlatform.Windows;
             case "android":
