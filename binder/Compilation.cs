@@ -518,7 +518,7 @@ namespace Embeddinator
             return File.Exists(sgenPath) ? sgenPath : Path.Combine(libPath, "monosgen-2.0.lib");
         }
 
-        bool CompileClang(IEnumerable<string> files)
+        bool CompileClangMac(IEnumerable<string> files)
         {
             var xcodePath = XcodeToolchain.GetXcodeToolchainPath();
             var clangBin = Path.Combine(xcodePath, "usr/bin/clang");
@@ -541,6 +541,42 @@ namespace Embeddinator
                 var libName = $"lib{name}.dylib";
                 var outputPath = Path.Combine(Options.OutputDir, libName);
                 args.Add($"-dynamiclib -install_name {libName} -o {outputPath}");
+            }
+
+            switch (Options.GeneratorKind)
+            {
+            case GeneratorKind.ObjectiveC:
+                args.Add("-ObjC");
+                args.Add("-lobjc");
+                break;
+            case GeneratorKind.CPlusPlus:
+                args.Add("-x c++");
+                break;
+            }
+
+            var invocation = string.Join(" ", args);
+            var output = Invoke(clangBin, invocation);
+            return output.ExitCode == 0;
+        }
+
+        bool CompileClangLinux(IEnumerable<string> files)
+        {
+            var clangBin = Path.Combine("/usr/bin/clang");
+            var monoPath = ManagedToolchain.FindMonoPath();
+
+            var args = new List<string> {
+                $"-D{DLLExportDefine}",
+                $"-D_REENTRANT -I/usr/lib/pkgconfig/../../include/mono-2.0",
+                $"-L/usr/lib/pkgconfig/../../lib -lmono-2.0 -lm -lrt -ldl -lpthread",
+                string.Join(" ", files.ToList())
+            };
+
+            if (Options.Compilation.Target == CompilationTarget.SharedLibrary)
+            {
+                var name = Path.GetFileNameWithoutExtension(Project.Assemblies[0]);
+                var libName = $"lib{name}.so";
+                var outputPath = Path.Combine(Options.OutputDir, libName);
+                args.Add($"-shared -fPIC -install_name {libName} -o {outputPath}");
             }
 
             switch (Options.GeneratorKind)
@@ -646,7 +682,7 @@ namespace Embeddinator
                     throw new NotSupportedException(
                         $"Cross compilation to target platform '{Options.Compilation.Platform}' is not supported.");
                 case TargetPlatform.MacOS:
-                    return CompileClang(files);
+                    return CompileClangMac(files);
                 case TargetPlatform.Android:
                     return CompileNDK(files);
                 }
@@ -656,6 +692,8 @@ namespace Embeddinator
             {
                 switch (Options.Compilation.Platform)
                 {
+                case TargetPlatform.Linux:
+                    return CompileClangLinux(files);
                 case TargetPlatform.Android:
                     return CompileNDK(files);
                 }
