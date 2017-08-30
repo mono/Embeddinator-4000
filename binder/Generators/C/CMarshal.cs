@@ -66,6 +66,8 @@ namespace Embeddinator.Generators
 
             typePrinter.PrintScopeKind = TypePrintScopeKind.Qualified;
             var arrayElementName = array.Array.Type.Visit(typePrinter);
+            if (array.Array.Type.IsClass())
+                arrayElementName += "*";
             var elementSize = $"sizeof({arrayElementName})";
     
             var nativeArrayId = CGenerator.GenId($"{Context.ArgName}_native_array");
@@ -88,12 +90,20 @@ namespace Embeddinator.Generators
             support.WriteStartBraceIndent();
 
             var elementId = CGenerator.GenId($"{Context.ArgName}_array_element");
-
-            var isValueType = CMarshalNativeToManaged.IsValueType(array.Array.Type);
-            support.WriteLine("{5} {0} = {4}mono_array_addr_with_size({1}, {2}, {3});",
-                elementId, arrayId, elementSizeId, iteratorId,
-                isValueType ? string.Empty : "*(MonoObject**)",
-                isValueType ? "char*" : "MonoObject*");
+            
+            if (CMarshalNativeToManaged.IsValueType(array.Array.Type))
+            {
+                var addressId = $"mono_array_addr_with_size({arrayId}, {elementSizeId}, {iteratorId})";
+                if (array.Array.Type.IsClass())
+                    support.WriteLine("MonoObject* {0} = mono_value_box({1}.domain, {2}, {3});",
+                        elementId, CGenerator.GenId("mono_context"), elementClassId, addressId);
+                else
+                    support.WriteLine("char* {0} = {1};",
+                        elementId, addressId);
+            }
+            else
+                support.WriteLine("MonoObject* {0} = *(MonoObject**) mono_array_addr_with_size({1}, {2}, {3});",
+                    elementId, arrayId, elementSizeId, iteratorId);
 
             var ctx = new MarshalContext(Context.Context)
             {
@@ -350,6 +360,16 @@ namespace Embeddinator.Generators
             support.WriteLine("MonoArray* {0} = mono_array_new({1}.domain, {2}, {3}.array->len);",
                 arrayId, contextId, elementClassId, Context.ArgName);
 
+            var isValueType = IsValueType(elementType);
+
+            var elementSizeId = string.Empty;
+            if (array.Array.Type.IsClass() && isValueType)
+            {
+                elementSizeId = CGenerator.GenId($"{Context.ArgName}_array_element_size");
+                support.WriteLine("gint32 {0} = mono_class_array_element_size({1});",
+                    elementSizeId, elementClassId);
+            }
+
             var iteratorId = CGenerator.GenId("i");
             support.WriteLine("for (int {0} = 0; {0} < {1}.array->len; {0}++)",
                               iteratorId, Context.ArgName);
@@ -359,9 +379,15 @@ namespace Embeddinator.Generators
             string elementTypeName = elementType.Visit(typePrinter);
 
             var elementId = CGenerator.GenId($"{Context.ArgName}_array_element");
-            support.WriteLine("{0} {1} = g_array_index({2}.array, {0}, {3});",
-                elementTypeName, elementId, Context.ArgName, iteratorId);
-
+            if (elementType.IsClass())
+            {
+                elementTypeName += "*";
+                support.WriteLine("{0} {1} = g_array_index({2}.array, {0}, {3});",
+                    elementTypeName, elementId, Context.ArgName, iteratorId);
+            }
+            else
+                support.WriteLine("{0} {1} = g_array_index({2}.array, {0}, {3});",
+                    elementTypeName, elementId, Context.ArgName, iteratorId);
             var ctx = new MarshalContext(Context.Context)
             {
                 ArgName = elementId,
@@ -373,12 +399,22 @@ namespace Embeddinator.Generators
             if (!string.IsNullOrWhiteSpace(marshal.Context.SupportBefore))
                 support.Write(marshal.Context.SupportBefore.ToString());
 
-            var isValueType = IsValueType(elementType);
             if (isValueType)
             {
-                support.WriteLine("mono_array_set({0}, {1}, {2}, {3});",
-                    arrayId, elementTypeName, iteratorId,
-                    marshal.Context.Return.ToString());
+                if (elementType.IsClass())
+                {
+                    var srcId = CGenerator.GenId("src");
+                    var ptrId = CGenerator.GenId("ptr");
+                    support.WriteLine("char* {0} = {1};", srcId, marshal.Context.Return.ToString());
+                    support.WriteLine("char* {0} = mono_array_addr_with_size({1}, {2}, {3});", 
+                        ptrId, arrayId, elementSizeId, iteratorId);
+                    support.WriteLine("memcpy({0}, {1}, {2});",
+                        ptrId, srcId, elementSizeId);
+                }
+                else
+                    support.WriteLine("mono_array_set({0}, {1}, {2}, {3});",
+                        arrayId, elementTypeName, iteratorId,
+                        marshal.Context.Return.ToString());
             }
             else
             {
