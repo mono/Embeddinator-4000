@@ -18,7 +18,7 @@ function managed_project(name)
   language "C#"
   location ("%{wks.location}/build/projects")
 
-  if not os.istarget("macosx") then
+  if os.istarget and os.istarget("windows") then
     filter { "action:vs*" }
       location "."
     filter {}
