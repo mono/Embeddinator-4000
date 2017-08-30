@@ -91,7 +91,7 @@ Task("Generate-C")
     .IsDependentOn("Build-FSharp-Generic")
     .Does(() =>
     {
-        var platform = IsRunningOnWindows() ? "Windows" : "macOS";
+        var platform = IsRunningOnWindows() ? "Windows" : IsRunningOnMacOS() ? "macOS" : "Linux";
         var output = commonDir + Directory("c");
         Exec(embeddinator, $"-gen=c -out={output} -platform={platform} -target=shared -verbose {managedDll} {fsharpManagedDll}");
     });
@@ -101,7 +101,7 @@ Task("Build-C-Tests")
     .Does(() =>
     {
         // Generate native project build files using Premake.
-        var os = IsRunningOnWindows() ? "--os=windows" : "--os=macosx";
+        var os = IsRunningOnWindows() ? "--os=windows" : IsRunningOnMacOS() ? "--os=macosx" : "--os=linux";
         var action = IsRunningOnWindows() ? "vs2015" : "gmake";
         Premake(commonDir + File("premake5.lua"), os, action);
 
@@ -162,7 +162,7 @@ Task("Generate-Java")
     .IsDependentOn("Build-Managed")
     .Does(() =>
     {
-        var platform = IsRunningOnWindows() ? "Windows" : "macOS";
+        var platform = IsRunningOnWindows() ? "Windows" : IsRunningOnMacOS() ? "macOS" : "Linux";
         var output = mkDir + Directory("java");
         Exec(embeddinator, $"-gen=Java -out={output} -platform={platform} -compile -target=shared {managedDll}");
     });

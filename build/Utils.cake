@@ -1,3 +1,8 @@
+bool IsRunningOnMacOS()
+{
+    return true;
+}
+
 void Exec(string path, ProcessSettings settings)
 {
     if (path.EndsWith(".exe") && !IsRunningOnWindows())
@@ -24,6 +29,6 @@ void Exec(string path, string args = "", string workingDir = ".")
 void Premake(string file, string args, string action)
 {
     var premakePath = Directory("./external/CppSharp/build/") + (IsRunningOnWindows() ?
-        File("premake5.exe") : File("premake5-osx"));
+        File("premake5.exe") : IsRunningOnMacOS() ? File("premake5-osx") : File("premake5-linux-64"));
     Exec(premakePath, $"--file={file} {args} {action}");
 }
