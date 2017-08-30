@@ -6,12 +6,14 @@ if [ -n "$BUILD_SOURCESDIRECTORY" ]; then
 BUILD_DIR=$BUILD_SOURCESDIRECTORY/build
 fi
 
-cd $BUILD_DIR/../objcgen
-./system-dependencies.sh --provision
-
 OS=$(uname -s)
 if [ "$OS" == "Darwin" ]; then
+	cd $BUILD_DIR/../objcgen
+	./system-dependencies.sh --provision
+
 	export PATH=$PATH:/Library/Frameworks/Mono.framework/Versions/Current/bin
+elif [ "$OS" == "Linux" ]; then
+	$BUILD_DIR/../external/CppSharp/build/InstallMono.sh
 fi
 
 cd $BUILD_DIR
