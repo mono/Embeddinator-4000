@@ -561,6 +561,8 @@ namespace Embeddinator.Generators
             foreach (var param in parameters)
             {
                 var paramDecl = VisitParameter(param);
+                paramDecl.Namespace = method;
+
                 method.Parameters.Add(paramDecl);
 
                 if (paramDecl.Ignore)
