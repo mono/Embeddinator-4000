@@ -4,9 +4,7 @@
 		<UnixMonoRuntime Condition="Exists('/Library/Frameworks/Mono.framework/Commands/')">/Library/Frameworks/Mono.framework/Commands/mono</UnixMonoRuntime>
 	</PropertyGroup>
 	<Target Name="BeforeBuild" Inputs="$(MSBuildThisFileDirectory)subscripts.tt" Outputs="$(MSBuildThisFileDirectory)subscripts.cs">
-		<Exec Condition=" '$(OS)' == 'Unix' " WorkingDirectory="$(MSBuildThisFileDirectory)" Command="nuget install Mono.TextTransform -OutputDirectory ../../packages/" />
 		<Exec Condition=" '$(OS)' == 'Unix' " WorkingDirectory="$(MSBuildThisFileDirectory)" Command=" $(UnixMonoRuntime) ../../packages/Mono.TextTransform.1.0.0/tools/TextTransform.exe subscripts.tt -o subscripts.cs" />
-		<Exec Condition=" '$(OS)' != 'Unix' " WorkingDirectory="$(MSBuildThisFileDirectory)" Command="..\..\.nuget\nuget.exe install Mono.TextTransform -OutputDirectory ..\..\packages\" />
 		<Exec Condition=" '$(OS)' != 'Unix' " WorkingDirectory="$(MSBuildThisFileDirectory)" Command="..\..\packages\Mono.TextTransform.1.0.0\tools\TextTransform.exe subscripts.tt -o subscripts.cs" />
 	</Target>  
 </Project>
