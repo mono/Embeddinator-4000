@@ -55,9 +55,6 @@
     <Compile Include="../../external/CppSharp/src/Parser/ParserOptions.cs">
       <Link>ParserOptions.cs</Link>
     </Compile>
-    <Compile Include="../../external/CppSharp/src/Parser/Project.cs">
-      <Link>Project.cs</Link>
-    </Compile>
     <Compile Include="../../external/CppSharp/src/Parser/TargetTriple.cs">
       <Link>TargetTriple.cs</Link>
     </Compile>
