@@ -9,14 +9,6 @@ sudo: required
 
 compiler: clang
 
-addons:
-  apt:
-    sources:
-    - ubuntu-toolchain-r-test
-    packages:
-    - gcc-7
-    - g++-7
-
 install:
   - source build/SetupCI.sh
 
