@@ -14,6 +14,7 @@ if [ "$OS" == "Darwin" ]; then
 	export PATH=$PATH:/Library/Frameworks/Mono.framework/Versions/Current/bin
 elif [ "$OS" == "Linux" ]; then
 	$BUILD_DIR/../external/CppSharp/build/InstallMono.sh
+	sudo apt-get install fsharp
 	wget https://dist.nuget.org/win-x86-commandline/latest/nuget.exe
 fi
 
