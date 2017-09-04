@@ -181,7 +181,7 @@ function SetupTestProjectsRunner(name)
 
     dependson { name .. ".Managed" }
 
-    filter { "not system:windows" }
+    filter { "not system:windows", "files:*.cpp" }
       buildoptions { "-std=gnu++11" }
 
     filter { "action:vs*" }
