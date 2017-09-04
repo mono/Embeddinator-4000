@@ -559,9 +559,24 @@ namespace Embeddinator
             return output.ExitCode == 0;
         }
 
+        public static string FindInPath(string filename)    
+        {
+            return new[]{Environment.CurrentDirectory}
+                .Concat(Environment.GetEnvironmentVariable("PATH").Split(';'))
+                .Select(dir => Path.Combine(dir, filename))
+                .FirstOrDefault(path => File.Exists(path));
+        }
+
         bool CompileClangLinux(IEnumerable<string> files)
         {
-            var clangBin = Path.Combine("/usr/bin/clang");
+            var compilerBin = FindInPath("clang");
+
+            if (compilerBin == null)
+                compilerBin = FindInPath("g++");
+
+            if (compilerBin == null)
+                throw new Exception("Cannot find C++ compiler on the system.");
+
             var monoPath = ManagedToolchain.FindMonoPath();
 
             var args = new List<string> {
@@ -591,7 +606,7 @@ namespace Embeddinator
             }
 
             var invocation = string.Join(" ", args);
-            var output = Invoke(clangBin, invocation);
+            var output = Invoke(compilerBin, invocation);
             return output.ExitCode == 0;
         }
 
