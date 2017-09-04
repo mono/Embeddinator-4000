@@ -102,7 +102,7 @@ Task("Build-C-Tests")
     {
         // Generate native project build files using Premake.
         var os = IsRunningOnWindows() ? "--os=windows" : IsRunningOnMacOS() ? "--os=macosx" : "--os=linux";
-        var action = IsRunningOnWindows() ? "vs2015" : "gmake";
+        var action = IsRunningOnWindows() ? "vs2015" : "gmake2";
         Premake(commonDir + File("premake5.lua"), os, action);
 
         // Execute the build files.
