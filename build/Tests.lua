@@ -181,6 +181,9 @@ function SetupTestProjectsRunner(name)
 
     dependson { name .. ".Managed" }
 
+    filter { "not system:windows" }
+      buildoptions { "-std=gnu++11" }
+
     filter { "action:vs*" }
       buildoptions { "/wd4018" } -- eglib signed/unsigned warnings
 
