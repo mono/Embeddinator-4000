@@ -565,7 +565,7 @@ namespace Embeddinator
             var monoPath = ManagedToolchain.FindMonoPath();
 
             var args = new List<string> {
-                $"-D{DLLExportDefine}",
+                $"-std=gnu99 -D{DLLExportDefine}",
                 $"-D_REENTRANT -I/usr/lib/pkgconfig/../../include/mono-2.0",
                 $"-L/usr/lib/pkgconfig/../../lib -lmono-2.0 -lm -lrt -ldl -lpthread",
                 string.Join(" ", files.ToList())

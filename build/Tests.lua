@@ -93,6 +93,9 @@ function SetupTestProjectC(name, depends)
       links { depends .. ".C" }
     end
 
+    filter { "not system:windows" }
+      buildoptions { "-std=gnu99" }
+
     filter { "action:vs*" }
       buildoptions { "/wd4018" } -- eglib signed/unsigned warnings
 
