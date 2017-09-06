@@ -14,16 +14,7 @@ if [ "$OS" == "Darwin" ]; then
 	export PATH=$PATH:/Library/Frameworks/Mono.framework/Versions/Current/bin
 elif [ "$OS" == "Linux" ]; then
 	$BUILD_DIR/../external/CppSharp/build/InstallMono.sh
-	sudo apt-get install fsharp
-	wget https://dist.nuget.org/win-x86-commandline/latest/nuget.exe
+	sudo apt-get install fsharp default-jdk-headless
 fi
-
-cd $BUILD_DIR
-if [ ! -f $BUILD_DIR/nuget.exe ]; then
-	curl -L https://nuget.org/nuget.exe -o $BUILD_DIR/nuget.exe
-	export NUGET_EXE=$BUILD_DIR/nuget.exe
-fi
-
-mono $BUILD_DIR/nuget.exe install Mono.TextTransform -OutputDirectory $BUILD_DIR/../deps
 
 cd $BUILD_DIR/..
