@@ -240,10 +240,27 @@ namespace Embeddinator
                 // Copy the Mono runtime shared library to the JAR file
                 var libDir = (Options.Compilation.Platform == TargetPlatform.Windows) ?
                     "bin" : "lib";
-                libName = (Options.Compilation.Platform == TargetPlatform.Windows) ?
-                    "mono-2.0-sgen.dll" : "libmonosgen-2.0.dylib";
+
+                switch(Options.Compilation.Platform)
+                {
+                    case TargetPlatform.Windows:
+                        libName = "mono-2.0-sgen.dll";
+                        break;
+                    case TargetPlatform.MacOS:
+                        libName = "libmonosgen-2.0.dylib";
+                        break;
+                    case TargetPlatform.Linux:
+                        libName = "libmonosgen-2.0.so";
+                        break;
+                    default:
+                        throw new NotImplementedException();
+                }
 
                 var monoLib = Path.Combine(monoPath, libDir, libName);
+
+                if (!File.Exists(monoLib))
+                    throw new Exception($"Cannot find Mono runtime shared library: {monoLib}");
+
                 File.Copy(monoLib, Path.Combine(platformDir, libName), true);
             }
 
