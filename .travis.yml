@@ -9,6 +9,9 @@ sudo: required
 
 compiler: clang
 
+jdk:
+  - openjdk8
+
 install:
   - source build/SetupCI.sh
 

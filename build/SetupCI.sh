@@ -14,7 +14,7 @@ if [ "$OS" == "Darwin" ]; then
 	export PATH=$PATH:/Library/Frameworks/Mono.framework/Versions/Current/bin
 elif [ "$OS" == "Linux" ]; then
 	$BUILD_DIR/../external/CppSharp/build/InstallMono.sh
-	sudo apt-get install fsharp default-jdk-headless
+	sudo apt-get install fsharp
 fi
 
 cd $BUILD_DIR/..
