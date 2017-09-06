@@ -58,6 +58,7 @@ MONO_API int monodroid_embedded_assemblies_set_assemblies_prefix (const char *pr
 JNIEXPORT void JNICALL
 Java_mono_embeddinator_AndroidImpl_setAssemblyPrefix()
 {
+    mono_embeddinator_set_runtime_assembly_path("assets/assemblies");
     monodroid_embedded_assemblies_set_assemblies_prefix("assets/assemblies/");
 }
 #endif
