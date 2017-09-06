@@ -36,7 +36,7 @@ Task("Create-Package")
 Task("Publish-Package")
     .Does(() =>
     {
-        var apiKey = System.IO.File.ReadAllText ("./.nuget/.nugetapikey");
+        var apiKey = System.IO.File.ReadAllText ("./.cake/.nugetapikey");
         var nupkg = "./build/Embeddinator-4000." + version + ".nupkg";
 
         NuGetPush(nupkg, new NuGetPushSettings
