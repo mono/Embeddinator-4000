@@ -93,6 +93,7 @@ public final class Runtime {
         }
 
         public void mono_embeddinator_set_assembly_path(String path);
+        public void mono_embeddinator_set_runtime_assembly_path(String path);
         public Pointer mono_embeddinator_install_error_report_hook(ErrorCallback cb);
     }
 
