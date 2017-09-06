@@ -559,20 +559,22 @@ namespace Embeddinator
             return output.ExitCode == 0;
         }
 
-        public static string FindInPath(string filename)    
+        public static string FindInPath(string filename)
         {
-            return new[]{Environment.CurrentDirectory}
-                .Concat(Environment.GetEnvironmentVariable("PATH").Split(';'))
-                .Select(dir => Path.Combine(dir, filename))
-                .FirstOrDefault(path => File.Exists(path));
+            return new[] { Environment.CurrentDirectory }
+                .Concat(Environment.GetEnvironmentVariable("PATH").Split(';', ':'))
+                .Select(dir =>
+                {
+                    var path = Path.Combine(dir, filename);
+                    Console.WriteLine(path);
+                    return path;
+                })
+                .FirstOrDefault(File.Exists);
         }
 
         bool CompileClangLinux(IEnumerable<string> files)
         {
-            var compilerBin = FindInPath("clang");
-
-            if (compilerBin == null)
-                compilerBin = FindInPath("g++");
+            var compilerBin = FindInPath("clang") ?? FindInPath("gcc");
 
             if (compilerBin == null)
                 throw new Exception("Cannot find C++ compiler on the system.");
