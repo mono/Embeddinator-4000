@@ -134,11 +134,27 @@ namespace Embeddinator
             // If we are running on macOS, invoke java_home to figure out Java path.
             if (Platform.IsMacOS)
                 return Helpers.Invoke("/usr/libexec/java_home", null, null).StandardOutput.Trim();
-
+    
             string home = Environment.GetEnvironmentVariable("JAVA_HOME");
+            if (!string.IsNullOrEmpty(home))
+                return home;
+    
+            if (Platform.IsLinux)
+            {
+                // Only available on Debian-based distros, set JAVA_HOME for other distros.
+                try
+                {
+                    var javaBin = Helpers.Invoke("update-alternatives", "--list java", null).StandardOutput.Trim();
+                    if (!string.IsNullOrEmpty(javaBin))
+                        return GetFullPath(Combine(GetDirectoryName(javaBin), "../.."));
+                }
+                finally { }
+            }
+
             if (string.IsNullOrEmpty(home))
                 throw new Exception("Cannot find Java SDK: JAVA_HOME environment variable is not set.");
-            return home;
+
+            return string.Empty;
         });
 
         public static string JavaSdkPath
