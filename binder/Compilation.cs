@@ -101,6 +101,7 @@ namespace Embeddinator
 
             var args = new List<string> {
                 string.Join(" ", javaFiles),
+                "-encoding UTF-8",
                 $"-source {XamarinAndroid.JavaVersion} -target {XamarinAndroid.JavaVersion}",
                 $"-bootclasspath \"{bootClassPath}\"",
                 $"-d {classesDir}",
