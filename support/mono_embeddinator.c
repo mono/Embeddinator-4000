@@ -134,6 +134,15 @@ void mono_embeddinator_set_assembly_path (const char *path)
 	path_override = g_string_new (path);
 }
 
+void mono_embeddinator_set_runtime_assembly_path(const char* path)
+{
+    GString* tmp = g_string_new(path);
+    gchar* sep = strrchr_seperator(tmp->str);
+    g_string_truncate(tmp, sep - tmp->str);
+    mono_set_dirs(tmp->str, tmp->str);
+    g_string_free(tmp, /*free_segment=*/ FALSE);
+}
+
 static GString* get_current_executable_path()
 {
     if (path_override)
