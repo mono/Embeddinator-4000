@@ -203,7 +203,7 @@ Task("Build-Java-Tests")
     {
         var output = mkDir + Directory("java");
         var tests = File("./tests/common/java/mono/embeddinator/Tests.java");
-        var javac = Directory(javaHome) + File("bin/javac");
+        var javac = IsRunningOnLinux() ? "javac" : Directory(javaHome) + File("bin/javac");
         Exec(javac, $"-cp {classPath} -d {output} -Xdiags:verbose -Xlint:deprecation -Xlint:unchecked {tests}");
     });
 
@@ -211,6 +211,6 @@ Task("Run-Java-Tests")
     .IsDependentOn("Build-Java-Tests")
     .Does(() =>
     {
-        var java = Directory(javaHome) + File("bin/java");
+        var java = IsRunningOnLinux() ? "java" : Directory(javaHome) + File("bin/java");
         Exec(java, $"-cp {classPath} -Djna.dump_memory=true -Djna.nosys=true org.junit.runner.JUnitCore mono.embeddinator.Tests");
     });

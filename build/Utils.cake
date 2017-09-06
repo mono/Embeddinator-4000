@@ -7,6 +7,11 @@ bool IsRunningOnMacOS()
            System.IO.File.Exists("/System/Library/CoreServices/ServerVersion.plist");
 }
 
+bool IsRunningOnLinux()
+{
+    return IsRunningOnUnix() && !IsRunningOnMacOS();
+}
+
 void Exec(string path, ProcessSettings settings)
 {
     if (path.EndsWith(".exe") && !IsRunningOnWindows())
