@@ -16,7 +16,7 @@ void Exec(string path, ProcessSettings settings)
 {
     if (path.EndsWith(".exe") && !IsRunningOnWindows())
     {
-        settings.Arguments.Prepend(path + " ");
+        settings.Arguments.Prepend("--debug " + path + " ");
         path = "mono";
     }
 
