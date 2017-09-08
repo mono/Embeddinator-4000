@@ -10,7 +10,7 @@ Embeddinator now has support for Windows and Linux, for C and Java generators, a
 Java support
 ------------
 
-* [pr475](https://github.com/mono/Embeddinator-4000/pull/475) - Improved support for C# interfaces, with generation of Java abstract class proxies
+* [pr475](https://github.com/mono/Embeddinator-4000/pull/475) - Improved support for C# abstract classes, with generation of Java abstract class proxies
 * [pr490](https://github.com/mono/Embeddinator-4000/pull/490) - Improved support for desktop Java in Windows, macOS and Linux platforms
 
 Android support
