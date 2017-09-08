@@ -52,4 +52,4 @@ install:
 
 build_script:
   - cmd: git submodule update --init --recursive
-  - ps: .\build.ps1 -t AppVeyor -v diagnostic
+  - ps: .\build.ps1 -verbose -t AppVeyor -v diagnostic
