@@ -39,6 +39,7 @@ bindings.m
 /external/ikvm
 packages
 .nuget/.nugetapikey
+/tests/android/**/.project
 
 ### Xcode ###
 DerivedData/
