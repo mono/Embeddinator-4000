@@ -80,7 +80,7 @@ if [ ! -f $PACKAGES_CONFIG_MD5 ] || [ "$( cat $PACKAGES_CONFIG_MD5 | sed 's/\r$/
     find . -type d ! -name . | xargs rm -rf
 fi
 
-mono "$NUGET_EXE" install -ExcludeVersion
+mono "$NUGET_EXE" install -ExcludeVersion -configfile MyGet.config
 if [ $? -ne 0 ]; then
     echo "Could not restore NuGet packages."
     exit 1
