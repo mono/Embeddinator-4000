@@ -1,6 +1,6 @@
 #!mono .cake/Cake/Cake.exe
 
-var version = Argument("version", "0.1");
+var version = Argument("version", "0.3.0");
 
 Task("Create-Package")
     .IsDependentOn("Build-Binder")
