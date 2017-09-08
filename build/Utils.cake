@@ -1,6 +1,15 @@
 bool IsRunningOnMacOS()
 {
-    return true;
+    if (Environment.OSVersion.Platform != PlatformID.Unix)
+        return false;
+
+    return System.IO.File.Exists("/System/Library/CoreServices/SystemVersion.plist") ||
+           System.IO.File.Exists("/System/Library/CoreServices/ServerVersion.plist");
+}
+
+bool IsRunningOnLinux()
+{
+    return IsRunningOnUnix() && !IsRunningOnMacOS();
 }
 
 void Exec(string path, ProcessSettings settings)
@@ -10,7 +19,9 @@ void Exec(string path, ProcessSettings settings)
         settings.Arguments.Prepend(path + " ");
         path = "mono";
     }
+
     Verbose($"Executing: {path} {settings.Arguments.Render()}");
+
     var exitCode = StartProcess(path, settings);
     if (exitCode != 0)
         throw new Exception(path + " failed!");

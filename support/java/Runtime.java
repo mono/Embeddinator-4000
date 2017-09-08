@@ -153,8 +153,9 @@ public final class Runtime {
         }
 
         if (!isRunningOnAndroid()) {
-            library = com.sun.jna.Platform.isWindows()
-                ? String.format("%s.dll", library) : String.format("lib%s.dylib", library);
+            library = com.sun.jna.Platform.isWindows() ? String.format("%s.dll", library) :
+                      com.sun.jna.Platform.isMac() ? String.format("lib%s.dylib", library) :
+                      String.format("lib%s.so", library);
         }
         return Native.loadLibrary(library, klass);
     }

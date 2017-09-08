@@ -37,7 +37,6 @@ environment:
 
 cache:
   - packages -> **\packages.config
-  - .cake -> build.cake, .cake\packages.config
   - external\Xamarin.Android -> build.cake
 
 #---------------------------------#
@@ -45,7 +44,7 @@ cache:
 #---------------------------------#
 
 init:
-  - git config --global core.autocrlf true
+  - cmd: git config --global core.autocrlf true
 
 install:
   - cmd: appveyor DownloadFile https://download.mono-project.com/archive/5.0.1/windows-installer/%MONO_INSTALLER%

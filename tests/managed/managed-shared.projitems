@@ -11,6 +11,9 @@
   <ItemGroup>
   </ItemGroup>
   <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)builtins.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)constructors.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)enums.cs" />

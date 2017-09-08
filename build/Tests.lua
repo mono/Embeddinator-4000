@@ -29,26 +29,32 @@ function SetupMono()
   -- For Windows, first search the default Mono install location.
   local monoDefaultWindowsDir = "C:\\Program Files (x86)\\Mono"
   if os.isdir(monoDefaultWindowsDir) then
-    monoDir = monoDefaultWindowsDir
+    monoIncludeDir = path.join(monoDefaultWindowsDir, "include")
+    monoLibDir = path.join(monoDefaultWindowsDir, "lib")
   end
 
   local monoDefaultOSXDir = "/Library/Frameworks/Mono.framework/Versions/Current/"
   if os.isdir(monoDefaultOSXDir) then
-    monoDir = monoDefaultOSXDir
+    monoIncludeDir = path.join(monoDefaultOSXDir, "include")
+    monoLibDir = path.join(monoDefaultOSXDir, "lib")
   end
 
   -- TODO: Use premake-pkgconfig for Linux
+  if os.ishost("linux") then
+    monoIncludeDir = "/usr/include"
+    monoLibDir = "/usr/lib"
+  end
 
-  if not monoDir or not os.isdir(monoDir) then
+  if not monoIncludeDir or not os.isdir(monoIncludeDir) then
     error("Could not find Mono install location, please specify it manually")
   end
 
-  includedirs { path.join(monoDir, "include", "mono-2.0") }
-  monoLibdir = path.join(monoDir, "lib")
-  libdirs { monoLibdir }
+  includedirs { path.join(monoIncludeDir, "mono-2.0") }
+  libdirs { monoLibDir }
+  
   if(os.ishost("windows")) then
-    libFiles = os.matchfiles(path.join(monoLibdir, "monosgen-2.0.lib"))
-    table.insert(libFiles, os.matchfiles(path.join(monoLibdir, "mono-2.0-sgen.lib")))
+    libFiles = os.matchfiles(path.join(monoLibDir, "monosgen-2.0.lib"))
+    table.insert(libFiles, os.matchfiles(path.join(monoLibDir, "mono-2.0-sgen.lib")))
     links { libFiles }
   else
     links { "monosgen-2.0" }
@@ -86,6 +92,9 @@ function SetupTestProjectC(name, depends)
     if depends ~= nil then
       links { depends .. ".C" }
     end
+
+    filter { "not system:windows" }
+      buildoptions { "-std=gnu99" }
 
     filter { "action:vs*" }
       buildoptions { "/wd4018" } -- eglib signed/unsigned warnings
@@ -171,6 +180,9 @@ function SetupTestProjectsRunner(name)
       links { name .. ".ObjC", "objc", "CoreFoundation.framework", "Foundation.framework" }
 
     dependson { name .. ".Managed" }
+
+    filter { "not system:windows", "files:*.cpp" }
+      buildoptions { "-std=gnu++11" }
 
     filter { "action:vs*" }
       buildoptions { "/wd4018" } -- eglib signed/unsigned warnings

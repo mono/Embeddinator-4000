@@ -27,6 +27,7 @@ obj/
 *.dylib
 bindings.h
 bindings.m
+/build/.vagrant
 /build/gen
 /build/lib
 /build/obj

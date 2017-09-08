@@ -102,7 +102,7 @@ Task("Build-C-Tests")
     {
         // Generate native project build files using Premake.
         var os = IsRunningOnWindows() ? "--os=windows" : IsRunningOnMacOS() ? "--os=macosx" : "--os=linux";
-        var action = IsRunningOnWindows() ? "vs2015" : "gmake";
+        var action = IsRunningOnWindows() ? "vs2015" : "gmake2";
         Premake(commonDir + File("premake5.lua"), os, action);
 
         // Execute the build files.
@@ -203,7 +203,7 @@ Task("Build-Java-Tests")
     {
         var output = mkDir + Directory("java");
         var tests = File("./tests/common/java/mono/embeddinator/Tests.java");
-        var javac = Directory(javaHome) + File("bin/javac");
+        var javac = IsRunningOnLinux() ? "javac" : Directory(javaHome) + File("bin/javac");
         Exec(javac, $"-cp {classPath} -d {output} -Xdiags:verbose -Xlint:deprecation -Xlint:unchecked {tests}");
     });
 
@@ -211,6 +211,6 @@ Task("Run-Java-Tests")
     .IsDependentOn("Build-Java-Tests")
     .Does(() =>
     {
-        var java = Directory(javaHome) + File("bin/java");
+        var java = IsRunningOnLinux() ? "java" : Directory(javaHome) + File("bin/java");
         Exec(java, $"-cp {classPath} -Djna.dump_memory=true -Djna.nosys=true org.junit.runner.JUnitCore mono.embeddinator.Tests");
     });

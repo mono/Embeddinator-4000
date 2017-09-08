@@ -101,6 +101,7 @@ namespace Embeddinator
 
             var args = new List<string> {
                 string.Join(" ", javaFiles),
+                "-encoding UTF-8",
                 $"-source {XamarinAndroid.JavaVersion} -target {XamarinAndroid.JavaVersion}",
                 $"-bootclasspath \"{bootClassPath}\"",
                 $"-d {classesDir}",
@@ -239,10 +240,27 @@ namespace Embeddinator
                 // Copy the Mono runtime shared library to the JAR file
                 var libDir = (Options.Compilation.Platform == TargetPlatform.Windows) ?
                     "bin" : "lib";
-                libName = (Options.Compilation.Platform == TargetPlatform.Windows) ?
-                    "mono-2.0-sgen.dll" : "libmonosgen-2.0.dylib";
+
+                switch(Options.Compilation.Platform)
+                {
+                    case TargetPlatform.Windows:
+                        libName = "mono-2.0-sgen.dll";
+                        break;
+                    case TargetPlatform.MacOS:
+                        libName = "libmonosgen-2.0.dylib";
+                        break;
+                    case TargetPlatform.Linux:
+                        libName = "libmonosgen-2.0.so";
+                        break;
+                    default:
+                        throw new NotImplementedException();
+                }
 
                 var monoLib = Path.Combine(monoPath, libDir, libName);
+
+                if (!File.Exists(monoLib))
+                    throw new Exception($"Cannot find Mono runtime shared library: {monoLib}");
+
                 File.Copy(monoLib, Path.Combine(platformDir, libName), true);
             }
 
@@ -559,13 +577,30 @@ namespace Embeddinator
             return output.ExitCode == 0;
         }
 
+        public static string FindInPath(string filename)
+        {
+            return new[] { Environment.CurrentDirectory }
+                .Concat(Environment.GetEnvironmentVariable("PATH").Split(';', ':'))
+                .Select(dir =>
+                {
+                    var path = Path.Combine(dir, filename);
+                    Console.WriteLine(path);
+                    return path;
+                })
+                .FirstOrDefault(File.Exists);
+        }
+
         bool CompileClangLinux(IEnumerable<string> files)
         {
-            var clangBin = Path.Combine("/usr/bin/clang");
+            var compilerBin = FindInPath("clang") ?? FindInPath("gcc");
+
+            if (compilerBin == null)
+                throw new Exception("Cannot find C++ compiler on the system.");
+
             var monoPath = ManagedToolchain.FindMonoPath();
 
             var args = new List<string> {
-                $"-D{DLLExportDefine}",
+                $"-std=gnu99 -D{DLLExportDefine}",
                 $"-D_REENTRANT -I/usr/lib/pkgconfig/../../include/mono-2.0",
                 $"-L/usr/lib/pkgconfig/../../lib -lmono-2.0 -lm -lrt -ldl -lpthread",
                 string.Join(" ", files.ToList())
@@ -591,7 +626,7 @@ namespace Embeddinator
             }
 
             var invocation = string.Join(" ", args);
-            var output = Invoke(clangBin, invocation);
+            var output = Invoke(compilerBin, invocation);
             return output.ExitCode == 0;
         }
 
