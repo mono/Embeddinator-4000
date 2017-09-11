@@ -447,8 +447,7 @@ namespace Embeddinator
 
         bool CompileMSVC(IEnumerable<string> files)
         {
-            List<ToolchainVersion> vsSdks;
-            MSVCToolchain.GetVisualStudioSdks(out vsSdks);
+            var vsSdks = MSVCToolchain.GetVisualStudioSdks();
 
             // Skip TestAgent VS instances as they do not provide native toolchains.
             vsSdks = vsSdks.Where(sdk => !sdk.Directory.Contains("TestAgent")).ToList();
@@ -506,11 +505,9 @@ namespace Embeddinator
             var invocation = string.Join(" ", args);
 
             var vsVersion = (VisualStudioVersion)(int)vsSdk.Version;
-            VisualStudioVersion foundVsVersion;
-            var includes = MSVCToolchain.GetSystemIncludes(vsVersion, out foundVsVersion);
+            var includes = MSVCToolchain.GetSystemIncludes(vsVersion);
 
-            var winSdks = new List<ToolchainVersion>();
-            MSVCToolchain.GetWindowsKitsSdks(out winSdks);
+            var winSdks = MSVCToolchain.GetWindowsKitsSdks();
 
             var libParentPath = Directory.GetParent(Directory.EnumerateDirectories(
                 Path.Combine(winSdks.Last().Directory, "lib"), "um", SearchOption.AllDirectories).First());

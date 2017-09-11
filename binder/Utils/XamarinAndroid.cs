@@ -169,8 +169,8 @@ namespace Embeddinator
 
             if (Platform.IsWindows)
             {
-                List<ToolchainVersion> toolchains;
-                if (!MSVCToolchain.GetMSBuildSdks(out toolchains))
+                List<ToolchainVersion> toolchains = MSVCToolchain.GetMSBuildSdks();
+                if (!toolchains.Any())
                     return "MSBuild.exe";
 
                 return Combine(toolchains.OrderByDescending(t => t.Version).Select(t => t.Directory).First(), "MSBuild.exe");
