@@ -67,6 +67,12 @@ mono_embeddinator_context_t* mono_embeddinator_get_context();
 MONO_EMBEDDINATOR_API
 void mono_embeddinator_set_assembly_path (const char *path);
 
+/*
+ * Override the default path (current executable / mono default installation) where runtime assemblies will be loaded.
+ */
+MONO_EMBEDDINATOR_API
+void mono_embeddinator_set_runtime_assembly_path (const char *path);
+
 /** 
  * Sets the current context.
  */

@@ -58,6 +58,7 @@ MONO_API int monodroid_embedded_assemblies_set_assemblies_prefix (const char *pr
 JNIEXPORT void JNICALL
 Java_mono_embeddinator_AndroidImpl_setAssemblyPrefix()
 {
+    mono_embeddinator_set_runtime_assembly_path("assets/assemblies");
     monodroid_embedded_assemblies_set_assemblies_prefix("assets/assemblies/");
 }
 #endif
@@ -102,13 +103,6 @@ int mono_embeddinator_init(mono_embeddinator_context_t* ctx, const char* domain)
     xamarin_initialize_embedded ();
     ctx->domain = mono_domain_get ();
 #else
-    if (path_override) {
-        GString* tmp = g_string_new(path_override->str);
-        gchar* sep = strrchr_seperator(tmp->str);
-        g_string_truncate(tmp, sep - tmp->str);
-        mono_set_dirs(tmp->str, tmp->str);
-        g_string_free(tmp, /*free_segment=*/ FALSE);
-    }
     #if defined (__ANDROID__)
     ctx->domain = mono_domain_get ();
     #else
@@ -139,6 +133,15 @@ int mono_embeddinator_destroy(mono_embeddinator_context_t* ctx)
 void mono_embeddinator_set_assembly_path (const char *path)
 {
 	path_override = g_string_new (path);
+}
+
+void mono_embeddinator_set_runtime_assembly_path(const char* path)
+{
+    GString* tmp = g_string_new(path);
+    gchar* sep = strrchr_seperator(tmp->str);
+    g_string_truncate(tmp, sep - tmp->str);
+    mono_set_dirs(tmp->str, tmp->str);
+    g_string_free(tmp, /*free_segment=*/ FALSE);
 }
 
 static GString* get_current_executable_path()
