@@ -93,7 +93,7 @@ Task("Generate-C")
     {
         var platform = IsRunningOnWindows() ? "Windows" : IsRunningOnMacOS() ? "macOS" : "Linux";
         var output = commonDir + Directory("c");
-        Exec(embeddinator, $"-gen=c -out={output} -platform={platform} -target=shared -verbose {managedDll} {fsharpManagedDll}");
+        Embeddinator($"-gen=c -out={output} -platform={platform} {managedDll} {fsharpManagedDll}");
     });
 
 Task("Build-C-Tests")
@@ -164,7 +164,7 @@ Task("Generate-Java")
     {
         var platform = IsRunningOnWindows() ? "Windows" : IsRunningOnMacOS() ? "macOS" : "Linux";
         var output = mkDir + Directory("java");
-        Exec(embeddinator, $"-gen=Java -out={output} -platform={platform} -compile -target=shared {managedDll}");
+        Embeddinator($"-gen=Java -out={output} -platform={platform} -compile {managedDll}");
     });
 
 //Java settings

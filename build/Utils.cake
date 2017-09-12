@@ -37,6 +37,12 @@ void Exec(string path, string args = "", string workingDir = ".")
     Exec(path, settings);
 }
 
+void Embeddinator(string args)
+{
+    var embeddinator = buildDir + File("Embeddinator-4000.exe");
+    Exec(embeddinator, "-verbose " + args);
+}
+
 void Premake(string file, string args, string action)
 {
     var premakePath = Directory("./external/CppSharp/build/") + (IsRunningOnWindows() ?

@@ -1,5 +1,4 @@
 var buildDir = Directory("./build/lib") + Directory(configuration);
-var embeddinator = buildDir + File("Embeddinator-4000.exe");
 
 var androidDll = Directory("./tests/managed/android/bin") + Directory(configuration) + File("managed.dll");
 var fsharpAndroidDll = Directory("./tests/managed/fsharp-android/bin") + Directory(configuration) + File("managed.dll");
@@ -61,7 +60,7 @@ Task("Generate-Android")
     .Does(() =>
     {
         var output = buildDir + Directory("android");
-        Exec(embeddinator, $"-gen=Java -out={output} -platform=Android -compile -target=shared {androidDll}");
+        Embeddinator($"-gen=Java -out={output} -platform=Android -compile {androidDll}");
     });
 
 Task("Generate-Android-PCL")
@@ -71,7 +70,7 @@ Task("Generate-Android-PCL")
     .Does(() =>
     {
         var output = buildDir + Directory("pcl");
-        Exec(embeddinator, $"-gen=Java -out={output} -platform=Android -compile -target=shared {pclDll}");
+        Embeddinator($"-gen=Java -out={output} -platform=Android -compile {pclDll}");
     });
 
 Task("Generate-Android-NetStandard")
@@ -81,7 +80,7 @@ Task("Generate-Android-NetStandard")
     .Does(() =>
     {
         var output = buildDir + Directory("netstandard");
-        Exec(embeddinator, $"-gen=Java -out={output} -platform=Android -compile -target=shared {netStandardDll}");
+        Embeddinator($"-gen=Java -out={output} -platform=Android -compile {netStandardDll}");
     });
 
 Task("Generate-Android-FSharp")
@@ -91,7 +90,7 @@ Task("Generate-Android-FSharp")
     .Does(() =>
     {
         var output = buildDir + Directory("fsharp");
-        Exec(embeddinator, $"-gen=Java -out={output} -platform=Android -compile -target=shared {fsharpAndroidDll}");
+        Embeddinator($"-gen=Java -out={output} -platform=Android -compile {fsharpAndroidDll}");
     });
 
 void Gradle(string args)
