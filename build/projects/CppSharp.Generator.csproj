@@ -197,6 +197,9 @@
     <Compile Include="../../external/CppSharp/src/Generator/Passes/IgnoreSystemDeclarationsPass.cs">
       <Link>Passes/IgnoreSystemDeclarationsPass.cs</Link>
     </Compile>
+    <Compile Include="../../external/CppSharp/src/Generator/Passes/MarkUsedClassInternalsPass.cs">
+      <Link>Passes/MarkUsedClassInternalsPass.cs</Link>
+    </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Passes/MarshalPrimitivePointersAsRefTypePass.cs">
       <Link>Passes/MarshalPrimitivePointersAsRefTypePass.cs</Link>
     </Compile>
