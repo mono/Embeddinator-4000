@@ -19,9 +19,8 @@ platform we provide an interface that is native to that platform as well
 as the tools needed to turn a .NET library into something that can be 
 consumed on that platform.
 
-This is a work in progress, the initial goals for this project are to
-surface .NET to C, C++, Objective-C (across the various Apple platforms)
-and Java (Android and regular Java).
+Presently there is support for .NET to C, Objective-C (across the various Apple platforms)
+and Java (Android and regular Java), across Windows, Linux and macOS platforms.
 
 ## Getting Started
 
@@ -59,7 +58,7 @@ Generates target language bindings for interop with managed code.
       --dll, --shared        compiles as a shared library
       --static               compiles as a static library
       --vs=VALUE             Visual Studio version for compilation: 2012, 2013,
-                               2015, Latest (defaults to Latest)
+                               2015, 2017, Latest (defaults to Latest)
   -v, --verbose              generates diagnostic verbose output
   -h, --help                 show this message and exit
 ```
