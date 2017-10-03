@@ -29,7 +29,7 @@ To generate C code, invoke the Embeddinator tool passing the right flags to targ
 ### Windows:
 
 ```
-$ build/lib/Debug/MonoEmbeddinator4000.exe --gen=c --output=managed_c --platform=windows --compile managed.dll
+$ build/lib/Debug/Embeddinator-4000.exe --gen=c --output=managed_c --platform=windows --compile managed.dll
 ```
 
 Make sure the to call Embeddinator from a Visual Studio command shell specific to the Visual Studio version you're targetting. 
@@ -37,7 +37,7 @@ Make sure the to call Embeddinator from a Visual Studio command shell specific t
 ### macOS
 
 ```
-$ mono build/lib/Debug/MonoEmbeddinator4000.exe --gen=c --output=managed_c --platform=macos --compile managed.dll
+$ mono build/lib/Debug/Embeddinator-4000.exe --gen=c --output=managed_c --platform=macos --compile managed.dll
 ```
 
 ### Output files

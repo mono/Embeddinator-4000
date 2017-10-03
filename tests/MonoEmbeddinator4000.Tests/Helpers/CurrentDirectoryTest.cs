@@ -2,7 +2,7 @@
 using System.IO;
 using NUnit.Framework;
 
-namespace MonoEmbeddinator4000.Tests
+namespace Embeddinator.Tests
 {
     /// <summary>
     /// Base unit test class for moving Environment.CurrentDirectory

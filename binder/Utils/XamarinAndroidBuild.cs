@@ -8,7 +8,7 @@ using Microsoft.Build.Evaluation;
 using Mono.Cecil;
 using Xamarin.Android.Tools;
 
-namespace MonoEmbeddinator4000
+namespace Embeddinator
 {
     /// <summary>
     /// Contains everything MSBuild-related for Xamarin.Android

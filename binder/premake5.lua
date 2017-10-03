@@ -1,13 +1,16 @@
-  project "MonoEmbeddinator4000"
-    SetupManagedProject()
+  managed_project "Embeddinator-4000"
 
     kind "ConsoleApp"
     language "C#"
 
     files { "../binder/**.cs" }
-
     libdirs { "../deps" }
   
+    nuget
+    {
+      "Mono.Cecil:0.9.6.4"
+    }
+
     links
     {
       "System",

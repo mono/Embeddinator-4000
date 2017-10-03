@@ -7,7 +7,7 @@ using CppSharp.AST.Extensions;
 using CppSharp.Generators;
 using IKVM.Reflection;
 
-namespace MonoEmbeddinator4000.Generators
+namespace Embeddinator.Generators
 {
     public static class DeclarationExtensions
     {
@@ -61,7 +61,7 @@ namespace MonoEmbeddinator4000.Generators
 
             foreach (var type in assembly.ExportedTypes)
             {
-                if (!type.IsPublic)
+                if (!type.IsPublic && (type.IsNested && !type.IsNestedPublic))
                     continue;
 
                 var typeInfo = type.GetTypeInfo();
@@ -136,11 +136,15 @@ namespace MonoEmbeddinator4000.Generators
 
         public Class VisitRecord(TypeInfo type)
         {
+            var isStatic = type.IsSealed && type.IsAbstract;
+
             var @class = new Class
             {
                 Name = UnmangleTypeName(type.Name),
                 Type = ClassType.RefType,
-                IsFinal = type.IsSealed
+                IsStatic = isStatic,
+                IsFinal = type.IsSealed && !isStatic,
+                IsAbstract = type.IsAbstract && !isStatic
             };
 
             if (type.IsInterface)
@@ -422,7 +426,7 @@ namespace MonoEmbeddinator4000.Generators
                 }
                 else if (managedType.IsArray)
                 {
-                    if (elementType.Type.IsClass() || Options.GeneratorKind == GeneratorKind.Java)
+                    if (Options.GeneratorKind == GeneratorKind.Java)
                         return new QualifiedType(new UnsupportedType { Description = managedType.FullName });
 
                     var array = new ArrayType
@@ -557,6 +561,8 @@ namespace MonoEmbeddinator4000.Generators
             foreach (var param in parameters)
             {
                 var paramDecl = VisitParameter(param);
+                paramDecl.Namespace = method;
+
                 method.Parameters.Add(paramDecl);
 
                 if (paramDecl.Ignore)

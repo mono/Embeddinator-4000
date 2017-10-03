@@ -6,7 +6,7 @@ Simply run `make` in `Embeddinator-4000/objcgen`.
 
 ## Run
 
-Don't use `MonoEmbeddinator4000.exe`.
+Don't use `Embeddinator-4000.exe`.
 
 Use `mono ./bin/Debug/objcgen.exe --gen=Obj-C -o ./Output ManagedAssembly1.dll`.
 

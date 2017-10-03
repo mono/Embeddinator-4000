@@ -8,7 +8,7 @@ using System.Text;
 using CppSharp;
 using Microsoft.CSharp;
 
-namespace MonoEmbeddinator4000
+namespace Embeddinator
 {
     /// <summary>
     /// This class is responsible for generating Resource.designer.dll

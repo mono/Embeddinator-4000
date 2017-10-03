@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using IKVM.Reflection;
 using Type = IKVM.Reflection.Type;
 
-namespace Embeddinator {
+namespace Embeddinator.ObjC {
 
 	public abstract partial class Processor {
 

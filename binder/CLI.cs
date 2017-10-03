@@ -5,7 +5,7 @@ using System.Linq;
 using CppSharp;
 using CppSharp.Generators;
 
-namespace MonoEmbeddinator4000
+namespace Embeddinator
 {
     public class CLI
     {
@@ -124,6 +124,8 @@ namespace MonoEmbeddinator4000
         {
             switch (platform.ToLowerInvariant())
             {
+            case "linux":
+                return TargetPlatform.Linux;
             case "windows":
                 return TargetPlatform.Windows;
             case "android":
@@ -164,6 +166,12 @@ namespace MonoEmbeddinator4000
             if (string.IsNullOrEmpty(Platform))
             {
                 Console.Error.WriteLine("Please specify a target platform.");
+                return false;
+            }
+
+            if (Generators.Contains(GeneratorKind.ObjectiveC))
+            {
+                Console.Error.WriteLine("Please use the objcgen tool for Objective-C generation.");
                 return false;
             }
 

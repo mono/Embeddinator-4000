@@ -87,7 +87,7 @@ if(!$PSScriptRoot){
 }
 
 $TOOLS_DIR = Join-Path $PSScriptRoot ".cake"
-$NUGET_EXE = Join-Path $PSScriptRoot ".nuget/nuget.exe"
+$NUGET_EXE = Join-Path $PSScriptRoot ".cake/nuget.exe"
 $CAKE_EXE = Join-Path $TOOLS_DIR "Cake/Cake.exe"
 $NUGET_URL = "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe"
 $PACKAGES_CONFIG = Join-Path $TOOLS_DIR "packages.config"
@@ -162,11 +162,11 @@ if(-Not $SkipToolPackageRestore.IsPresent) {
     if((!(Test-Path $PACKAGES_CONFIG_MD5)) -Or
       ($md5Hash -ne (Get-Content $PACKAGES_CONFIG_MD5 ))) {
         Write-Verbose -Message "Missing or changed package.config hash..."
-        Remove-Item * -Recurse -Exclude packages.config,nuget.exe
+        Remove-Item * -Recurse -Exclude *.config,nuget.exe
     }
 
     Write-Verbose -Message "Restoring tools from NuGet..."
-    $NuGetOutput = Invoke-Expression "&`"$NUGET_EXE`" install -ExcludeVersion -OutputDirectory `"$TOOLS_DIR`""
+    $NuGetOutput = Invoke-Expression "&`"$NUGET_EXE`" install -ExcludeVersion -OutputDirectory `"$TOOLS_DIR`" -configfile MyGet.config"
 
     if ($LASTEXITCODE -ne 0) {
         Throw "An error occured while restoring NuGet tools."

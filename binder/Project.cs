@@ -4,7 +4,7 @@ using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace MonoEmbeddinator4000
+namespace Embeddinator
 {
     /// <summary>
     /// Represents an input file in the binding project.

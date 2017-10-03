@@ -3,7 +3,7 @@ using NUnit.Framework;
 using Xamarin.Android.Tools;
 using System.IO;
 
-namespace MonoEmbeddinator4000.Tests
+namespace Embeddinator.Tests
 {
     [TestFixture]
     public class XamarinAndroidTest : CurrentDirectoryTest

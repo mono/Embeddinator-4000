@@ -1,7 +1,7 @@
 ﻿﻿﻿using CppSharp.AST;
 using CppSharp.AST.Extensions;
 
-namespace MonoEmbeddinator4000.Generators
+namespace Embeddinator.Generators
 {
     public class JavaMarshalPrinter : CMarshalPrinter
     {
@@ -223,7 +223,7 @@ namespace MonoEmbeddinator4000.Generators
             var typePrinter = new JavaTypePrinter(Context.Context);
             var typeName = @class.Visit(typePrinter);
 
-            if (@class.IsInterface)
+            if (@class.IsInterface || @class.IsAbstract)
                 typeName = $"{typeName}Impl";
 
             Context.Return.Write("({0} == com.sun.jna.Pointer.NULL ? null : new {1}({0}))",

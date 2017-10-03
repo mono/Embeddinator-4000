@@ -1,48 +1,41 @@
 # Embeddinator-4000 0.3
 
-This is the third public release of Embeddinator-4000. It supports the Objective-C language on macOS, iOS, and tvOS. More languages and platforms will be added in future releases.
-
-Requirements
-============
-
-* macOS 10.12 (Sierra) or later;
-* Xcode 8.3.2 or later;
-* Mono 5.0 or later;
-
-Optional
---------
-
-* [Visual Studio for Mac](https://www.visualstudio.com/vs/visual-studio-mac/);
-* [Xamarin.iOS 10.11.0.136 or later](https://jenkins.mono-project.com/view/Xamarin.MaciOS/job/xamarin-macios-builds-master/) **Links to preview builds**. Required for iOS and tvOS support;
-* [Xamarin.Mac 3.5.0.144 or later](https://jenkins.mono-project.com/view/Xamarin.MaciOS/job/xamarin-macios-builds-master/) **Links to preview builds**. Required for standalone macOS support;
-
+This is the third public release of Embeddinator-4000.
 
 What's New
 ==========
 
-Objective-C Support
--------------------
+Embeddinator now has support for Windows and Linux, for C and Java generators, as well as targetting the Android platform.
 
-
-iOS Support
------------
-
-
-macOS Support
--------------
-
-
-tvOS Support
+Java support
 ------------
 
-Other New Features
-------------------
+* [pr488](https://github.com/mono/Embeddinator-4000/pull/488) - Improved support for C# abstract classes, with generation of Java abstract class proxies
+* [pr490](https://github.com/mono/Embeddinator-4000/pull/490) - Improved support for desktop Java in Windows, macOS and Linux platforms
+
+Android support
+---------------
+
+* [pr475](https://github.com/mono/Embeddinator-4000/pull/475) - Support for Android Studio 3.0
+* [pr474](https://github.com/mono/Embeddinator-4000/pull/474) - Improved assemblies referencing for Android resources compilation
+* [pr477](https://github.com/mono/Embeddinator-4000/pull/477) - JAR file dependencies improvements for Xamarin.Forms apps
+
+C support
+---------
+
+* [pr497](https://github.com/mono/Embeddinator-4000/pull/497) - Improved support for generation of class type arrays
+* Fixes for compilation of generated code with VS2017 toolchain
+
+Other features and fixes
+------------------------
+
+* [pr499](https://github.com/mono/Embeddinator-4000/pull/499) - Support for Linux platform, including a new CI testing configuration
+* [pr495](https://github.com/mono/Embeddinator-4000/pull/495) [pr498](https://github.com/mono/Embeddinator-4000/pull/489) - Improved support for F# language
+* [pr471](https://github.com/mono/Embeddinator-4000/pull/471) - Fixes for MSBuild lookup on Windows
 
 Known Issues
 ============
 
-* This release only generates Objective-C code;
-* This release only targets macOS, iOS, and tvOS - the latter requires Xamarin.iOS (10.11+) to be installed;
 * Some C# features (e.g. generics) are not yet supported;
 * In some cases the generator produces duplicate symbols, which won't compile. Please file issues on github if this occurs.
 

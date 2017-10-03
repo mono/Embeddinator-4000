@@ -6,11 +6,11 @@ using CppSharp;
 using CppSharp.AST;
 using CppSharp.Generators;
 using CppSharp.Passes;
-using MonoEmbeddinator4000.Generators;
-using MonoEmbeddinator4000.Passes;
+using Embeddinator.Generators;
+using Embeddinator.Passes;
 using BindingContext = CppSharp.Generators.BindingContext;
 
-namespace MonoEmbeddinator4000
+namespace Embeddinator
 {
     public partial class Driver
     {
@@ -41,6 +41,9 @@ namespace MonoEmbeddinator4000
 
             if (Options.Verbose)
                 Diagnostics.Level = DiagnosticKind.Debug;
+
+            if (!Options.Compilation.Platform.HasValue)
+                Options.Compilation.Platform = Platform.Host;
 
             Declaration.QualifiedNameSeparator = "_";
         }

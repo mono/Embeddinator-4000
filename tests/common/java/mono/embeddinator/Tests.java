@@ -9,6 +9,7 @@ import managed.constructors.*;
 import managed.enums.*;
 import managed.fields.*;
 import managed.interfaces.*;
+import managed.abstracts.*;
 import managed.methods.*;
 import managed.structs.*;
 import managed.keywords.*;
@@ -165,7 +166,7 @@ public class Tests {
         assertEquals(new Integer(7), l.get());
         assertEquals("XAMARIN", os.get());
 
-        int refId = Parameters.refClass(new Ref(static_method));
+        int refId = Parameters.refClass(new Ref<Static>(static_method));
         assertEquals(static_method.getId(), refId);
 
         Ref<Static> ref = new Ref<Static>(static_method);
@@ -320,6 +321,15 @@ public class Tests {
         ManagedAdder adder = new ManagedAdder();
         assertEquals(42, OpConsumer.doAddition(adder, 40, 2));
         assertEquals(true, OpConsumer.testManagedAdder(1, -1));
+    }
+
+    @Test
+    public void testAbstracts() {
+        AbstractClass abs = ConcreteAbstractClass.create();
+        assertEquals(true, abs.abstractMethod());
+
+        boolean b = AbstractClass.processStaticAbstract(abs);
+        assertEquals(true, b);
     }
 
     static long UCHAR_MAX = (long)(Math.pow(2, Byte.SIZE) - 1);

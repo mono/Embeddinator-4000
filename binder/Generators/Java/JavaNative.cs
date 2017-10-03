@@ -6,7 +6,7 @@ using CppSharp;
 using CppSharp.AST;
 using CppSharp.Generators;
 
-namespace MonoEmbeddinator4000.Generators
+namespace Embeddinator.Generators
 {
     /// <summary>
     /// This class is responsible for generating JNA-compatible method and class

@@ -7,7 +7,7 @@
     <OutputType>Library</OutputType>
     <RootNamespace>objcgentest</RootNamespace>
     <AssemblyName>objcgentest</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DebugSymbols>true</DebugSymbols>
@@ -53,6 +53,10 @@
     <ProjectReference Include="..\managedwarn\managedwarn.csproj">
       <Project>{73C4FAF0-C37A-4CEE-A3F3-B1F80748D5B2}</Project>
       <Name>managedwarn</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\build\projects\IKVM.Reflection.csproj">
+      <Project>{95A93EAD-0135-AC71-0A46-2F6676500872}</Project>
+      <Name>IKVM.Reflection</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

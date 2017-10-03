@@ -7,7 +7,7 @@ using CppSharp;
 using CppSharp.Generators;
 using NUnit.Framework;
 
-namespace MonoEmbeddinator4000.Tests
+namespace Embeddinator.Tests
 {
     /// <summary>
     /// A set of integration tests / approval tests verifying generated java code
@@ -112,7 +112,7 @@ namespace MonoEmbeddinator4000.Tests
         [Test]
         public void AssemblyWithDots()
         {
-            temp = Path.Combine(Path.GetTempPath(), "hello.with.dots.dll");
+            temp = Path.Combine(outputDir, "hello.with.dots.dll");
             tempFiles.Add(temp);
 
             RunDriver("Hello");
@@ -124,7 +124,7 @@ namespace MonoEmbeddinator4000.Tests
         [Test]
         public void AssemblyWithUpperCase()
         {
-            temp = Path.Combine(Path.GetTempPath(), "HELLO.dll");
+            temp = Path.Combine(outputDir, "HELLO.dll");
             tempFiles.Add(temp);
 
             RunDriver("Hello");

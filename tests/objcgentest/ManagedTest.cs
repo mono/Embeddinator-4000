@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Xml;
 
-using Embeddinator;
+using Embeddinator.ObjC;
 
 using Xamarin;
 using DriverTest;

@@ -5,7 +5,7 @@ using System.Text;
 using IKVM.Reflection;
 using Type = IKVM.Reflection.Type;
 
-namespace Embeddinator {
+namespace Embeddinator.ObjC {
 
 	public static class StringExtensions {
 
@@ -134,7 +134,7 @@ namespace Embeddinator {
 		{
 			if (self.Name != name)
 				return false;
-			var pc = self.ParameterCount;
+			var pc = self.GetParameters ().Length;
 			if (pc != parameterTypes.Length)
 				return false;
 			if (self.ReturnType.FullName != returnType)

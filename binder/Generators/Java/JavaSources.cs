@@ -7,7 +7,7 @@ using CppSharp.AST;
 using CppSharp.AST.Extensions;
 using CppSharp.Generators;
 
-namespace MonoEmbeddinator4000.Generators
+namespace Embeddinator.Generators
 {
     [DebuggerDisplay("Decl = {Declaration}")]
     public class JavaSources : CodeGenerator
@@ -207,11 +207,8 @@ namespace MonoEmbeddinator4000.Generators
             if (@class.IsAbstract)
                 keywords.Add("abstract");
 
-            if (@class.IsFinal)
+            if (@class.IsFinal || @class.IsStatic)
                 keywords.Add("final");
-
-            if (@class.IsStatic)
-                keywords.Add("static");
 
             keywords.Add(@class.IsInterface ? "interface" : "class");
             keywords.Add(@class.Name);
@@ -393,9 +390,12 @@ namespace MonoEmbeddinator4000.Generators
             if (method.IsConstructor)
                 Write("__object = ");
 
-            var unit = method.TranslationUnit;
+            // Get the effective method for synthetized interface method implementations.
+            var effectiveMethod = method.CompleteDeclaration as Method ?? method;
+            var unit = effectiveMethod.TranslationUnit;
             var package = string.Join(".", GetPackageNames(unit));
-            Write($"{package}.{JavaNative.GetNativeLibClassName(unit)}.INSTANCE.{JavaNative.GetCMethodIdentifier(method)}(");
+            var nativeMethodId = JavaNative.GetCMethodIdentifier(effectiveMethod);
+            Write($"{package}.{JavaNative.GetNativeLibClassName(unit)}.INSTANCE.{nativeMethodId}(");
 
             Write(string.Join(", ", @params));
             WriteLine(");");

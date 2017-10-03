@@ -8,9 +8,9 @@ using CppSharp;
 using CppSharp.Generators;
 using Xamarin.Android.Tasks;
 using Xamarin.Android.Tools;
-using static MonoEmbeddinator4000.Helpers;
+using static Embeddinator.Helpers;
 
-namespace MonoEmbeddinator4000
+namespace Embeddinator
 {
     public partial class Driver
     {
@@ -101,6 +101,7 @@ namespace MonoEmbeddinator4000
 
             var args = new List<string> {
                 string.Join(" ", javaFiles),
+                "-encoding UTF-8",
                 $"-source {XamarinAndroid.JavaVersion} -target {XamarinAndroid.JavaVersion}",
                 $"-bootclasspath \"{bootClassPath}\"",
                 $"-d {classesDir}",
@@ -159,6 +160,22 @@ namespace MonoEmbeddinator4000
             return output.ExitCode == 0;
         }
 
+        string GetJnaPlatformDir()
+        {
+            // TODO: Use {os}-{arch} JNA format once we have better ABI support.
+            switch (Options.Compilation.Platform)
+            {
+                case TargetPlatform.MacOS:
+                    return "darwin";
+                case TargetPlatform.Windows:
+                    return "win32";
+                case TargetPlatform.Linux:
+                    return "linux";
+            }
+
+            throw new NotSupportedException();
+        }
+
         bool CreateJar()
         {
             var executableSuffix = Platform.IsWindows ? ".exe" : string.Empty;
@@ -173,16 +190,21 @@ namespace MonoEmbeddinator4000
             };
 
             // On desktop Java, we need a few more files included
-            if (Options.Compilation.Platform == TargetPlatform.MacOS)
+            if (Options.Compilation.Platform != TargetPlatform.Android)
             {
                 //Copy native libs
-                var platformDir = Path.Combine(classesDir, "darwin");
+                var platformDir = Path.Combine(classesDir, GetJnaPlatformDir());
                 if (!Directory.Exists(platformDir))
                     Directory.CreateDirectory(platformDir);
 
-                var libName = $"lib{name}.dylib";
-                var outputDir = Path.Combine(Options.OutputDir, libName);
-                File.Copy(outputDir, Path.Combine(platformDir, libName), true);
+                var libName = (Options.Compilation.Platform == TargetPlatform.Windows) ?
+                    $"{name}.dll" : $"lib{name}.dylib";
+                var libFile = Path.Combine(Options.OutputDir, libName);
+                if (File.Exists(libFile))
+                {
+                    var outputFile = Path.Combine(platformDir, libName);
+                    File.Copy(libFile, outputFile, true);
+                }
 
                 //Copy .NET assemblies
                 var assembliesDir = Path.Combine(classesDir, "assemblies");
@@ -205,15 +227,40 @@ namespace MonoEmbeddinator4000
                     }
                 }
 
-                var monoPath = ManagedToolchain.FindMonoPath();
                 foreach (var reference in referencedAssemblies)
                 {
-                    var referencePath = Path.Combine(monoPath, "lib", "mono", "4.5", reference + ".dll");
+                    var referencePath = Path.Combine(MonoSdkPath, "lib", "mono", "4.5", reference + ".dll");
                     if (File.Exists(referencePath))
                     {
                         File.Copy(referencePath, Path.Combine(assembliesDir, reference + ".dll"), true);
                     }
                 }
+
+                // Copy the Mono runtime shared library to the JAR file
+                var libDir = (Options.Compilation.Platform == TargetPlatform.Windows) ?
+                    "bin" : "lib";
+
+                switch(Options.Compilation.Platform)
+                {
+                    case TargetPlatform.Windows:
+                        libName = "mono-2.0-sgen.dll";
+                        break;
+                    case TargetPlatform.MacOS:
+                        libName = "libmonosgen-2.0.dylib";
+                        break;
+                    case TargetPlatform.Linux:
+                        libName = "libmonosgen-2.0.so";
+                        break;
+                    default:
+                        throw new NotImplementedException();
+                }
+
+                var monoLib = Path.Combine(MonoSdkPath, libDir, libName);
+
+                if (!File.Exists(monoLib))
+                    throw new Exception($"Cannot find Mono runtime shared library: {monoLib}");
+
+                File.Copy(monoLib, Path.Combine(platformDir, libName), true);
             }
 
             //Embed JNA into our jar file
@@ -399,8 +446,10 @@ namespace MonoEmbeddinator4000
 
         bool CompileMSVC(IEnumerable<string> files)
         {
-            List<ToolchainVersion> vsSdks;
-            MSVCToolchain.GetVisualStudioSdks(out vsSdks);
+            var vsSdks = MSVCToolchain.GetVisualStudioSdks();
+
+            // Skip TestAgent VS instances as they do not provide native toolchains.
+            vsSdks = vsSdks.Where(sdk => !sdk.Directory.Contains("TestAgent")).ToList();
 
             if (vsSdks.Count == 0)
                 throw new Exception("Visual Studio SDK was not found on your system.");
@@ -418,27 +467,35 @@ namespace MonoEmbeddinator4000
                 vsSdk = exactVersion.Value;
             }
 
-            var clBin = String.Empty;
-            if ((int)vsSdk.Version == (int)VisualStudioVersion.VS2017)
+            var clBin = string.Empty;
+            var clLib = string.Empty;
+
+            const string clArch = "x86";
+
+            var isVS2017OrGreater = (int)vsSdk.Version >= (int)VisualStudioVersion.VS2017;
+            if (isVS2017OrGreater)
             {
-                var clFiles = System.IO.Directory.EnumerateFiles(Path.Combine(vsSdk.Directory, @"..\..\VC\Tools\MSVC"), "cl.exe", SearchOption.AllDirectories);
-                clBin = clFiles.Where(s => s.Contains(@"x86\cl.exe")).First();
+                var clBaseDir = Directory.EnumerateDirectories(Path.Combine(vsSdk.Directory, @"..\..\VC\Tools\MSVC")).Last();
+                clBin = Path.Combine(clBaseDir, $"bin\\Hostx86\\{clArch}\\cl.exe");
+                clLib = Path.Combine(clBaseDir, $"lib\\{clArch}");
             }
             else
+            {
                 clBin = Path.GetFullPath(Path.Combine(vsSdk.Directory, "..", "..", "VC", "bin", "cl.exe"));
+                clLib = Path.GetFullPath(Path.Combine(vsSdk.Directory, "..", "..", "VC", "lib"));
+            }
 
             Diagnostics.Debug($"VS path {vsSdk.Directory}");
 
-            var monoPath = ManagedToolchain.FindMonoPath();
             var outputPath = Path.Combine(Options.OutputDir, Options.LibraryName ??
                 Path.GetFileNameWithoutExtension(Project.Assemblies[0]));
 
             var args = new List<string> {
                 "/nologo",
                 $"-D{DLLExportDefine}",
-                $"-I\"{monoPath}\\include\\mono-2.0\"",
+                $"-I\"{MonoSdkPath}\\include\\mono-2.0\"",
                 string.Join(" ", files.Select(file => "\""+ Path.GetFullPath(file) + "\"")),
-                $"\"{GetSgenLibPath(monoPath)}\"",
+                $"\"{GetSgenLibPath(MonoSdkPath)}\"",
                 Options.Compilation.CompileSharedLibrary ? "/LD" : string.Empty,
                 $"/Fe{outputPath}"
             };
@@ -448,10 +505,10 @@ namespace MonoEmbeddinator4000
             var vsVersion = (VisualStudioVersion)(int)vsSdk.Version;
             var includes = MSVCToolchain.GetSystemIncludes(vsVersion);
 
-            var winSdks = new List<ToolchainVersion>();
-            MSVCToolchain.GetWindowsKitsSdks(out winSdks);
+            var winSdks = MSVCToolchain.GetWindowsKitsSdks();
 
-            var libParentPath = Directory.GetParent(Directory.EnumerateDirectories(Path.Combine(winSdks.Last().Directory, "lib"), "um", SearchOption.AllDirectories).First());
+            var libParentPath = Directory.GetParent(Directory.EnumerateDirectories(
+                Path.Combine(winSdks.Last().Directory, "lib"), "um", SearchOption.AllDirectories).First());
             var libPaths = libParentPath.EnumerateDirectories();
 
             Dictionary<string, string> envVars = null;
@@ -459,10 +516,8 @@ namespace MonoEmbeddinator4000
             {
                 envVars = new Dictionary<string, string>();
                 envVars["INCLUDE"] = string.Join(";", includes);
-
-                var clLib = Path.GetFullPath(
-                    Path.Combine(vsSdk.Directory, "..", "..", "VC", "lib"));
-                envVars["LIB"] = clLib + ";" + string.Join(";", libPaths.Select(path => Path.Combine(path.FullName, "x86")));
+                envVars["LIB"] = Path.GetFullPath(clLib) + ";" +
+                    string.Join(";", libPaths.Select(path => Path.Combine(path.FullName, clArch)));
             }
 
             var output = Invoke(clBin, invocation, envVars);
@@ -476,17 +531,16 @@ namespace MonoEmbeddinator4000
             return File.Exists(sgenPath) ? sgenPath : Path.Combine(libPath, "monosgen-2.0.lib");
         }
 
-        bool CompileClang(IEnumerable<string> files)
+        bool CompileClangMac(IEnumerable<string> files)
         {
             var xcodePath = XcodeToolchain.GetXcodeToolchainPath();
             var clangBin = Path.Combine(xcodePath, "usr/bin/clang");
-            var monoPath = ManagedToolchain.FindMonoPath();
 
             var args = new List<string> {
                 $"-D{DLLExportDefine}",
                 "-framework CoreFoundation",
-                $"-I\"{monoPath}/include/mono-2.0\"",
-                $"-L\"{monoPath}/lib/\" -lmonosgen-2.0",
+                $"-I\"{MonoSdkPath}/include/mono-2.0\"",
+                $"-L\"{MonoSdkPath}/lib/\" -lmonosgen-2.0",
                 string.Join(" ", files.ToList())
             };
 
@@ -517,9 +571,60 @@ namespace MonoEmbeddinator4000
             return output.ExitCode == 0;
         }
 
+        public static string FindInPath(string filename)
+        {
+            return new[] { Environment.CurrentDirectory }
+                .Concat(Environment.GetEnvironmentVariable("PATH").Split(';', ':'))
+                .Select(dir =>
+                {
+                    var path = Path.Combine(dir, filename);
+                    Console.WriteLine(path);
+                    return path;
+                })
+                .FirstOrDefault(File.Exists);
+        }
+
+        bool CompileClangLinux(IEnumerable<string> files)
+        {
+            var compilerBin = FindInPath("clang") ?? FindInPath("gcc");
+
+            if (compilerBin == null)
+                throw new Exception("Cannot find C++ compiler on the system.");
+
+            var args = new List<string> {
+                $"-std=gnu99 -D{DLLExportDefine}",
+                $"-D_REENTRANT -I/usr/lib/pkgconfig/../../include/mono-2.0",
+                $"-L/usr/lib/pkgconfig/../../lib -lmono-2.0 -lm -lrt -ldl -lpthread",
+                string.Join(" ", files.ToList())
+            };
+
+            if (Options.Compilation.Target == CompilationTarget.SharedLibrary)
+            {
+                var name = Path.GetFileNameWithoutExtension(Project.Assemblies[0]);
+                var libName = $"lib{name}.so";
+                var outputPath = Path.Combine(Options.OutputDir, libName);
+                args.Add($"-shared -fPIC -install_name {libName} -o {outputPath}");
+            }
+
+            switch (Options.GeneratorKind)
+            {
+            case GeneratorKind.ObjectiveC:
+                args.Add("-ObjC");
+                args.Add("-lobjc");
+                break;
+            case GeneratorKind.CPlusPlus:
+                args.Add("-x c++");
+                break;
+            }
+
+            var invocation = string.Join(" ", args);
+            var output = Invoke(compilerBin, invocation);
+            return output.ExitCode == 0;
+        }
+
         bool CompileNDK(IEnumerable<string> files)
         {
-            var monoPath = Path.Combine(ManagedToolchain.FindMonoPath(), "include", "mono-2.0");
+            var monoPath = Path.Combine(MonoSdkPath, "include", "mono-2.0");
             var name = Path.GetFileNameWithoutExtension(Project.Assemblies[0]);
             var libName = $"lib{name}.so";
             var ndkPath = AndroidSdk.AndroidNdkPath;
@@ -604,7 +709,7 @@ namespace MonoEmbeddinator4000
                     throw new NotSupportedException(
                         $"Cross compilation to target platform '{Options.Compilation.Platform}' is not supported.");
                 case TargetPlatform.MacOS:
-                    return CompileClang(files);
+                    return CompileClangMac(files);
                 case TargetPlatform.Android:
                     return CompileNDK(files);
                 }
@@ -614,6 +719,8 @@ namespace MonoEmbeddinator4000
             {
                 switch (Options.Compilation.Platform)
                 {
+                case TargetPlatform.Linux:
+                    return CompileClangLinux(files);
                 case TargetPlatform.Android:
                     return CompileNDK(files);
                 }
@@ -621,5 +728,23 @@ namespace MonoEmbeddinator4000
 
             throw new NotImplementedException();
         }
+
+        /// <summary>
+        /// Gets the Mono SDK install path.
+        /// </summary>
+        public static string MonoSdkPath
+        {
+            get { return monoSdkPath.Value; }
+        }
+
+        static Lazy<string> monoSdkPath = new Lazy<string>(() =>
+        {
+            string path = ManagedToolchain.FindMonoPath();
+
+            if (string.IsNullOrEmpty(path) || !Directory.Exists(path))
+                throw new Exception("Cannot find Mono SDK, it needs to be installed on the system.");
+
+            return path;
+        });
     }
 }

@@ -95,6 +95,9 @@
     <Compile Include="../../external/CppSharp/src/Generator/Generators/CSharp/CSharpSources.cs">
       <Link>Generators/CSharp/CSharpSources.cs</Link>
     </Compile>
+    <Compile Include="../../external/CppSharp/src/Generator/Generators/CSharp/CSharpSourcesExtensions.cs">
+      <Link>Generators/CSharp/CSharpSourcesExtensions.cs</Link>
+    </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Generators/CSharp/CSharpTypePrinter.cs">
       <Link>Generators/CSharp/CSharpTypePrinter.cs</Link>
     </Compile>
@@ -143,6 +146,9 @@
     <Compile Include="../../external/CppSharp/src/Generator/Passes/CheckVirtualOverrideReturnCovariance.cs">
       <Link>Passes/CheckVirtualOverrideReturnCovariance.cs</Link>
     </Compile>
+    <Compile Include="../../external/CppSharp/src/Generator/Passes/CleanCommentsPass.cs">
+      <Link>Passes/CleanCommentsPass.cs</Link>
+    </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Passes/CleanInvalidDeclNamesPass.cs">
       <Link>Passes/CleanInvalidDeclNamesPass.cs</Link>
     </Compile>
@@ -154,6 +160,9 @@
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Passes/DelegatesPass.cs">
       <Link>Passes/DelegatesPass.cs</Link>
+    </Compile>
+    <Compile Include="../../external/CppSharp/src/Generator/Passes/EqualiseAccessOfOverrideAndBasePass.cs">
+      <Link>Passes/EqualiseAccessOfOverrideAndBasePass.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Passes/FieldToPropertyPass.cs">
       <Link>Passes/FieldToPropertyPass.cs</Link>
@@ -176,9 +185,6 @@
     <Compile Include="../../external/CppSharp/src/Generator/Passes/GenerateAbstractImplementationsPass.cs">
       <Link>Passes/GenerateAbstractImplementationsPass.cs</Link>
     </Compile>
-    <Compile Include="../../external/CppSharp/src/Generator/Passes/GenerateAnonymousDelegatesPass.cs">
-      <Link>Passes/GenerateAnonymousDelegatesPass.cs</Link>
-    </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Passes/GenerateSymbolsPass.cs">
       <Link>Passes/GenerateSymbolsPass.cs</Link>
     </Compile>
@@ -188,14 +194,11 @@
     <Compile Include="../../external/CppSharp/src/Generator/Passes/HandleDefaultParamValuesPass.cs">
       <Link>Passes/HandleDefaultParamValuesPass.cs</Link>
     </Compile>
-    <Compile Include="../../external/CppSharp/src/Generator/Passes/IgnoreMoveConstructorsPass.cs">
-      <Link>Passes/IgnoreMoveConstructorsPass.cs</Link>
-    </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Passes/IgnoreSystemDeclarationsPass.cs">
       <Link>Passes/IgnoreSystemDeclarationsPass.cs</Link>
     </Compile>
-    <Compile Include="../../external/CppSharp/src/Generator/Passes/MarkSupportedClassTemplateSpecializationsPass.cs">
-      <Link>Passes/MarkSupportedClassTemplateSpecializationsPass.cs</Link>
+    <Compile Include="../../external/CppSharp/src/Generator/Passes/MarkUsedClassInternalsPass.cs">
+      <Link>Passes/MarkUsedClassInternalsPass.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Passes/MarshalPrimitivePointersAsRefTypePass.cs">
       <Link>Passes/MarshalPrimitivePointersAsRefTypePass.cs</Link>
@@ -229,6 +232,9 @@
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Passes/SortDeclarationsPass.cs">
       <Link>Passes/SortDeclarationsPass.cs</Link>
+    </Compile>
+    <Compile Include="../../external/CppSharp/src/Generator/Passes/SpecializationMethodsWithDependentPointersPass.cs">
+      <Link>Passes/SpecializationMethodsWithDependentPointersPass.cs</Link>
     </Compile>
     <Compile Include="../../external/CppSharp/src/Generator/Passes/StripUnusedSystemTypesPass.cs">
       <Link>Passes/StripUnusedSystemTypesPass.cs</Link>

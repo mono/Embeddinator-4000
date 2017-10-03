@@ -1,7 +1,7 @@
 ﻿using IKVM.Reflection;
 using NUnit.Framework;
 
-namespace MonoEmbeddinator4000.Tests
+namespace Embeddinator.Tests
 {
     /// <summary>
     /// Base class for unit tests that need a Universe

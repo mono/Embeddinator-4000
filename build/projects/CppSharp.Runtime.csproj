@@ -20,7 +20,7 @@
     <OutputPath>../lib/Debug\</OutputPath>
     <BaseIntermediateOutputPath>../obj/Debug/CppSharp.Runtime\</BaseIntermediateOutputPath>
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
-    <DefineConstants>MSVC</DefineConstants>
+    <DefineConstants>MSVC;LIBCXX</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -33,7 +33,7 @@
     <OutputPath>../lib/Release\</OutputPath>
     <BaseIntermediateOutputPath>../obj/Release/CppSharp.Runtime\</BaseIntermediateOutputPath>
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
-    <DefineConstants>MSVC</DefineConstants>
+    <DefineConstants>MSVC;LIBCXX</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>

@@ -3,7 +3,7 @@ using CppSharp.Generators;
 using System;
 using System.Collections.Generic;
 
-namespace MonoEmbeddinator4000.Generators
+namespace Embeddinator.Generators
 {
     public class JavaTypePrinter : TypePrinter
     {

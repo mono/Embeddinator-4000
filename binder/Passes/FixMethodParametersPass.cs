@@ -3,7 +3,7 @@ using CppSharp.Generators;
 using CppSharp.Passes;
 using System.Linq;
 
-namespace MonoEmbeddinator4000.Passes
+namespace Embeddinator.Passes
 {
     public class FixMethodParametersPass : TranslationUnitPass
     {

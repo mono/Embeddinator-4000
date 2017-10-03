@@ -5,9 +5,9 @@ using CppSharp;
 using CppSharp.AST;
 using CppSharp.AST.Extensions;
 using CppSharp.Generators;
-using MonoEmbeddinator4000.Passes;
+using Embeddinator.Passes;
 
-namespace MonoEmbeddinator4000.Generators
+namespace Embeddinator.Generators
 {
     public class CSources : CCodeGenerator
     {

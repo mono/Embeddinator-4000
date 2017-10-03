@@ -9,7 +9,7 @@
 # Define directories.
 SCRIPT_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 TOOLS_DIR=$SCRIPT_DIR/.cake
-NUGET_EXE=$SCRIPT_DIR/.nuget/nuget.exe
+NUGET_EXE=$SCRIPT_DIR/.cake/nuget.exe
 CAKE_EXE=$TOOLS_DIR/Cake/Cake.exe
 PACKAGES_CONFIG=$TOOLS_DIR/packages.config
 PACKAGES_CONFIG_MD5=$TOOLS_DIR/packages.config.md5sum
@@ -80,7 +80,7 @@ if [ ! -f $PACKAGES_CONFIG_MD5 ] || [ "$( cat $PACKAGES_CONFIG_MD5 | sed 's/\r$/
     find . -type d ! -name . | xargs rm -rf
 fi
 
-mono "$NUGET_EXE" install -ExcludeVersion
+mono "$NUGET_EXE" install -ExcludeVersion -configfile MyGet.config
 if [ $? -ne 0 ]; then
     echo "Could not restore NuGet packages."
     exit 1

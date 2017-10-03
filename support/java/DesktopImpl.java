@@ -13,6 +13,7 @@ public class DesktopImpl {
 
         RuntimeLibrary runtimeLibrary = Native.loadLibrary(library, RuntimeLibrary.class);
         runtimeLibrary.mono_embeddinator_set_assembly_path(assemblyPath);
+        runtimeLibrary.mono_embeddinator_set_runtime_assembly_path(assemblyPath);
 
         //NOTE: need to make sure mscorlib.dll is extracted & directory set
         String monoPath = Utilities.combinePath(tmp, "mono", "4.5");
@@ -20,8 +21,9 @@ public class DesktopImpl {
         if (!monoFile.isDirectory()) {
             monoFile.mkdirs();
             monoFile.deleteOnExit();
-            extractAssembly(monoPath, "mscorlib");
         }
+
+        extractAssembly(monoPath, "mscorlib");
 
         return runtimeLibrary;
     }

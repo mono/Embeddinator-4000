@@ -93,6 +93,7 @@ public final class Runtime {
         }
 
         public void mono_embeddinator_set_assembly_path(String path);
+        public void mono_embeddinator_set_runtime_assembly_path(String path);
         public Pointer mono_embeddinator_install_error_report_hook(ErrorCallback cb);
     }
 
@@ -153,8 +154,9 @@ public final class Runtime {
         }
 
         if (!isRunningOnAndroid()) {
-            library = com.sun.jna.Platform.isWindows()
-                ? String.format("%s.dll", library) : String.format("lib%s.dylib", library);
+            library = com.sun.jna.Platform.isWindows() ? String.format("%s.dll", library) :
+                      com.sun.jna.Platform.isMac() ? String.format("lib%s.dylib", library) :
+                      String.format("lib%s.so", library);
         }
         return Native.loadLibrary(library, klass);
     }

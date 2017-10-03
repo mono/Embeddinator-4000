@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 // Error allocation: the errors are listed (and documented) in $(TOP)/docs/errors.md
 
-namespace Embeddinator
+namespace Embeddinator.ObjC
 {
 	public class EmbeddinatorException : Exception
 	{

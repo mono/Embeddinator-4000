@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using NUnit.Framework;
 
-namespace MonoEmbeddinator4000.Tests
+namespace Embeddinator.Tests
 {
     /// <summary>
     /// This is a very simple implementation of ApprovalTests: http://approvaltests.com/

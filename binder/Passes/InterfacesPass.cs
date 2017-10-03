@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using CppSharp.AST;
 
-namespace MonoEmbeddinator4000.Passes
+namespace Embeddinator.Passes
 {
     public class InterfacesPass : GetReferencedDecls
     {
@@ -18,7 +18,7 @@ namespace MonoEmbeddinator4000.Passes
         {
             var ret = base.VisitTranslationUnit(unit);
 
-            var interfaces = Classes.Where(c => c.IsInterface && c.IsGenerated);
+            var interfaces = Classes.Where(c => (c.IsInterface || c.IsAbstract) && c.IsGenerated);
             foreach (var @interface in interfaces)
                     HandleInterface(@interface);
 
@@ -40,7 +40,19 @@ namespace MonoEmbeddinator4000.Passes
             // We also add a __getObject() method to the interface that returns
             // the Embeddinator runtime object for the interface to be used when
             // doing marshaling.
-            AddObjectGetterToInterface(@interface);
+            if (@interface.IsInterface)
+                AddObjectGetterToInterface(@interface);
+        }
+
+        static bool MethodIsOverride(Method method1, Method method2)
+        {
+            var sameParams = method1.Parameters.SequenceEqual(method2.Parameters,
+                ParameterTypeComparer.Instance);
+
+            var sameReturnType = method1.ReturnType == method2.ReturnType;
+
+            return method1.OriginalName == method2.OriginalName &&
+                sameParams && sameReturnType;
         }
 
         void CreateInterfaceImplementation(Class @interface)
@@ -59,13 +71,23 @@ namespace MonoEmbeddinator4000.Passes
             var methods = new List<Method>(@interface.Declarations.OfType<Method>());
             foreach (var baseInterface in @interface.Bases)
             {
-                methods.AddRange(baseInterface.Class.Declarations.OfType<Method>());
+                foreach (var method in baseInterface.Class.Declarations.OfType<Method>())
+                {
+                    // Skip methods that have been overriden previously in the chain.
+                    if (methods.Any(m => MethodIsOverride(method, m)))
+                        continue;
+
+                    methods.Add(method);
+                }
             }
 
             foreach (var method in methods)
             {
                 //NOTE: skip methods such as __getObject
                 if (method.IsImplicit)
+                    continue;
+
+                if (!method.IsPure || method.IsFinal)
                     continue;
 
                 var methodImpl = new Method(method)

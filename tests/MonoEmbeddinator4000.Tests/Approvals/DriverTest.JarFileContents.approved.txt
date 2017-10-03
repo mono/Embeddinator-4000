@@ -142,6 +142,7 @@ com/sun/jna/win32-x86-64/jnidispatch.dll
 com/sun/jna/WString.class
 darwin/
 darwin/libhello.dylib
+darwin/libmonosgen-2.0.dylib
 hello/
 hello/example/
 hello/example/Hello.class

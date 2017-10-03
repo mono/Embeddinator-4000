@@ -109,6 +109,7 @@ typedef struct _MonoClassField MonoClassField;
 /* metadata/debug-helpers.h */
 typedef struct MonoMethodDesc MonoMethodDesc;
 
+#if !defined(_WIN32)
 typedef MonoMethodDesc* (*_mono_method_desc_new_fptr) (const char *name, mono_bool include_namespace);
 typedef void            (*_mono_method_desc_free_fptr) (MonoMethodDesc *desc);
 typedef MonoMethod*     (*_mono_method_desc_search_in_class_fptr) (MonoMethodDesc *desc, MonoClass *klass);
@@ -181,6 +182,7 @@ mono_embeddinator_dylib_mono_free (struct DylibMono *mono_imports);
 
 MONO_EMBEDDINATOR_API int
 mono_embeddinator_dylib_mono_init (struct DylibMono *mono_imports, const char *libmono_path);
+#endif
 
 #include <mono/jit/jit.h>
 #include <mono/metadata/mono-config.h>

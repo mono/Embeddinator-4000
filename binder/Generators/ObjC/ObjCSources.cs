@@ -2,7 +2,7 @@ using CppSharp;
 using CppSharp.AST;
 using CppSharp.Generators;
 
-namespace MonoEmbeddinator4000.Generators
+namespace Embeddinator.Generators
 {
     public class ObjCSources : CSources
     {
