@@ -93,13 +93,14 @@ workspace "Embeddinator-4000"
       "System.Xml.Linq",
       "Mono.Posix"
     }
+    location ("%{wks.location}/build/projects")
 
   managed_project "Xamarin.Android.Tools"
 
     kind "SharedLib"
     language "C#"
 
-    files { "../external/Xamarin.Android.Tools/src/Xamarin.Android.Tools/**.cs" }
+    files { "../external/Xamarin.Android.Tools/src/Xamarin.Android.Tools.AndroidSdk/*.cs", "../external/Xamarin.Android.Tools/src/Xamarin.Android.Tools.AndroidSdk/Sdks/*.cs" }
     links
     {
       "System",
@@ -107,6 +108,7 @@ workspace "Embeddinator-4000"
       "System.Xml",
       "System.Xml.Linq"
     }
+    location ("%{wks.location}/build/projects")
 
 -- Override VS solution generation so we do not generate anything.
 premake.override(premake.vstudio.vs2005, "generateSolution", function(base, wks) end)
