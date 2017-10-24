@@ -100,7 +100,12 @@ workspace "Embeddinator-4000"
     kind "SharedLib"
     language "C#"
 
-    files { "../external/Xamarin.Android.Tools/src/Xamarin.Android.Tools.AndroidSdk/*.cs", "../external/Xamarin.Android.Tools/src/Xamarin.Android.Tools.AndroidSdk/Sdks/*.cs" }
+    files
+    { 
+      "../external/Xamarin.Android.Tools/src/Xamarin.Android.Tools.AndroidSdk/*.cs",
+      "../external/Xamarin.Android.Tools/src/Xamarin.Android.Tools.AndroidSdk/Sdks/*.cs",
+      "../external/MonoDroidSdk/*.cs"
+    }
     links
     {
       "System",

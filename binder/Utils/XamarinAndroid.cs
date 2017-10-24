@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using CppSharp;
@@ -15,32 +16,33 @@ namespace Embeddinator
     {
         public const string TargetFrameworkVersion = "v7.0";
         public const string MinSdkVersion = "9";
-        public const string TargetSdkVersion = "25";
+        public const int TargetSdkVersion = 24;
         public const string JavaVersion = "1.8";
 
-        static XamarinAndroid()
-        {
-            AndroidLogger.Info += AndroidLogger_Info;
-            AndroidLogger.Warning += AndroidLogger_Warning;
-            AndroidLogger.Error += AndroidLogger_Error;
+        static readonly AndroidSdkInfo androidSdk;
 
-            AndroidSdk.Refresh();
+        static XamarinAndroid ()
+        {
+            androidSdk = new AndroidSdkInfo (AndroidSdkLogger);
         }
 
-        static void AndroidLogger_Info(string task, string message)
+        static void AndroidSdkLogger (TraceLevel level, string message)
         {
-            Diagnostics.Debug(message);
+            switch (level)
+            {
+            case TraceLevel.Error:
+                Diagnostics.Error (message);
+                break;
+            case TraceLevel.Warning:
+                Diagnostics.Warning (message);
+                break;
+            default:
+                Diagnostics.Debug (message);
+                break;
+            }
         }
 
-        static void AndroidLogger_Warning(string task, string message)
-        {
-            Diagnostics.Warning(message);
-        }
-
-        static void AndroidLogger_Error(string task, string message)
-        {
-            Diagnostics.Error(message);
-        }
+        public static AndroidSdkInfo AndroidSdk => androidSdk;
 
         static string GetMonoDroidPath()
         {
@@ -109,7 +111,16 @@ namespace Embeddinator
             throw new FileNotFoundException("Unable to find assembly!", assemblyName);
         }
 
-        static Lazy<int> apiLevel = new Lazy<int>(() => AndroidSdk.GetInstalledPlatformVersions().Select(m => m.ApiLevel).Max());
+        static Lazy<int> apiLevel = new Lazy<int> (() =>
+        {
+            for (int i = TargetSdkVersion; i > 0; i--)
+            {
+                if (androidSdk.IsPlatformInstalled (i))
+                    return i;
+            }
+
+             throw new Exception ("Unable to find an installed API level!");
+        });
 
         /// <summary>
         /// Right now we are choosing the max API level installed
