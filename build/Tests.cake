@@ -168,26 +168,30 @@ Task("Generate-Java")
     });
 
 //Java settings
-string javaHome;
-if (IsRunningOnWindows())
+string GetJavaSdkPath()
 {
-    javaHome = EnvironmentVariable("JAVA_HOME");
-    if (string.IsNullOrEmpty(javaHome))
-        throw new Exception("Cannot find Java SDK: JAVA_HOME environment variable is not set.");
-}
-else if (FileExists("/usr/libexec/java_home"))
-{
-    using (var process = StartAndReturnProcess("/usr/libexec/java_home", new ProcessSettings { RedirectStandardOutput = true }))
+    string javaHome;
+    if (IsRunningOnWindows())
     {
-        process.WaitForExit();
-
-        javaHome = process.GetStandardOutput().First().Trim();
+        javaHome = EnvironmentVariable("JAVA_HOME");
+        if (string.IsNullOrEmpty(javaHome))
+            throw new Exception("Cannot find Java SDK: JAVA_HOME environment variable is not set.");
     }
+    else if (FileExists("/usr/libexec/java_home"))
+    {
+        javaHome = CaptureProcessOutput("/usr/libexec/java_home");
+    }
+    else
+    {
+        javaHome = EnvironmentVariable("JAVA_HOME");
+        if (string.IsNullOrEmpty(javaHome))
+            throw new Exception("Cannot find Java SDK: JAVA_HOME environment variable is not set.");
+    }
+
+    return javaHome;
 }
-else
-{
-    javaHome = EnvironmentVariable("JAVA_HOME");
-}
+
+string javaHome = GetJavaSdkPath();
 
 var classPath = string.Join(IsRunningOnWindows() ? ";" : ":", new[]
 {
