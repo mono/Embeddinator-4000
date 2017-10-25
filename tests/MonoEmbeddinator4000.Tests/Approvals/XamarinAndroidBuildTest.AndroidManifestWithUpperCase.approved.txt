@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" package="hello">
-    <uses-sdk android:minSdkVersion="9" android:targetSdkVersion="25" />
+    <uses-sdk android:minSdkVersion="9" android:targetSdkVersion="24" />
     <application>
         <meta-data android:name="mono.embeddinator.classname" android:value="hello.Native_HELLO" />
         <provider android:name="mono.embeddinator.AndroidRuntimeProvider" android:exported="false" android:initOrder="2147483647" android:authorities="${applicationId}.mono.embeddinator.AndroidRuntimeProvider.__mono_init__" />

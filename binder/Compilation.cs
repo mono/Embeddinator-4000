@@ -627,7 +627,7 @@ namespace Embeddinator
             var monoPath = Path.Combine(MonoSdkPath, "include", "mono-2.0");
             var name = Path.GetFileNameWithoutExtension(Project.Assemblies[0]);
             var libName = $"lib{name}.so";
-            var ndkPath = AndroidSdk.AndroidNdkPath;
+            var ndkPath = XamarinAndroid.AndroidSdk.AndroidNdkPath;
 
             foreach (var abi in new[] { "armeabi", "armeabi-v7a", "arm64-v8a", "x86", "x86_64" })
             {

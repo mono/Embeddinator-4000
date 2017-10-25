@@ -65,8 +65,10 @@ xcuserdata/
 *.dSYM.zip
 *.dSYM
 *.nupkg
+*.bak
 .cake/**
 !.cake/packages.config
 .vscode/
+.vs/
 Resource.designer.cs
 external/Xamarin.Android
