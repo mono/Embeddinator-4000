@@ -19,12 +19,7 @@ namespace Embeddinator
         public const int TargetSdkVersion = 24;
         public const string JavaVersion = "1.8";
 
-        static readonly AndroidSdkInfo androidSdk;
-
-        static XamarinAndroid ()
-        {
-            androidSdk = new AndroidSdkInfo (AndroidSdkLogger);
-        }
+        static readonly Lazy<AndroidSdkInfo> androidSdk = new Lazy<AndroidSdkInfo>(() => new AndroidSdkInfo(AndroidSdkLogger));
 
         static void AndroidSdkLogger (TraceLevel level, string message)
         {
@@ -42,7 +37,7 @@ namespace Embeddinator
             }
         }
 
-        public static AndroidSdkInfo AndroidSdk => androidSdk;
+        public static AndroidSdkInfo AndroidSdk => androidSdk.Value;
 
         static string GetMonoDroidPath()
         {
@@ -68,21 +63,15 @@ namespace Embeddinator
             return libPath;
         }
 
-        static Lazy<string> path = new Lazy<string>(GetMonoDroidPath);
+        static readonly Lazy<string> path = new Lazy<string>(GetMonoDroidPath);
 
-        public static string Path
-        {
-            get { return path.Value; }
-        }
+        public static string Path => path.Value;
 
-        static Lazy<string> libraryPath = new Lazy<string>(GetMonoDroidLibPath);
+        static readonly Lazy<string> libraryPath = new Lazy<string>(GetMonoDroidLibPath);
 
-        public static string LibraryPath
-        {
-            get { return libraryPath.Value; }
-        }
+        public static string LibraryPath => libraryPath.Value;
 
-        static Lazy<string[]> targetFrameworks = new Lazy<string[]>(() => new[]
+        static readonly Lazy<string[]> targetFrameworks = new Lazy<string[]>(() => new[]
         {
             Combine(Path, "lib", "xbuild-frameworks", "MonoAndroid", "v1.0"),
             Combine(Path, "lib", "xbuild-frameworks", "MonoAndroid", "v1.0", "Facades"),
@@ -90,10 +79,7 @@ namespace Embeddinator
             Combine(Path, "lib", "xbuild-frameworks", "MonoAndroid", "v2.3"), //Mono.Android.Export.dll is here
         });
 
-        public static string[] TargetFrameworkDirectories
-        {
-            get { return targetFrameworks.Value; }
-        }
+        public static string[] TargetFrameworkDirectories => targetFrameworks.Value;
 
         /// <summary>
         /// Finds a Xamarin.Android assembly in v1.0, v1.0/Facades, or TargetFrameworkVersion
@@ -111,11 +97,11 @@ namespace Embeddinator
             throw new FileNotFoundException("Unable to find assembly!", assemblyName);
         }
 
-        static Lazy<int> apiLevel = new Lazy<int> (() =>
+        static readonly Lazy<int> apiLevel = new Lazy<int> (() =>
         {
             for (int i = TargetSdkVersion; i > 0; i--)
             {
-                if (androidSdk.IsPlatformInstalled (i))
+                if (AndroidSdk.IsPlatformInstalled (i))
                     return i;
             }
 
@@ -125,22 +111,16 @@ namespace Embeddinator
         /// <summary>
         /// Right now we are choosing the max API level installed
         /// </summary>
-        public static int ApiLevel
-        {
-            get { return apiLevel.Value; }
-        }
+        public static int ApiLevel => apiLevel.Value;
 
-        static Lazy<string> platformDirectory = new Lazy<string>(() => AndroidSdk.GetPlatformDirectory(ApiLevel));
+        static readonly Lazy<string> platformDirectory = new Lazy<string>(() => AndroidSdk.GetPlatformDirectory(ApiLevel));
 
         /// <summary>
         /// Gets the platform directory based on the max API level installed
         /// </summary>
-        public static string PlatformDirectory
-        {
-            get { return platformDirectory.Value; }
-        }
+        public static string PlatformDirectory => platformDirectory.Value;
 
-        static Lazy<string> javaSdkPath = new Lazy<string>(() =>
+        static readonly Lazy<string> javaSdkPath = new Lazy<string>(() =>
         {
             // If we are running on macOS, invoke java_home to figure out Java path.
             if (Platform.IsMacOS)
@@ -153,13 +133,9 @@ namespace Embeddinator
             if (Platform.IsLinux)
             {
                 // Only available on Debian-based distros, set JAVA_HOME for other distros.
-                try
-                {
-                    var javaBin = Helpers.Invoke("update-alternatives", "--list java", null).StandardOutput.Trim();
-                    if (!string.IsNullOrEmpty(javaBin))
-                        return GetFullPath(Combine(GetDirectoryName(javaBin), "../.."));
-                }
-                finally { }
+                var javaBin = Helpers.Invoke("update-alternatives", "--list java", null).StandardOutput.Trim();
+                if (!string.IsNullOrEmpty(javaBin))
+                    return GetFullPath(Combine(GetDirectoryName(javaBin), "../.."));
             }
 
             if (string.IsNullOrEmpty(home))
@@ -168,12 +144,9 @@ namespace Embeddinator
             return string.Empty;
         });
 
-        public static string JavaSdkPath
-        {
-            get { return javaSdkPath.Value; }
-        }
+        public static string JavaSdkPath => javaSdkPath.Value;
 
-        static Lazy<string> msBuildPath = new Lazy<string>(() =>
+        static readonly Lazy<string> msBuildPath = new Lazy<string>(() =>
         {
             if (Platform.IsMacOS)
                 return "/Library/Frameworks/Mono.framework/Versions/Current/Commands/msbuild";
@@ -190,9 +163,6 @@ namespace Embeddinator
             return "/usr/bin/msbuild";
         });
 
-        public static string MSBuildPath
-        {
-            get { return msBuildPath.Value; }
-        }
+        public static string MSBuildPath => msBuildPath.Value;
     }
 }
