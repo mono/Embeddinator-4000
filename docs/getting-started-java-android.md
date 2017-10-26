@@ -3,7 +3,7 @@
 In addition to the requirements from our [Getting started with Java](getting-started-java.md) guide you'll also need:
 
 * Xamarin.Android 7.4.99 or later (build from [Jenkins](https://jenkins.mono-project.com/view/Xamarin.Android/job/xamarin-android/lastSuccessfulBuild/Azure/))
-* [Android Studio 3.x](https://developer.android.com/studio/preview/index.html) with Java 1.8
+* [Android Studio 3.x](https://developer.android.com/studio/index.html) with Java 1.8
 
 As an overview, we will:
 * Create a C# Android Library project
@@ -171,7 +171,7 @@ If you are looking for an additional walkthrough, check out this video embedding
 
 ## Using Java 1.8
 
-As of writing this, the best option is to use Android Studio 3.0 beta ([download here](https://developer.android.com/studio/preview/index.html)).
+As of writing this, the best option is to use Android Studio 3.0 ([download here](https://developer.android.com/studio/index.html)).
 
 To enable Java 1.8 in your app module's `build.gradle` file:
 ```groovy
