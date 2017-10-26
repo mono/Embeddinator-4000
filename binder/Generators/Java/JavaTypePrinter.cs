@@ -20,9 +20,9 @@ namespace Embeddinator.Generators
             TypeQualifiers quals)
         {
             if (ContextKind == TypePrinterContextKind.Native)
-                return JavaGenerator.IntPtrType;
+                return "Runtime.RuntimeLibrary.MonoEmbedArray";
 
-            return string.Format("{0}[]", array.Type.Visit(this));
+            return $"{array.Type.Visit(this)}[]";
         }
 
         static string GetName(Declaration decl)

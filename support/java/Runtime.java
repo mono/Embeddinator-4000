@@ -58,6 +58,25 @@ public final class Runtime {
             }
         }
 
+        public class GArray extends Structure {
+            public static class ByValue extends GArray implements Structure.ByValue { }
+            public static class ByReference  extends GArray implements Structure.ByReference { }
+
+            public Pointer data = Pointer.NULL;
+            public int len = 0;
+
+            // Private members defined in GArrayPriv
+            public boolean clear_;
+            public UnsignedInt element_size;
+            public boolean zero_terminated;
+            public UnsignedInt capacity;
+
+            @Override
+            protected List getFieldOrder() {
+                return Arrays.asList("data", "len", "clear_", "element_size", "zero_terminated", "capacity");
+            }
+        }
+
         public class GString extends Structure {
             public static class ByValue extends GString implements Structure.ByValue { }
             public static class ByReference extends GString implements Structure.ByReference { }
@@ -69,6 +88,17 @@ public final class Runtime {
             @Override
             protected List<String> getFieldOrder() {
                 return Arrays.asList("str", "len", "allocated_len");
+            }
+        }
+
+        public class MonoEmbedArray extends Structure {
+            public static class ByValue extends MonoEmbedArray implements Structure.ByValue { }
+
+            public GArray.ByReference array = Pointer.NULL;
+
+            @Override
+            protected List getFieldOrder() {
+                return Arrays.asList("array");
             }
         }
 

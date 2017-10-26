@@ -24,7 +24,7 @@ namespace Embeddinator.Generators
         public override bool VisitManagedArrayType(ManagedArrayType array,
             TypeQualifiers quals)
         {
-            Context.Return.Write("null");
+            Context.Return.Write("Pointer.NULL");
             return true;
         }
 
@@ -214,7 +214,65 @@ namespace Embeddinator.Generators
         public override bool VisitManagedArrayType(ManagedArrayType array,
             TypeQualifiers quals)
         {
-            Context.Return.Write("null");
+            var arraySizeId = JavaGenerator.GeneratedIdentifier("arrraySize");
+            var arrayElementSizeId = JavaGenerator.GeneratedIdentifier("arrrayElementSize");
+
+            Context.SupportBefore.WriteLine($"int {arrayElementSizeId} = {Context.ReturnVarName}.array.element_size;");
+            Context.SupportBefore.WriteLine($"int {arraySizeId} = {Context.ReturnVarName}.array.len / {arrayElementSizeId};");
+
+            var arrayId = JavaGenerator.GeneratedIdentifier("array");
+            var arrayElementType = array.Array.Type.Visit(TypePrinter);
+            Context.SupportBefore.WriteLine($"{arrayElementType}[] {arrayId} = new {arrayElementType}[{arraySizeId}];");
+
+            // Marshal the array elements to the Java array.
+            Context.SupportBefore.WriteLine($"for (int i = 0; i < {arrayElementSizeId}; ++i)");
+            Context.SupportBefore.WriteStartBraceIndent();
+
+            TypePrinter.PushContext(TypePrinterContextKind.Native);
+            var arrayElementNativeType = array.Array.Type.Visit(TypePrinter);
+            TypePrinter.PopContext();
+
+            var arrayElementId = JavaGenerator.GeneratedIdentifier("arrayElement");
+
+            Context.SupportBefore.Write($"{JavaGenerator.IntPtrType} {arrayElementId} = ");
+            Context.SupportBefore.WriteLine($"{Context.ReturnVarName}.data.share(i * {arrayElementSizeId}, {arrayElementSizeId});");
+
+            var elementType = array.Array.Type.Desugar();
+            var marshalElementId = JavaGenerator.GeneratedIdentifier("marshalElement");
+
+            bool didMarshal = true;
+
+            PrimitiveType primitiveType;
+            if (elementType.IsPrimitiveType(out primitiveType))
+            {
+                switch(primitiveType)
+                {
+                    case PrimitiveType.Bool:
+                    case PrimitiveType.UChar:
+                    case PrimitiveType.SChar:
+                        Context.SupportBefore.WriteLine($"int {marshalElementId} = {arrayElementId}.getByte();");
+                        break;
+                    case PrimitiveType.Short:
+                        Context.SupportBefore.WriteLine($"int {marshalElementId} = {arrayElementId}.getShort();");
+                        break;
+                    case PrimitiveType.Int:
+                        Context.SupportBefore.WriteLine($"int {marshalElementId} = {arrayElementId}.getInt();");
+                        break;
+                    case PrimitiveType.Long:
+                        Context.SupportBefore.WriteLine($"int {marshalElementId} = {arrayElementId}.getLong();");
+                        break;
+                    default:
+                        didMarshal = false;
+                        break;
+                }
+            }
+
+            if (didMarshal)
+                Context.SupportBefore.WriteLine($"{arrayId}.add({marshalElementId});");
+
+            Context.SupportBefore.WriteCloseBraceIndent();
+
+            Context.Return.Write(arrayId);
             return true;
         }
 

@@ -426,8 +426,8 @@ namespace Embeddinator.Generators
                 }
                 else if (managedType.IsArray)
                 {
-                    if (Options.GeneratorKind == GeneratorKind.Java)
-                        return new QualifiedType(new UnsupportedType { Description = managedType.FullName });
+                    //if (Options.GeneratorKind == GeneratorKind.Java)
+                    //    return new QualifiedType(new UnsupportedType { Description = managedType.FullName });
 
                     var array = new ArrayType
                     {
