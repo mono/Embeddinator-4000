@@ -218,3 +218,37 @@ Task("Run-Java-Tests")
         var java = IsRunningOnLinux() ? "java" : Directory(javaHome) + File("bin/java");
         Exec(java, $"-cp {classPath} -Djna.dump_memory=true -Djna.nosys=true org.junit.runner.JUnitCore mono.embeddinator.Tests");
     });
+
+/// ---------------------------
+/// Swift tests
+/// ---------------------------
+
+Task("Generate-Swift")
+    .Does(() =>
+    {
+        var platform = IsRunningOnWindows() ? "Windows" : IsRunningOnMacOS() ? "macOS" : "Linux";
+        var output = mkDir + Directory("swift");
+        Embeddinator($"-gen=Swift -out={output} -platform={platform} -compile {managedDll}");
+    });
+
+Task("Build-Swift-Tests")
+    .Does(() =>
+    {
+        if (!IsRunningOnMacOS())
+            return;
+
+        var xcodePath = CaptureProcessOutput("xcode-select", "-p");
+        var swiftFrameworkPath = $"{xcodePath}/Platforms/MacOSX.platform/Developer/Library/Frameworks";
+
+        var output = mkDir + Directory("swift");
+        var module = $"{output}/managed.swiftmodule";
+
+        Exec("swiftc", $"-F{swiftFrameworkPath} -module-link-name {module} {commonDir}/swift/Tests.swift -o {output}/Tests");
+    });
+
+Task("Run-Swift-Tests")
+    .Does(() =>
+    {
+        var output = mkDir + Directory("swift");
+        Exec("xcrun", $"xctest {output}/Tests");
+    });

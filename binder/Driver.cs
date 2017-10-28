@@ -158,6 +158,9 @@ namespace Embeddinator
                 case GeneratorKind.Java:
                     generator = new JavaGenerator(Context);
                     break;
+                case GeneratorKind.Swift:
+                    generator = new SwiftGenerator(Context);
+                    break;
                 default:
                     throw new NotImplementedException();
             }

@@ -11,6 +11,7 @@
     <AssemblyName>Embeddinator-4000</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <BaseIntermediateOutputPath>..\obj\Debug\Embeddinator-4000</BaseIntermediateOutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -119,6 +120,15 @@
     <Compile Include="../../binder/Generators/ObjC/ObjCSources.cs">
       <Link>binder/Generators/ObjC/ObjCSources.cs</Link>
     </Compile>
+    <Compile Include="../../binder/Generators/Swift/SwiftGenerator.cs">
+      <Link>binder/Generators/Swift/SwiftGenerator.cs</Link>
+    </Compile>
+    <Compile Include="../../binder/Generators/Swift/SwiftSources.cs">
+      <Link>binder/Generators/Swift/SwiftSources.cs</Link>
+    </Compile>
+    <Compile Include="../../binder/Generators/Swift/SwiftTypePrinter.cs">
+      <Link>binder/Generators/Swift/SwiftTypePrinter.cs</Link>
+    </Compile>
     <Compile Include="../../binder/Generators/Types.cs">
       <Link>binder/Generators/Types.cs</Link>
     </Compile>
@@ -183,6 +193,9 @@
       <Link>binder/Utils/XamarinAndroidBuild.cs</Link>
     </Compile>
     <None Include="packages.config" />
+    <Compile Include="..\..\binder\Generators\Swift\SwiftMarshal.cs">
+      <Link>binder\Generators\Swift\SwiftMarshal.cs</Link>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="IKVM.Reflection.csproj">
