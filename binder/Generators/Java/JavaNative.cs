@@ -20,10 +20,11 @@ namespace Embeddinator.Generators
         {
         }
 
-        public static string GetNativeLibClassName(TranslationUnit unit) => GetNativeLibClassName(unit.FileName);
+        public static string GetNativeLibClassName(TranslationUnit unit) =>
+            GetNativeLibClassName(unit.FileName);
 
         public static string GetNativeLibClassName(string fileName) =>
-            $"Native_{Path.GetFileNameWithoutExtension(fileName).Replace('.', '_').Replace('-', '_')}";
+            $"Native_{JavaGenerator.FileNameAsIdentifier(fileName)}";
 
         public string ClassName => GetNativeLibClassName(TranslationUnit);
 

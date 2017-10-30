@@ -13,10 +13,14 @@ namespace Embeddinator.Generators
     {
         public static string IntPtrType = "com.sun.jna.Pointer";
 
-        public static string GetNativeLibPackageName(TranslationUnit unit) => GetNativeLibPackageName(unit.FileName);
+        public static string GetNativeLibPackageName(TranslationUnit unit) =>
+            GetNativeLibPackageName(unit.FileName);
 
         public static string GetNativeLibPackageName(string fileName) =>
-            Path.GetFileNameWithoutExtension(fileName).Replace('.', '_').Replace('-', '_').ToLowerInvariant();
+            FileNameAsIdentifier(fileName).ToLowerInvariant();
+
+        public static string FileNameAsIdentifier(string fileName) =>
+            Path.GetFileNameWithoutExtension(fileName).Replace('.', '_').Replace('-', '_');
 
         public JavaTypePrinter TypePrinter;
 
