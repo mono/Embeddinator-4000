@@ -196,6 +196,9 @@
     <Compile Include="..\..\binder\Generators\Swift\SwiftMarshal.cs">
       <Link>binder\Generators\Swift\SwiftMarshal.cs</Link>
     </Compile>
+    <Compile Include="..\..\binder\Generators\Swift\SwiftNative.cs">
+      <Link>binder\Generators\Swift\SwiftNative.cs</Link>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="IKVM.Reflection.csproj">
