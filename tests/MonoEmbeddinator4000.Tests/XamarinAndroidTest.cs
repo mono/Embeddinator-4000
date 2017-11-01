@@ -8,36 +8,6 @@ namespace Embeddinator.Tests
     [TestFixture]
     public class XamarinAndroidTest : CurrentDirectoryTest
     {
-        [SetUp]
-        public override void SetUp()
-        {
-            base.SetUp();
-
-            AndroidLogger.Error += AndroidLogger_Error;
-            AndroidLogger.Warning += AndroidLogger_Error;
-            AndroidLogger.Info += AndroidLogger_Info;
-        }
-
-        [TearDown]
-        public override void TearDown()
-        {
-            base.TearDown();
-
-            AndroidLogger.Error -= AndroidLogger_Error;
-            AndroidLogger.Warning -= AndroidLogger_Error;
-            AndroidLogger.Info -= AndroidLogger_Info;
-        }
-
-        void AndroidLogger_Error(string task, string message)
-        {
-            Assert.Fail("{0}: {1}", task, message);
-        }
-
-        void AndroidLogger_Info(string task, string message)
-        {
-            Console.WriteLine("{0}: {1}", task, message);
-        }
-
         [Test]
         public void PathExists()
         {

@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -13,9 +13,9 @@ namespace Embeddinator.Generators
     /// Java code for a given managed library represented as a translation unit.
     /// </summary>
     [DebuggerDisplay("Unit = {TranslationUnit}")]
-    public class JavaNative : JavaSources
+    public class SwiftNative : SwiftSources
     {
-        public JavaNative(BindingContext context, TranslationUnit unit)
+        public SwiftNative(BindingContext context, TranslationUnit unit)
             : base(context, unit)
         {
         }
@@ -28,40 +28,21 @@ namespace Embeddinator.Generators
 
         public string ClassName => GetNativeLibClassName(TranslationUnit);
 
-        public override string FilePath
-        {
-            get
-            {
-                var names = new List<string>
-                {
-                    JavaGenerator.GetNativeLibPackageName(TranslationUnit),
-                    ClassName
-                };
-
-                var filePath = string.Join(Path.DirectorySeparatorChar.ToString(), names);
-                return $"{filePath}.{FileExtension}";
-            }
-        }
+        public override string FilePath => $"{ClassName}.{FileExtension}";
 
         public override void Process()
         {
             GenerateFilePreamble(CommentKind.JavaDoc, "Embeddinator-4000");
 
-            GenerateJavaPackage(TranslationUnit);
-            GenerateJavaImports();
+            GenerateImports();
 
             TranslationUnit.Visit(this);
         }
 
         public override bool VisitTranslationUnit(TranslationUnit unit)
         {
-            WriteLine($"public interface {ClassName} extends com.sun.jna.Library");
+            Write($"public class {ClassName} ");
             WriteStartBraceIndent();
-
-            WriteLine($"{ClassName} INSTANCE = ");
-            var libName = unit.FileNameWithoutExtension;
-            WriteLineIndent($"mono.embeddinator.Runtime.loadLibrary(\"{libName}\", {ClassName}.class);");
-            NewLine();
 
             var ret = base.VisitTranslationUnit(unit);
 
@@ -73,29 +54,6 @@ namespace Embeddinator.Generators
         {
             var @class = decl.Namespace as Class;
             return @class.Declarations.Where(d => d.OriginalName == decl.OriginalName);
-        }
-
-        public static string GetCMethodIdentifier(Method method)
-        {
-            if (method.CompleteDeclaration != null)
-                method = method.CompleteDeclaration as Method;
-
-            var methodName = (method.IsConstructor) ? "new" : method.OriginalName;
-
-            var @class = method.Namespace as Class;
-            var name = $"{@class.QualifiedOriginalName}_{methodName}";
-
-            // Deal with naming overloads conflicts.
-            var overloads = GetOverloadedDeclarations(method).ToList();
-
-            if (overloads.Count > 1)
-            {
-                var overloadIndex = overloads.FindIndex(m => ReferenceEquals(m, method));
-                if (overloadIndex > 0)
-                    name = $"{name}_{overloadIndex}";
-            }
-
-            return name;
         }
 
         public override bool VisitMethodDecl(Method method)
@@ -111,9 +69,9 @@ namespace Embeddinator.Generators
             TypePrinter.PushContext(TypePrinterContextKind.Native);
 
             var returnTypeName = method.ReturnType.Visit(TypePrinter);
-            Write($"public {returnTypeName} {GetCMethodIdentifier(method)}(");
+            Write($"public static func {JavaNative.GetCMethodIdentifier(method)}(");
             Write(TypePrinter.VisitParameters(method.Parameters, hasNames: true).ToString());
-            Write(");");
+            Write($") -> {returnTypeName};");
 
             TypePrinter.PopContext();
 
@@ -132,10 +90,7 @@ namespace Embeddinator.Generators
 
         public override bool VisitEnumDecl(Enumeration @enum)
         {
-            if (!VisitDeclaration(@enum))
-                return false;
-
-            return true;
+            return VisitDeclaration(@enum);
         }
     }
 }

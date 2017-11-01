@@ -28,7 +28,7 @@ namespace Embeddinator
                 .Select(s => s.StartsWith("VS", StringComparison.InvariantCulture) ? s.Substring(2) : s));
 
             var optionSet = new Mono.Options.OptionSet() {
-                { "gen=", "target generator (C, C++, Obj-C, Java)", v => Generators.Add(ConvertToGeneratorKind(v)) },
+                { "gen=", "target generator (C, C++, Obj-C, Java, Swift)", v => Generators.Add(ConvertToGeneratorKind(v)) },
                 { "p|platform=", "target platform (iOS, macOS, Android, Windows)", v => Platform = v },
                 { "o|out|outdir=", "output directory", v => OutputDir = v },
                 { "c|compile", "compiles the generated output", v => CompileCode = true },
@@ -103,6 +103,8 @@ namespace Embeddinator
                 return GeneratorKind.ObjectiveC;
             case "java":
                 return GeneratorKind.Java;
+            case "swift":
+                return GeneratorKind.Swift;
             }
 
             throw new NotSupportedException("Unknown target generator: " + gen);

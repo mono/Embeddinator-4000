@@ -175,4 +175,15 @@ public class AndroidTests {
     public void googlePlayServices() {
         assertNotNull(GooglePlayServices.createClient());
     }
+
+    @Test
+    public void monoPackageManagerContext() {
+        assertNotNull(mono.MonoPackageManager.Context);
+    }
+
+    @Test
+    public void monoPackageManagerSetContext() {
+        //Just make sure this compiles, and doesn't throw
+        mono.MonoPackageManager.setContext(null);
+    }
 }
