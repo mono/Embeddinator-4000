@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using CppSharp;
@@ -171,6 +172,21 @@ namespace Embeddinator.Generators
 
             Write(" ");
             WriteStartBraceIndent();
+
+            var hasNonInterfaceBase = @class.HasBaseClass && @class.BaseClass.IsGenerated
+                && !@class.BaseClass.IsInterface;
+
+            var objectIdent = SwiftGenerator.GeneratedIdentifier("object");
+
+            if (!@class.IsStatic && !@class.IsInterface && !hasNonInterfaceBase)
+            {
+                TypePrinter.PushContext(TypePrinterContextKind.Native);
+                var typeName = @class.Visit(TypePrinter);
+                TypePrinter.PopContext();
+
+                WriteLine($"public var {objectIdent} : {typeName}");
+                NewLine();
+            }
 
             VisitDeclContext(@class);
             WriteCloseBraceIndent();
