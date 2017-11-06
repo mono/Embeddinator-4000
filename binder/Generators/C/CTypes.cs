@@ -11,6 +11,12 @@ namespace Embeddinator.Generators
 
         public bool IsByRefParameter => param != null && (param.IsOut || param.IsInOut);
 
+        public override string VisitDeclaration(Declaration decl)
+        {
+            var name = base.VisitDeclaration(decl);
+            return CGenerator.QualifiedName(decl);
+        }
+
         public override string VisitDecayedType(DecayedType decayed,
             TypeQualifiers quals)
         {

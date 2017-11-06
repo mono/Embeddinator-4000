@@ -503,7 +503,7 @@ namespace Embeddinator.Generators
                 integerType, newArgName, Context.ArgName);
             Context.Return.Write("&{0}", newArgName);
             Context.SupportAfter.WriteLine("*{0} = ({1}) {2};", Context.ArgName,
-                @enum.QualifiedName, newArgName);
+                @enum.Visit(CTypePrinter), newArgName);
         }
 
         public override bool VisitPointerType(PointerType pointer,

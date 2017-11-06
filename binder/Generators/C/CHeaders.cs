@@ -102,7 +102,7 @@ namespace Embeddinator.Generators
             PushBlock();
 
             var enumName = Options.GeneratorKind != GeneratorKind.CPlusPlus ?
-                @enum.QualifiedName : @enum.Name;
+                CGenerator.QualifiedName(@enum) : @enum.Name;
             
             Write($"typedef enum {enumName}");
 
