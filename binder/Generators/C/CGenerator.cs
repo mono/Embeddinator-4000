@@ -36,7 +36,9 @@ namespace Embeddinator.Generators
             if (Options.GeneratorKind == GeneratorKind.CPlusPlus)
                 return decl.Name;
 
-            return decl.QualifiedName;
+            var isSwiftTarget = Options.GeneratorKinds.Contains(GeneratorKind.Swift);
+
+            return (isSwiftTarget && !decl.IsImplicit) ? $"_{decl.QualifiedName}" : decl.QualifiedName;
         }
 
         public static string ObjectInstanceId => GenId("object");
