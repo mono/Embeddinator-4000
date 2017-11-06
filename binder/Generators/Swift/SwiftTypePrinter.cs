@@ -37,11 +37,13 @@ namespace Embeddinator.Generators
         public override TypePrinterResult VisitParameter(Parameter param, bool hasName)
         {
             Parameter = param;
-            var type = param.QualifiedType.Visit(this);
+
             var name = hasName ? $"{param.Name}" : string.Empty;
+            var inout = IsByRefParameter ? "inout " : string.Empty;
+            var type = param.QualifiedType.Visit(this);
+
             Parameter = null;
 
-            var inout = IsByRefParameter ? "inout " : string.Empty;
             return $"{name} : {inout}{type}";
         }
 
@@ -56,6 +58,9 @@ namespace Embeddinator.Generators
             TypeQualifiers quals = new TypeQualifiers())
         {
             var isNative = ContextKind == TypePrinterContextKind.Native;
+
+            if (isNative && IsByRefParameter && primitive == PrimitiveType.String)
+                return "GString";
 
             switch (primitive)
             {
