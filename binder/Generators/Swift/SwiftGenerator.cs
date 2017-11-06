@@ -9,7 +9,7 @@ namespace Embeddinator.Generators
     {
         public SwiftTypePrinter TypePrinter { get; internal set; }
 
-        public static string IntPtrType = "UnsafePointer<Void>";
+        public static string IntPtrType = "UnsafeRawPointer";
 
         public SwiftGenerator(BindingContext context)
             : base(context)
