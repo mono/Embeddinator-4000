@@ -277,6 +277,47 @@ namespace Embeddinator.Generators
 
                 @params.Add(marshal.Context.Return);
             }
+
+            var hasReturn = !method.ReturnType.Type.IsPrimitiveType(PrimitiveType.Void) &&
+                            !(method.IsConstructor || method.IsDestructor);
+
+            if (hasReturn)
+            {
+                TypePrinter.PushContext(TypePrinterContextKind.Native);
+                var typeName = method.ReturnType.Visit(TypePrinter);
+                TypePrinter.PopContext();
+                Write($"let __ret : {typeName.Type} = ");
+            }
+
+            var effectiveMethod = method.CompleteDeclaration as Method ?? method;
+            var nativeMethodId = JavaNative.GetCMethodIdentifier(effectiveMethod);
+            WriteLine($"{nativeMethodId}({string.Join(", ", @params)})");
+
+            foreach (var marshal in contexts)
+            {
+                if (!string.IsNullOrWhiteSpace(marshal.SupportAfter))
+                    Write(marshal.SupportAfter);
+            }
+
+            if (hasReturn)
+            {
+                var ctx = new MarshalContext(Context)
+                {
+                    ReturnType = method.ReturnType,
+                    ReturnVarName = "__ret"
+                };
+
+                var marshal = new SwiftMarshalNativeToManaged(ctx);
+                method.ReturnType.Visit(marshal);
+
+                if (marshal.Context.Return.ToString().Length == 0)
+                    throw new NotSupportedException($"Cannot marshal return type {method.ReturnType}");
+
+                if (!string.IsNullOrWhiteSpace(marshal.Context.SupportBefore))
+                        Write(marshal.Context.SupportBefore);
+
+                WriteLine($"return {marshal.Context.Return}");
+            }
         }
 
         public override bool VisitTypedefDecl(TypedefDecl typedef)
