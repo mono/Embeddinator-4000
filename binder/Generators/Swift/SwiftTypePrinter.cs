@@ -80,9 +80,6 @@ namespace Embeddinator.Generators
                 case PrimitiveType.ULong: return isNative ? "CUnsignedLongLong" : "UInt64";
                 case PrimitiveType.LongLong: return isNative ? "CLongLong" : "LongLong";
                 case PrimitiveType.ULongLong: return isNative ? "CUnsignedLongLong" : "UnsignedLongLong";
-                case PrimitiveType.Int128: return "__int128";
-                case PrimitiveType.UInt128: return "__uint128_t";
-                case PrimitiveType.Half: return "__fp16";
                 case PrimitiveType.Float: return isNative ? "CFloat" : "Float";
                 case PrimitiveType.Double: return isNative ? "CDouble" : "Double";
                 case PrimitiveType.IntPtr:
