@@ -53,7 +53,7 @@ namespace Embeddinator.Passes
 
             var typedef = new TypedefDecl
             {
-                Name = string.Format("_{0}", typeName),
+                Name = $"_{typeName}",
                 Namespace = @namespace,
                 QualifiedType = new QualifiedType(new TagType(MonoEmbedArray))
             };

@@ -1,5 +1,4 @@
 ﻿﻿﻿using CppSharp.AST;
-using CppSharp.AST.Extensions;
 
 namespace Embeddinator.Generators
 {

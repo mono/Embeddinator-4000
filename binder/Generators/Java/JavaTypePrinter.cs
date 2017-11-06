@@ -162,7 +162,6 @@ namespace Embeddinator.Generators
                 case PrimitiveType.Null: return JavaGenerator.IntPtrType;
                 case PrimitiveType.String: return "String";
                 case PrimitiveType.Decimal: return "java.math.BigDecimal";
-
             }
 
             throw new NotSupportedException();

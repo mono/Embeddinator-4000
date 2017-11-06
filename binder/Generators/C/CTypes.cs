@@ -29,8 +29,7 @@ namespace Embeddinator.Generators
 
         public override string VisitCILType(CILType type, TypeQualifiers quals)
         {
-            throw new System.NotImplementedException(
-                string.Format("Unhandled .NET type: {0}", type.Type));
+            throw new NotImplementedException($"Unhandled .NET type: {type.Type}");
         }
 
         public override string VisitClassDecl(Class @class)
@@ -93,7 +92,7 @@ namespace Embeddinator.Generators
             typeName = AsCIdentifier(typeName);
             typeName = StringHelpers.Capitalize(typeName);
 
-            return string.Format("{0}Array", typeName);
+            return $"{typeName}Array";
         }
 
         public override string VisitUnsupportedType(UnsupportedType type, TypeQualifiers quals)

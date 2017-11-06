@@ -180,7 +180,7 @@ namespace Embeddinator.Generators
             PushBlock();
 
             var typeName = typedef.Type.Visit(CTypePrinter);
-            WriteLine("typedef {0} {1};", typeName, typedef.Name);
+            WriteLine($"typedef {typeName} {typedef};");
 
             var newlineKind = NewLineKind.BeforeNextBlock;
 
