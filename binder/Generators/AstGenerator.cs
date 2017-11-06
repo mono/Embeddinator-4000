@@ -426,7 +426,7 @@ namespace Embeddinator.Generators
                 }
                 else if (managedType.IsArray)
                 {
-                    if (Options.GeneratorKind == GeneratorKind.Java)
+                    if (Options.GeneratorKind == GeneratorKind.Java || Options.GeneratorKind == GeneratorKind.Swift)
                         return new QualifiedType(new UnsupportedType { Description = managedType.FullName });
 
                     var array = new ArrayType
