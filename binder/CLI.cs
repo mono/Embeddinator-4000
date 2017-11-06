@@ -183,6 +183,8 @@ namespace Embeddinator
                 Generators.Insert(0, GeneratorKind.C);
             }
 
+            options.GeneratorKinds = Generators;
+
             var targetPlatform = ConvertToTargetPlatform(Platform);
             options.Compilation.Platform = targetPlatform;
 

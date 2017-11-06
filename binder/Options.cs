@@ -1,9 +1,16 @@
+using System.Collections.Generic;
 using CppSharp;
+using CppSharp.Generators;
 
 namespace Embeddinator
 {
     public class Options : DriverOptions
     {
+        /// <summary>
+        /// The list of generators that will be targeted.
+        /// </summary>
+        public IEnumerable<GeneratorKind> GeneratorKinds = new List<GeneratorKind>();
+
         /// <summary>
         /// The name of the library to be bound.
         /// </summary>

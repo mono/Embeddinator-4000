@@ -230,8 +230,8 @@ namespace Embeddinator.Generators
 
             if (method.IsConstructor)
             {
-                var alloc = GenerateClassObjectAlloc(@class.QualifiedName);
-                WriteLine($"{@class.QualifiedName}* {objectId} = {alloc};");
+                var alloc = GenerateClassObjectAlloc(@class);
+                WriteLine($"{@class.Visit(CTypePrinter)}* {objectId} = {alloc};");
 
                 var classId = $"class_{@class.QualifiedName}";
                 WriteLine("MonoObject* {0} = mono_object_new({1}.domain, {2});",

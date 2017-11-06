@@ -45,6 +45,7 @@ namespace Embeddinator
             if (!Options.Compilation.Platform.HasValue)
                 Options.Compilation.Platform = Platform.Host;
 
+            CGenerator.Options = options;
             Declaration.QualifiedNameSeparator = "_";
         }
 

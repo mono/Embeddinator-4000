@@ -29,6 +29,18 @@ namespace Embeddinator.Generators
             return "__" + id.Replace('-', '_');
         }
 
+        public static Options Options;
+
+        public static string QualifiedName(Declaration decl)
+        {
+            if (Options.GeneratorKind == GeneratorKind.CPlusPlus)
+                return decl.Name;
+
+            var isSwiftTarget = Options.GeneratorKinds.Contains(GeneratorKind.Swift);
+
+            return (isSwiftTarget && !decl.IsImplicit) ? $"_{decl.QualifiedName}" : decl.QualifiedName;
+        }
+
         public static string ObjectInstanceId => GenId("object");
 
         public static string AssemblyId(TranslationUnit unit)
@@ -119,14 +131,6 @@ namespace Embeddinator.Generators
             return CGenerator.GenId(id);
         }
 
-        public string QualifiedName(Declaration decl)
-        {
-            if (Options.GeneratorKind == GeneratorKind.CPlusPlus)
-                return decl.Name;
-
-            return decl.QualifiedName;
-        }
-
         public CManagedToNativeTypePrinter CTypePrinter =>
                 CGenerator.GetCTypePrinter(Options.GeneratorKind);
 
@@ -162,9 +166,10 @@ namespace Embeddinator.Generators
             Write(")");
         }
 
-        public virtual string GenerateClassObjectAlloc(string type)
+        public virtual string GenerateClassObjectAlloc(Declaration decl)
         {
-            return $"({type}*) calloc(1, sizeof({type}))";
+            var typeName = decl.Visit(CTypePrinter);
+            return $"({typeName}*) calloc(1, sizeof({typeName}))";
         }
 
         public override bool VisitTypedefDecl(TypedefDecl typedef)
@@ -175,7 +180,7 @@ namespace Embeddinator.Generators
             PushBlock();
 
             var typeName = typedef.Type.Visit(CTypePrinter);
-            WriteLine("typedef {0} {1};", typeName, typedef.Name);
+            WriteLine($"typedef {typeName} {typedef};");
 
             var newlineKind = NewLineKind.BeforeNextBlock;
 

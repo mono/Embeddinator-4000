@@ -102,14 +102,13 @@ namespace Embeddinator.Generators
             PushBlock();
 
             var enumName = Options.GeneratorKind != GeneratorKind.CPlusPlus ?
-                @enum.QualifiedName : @enum.Name;
+                CGenerator.QualifiedName(@enum) : @enum.Name;
             
             Write($"typedef enum {enumName}");
 
             if (Options.GeneratorKind == GeneratorKind.CPlusPlus)
             {
-                var typePrinter = CTypePrinter;
-                var typeName = typePrinter.VisitPrimitiveType(
+                var typeName = CTypePrinter.VisitPrimitiveType(
                     @enum.BuiltinType.Type, new TypeQualifiers());
 
                 if (@enum.BuiltinType.Type != PrimitiveType.Int)
