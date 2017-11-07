@@ -95,19 +95,35 @@ namespace Embeddinator
                 "Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs");
             var sdk = Directory.EnumerateDirectories(sdkPath).First();
 
-            var args = new List<string> {
-                "-emit-module",
-                $"-emit-module-path {Options.OutputDir}",
-                $"-module-name {moduleName}",
-                $"-swift-version {swiftVersion}",
-                $"-sdk {sdk}",
-                string.Join(" ", files.ToList())
-            };
+            bool compileSuccess = true;
 
-            var invocation = string.Join(" ", args);
-            var output = Invoke(swiftcBin, invocation);
+            foreach (var file in files)
+            {
+                var args = new List<string>
+                {
+                    "-emit-module",
+                    $"-emit-module-path {Options.OutputDir}",
+                    $"-module-name {moduleName}",
+                    $"-swift-version {swiftVersion}",
+                    $"-sdk {sdk}",
+                    $"-I \"{MonoSdkPath}/include/mono-2.0\"",
+                };
 
-            return output.ExitCode == 0;
+                var bridgingHeader = Directory.EnumerateFiles(Options.OutputDir, "*.h")
+                    .SingleOrDefault(header => Path.GetFileNameWithoutExtension(header) ==
+                        Path.GetFileNameWithoutExtension(file));
+
+                args.Add($"-import-objc-header {bridgingHeader}");
+
+                args.Add(file);
+
+                var invocation = string.Join(" ", args);
+                var output = Invoke(swiftcBin, invocation);
+
+                compileSuccess &= output.ExitCode == 0;
+            }
+
+            return compileSuccess;
         }
 
         bool CompileJava(IEnumerable<string> files)

@@ -152,9 +152,6 @@ namespace Embeddinator.Generators
                 case PrimitiveType.ULong: return "UnsignedLong";
                 case PrimitiveType.LongLong: return "LongLong";
                 case PrimitiveType.ULongLong: return "UnsignedLongLong";
-                case PrimitiveType.Int128: return "__int128";
-                case PrimitiveType.UInt128: return "__uint128_t";
-                case PrimitiveType.Half: return "__fp16";
                 case PrimitiveType.Float: return useReferencePrimitiveTypes ? "Float" : "float";
                 case PrimitiveType.Double: return useReferencePrimitiveTypes ? "Double" : "double";
                 case PrimitiveType.IntPtr:
