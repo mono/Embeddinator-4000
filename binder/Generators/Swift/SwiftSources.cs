@@ -268,7 +268,7 @@ namespace Embeddinator.Generators
 
         public void GenerateMethodInvocation(Method method)
         {
-            var contexts = new List<MarshalContext>();
+            var marshalers = new List<Marshaler>();
             var @params = new List<string>();
 
             if (!method.IsStatic && !(method.IsConstructor || method.IsDestructor))
@@ -277,21 +277,20 @@ namespace Embeddinator.Generators
             int paramIndex = 0;
             foreach (var param in method.Parameters.Where(m => !m.IsImplicit))
             {
-                var ctx = new MarshalContext(Context)
+                var marshal = new SwiftMarshalManagedToNative(Context)
                 {
                     ArgName = param.Name,
                     Parameter = param,
                     ParameterIndex = paramIndex++
                 };
-                contexts.Add(ctx);
+                marshalers.Add(marshal);
 
-                var marshal = new SwiftMarshalManagedToNative(ctx);
                 param.Visit(marshal);
 
-                if (!string.IsNullOrWhiteSpace(marshal.Context.SupportBefore))
-                    Write(marshal.Context.SupportBefore);
+                if (!string.IsNullOrWhiteSpace(marshal.Before))
+                    Write(marshal.Before);
 
-                @params.Add(marshal.Context.Return);
+                @params.Add(marshal.Return);
             }
 
             var hasReturn = !method.ReturnType.Type.IsPrimitiveType(PrimitiveType.Void) &&
@@ -309,30 +308,29 @@ namespace Embeddinator.Generators
             var nativeMethodId = JavaNative.GetCMethodIdentifier(effectiveMethod);
             WriteLine($"{nativeMethodId}({string.Join(", ", @params)})");
 
-            foreach (var marshal in contexts)
+            foreach (var marshal in marshalers)
             {
-                if (!string.IsNullOrWhiteSpace(marshal.SupportAfter))
-                    Write(marshal.SupportAfter);
+                if (!string.IsNullOrWhiteSpace(marshal.After))
+                    Write(marshal.After);
             }
 
             if (hasReturn)
             {
-                var ctx = new MarshalContext(Context)
+                var marshal = new SwiftMarshalNativeToManaged(Context)
                 {
                     ReturnType = method.ReturnType,
                     ReturnVarName = "__ret"
                 };
 
-                var marshal = new SwiftMarshalNativeToManaged(ctx);
                 method.ReturnType.Visit(marshal);
 
-                if (marshal.Context.Return.ToString().Length == 0)
+                if (marshal.Return.ToString().Length == 0)
                     throw new NotSupportedException($"Cannot marshal return type {method.ReturnType}");
 
-                if (!string.IsNullOrWhiteSpace(marshal.Context.SupportBefore))
-                        Write(marshal.Context.SupportBefore);
+                if (!string.IsNullOrWhiteSpace(marshal.Before))
+                        Write(marshal.Before);
 
-                WriteLine($"return {marshal.Context.Return}");
+                WriteLine($"return {marshal.Return}");
             }
         }
 

@@ -1,29 +1,30 @@
 using CppSharp.AST;
+using CppSharp.Generators;
 
 namespace Embeddinator.Generators
 {
-    public class SwiftMarshalPrinter : CMarshalPrinter
+    public class SwiftMarshaler : CMarshaler
     {
         public SwiftTypePrinter TypePrinter;
 
-        public SwiftMarshalPrinter(MarshalContext marshalContext)
-            : base(marshalContext)
+        public SwiftMarshaler(BindingContext context)
+            : base(context)
         {
-            TypePrinter = new SwiftTypePrinter(Context.Context);
+            TypePrinter = new SwiftTypePrinter(Context);
         }
     }
 
-    public class SwiftMarshalManagedToNative : SwiftMarshalPrinter
+    public class SwiftMarshalManagedToNative : SwiftMarshaler
     {
-        public SwiftMarshalManagedToNative(MarshalContext marshalContext)
-            : base(marshalContext)
+        public SwiftMarshalManagedToNative(BindingContext context)
+            : base(context)
         {
         }
 
         public override bool VisitArrayType(ArrayType array,
             TypeQualifiers quals)
         {
-            Context.Return.Write("Pointer.NULL");
+            Return.Write("Pointer.NULL");
             return true;
         }
 
@@ -36,42 +37,42 @@ namespace Embeddinator.Generators
         public override bool VisitClassDecl(Class @class)
         {
             var objectRef = @class.IsInterface ? "__getObject()" : "__object!";
-            Context.Return.Write($"{Context.ArgName}.{objectRef}");
+            Return.Write($"{ArgName}.{objectRef}");
             return true;
         }
 
         public override bool VisitEnumDecl(Enumeration @enum)
         {
-            Context.Return.Write(Context.ArgName);
+            Return.Write(ArgName);
             return true;
         }
 
         void HandleDecimalType()
         {
-            var decimalId = SwiftGenerator.GeneratedIdentifier($"{Context.Parameter.Name}_decimal");
+            var decimalId = SwiftGenerator.GeneratedIdentifier($"{Parameter.Name}_decimal");
             var @var = IsByRefParameter ? "var" : "let";
-            Context.SupportBefore.WriteLine($"{@var} {decimalId} : MonoDecimal = mono_embeddinator_string_to_decimal(\"\")");
+            Before.WriteLine($"{@var} {decimalId} : MonoDecimal = mono_embeddinator_string_to_decimal(\"\")");
 
             var pointerId = "pointer";
             if (IsByRefParameter)
             {
-                Context.SupportBefore.WriteLine($"withUnsafeMutablePointer(to: &{decimalId}) {{ ({pointerId}) in");
-                Context.SupportAfter.WriteLine("}");
+                Before.WriteLine($"withUnsafeMutablePointer(to: &{decimalId}) {{ ({pointerId}) in");
+                After.WriteLine("}");
             }
 
-            Context.Return.Write(IsByRefParameter ? pointerId : decimalId);
+            Return.Write(IsByRefParameter ? pointerId : decimalId);
         }
 
         public void HandleRefOutPrimitiveType(PrimitiveType type)
         {
             if (type == PrimitiveType.String)
             {
-                var gstringId = $"{Context.ReturnVarName}_gstring";
-                Context.SupportBefore.WriteLine($"let {gstringId} : UnsafeMutablePointer<GString> = g_string_new(\"\")");
+                var gstringId = $"{ReturnVarName}_gstring";
+                Before.WriteLine($"let {gstringId} : UnsafeMutablePointer<GString> = g_string_new(\"\")");
 
-                Context.SupportBefore.WriteLine($"g_string_free({gstringId}, 1)");
+                Before.WriteLine($"g_string_free({gstringId}, 1)");
 
-                Context.Return.Write(gstringId);
+                Return.Write(gstringId);
                 return;
             }
             else if (type == PrimitiveType.Decimal)
@@ -80,7 +81,7 @@ namespace Embeddinator.Generators
                 return;
             }
 
-            Context.Return.Write($"&{Context.ArgName}");
+            Return.Write($"&{ArgName}");
         }
 
         public override bool VisitPrimitiveType(PrimitiveType type,
@@ -94,7 +95,7 @@ namespace Embeddinator.Generators
 
             if (type == PrimitiveType.Char)
             {
-                Context.Return.Write($"gunichar2({Context.ArgName}.unicodeScalars.first!.value)");
+                Return.Write($"gunichar2({ArgName}.unicodeScalars.first!.value)");
                 return true;
             }
             else if (type == PrimitiveType.Decimal)
@@ -103,7 +104,7 @@ namespace Embeddinator.Generators
                 return true;
             }
 
-            Context.Return.Write(Context.ArgName);
+            Return.Write(ArgName);
             return true;
         }
 
@@ -114,10 +115,10 @@ namespace Embeddinator.Generators
         }
     }
 
-    public class SwiftMarshalNativeToManaged : SwiftMarshalPrinter
+    public class SwiftMarshalNativeToManaged : SwiftMarshaler
     {
-        public SwiftMarshalNativeToManaged (MarshalContext marshalContext)
-            : base(marshalContext)
+        public SwiftMarshalNativeToManaged(BindingContext context)
+            : base(context)
         {
         }
 
@@ -125,27 +126,27 @@ namespace Embeddinator.Generators
             TypeQualifiers quals)
         {
             var typeName = array.Visit(TypePrinter);
-            Context.Return.Write($"new [{typeName}]");
+            Return.Write($"new [{typeName}]");
             return true;
         }
 
         public override bool VisitClassDecl(Class @class)
         {
-            var typePrinter = new SwiftTypePrinter(Context.Context);
+            var typePrinter = new SwiftTypePrinter(Context);
             var typeName = @class.Visit(typePrinter);
 
             //if (@class.IsInterface || @class.IsAbstract)
                 //typeName = $"{typeName}Impl";
 
-            Context.Return.Write($"{typeName}()");
+            Return.Write($"{typeName}()");
 
-            //Context.Return.Write(Context.ReturnVarName);
+            //Return.Write(ReturnVarName);
             return true;
         }
 
         public override bool VisitEnumDecl(Enumeration @enum)
         {
-            Context.Return.Write(Context.ReturnVarName);
+            Return.Write(ReturnVarName);
             return true;
         }
 
@@ -154,12 +155,12 @@ namespace Embeddinator.Generators
         {
             if (type == PrimitiveType.Char)
             {
-                Context.Return.Write($"Character(Unicode.Scalar({Context.ReturnVarName})!)");
+                Return.Write($"Character(Unicode.Scalar({ReturnVarName})!)");
                 return true;
             }
             else if (type == PrimitiveType.String)
             {
-                Context.Return.Write($"String(cString: {Context.ReturnVarName})");
+                Return.Write($"String(cString: {ReturnVarName})");
                 return true;
             }
             else if (type == PrimitiveType.Decimal)
@@ -168,25 +169,25 @@ namespace Embeddinator.Generators
                 return true;
             }
 
-            Context.Return.Write(Context.ReturnVarName);
+            Return.Write(ReturnVarName);
             return true;
         }
 
         void HandleDecimalType()
         {
-            var gstringId = $"{Context.ReturnVarName}_gstring";
-            Context.SupportBefore.Write($"let {gstringId} : UnsafeMutablePointer<GString> = ");
-            Context.SupportBefore.WriteLine($"mono_embeddinator_decimal_to_gstring({Context.ReturnVarName})");
+            var gstringId = $"{ReturnVarName}_gstring";
+            Before.Write($"let {gstringId} : UnsafeMutablePointer<GString> = ");
+            Before.WriteLine($"mono_embeddinator_decimal_to_gstring({ReturnVarName})");
 
-            var stringId = $"{Context.ReturnVarName}_string";
-            Context.SupportBefore.WriteLine($"let {stringId} : String = String(cString: {gstringId}.pointee.str)");
+            var stringId = $"{ReturnVarName}_string";
+            Before.WriteLine($"let {stringId} : String = String(cString: {gstringId}.pointee.str)");
 
-            var decimalId = $"{Context.ReturnVarName}_decimal";
-            Context.SupportBefore.WriteLine($"let {decimalId} : Decimal = Decimal(string: {stringId})!");
+            var decimalId = $"{ReturnVarName}_decimal";
+            Before.WriteLine($"let {decimalId} : Decimal = Decimal(string: {stringId})!");
 
-            Context.SupportBefore.WriteLine($"g_string_free({gstringId}, 1)");
+            Before.WriteLine($"g_string_free({gstringId}, 1)");
 
-            Context.Return.Write(decimalId);
+            Return.Write(decimalId);
         }
     }
 }
