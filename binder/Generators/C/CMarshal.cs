@@ -50,44 +50,41 @@ namespace Embeddinator.Generators
         public override bool VisitManagedArrayType(ManagedArrayType array,
             TypeQualifiers quals)
         {
-            var support = Before;
-
             var arrayId = CGenerator.GenId($"{ArgName}_array");
-            support.WriteLine("MonoArray* {0} = (MonoArray*) {1};",
+            Before.WriteLine("MonoArray* {0} = (MonoArray*) {1};",
                                             arrayId, ArgName);
 
             var arraySizeId = CGenerator.GenId($"{ArgName}_array_size");
-            support.WriteLine("uintptr_t {0} = mono_array_length({1});",
+            Before.WriteLine("uintptr_t {0} = mono_array_length({1});",
                                             arraySizeId, arrayId);
 
-            var typePrinter = CTypePrinter;
-            typePrinter.PrintScopeKind = TypePrintScopeKind.Local;
-            var arrayTypedefName = array.Typedef.Visit(typePrinter);
+            CTypePrinter.PrintScopeKind = TypePrintScopeKind.Local;
+            var arrayTypedefName = array.Typedef.Visit(CTypePrinter);
 
-            typePrinter.PrintScopeKind = TypePrintScopeKind.Qualified;
-            var arrayElementName = array.Array.Type.Visit(typePrinter);
+            CTypePrinter.PrintScopeKind = TypePrintScopeKind.Qualified;
+            var arrayElementName = array.Array.Type.Visit(CTypePrinter);
             if (array.Array.Type.IsClass())
                 arrayElementName += "*";
             var elementSize = $"sizeof({arrayElementName})";
     
             var nativeArrayId = CGenerator.GenId($"{ArgName}_native_array");
-            support.WriteLine("{0} {1};", arrayTypedefName, nativeArrayId);
-            support.WriteLine("{0}.array = g_array_sized_new(/*zero_terminated=*/FALSE," +
+            Before.WriteLine("{0} {1};", arrayTypedefName, nativeArrayId);
+            Before.WriteLine("{0}.array = g_array_sized_new(/*zero_terminated=*/FALSE," +
                 " /*clear_=*/TRUE, {1}, {2});", nativeArrayId, elementSize, arraySizeId);
 
             var elementClassId = CGenerator.GenId($"{ArgName}_element_class");
-            support.WriteLine("MonoClass* {0} = mono_class_get_element_class({1});",
+            Before.WriteLine("MonoClass* {0} = mono_class_get_element_class({1});",
                 elementClassId,
-                CMarshalNativeToManaged.GenerateArrayTypeLookup(array.Array.Type, support));
+                CMarshalNativeToManaged.GenerateArrayTypeLookup(array.Array.Type, Before));
 
             var elementSizeId = CGenerator.GenId($"{ArgName}_array_element_size");
-            support.WriteLine("gint32 {0} = mono_class_array_element_size({1});",
+            Before.WriteLine("gint32 {0} = mono_class_array_element_size({1});",
                 elementSizeId, elementClassId);
 
             var iteratorId = CGenerator.GenId("i");
-            support.WriteLine("for (int {0} = 0; {0} < {1}; {0}++)",
+            Before.WriteLine("for (int {0} = 0; {0} < {1}; {0}++)",
                 iteratorId, arraySizeId);
-            support.WriteStartBraceIndent();
+            Before.WriteStartBraceIndent();
 
             var elementId = CGenerator.GenId($"{ArgName}_array_element");
             
@@ -95,14 +92,14 @@ namespace Embeddinator.Generators
             {
                 var addressId = $"mono_array_addr_with_size({arrayId}, {elementSizeId}, {iteratorId})";
                 if (array.Array.Type.IsClass())
-                    support.WriteLine("MonoObject* {0} = mono_value_box({1}.domain, {2}, {3});",
+                    Before.WriteLine("MonoObject* {0} = mono_value_box({1}.domain, {2}, {3});",
                         elementId, CGenerator.GenId("mono_context"), elementClassId, addressId);
                 else
-                    support.WriteLine("char* {0} = {1};",
+                    Before.WriteLine("char* {0} = {1};",
                         elementId, addressId);
             }
             else
-                support.WriteLine("MonoObject* {0} = *(MonoObject**) mono_array_addr_with_size({1}, {2}, {3});",
+                Before.WriteLine("MonoObject* {0} = *(MonoObject**) mono_array_addr_with_size({1}, {2}, {3});",
                     elementId, arrayId, elementSizeId, iteratorId);
 
             var marshal = new CMarshalManagedToNative(Context)
@@ -116,12 +113,12 @@ namespace Embeddinator.Generators
             array.Array.QualifiedType.Visit(marshal);
 
             if (!string.IsNullOrWhiteSpace(marshal.Before))
-                support.Write(marshal.Before.ToString());
+                Before.Write(marshal.Before.ToString());
 
-            support.WriteLine("g_array_append_val({0}.array, {1});", nativeArrayId,
+            Before.WriteLine("g_array_append_val({0}.array, {1});", nativeArrayId,
                 marshal.Return.ToString());
 
-            support.WriteCloseBraceIndent();
+            Before.WriteCloseBraceIndent();
 
             Return.Write("{0}", nativeArrayId);
             return false;
@@ -344,18 +341,16 @@ namespace Embeddinator.Generators
         public override bool VisitManagedArrayType(ManagedArrayType array,
             TypeQualifiers quals)
         {
-            var support = Before;
-
             var contextId = CGenerator.GenId("mono_context");
             var arrayId = CGenerator.GenId($"{ArgName}_array");
             var elementClassId = CGenerator.GenId($"{ArgName}_element_class");
 
             var managedArray = array.Array;
             var elementType = managedArray.Type;
-            support.WriteLine("MonoClass* {0} = mono_class_get_element_class({1});",
-                elementClassId, GenerateArrayTypeLookup(elementType, support));
+            Before.WriteLine("MonoClass* {0} = mono_class_get_element_class({1});",
+                elementClassId, GenerateArrayTypeLookup(elementType, Before));
 
-            support.WriteLine("MonoArray* {0} = mono_array_new({1}.domain, {2}, {3}.array->len);",
+            Before.WriteLine("MonoArray* {0} = mono_array_new({1}.domain, {2}, {3}.array->len);",
                 arrayId, contextId, elementClassId, ArgName);
 
             var isValueType = IsValueType(elementType);
@@ -364,27 +359,26 @@ namespace Embeddinator.Generators
             if (array.Array.Type.IsClass() && isValueType)
             {
                 elementSizeId = CGenerator.GenId($"{ArgName}_array_element_size");
-                support.WriteLine("gint32 {0} = mono_class_array_element_size({1});",
+                Before.WriteLine("gint32 {0} = mono_class_array_element_size({1});",
                     elementSizeId, elementClassId);
             }
 
             var iteratorId = CGenerator.GenId("i");
-            support.WriteLine("for (int {0} = 0; {0} < {1}.array->len; {0}++)",
+            Before.WriteLine("for (int {0} = 0; {0} < {1}.array->len; {0}++)",
                               iteratorId, ArgName);
-            support.WriteStartBraceIndent();
+            Before.WriteStartBraceIndent();
 
-            var typePrinter = CTypePrinter;
-            string elementTypeName = elementType.Visit(typePrinter);
+            string elementTypeName = elementType.Visit(CTypePrinter);
 
             var elementId = CGenerator.GenId($"{ArgName}_array_element");
             if (elementType.IsClass())
             {
                 elementTypeName += "*";
-                support.WriteLine("{0} {1} = g_array_index({2}.array, {0}, {3});",
+                Before.WriteLine("{0} {1} = g_array_index({2}.array, {0}, {3});",
                     elementTypeName, elementId, ArgName, iteratorId);
             }
             else
-                support.WriteLine("{0} {1} = g_array_index({2}.array, {0}, {3});",
+                Before.WriteLine("{0} {1} = g_array_index({2}.array, {0}, {3});",
                     elementTypeName, elementId, ArgName, iteratorId);
 
             var marshal = new CMarshalNativeToManaged (Context)
@@ -396,7 +390,7 @@ namespace Embeddinator.Generators
             elementType.Visit(marshal);
 
             if (!string.IsNullOrWhiteSpace(marshal.Before))
-                support.Write(marshal.Before.ToString());
+                Before.Write(marshal.Before.ToString());
 
             if (isValueType)
             {
@@ -404,24 +398,24 @@ namespace Embeddinator.Generators
                 {
                     var srcId = CGenerator.GenId("src");
                     var ptrId = CGenerator.GenId("ptr");
-                    support.WriteLine("char* {0} = {1};", srcId, marshal.Return.ToString());
-                    support.WriteLine("char* {0} = mono_array_addr_with_size({1}, {2}, {3});", 
+                    Before.WriteLine("char* {0} = {1};", srcId, marshal.Return.ToString());
+                    Before.WriteLine("char* {0} = mono_array_addr_with_size({1}, {2}, {3});", 
                         ptrId, arrayId, elementSizeId, iteratorId);
-                    support.WriteLine("memcpy({0}, {1}, {2});",
+                    Before.WriteLine("memcpy({0}, {1}, {2});",
                         ptrId, srcId, elementSizeId);
                 }
                 else
-                    support.WriteLine("mono_array_set({0}, {1}, {2}, {3});",
+                    Before.WriteLine("mono_array_set({0}, {1}, {2}, {3});",
                         arrayId, elementTypeName, iteratorId,
                         marshal.Return.ToString());
             }
             else
             {
-                support.WriteLine("mono_array_setref({0}, {1}, {2});",
+                Before.WriteLine("mono_array_setref({0}, {1}, {2});",
                     arrayId, iteratorId, marshal.Return.ToString());
             }
 
-            support.WriteCloseBraceIndent();
+            Before.WriteCloseBraceIndent();
 
             Return.Write("{0}", arrayId);
 
