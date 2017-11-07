@@ -286,8 +286,8 @@ namespace Embeddinator.Generators
                 var marshal = new CMarshalNativeToManaged(EmbedOptions, ctx);
                 param.Visit(marshal);
 
-                if (!string.IsNullOrWhiteSpace(marshal.Context.SupportBefore))
-                    Write(marshal.Context.SupportBefore);
+                if (!string.IsNullOrWhiteSpace(marshal.Context.Before))
+                    Write(marshal.Context.Before);
 
                 WriteLine($"{argsId}[{paramIndex++}] = {marshal.Context.Return};");
                 NeedNewLine();
@@ -340,10 +340,10 @@ namespace Embeddinator.Generators
 
             foreach (var marshalContext in contexts)
             {
-                if (!string.IsNullOrWhiteSpace(marshalContext.SupportAfter))
+                if (!string.IsNullOrWhiteSpace(marshalContext.After))
                 {
                     NewLineIfNeeded();
-                    Write(marshalContext.SupportAfter);
+                    Write(marshalContext.After);
                 }
             }
         }
@@ -385,8 +385,8 @@ namespace Embeddinator.Generators
 
                 NewLineIfNeeded();
 
-                if (!string.IsNullOrWhiteSpace(marshal.Context.SupportBefore))
-                    Write(marshal.Context.SupportBefore);
+                if (!string.IsNullOrWhiteSpace(marshal.Context.Before))
+                    Write(marshal.Context.Before);
 
                 returnCode = marshal.Context.Return.ToString();
             }
@@ -481,8 +481,8 @@ namespace Embeddinator.Generators
             var marshal = new CMarshalManagedToNative(EmbedOptions, ctx);
             property.QualifiedType.Visit(marshal);
 
-            if (!string.IsNullOrWhiteSpace(marshal.Context.SupportBefore))
-                Write(marshal.Context.SupportBefore);
+            if (!string.IsNullOrWhiteSpace(marshal.Context.Before))
+                Write(marshal.Context.Before);
 
             WriteLine($"return {marshal.Context.Return.ToString()};");
 
@@ -507,8 +507,8 @@ namespace Embeddinator.Generators
             var marshal = new CMarshalNativeToManaged(EmbedOptions, ctx);
             property.QualifiedType.Visit(marshal);
 
-            if (!string.IsNullOrWhiteSpace(marshal.Context.SupportBefore))
-                Write(marshal.Context.SupportBefore);
+            if (!string.IsNullOrWhiteSpace(marshal.Context.Before))
+                Write(marshal.Context.Before);
 
             var valueId = GeneratedIdentifier("value");
             WriteLine($"void* {valueId} = {marshal.Context.Return.ToString()};");

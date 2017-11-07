@@ -9,8 +9,8 @@ namespace Embeddinator.Generators
         public MarshalContext(BindingContext context)
         {
             Context = context;
-            SupportBefore = new TextGenerator();
-            SupportAfter = new TextGenerator ();
+            Before = new TextGenerator();
+            After = new TextGenerator ();
             Return = new TextGenerator();
             MarshalVarPrefix = string.Empty;
         }
@@ -19,8 +19,8 @@ namespace Embeddinator.Generators
 
         public MarshalPrinter<MarshalContext> MarshalToNative;
 
-        public TextGenerator SupportBefore { get; private set; }
-        public TextGenerator SupportAfter { get; private set; }
+        public TextGenerator Before { get; private set; }
+        public TextGenerator After { get; private set; }
         public TextGenerator Return { get; private set; }
 
         public Declaration Declaration { get; set; }

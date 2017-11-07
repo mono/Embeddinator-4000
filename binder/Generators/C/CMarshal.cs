@@ -50,7 +50,7 @@ namespace Embeddinator.Generators
         public override bool VisitManagedArrayType(ManagedArrayType array,
             TypeQualifiers quals)
         {
-            var support = Context.SupportBefore;
+            var support = Context.Before;
 
             var arrayId = CGenerator.GenId($"{Context.ArgName}_array");
             support.WriteLine("MonoArray* {0} = (MonoArray*) {1};",
@@ -115,8 +115,8 @@ namespace Embeddinator.Generators
             var marshal = new CMarshalManagedToNative(Options, ctx) { UnboxPrimitiveValues = false };
             array.Array.QualifiedType.Visit(marshal);
 
-            if (!string.IsNullOrWhiteSpace(marshal.Context.SupportBefore))
-                support.Write(marshal.Context.SupportBefore.ToString());
+            if (!string.IsNullOrWhiteSpace(marshal.Context.Before))
+                support.Write(marshal.Context.Before.ToString());
 
             support.WriteLine("g_array_append_val({0}.array, {1});", nativeArrayId,
                 marshal.Context.Return.ToString());
@@ -137,7 +137,7 @@ namespace Embeddinator.Generators
         {
             var typeName = @class.Visit(CTypePrinter);
             var objectId = $"{Context.ArgName}_obj";
-            Context.SupportBefore.WriteLine("{1}* {0} = {2} ? ({1}*) mono_embeddinator_create_object({2}) : 0;",
+            Context.Before.WriteLine("{1}* {0} = {2} ? ({1}*) mono_embeddinator_create_object({2}) : 0;",
                 objectId, typeName, Context.ArgName);
             Context.Return.Write("{0}", objectId);
             return true;
@@ -200,7 +200,7 @@ namespace Embeddinator.Generators
                     if (UnboxPrimitiveValues)
                     {
                         var unboxId = CGenerator.GenId("unbox");
-                        Context.SupportBefore.WriteLine("void* {0} = mono_object_unbox({1});",
+                        Context.Before.WriteLine("void* {0} = mono_object_unbox({1});",
                             unboxId, Context.ArgName);
                         valueId = unboxId;
                     }
@@ -211,7 +211,7 @@ namespace Embeddinator.Generators
                 case PrimitiveType.String:
                 {
 	                var stringId = CGenerator.GenId("string");
-	                Context.SupportBefore.WriteLine("char* {0} = mono_string_to_utf8(" +
+	                Context.Before.WriteLine("char* {0} = mono_string_to_utf8(" +
 	                    "(MonoString*) {1});", stringId, Context.ArgName);
 	
 	                Context.Return.Write("{0}", stringId);
@@ -346,7 +346,7 @@ namespace Embeddinator.Generators
         public override bool VisitManagedArrayType(ManagedArrayType array,
             TypeQualifiers quals)
         {
-            var support = Context.SupportBefore;
+            var support = Context.Before;
 
             var contextId = CGenerator.GenId("mono_context");
             var arrayId = CGenerator.GenId($"{Context.ArgName}_array");
@@ -396,8 +396,8 @@ namespace Embeddinator.Generators
             var marshal = new CMarshalNativeToManaged (Options, ctx) { PrimitiveValuesByValue = true };
             elementType.Visit(marshal);
 
-            if (!string.IsNullOrWhiteSpace(marshal.Context.SupportBefore))
-                support.Write(marshal.Context.SupportBefore.ToString());
+            if (!string.IsNullOrWhiteSpace(marshal.Context.Before))
+                support.Write(marshal.Context.Before.ToString());
 
             if (isValueType)
             {
@@ -457,14 +457,14 @@ namespace Embeddinator.Generators
                 var argId = GenParamId(Context);
                 var objId = $"{argId}_obj";
 
-                Context.SupportBefore.WriteLine($"MonoObject* {objId} = {@object};");
-                Context.SupportBefore.WriteLine($"MonoObject* {argId} = {objId};");
+                Context.Before.WriteLine($"MonoObject* {objId} = {@object};");
+                Context.Before.WriteLine($"MonoObject* {argId} = {objId};");
 
-                Context.SupportAfter.WriteLine($"if ({objId} != {argId})");
-                Context.SupportAfter.WriteStartBraceIndent();
-                Context.SupportAfter.WriteLine($"mono_embeddinator_destroy_object({arg});");
-                Context.SupportAfter.WriteLine($"{arg} = ({argId} != 0) ? mono_embeddinator_create_object({argId}) : 0;");
-                Context.SupportAfter.WriteCloseBraceIndent();
+                Context.After.WriteLine($"if ({objId} != {argId})");
+                Context.After.WriteStartBraceIndent();
+                Context.After.WriteLine($"mono_embeddinator_destroy_object({arg});");
+                Context.After.WriteLine($"{arg} = ({argId} != 0) ? mono_embeddinator_create_object({argId}) : 0;");
+                Context.After.WriteCloseBraceIndent();
 
                 Context.Return.Write($"&{argId}");
                 return true;
@@ -499,10 +499,10 @@ namespace Embeddinator.Generators
             var typePrinter = new CppTypePrinter();
             var integerType = typePrinter.VisitPrimitiveType(backingType);
             var newArgName = CGenerator.GenId(Context.ArgName);
-            Context.SupportBefore.WriteLine("{0} {1} = *(({0}*) {2});",
+            Context.Before.WriteLine("{0} {1} = *(({0}*) {2});",
                 integerType, newArgName, Context.ArgName);
             Context.Return.Write("&{0}", newArgName);
-            Context.SupportAfter.WriteLine("*{0} = ({1}) {2};", Context.ArgName,
+            Context.After.WriteLine("*{0} = ({1}) {2};", Context.ArgName,
                 @enum.Visit(CTypePrinter), newArgName);
         }
 
@@ -582,11 +582,11 @@ namespace Embeddinator.Generators
                     if (IsByRefParameter)
                     {
                         @string = $"{Context.ArgName}->str";
-                        Context.SupportAfter.WriteLine("mono_embeddinator_marshal_string_to_gstring({0}, {1});",
+                        Context.After.WriteLine("mono_embeddinator_marshal_string_to_gstring({0}, {1});",
                             Context.ArgName, argId);
                     }
 
-                    Context.SupportBefore.WriteLine("MonoString* {0} = ({2}) ? mono_string_new({1}.domain, {2}) : 0;",
+                    Context.Before.WriteLine("MonoString* {0} = ({2}) ? mono_string_new({1}.domain, {2}) : 0;",
                         argId, contextId, @string);
                     Context.Return.Write("{0}{1}", IsByRefParameter ? "&" : string.Empty, argId);
                     return true;

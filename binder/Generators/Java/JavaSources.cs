@@ -369,8 +369,8 @@ namespace Embeddinator.Generators
                 var marshal = new JavaMarshalManagedToNative(ctx);
                 param.Visit(marshal);
 
-                if (!string.IsNullOrWhiteSpace(marshal.Context.SupportBefore))
-                        Write(marshal.Context.SupportBefore);
+                if (!string.IsNullOrWhiteSpace(marshal.Context.Before))
+                        Write(marshal.Context.Before);
 
                 @params.Add(marshal.Context.Return);
             }
@@ -404,8 +404,8 @@ namespace Embeddinator.Generators
 
             foreach (var marshal in contexts)
             {
-                if (!string.IsNullOrWhiteSpace(marshal.SupportAfter))
-                    Write(marshal.SupportAfter);
+                if (!string.IsNullOrWhiteSpace(marshal.After))
+                    Write(marshal.After);
             }
 
             if (hasReturn)
@@ -422,8 +422,8 @@ namespace Embeddinator.Generators
                 if (marshal.Context.Return.ToString().Length == 0)
                     throw new System.Exception();
 
-                if (!string.IsNullOrWhiteSpace(marshal.Context.SupportBefore))
-                        Write(marshal.Context.SupportBefore);
+                if (!string.IsNullOrWhiteSpace(marshal.Context.Before))
+                        Write(marshal.Context.Before);
 
                 WriteLine($"return {marshal.Context.Return};");
             }
