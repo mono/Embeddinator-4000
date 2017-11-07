@@ -3,18 +3,18 @@ using CppSharp.Generators;
 
 namespace Embeddinator.Generators
 {
-    public class SwiftMarshalPrinter : CMarshalPrinter
+    public class SwiftMarshaler : CMarshaler
     {
         public SwiftTypePrinter TypePrinter;
 
-        public SwiftMarshalPrinter(BindingContext context)
+        public SwiftMarshaler(BindingContext context)
             : base(context)
         {
             TypePrinter = new SwiftTypePrinter(Context);
         }
     }
 
-    public class SwiftMarshalManagedToNative : SwiftMarshalPrinter
+    public class SwiftMarshalManagedToNative : SwiftMarshaler
     {
         public SwiftMarshalManagedToNative(BindingContext context)
             : base(context)
@@ -115,7 +115,7 @@ namespace Embeddinator.Generators
         }
     }
 
-    public class SwiftMarshalNativeToManaged : SwiftMarshalPrinter
+    public class SwiftMarshalNativeToManaged : SwiftMarshaler
     {
         public SwiftMarshalNativeToManaged(BindingContext context)
             : base(context)

@@ -5,9 +5,9 @@ using CppSharp.Generators;
 
 namespace Embeddinator.Generators
 {
-    public class CMarshalPrinter : Marshaler
+    public class CMarshaler : Marshaler
     {
-        public CMarshalPrinter(BindingContext context)
+        public CMarshaler(BindingContext context)
             : base(context)
         {
         }
@@ -37,7 +37,7 @@ namespace Embeddinator.Generators
         }
     }
 
-    public class CMarshalManagedToNative : CMarshalPrinter
+    public class CMarshalManagedToNative : CMarshaler
     {
         public bool UnboxPrimitiveValues { get; set; }
 
@@ -223,7 +223,7 @@ namespace Embeddinator.Generators
         }
     }
 
-    public class CMarshalNativeToManaged : CMarshalPrinter
+    public class CMarshalNativeToManaged : CMarshaler
     {
         public bool PrimitiveValuesByValue { get; set; }
 

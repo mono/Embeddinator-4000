@@ -3,7 +3,7 @@ using CppSharp.Generators;
 
 namespace Embeddinator.Generators
 {
-    public class JavaMarshalPrinter : CMarshalPrinter
+    public class JavaMarshalPrinter : CMarshaler
     {
         public JavaTypePrinter TypePrinter;
 
