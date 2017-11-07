@@ -268,7 +268,7 @@ namespace Embeddinator.Generators
 
         public void GenerateMethodInvocation(Method method)
         {
-            var marshalers = new List<MarshalPrinter>();
+            var marshalers = new List<Marshaler>();
             var @params = new List<string>();
 
             if (!method.IsStatic && !(method.IsConstructor || method.IsDestructor))

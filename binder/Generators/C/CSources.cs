@@ -270,7 +270,7 @@ namespace Embeddinator.Generators
                 WriteLine($"void* {argsId}[{numParamsToMarshal}];");
             }
 
-            var marshalers = new List<MarshalPrinter>();
+            var marshalers = new List<Marshaler>();
 
             int paramIndex = 0;
             foreach (var param in paramsToMarshal)

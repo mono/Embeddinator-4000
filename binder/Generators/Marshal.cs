@@ -4,13 +4,13 @@ using CppSharp.Generators;
 
 namespace Embeddinator.Generators
 {
-    public class MarshalPrinter : AstVisitor
+    public class Marshaler : AstVisitor
     {
-        public MarshalPrinter(BindingContext context)
+        public Marshaler(BindingContext context)
         {
             Context = context;
             Before = new TextGenerator();
-            After = new TextGenerator ();
+            After = new TextGenerator();
             Return = new TextGenerator();
         }
 

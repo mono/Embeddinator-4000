@@ -5,7 +5,7 @@ using CppSharp.Generators;
 
 namespace Embeddinator.Generators
 {
-    public class CMarshalPrinter : MarshalPrinter
+    public class CMarshalPrinter : Marshaler
     {
         public CMarshalPrinter(BindingContext context)
             : base(context)
@@ -435,7 +435,7 @@ namespace Embeddinator.Generators
             return true;
         }
 
-        public static string GenParamId(MarshalPrinter marshal)
+        public static string GenParamId(Marshaler marshal)
         {
             return $"{CGenerator.GenId(marshal.ArgName)}_{marshal.ParameterIndex}";
         }
