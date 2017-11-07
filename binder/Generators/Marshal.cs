@@ -4,9 +4,9 @@ using CppSharp.Generators;
 
 namespace Embeddinator.Generators
 {
-    public class MarshalContext
+    public class MarshalPrinter : AstVisitor
     {
-        public MarshalContext(BindingContext context)
+        public MarshalPrinter(BindingContext context)
         {
             Context = context;
             Before = new TextGenerator();
@@ -34,16 +34,6 @@ namespace Embeddinator.Generators
         public Function Function { get; set; }
 
         public string MarshalVarPrefix { get; set; }
-    }
-
-    public abstract class MarshalPrinter<T> : AstVisitor where T : MarshalContext
-    {
-        public T Context { get; private set; }
-
-        protected MarshalPrinter(T ctx)
-        {
-            Context = ctx;
-        }
     }
 }
 

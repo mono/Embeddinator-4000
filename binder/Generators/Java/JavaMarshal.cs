@@ -1,4 +1,5 @@
 ﻿﻿﻿using CppSharp.AST;
+using CppSharp.Generators;
 
 namespace Embeddinator.Generators
 {
@@ -6,70 +7,69 @@ namespace Embeddinator.Generators
     {
         public JavaTypePrinter TypePrinter;
 
-        public JavaMarshalPrinter(MarshalContext marshalContext)
-            : base(marshalContext)
+        public JavaMarshalPrinter(BindingContext context)
+            : base(context)
         {
-            TypePrinter = new JavaTypePrinter(Context.Context);
+            TypePrinter = new JavaTypePrinter(Context);
         }
     }
 
     public class JavaMarshalManagedToNative : JavaMarshalPrinter
     {
-        public JavaMarshalManagedToNative(MarshalContext marshalContext)
-            : base(marshalContext)
+        public JavaMarshalManagedToNative(BindingContext context)
+            : base(context)
         {
         }
 
         public override bool VisitManagedArrayType(ManagedArrayType array,
             TypeQualifiers quals)
         {
-            Context.Return.Write("null");
+            Return.Write("null");
             return true;
         }
 
         public override bool VisitClassDecl(Class @class)
         {
-            var @object = IsByRefParameter ? $"{Context.ArgName}.get()" : Context.ArgName;
+            var @object = IsByRefParameter ? $"{ArgName}.get()" : ArgName;
             var objectRef = @class.IsInterface ? "__getObject()" : "__object";
 
             if (IsByRefParameter)
             {
-                CheckRefOutParameter(Context.Parameter.IsInOut);
+                CheckRefOutParameter(Parameter.IsInOut);
 
                 TypePrinter.PushContext(TypePrinterContextKind.Native);
-                var typeName = Context.Parameter.Visit(TypePrinter);
+                var typeName = Parameter.Visit(TypePrinter);
                 TypePrinter.PopContext();
 
-                var varName = JavaGenerator.GeneratedIdentifier(Context.ArgName);
-                var marshal = Context.Parameter.IsInOut ?
+                var varName = JavaGenerator.GeneratedIdentifier(ArgName);
+                var marshal = Parameter.IsInOut ?
                     $"new {typeName}({@object}.{objectRef})" : $"new {typeName}()";
-                Context.SupportBefore.WriteLine($"{typeName} {varName} = {marshal};");
+                Before.WriteLine($"{typeName} {varName} = {marshal};");
 
-                var marshalContext = new MarshalContext(Context.Context)
+                var marshaler = new JavaMarshalNativeToManaged(Context)
                 {
-                    Parameter = Context.Parameter,
+                    Parameter = Parameter,
                     ReturnVarName = $"{varName}.getValue()"
                 };
-                
-                var marshaler = new JavaMarshalNativeToManaged(marshalContext);
+
                 @class.Visit(marshaler);
 
-                Context.SupportAfter.WriteLine($"{Context.ArgName}.set({marshaler.Context.Return});");
+                After.WriteLine($"{ArgName}.set({marshaler.Return});");
 
-                Context.Return.Write(varName);
+                Return.Write(varName);
                 return true;
             }
 
-            Context.Return.Write($"{Context.ArgName} == null ? null : {Context.ArgName}.{objectRef}");
+            Return.Write($"{ArgName} == null ? null : {ArgName}.{objectRef}");
             return true;
         }
 
         public void CheckRefOutParameter(bool nullCheck)
         {
             // Perform null checking for all primitive value types.
-            string extraCheck = nullCheck ? $" || {Context.ArgName}.get() == null" : string.Empty;
-            Context.SupportBefore.WriteLine($"if ({Context.ArgName} == null{extraCheck})");
-            Context.SupportBefore.WriteLineIndent($"throw new NullRefParameterException(\"{Context.Parameter.Name}\");");
+            string extraCheck = nullCheck ? $" || {ArgName}.get() == null" : string.Empty;
+            Before.WriteLine($"if ({ArgName} == null{extraCheck})");
+            Before.WriteLineIndent($"throw new NullRefParameterException(\"{Parameter.Name}\");");
         }
 
         static bool IsReferenceIntegerType(PrimitiveType type)
@@ -107,12 +107,12 @@ namespace Embeddinator.Generators
         public void HandleRefOutPrimitiveType(PrimitiveType type, Enumeration @enum = null)
         {
             TypePrinter.PushContext(TypePrinterContextKind.Native);
-            var typeName = Context.Parameter.Visit(TypePrinter);
+            var typeName = Parameter.Visit(TypePrinter);
             TypePrinter.PopContext();
 
-            CheckRefOutParameter(type != PrimitiveType.String && Context.Parameter.IsInOut);
+            CheckRefOutParameter(type != PrimitiveType.String && Parameter.IsInOut);
 
-            string marshal = $"{Context.ArgName}.get()";
+            string marshal = $"{ArgName}.get()";
 
             var isEnum = @enum != null;
             if (isEnum)
@@ -127,16 +127,16 @@ namespace Embeddinator.Generators
                 marshal = $"({integerTypeName}){marshal}.intValue()";
             }
 
-            var varName = JavaGenerator.GeneratedIdentifier(Context.ArgName);
+            var varName = JavaGenerator.GeneratedIdentifier(ArgName);
 
-            Context.SupportBefore.Write($"{typeName} {varName} = ");
+            Before.Write($"{typeName} {varName} = ");
 
             if (isEnum || type == PrimitiveType.Bool || IsReferenceIntegerType(type))
-                Context.SupportBefore.WriteLine($"new {typeName}({marshal});");
+                Before.WriteLine($"new {typeName}({marshal});");
             else
-                Context.SupportBefore.WriteLine($"({marshal}) != null ? new {typeName}({marshal}) : new {typeName}();");
+                Before.WriteLine($"({marshal}) != null ? new {typeName}({marshal}) : new {typeName}();");
 
-            Context.Return.Write(varName);
+            Return.Write(varName);
 
             var value = $"{varName}.getValue()";
             marshal = value;
@@ -149,11 +149,11 @@ namespace Embeddinator.Generators
 
             if (IsReferenceIntegerType(type))
             {
-                var integerTypeName = Context.Parameter.Type.Visit(TypePrinter);
+                var integerTypeName = Parameter.Type.Visit(TypePrinter);
                 marshal = $"new {integerTypeName}({value})";
             }
 
-            Context.SupportAfter.WriteLine($"{Context.ArgName}.set({marshal});");
+            After.WriteLine($"{ArgName}.set({marshal});");
         }
 
         public override bool VisitEnumDecl(Enumeration @enum)
@@ -165,10 +165,10 @@ namespace Embeddinator.Generators
             }
 
             var typeName = @enum.BuiltinType.Visit(TypePrinter);
-            var varName = JavaGenerator.GeneratedIdentifier(Context.ArgName);
-            Context.SupportBefore.WriteLine($"{typeName} {varName} = {Context.ArgName}.getValue();");
+            var varName = JavaGenerator.GeneratedIdentifier(ArgName);
+            Before.WriteLine($"{typeName} {varName} = {ArgName}.getValue();");
 
-            Context.Return.Write(varName);
+            Return.Write(varName);
             return true;
         }
 
@@ -182,17 +182,17 @@ namespace Embeddinator.Generators
             }
             else if (type == PrimitiveType.Decimal)
             {
-                Context.Return.Write($"new mono.embeddinator.Decimal({Context.ArgName})");
+                Return.Write($"new mono.embeddinator.Decimal({ArgName})");
                 return true;
             }
             else if (type == PrimitiveType.Bool)
             {
-                Context.Return.Write($"(byte)({Context.ArgName}? 1 : 0)");
+                Return.Write($"(byte)({ArgName}? 1 : 0)");
                 return true;
             }
 
 
-            Context.Return.Write(Context.ArgName);
+            Return.Write(ArgName);
             return true;
         }
 
@@ -205,34 +205,34 @@ namespace Embeddinator.Generators
 
     public class JavaMarshalNativeToManaged : JavaMarshalPrinter
     {
-        public JavaMarshalNativeToManaged (MarshalContext marshalContext)
-            : base(marshalContext)
+        public JavaMarshalNativeToManaged (BindingContext context)
+            : base(context)
         {
         }
 
         public override bool VisitManagedArrayType(ManagedArrayType array,
             TypeQualifiers quals)
         {
-            Context.Return.Write("null");
+            Return.Write("null");
             return true;
         }
 
         public override bool VisitClassDecl(Class @class)
         {
-            var typePrinter = new JavaTypePrinter(Context.Context);
+            var typePrinter = new JavaTypePrinter(Context);
             var typeName = @class.Visit(typePrinter);
 
             if (@class.IsInterface || @class.IsAbstract)
                 typeName = $"{typeName}Impl";
 
-            Context.Return.Write("({0} == com.sun.jna.Pointer.NULL ? null : new {1}({0}))",
-                Context.ReturnVarName, typeName);
+            Return.Write("({0} == com.sun.jna.Pointer.NULL ? null : new {1}({0}))",
+                ReturnVarName, typeName);
             return true;
         }
 
         public override bool VisitEnumDecl(Enumeration @enum)
         {
-            Context.Return.Write($"{@enum.Visit(TypePrinter)}.fromOrdinal({Context.ReturnVarName})");
+            Return.Write($"{@enum.Visit(TypePrinter)}.fromOrdinal({ReturnVarName})");
             return true;
         }
 
@@ -240,11 +240,11 @@ namespace Embeddinator.Generators
             TypeQualifiers quals)
         {
             if(type == PrimitiveType.Bool)
-                Context.Return.Write($"{Context.ReturnVarName} != 0");
+                Return.Write($"{ReturnVarName} != 0");
             else if (type == PrimitiveType.Decimal)
-                Context.Return.Write($"{Context.ReturnVarName}.getValue()");
+                Return.Write($"{ReturnVarName}.getValue()");
             else
-                Context.Return.Write(Context.ReturnVarName);
+                Return.Write(ReturnVarName);
             return true;
         }
     }
