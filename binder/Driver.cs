@@ -45,6 +45,7 @@ namespace Embeddinator
             if (!Options.Compilation.Platform.HasValue)
                 Options.Compilation.Platform = Platform.Host;
 
+            CGenerator.Options = options;
             Declaration.QualifiedNameSeparator = "_";
         }
 
@@ -157,6 +158,9 @@ namespace Embeddinator
                     break;
                 case GeneratorKind.Java:
                     generator = new JavaGenerator(Context);
+                    break;
+                case GeneratorKind.Swift:
+                    generator = new SwiftGenerator(Context);
                     break;
                 default:
                     throw new NotImplementedException();

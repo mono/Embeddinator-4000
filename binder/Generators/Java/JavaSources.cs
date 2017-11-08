@@ -349,7 +349,7 @@ namespace Embeddinator.Generators
 
         public void GenerateMethodInvocation(Method method)
         {
-            var contexts = new List<MarshalContext>();
+            var marshalers = new List<Marshaler>();
             var @params = new List<string>();
 
             if (!method.IsStatic && !(method.IsConstructor || method.IsDestructor))
@@ -358,21 +358,20 @@ namespace Embeddinator.Generators
             int paramIndex = 0;
             foreach (var param in method.Parameters.Where(m => !m.IsImplicit))
             {
-                var ctx = new MarshalContext(Context)
+                var marshal = new JavaMarshalManagedToNative(Context)
                 {
                     ArgName = param.Name,
                     Parameter = param,
                     ParameterIndex = paramIndex++
                 };
-                contexts.Add(ctx);
+                marshalers.Add(marshal);
 
-                var marshal = new JavaMarshalManagedToNative(ctx);
                 param.Visit(marshal);
 
-                if (!string.IsNullOrWhiteSpace(marshal.Context.SupportBefore))
-                        Write(marshal.Context.SupportBefore);
+                if (!string.IsNullOrWhiteSpace(marshal.Before))
+                        Write(marshal.Before);
 
-                @params.Add(marshal.Context.Return);
+                @params.Add(marshal.Return);
             }
 
             PrimitiveType primitive;
@@ -402,30 +401,29 @@ namespace Embeddinator.Generators
 
             WriteLine("mono.embeddinator.Runtime.checkExceptions();");
 
-            foreach (var marshal in contexts)
+            foreach (var marshal in marshalers)
             {
-                if (!string.IsNullOrWhiteSpace(marshal.SupportAfter))
-                    Write(marshal.SupportAfter);
+                if (!string.IsNullOrWhiteSpace(marshal.After))
+                    Write(marshal.After);
             }
 
             if (hasReturn)
             {
-                var ctx = new MarshalContext(Context)
+                var marshal = new JavaMarshalNativeToManaged(Context)
                 {
                     ReturnType = method.ReturnType,
                     ReturnVarName = "__ret"
                 };
 
-                var marshal = new JavaMarshalNativeToManaged(ctx);
                 method.ReturnType.Visit(marshal);
 
-                if (marshal.Context.Return.ToString().Length == 0)
+                if (marshal.Return.ToString().Length == 0)
                     throw new System.Exception();
 
-                if (!string.IsNullOrWhiteSpace(marshal.Context.SupportBefore))
-                        Write(marshal.Context.SupportBefore);
+                if (!string.IsNullOrWhiteSpace(marshal.Before))
+                        Write(marshal.Before);
 
-                WriteLine($"return {marshal.Context.Return};");
+                WriteLine($"return {marshal.Return};");
             }
         }
 

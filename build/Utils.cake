@@ -37,6 +37,16 @@ void Exec(string path, string args = "", string workingDir = ".")
     Exec(path, settings);
 }
 
+string CaptureProcessOutput(string path, string args = "")
+{
+    using (var process = StartAndReturnProcess(path,
+        new ProcessSettings { Arguments = args, RedirectStandardOutput = true }))
+    {
+        process.WaitForExit();
+        return process.GetStandardOutput().First().Trim();
+    }
+}
+
 void Embeddinator(string args)
 {
     var embeddinator = buildDir + File("Embeddinator-4000.exe");

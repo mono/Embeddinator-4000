@@ -40,12 +40,16 @@ namespace Embeddinator
             case GeneratorKind.Java:
                 files = GetOutputFiles("java");
                 break;
+            case GeneratorKind.Swift:
+                files = GetOutputFiles("swift");
+                break;
             }
 
             if (files == null || files.Count() == 0)
                 throw new Exception("No generated files found.");
 
-            if (Options.GeneratorKind != GeneratorKind.Java)
+            if (Options.GeneratorKind != GeneratorKind.Java &&
+                Options.GeneratorKind != GeneratorKind.Swift)
             {
                 if (!CompileNativeCode(files))
                     return false;
@@ -66,7 +70,60 @@ namespace Embeddinator
                 }
             }
 
+            if (Options.GeneratorKind == GeneratorKind.Swift)
+            {
+                if (!CompileSwift(files))
+                    return false;
+            }
+
             return true;
+        }
+
+        bool CompileSwift(IEnumerable<string> files)
+        {
+            if (!Platform.IsMacOS)
+                throw new NotImplementedException();
+
+            var xcodePath = XcodeToolchain.GetXcodeToolchainPath();
+            var swiftcBin = Path.Combine(xcodePath, "usr/bin/swiftc");
+
+            var moduleName = Path.GetFileNameWithoutExtension(Project.Assemblies[0]);
+
+            var swiftVersion = 4;
+
+            var sdkPath = Path.Combine(XcodeToolchain.GetXcodePath(),
+                "Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs");
+            var sdk = Directory.EnumerateDirectories(sdkPath).First();
+
+            bool compileSuccess = true;
+
+            foreach (var file in files)
+            {
+                var args = new List<string>
+                {
+                    "-emit-module",
+                    $"-emit-module-path {Options.OutputDir}",
+                    $"-module-name {moduleName}",
+                    $"-swift-version {swiftVersion}",
+                    $"-sdk {sdk}",
+                    $"-I \"{MonoSdkPath}/include/mono-2.0\"",
+                };
+
+                var bridgingHeader = Directory.EnumerateFiles(Options.OutputDir, "*.h")
+                    .SingleOrDefault(header => Path.GetFileNameWithoutExtension(header) ==
+                        Path.GetFileNameWithoutExtension(file));
+
+                args.Add($"-import-objc-header {bridgingHeader}");
+
+                args.Add(file);
+
+                var invocation = string.Join(" ", args);
+                var output = Invoke(swiftcBin, invocation);
+
+                compileSuccess &= output.ExitCode == 0;
+            }
+
+            return compileSuccess;
         }
 
         bool CompileJava(IEnumerable<string> files)
@@ -627,7 +684,7 @@ namespace Embeddinator
             var monoPath = Path.Combine(MonoSdkPath, "include", "mono-2.0");
             var name = Path.GetFileNameWithoutExtension(Project.Assemblies[0]);
             var libName = $"lib{name}.so";
-            var ndkPath = AndroidSdk.AndroidNdkPath;
+            var ndkPath = XamarinAndroid.AndroidSdk.AndroidNdkPath;
 
             foreach (var abi in new[] { "armeabi", "armeabi-v7a", "arm64-v8a", "x86", "x86_64" })
             {

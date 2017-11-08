@@ -1,9 +1,10 @@
-﻿using CppSharp;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using CppSharp;
+using Embeddinator;
 using Xamarin.Android.Tools;
 
 namespace Xamarin.Android.Tasks
@@ -37,7 +38,7 @@ namespace Xamarin.Android.Tasks
             List<string> toolPaths = null;
             foreach (var platbase in toolchains)
             {
-                string path = Path.Combine(platbase, "prebuilt", AndroidSdk.AndroidNdkHostPlatform, "bin", GetNdkToolchainPrefix(arch) + tool + extension);
+                string path = Path.Combine(platbase, "prebuilt", XamarinAndroid.AndroidSdk.AndroidNdkHostPlatform, "bin", GetNdkToolchainPrefix(arch) + tool + extension);
                 if (File.Exists(path))
                     return path;
                 if (toolPaths == null)

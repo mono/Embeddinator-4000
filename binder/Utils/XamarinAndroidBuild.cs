@@ -110,9 +110,9 @@ namespace Embeddinator
             aapt.SetParameter("JavaDesignerOutputDirectory", outputDirectory);
             aapt.SetParameter("AssetDirectory", assetsDir);
             aapt.SetParameter("ResourceDirectory", resourceDir);
-            aapt.SetParameter("ToolPath", AndroidSdk.GetBuildToolsPaths().First());
+            aapt.SetParameter("ToolPath", XamarinAndroid.AndroidSdk.GetBuildToolsPaths().First());
             aapt.SetParameter("ToolExe", "aapt");
-            aapt.SetParameter("ApiLevel", XamarinAndroid.TargetSdkVersion);
+            aapt.SetParameter("ApiLevel", XamarinAndroid.TargetSdkVersion.ToString());
             aapt.SetParameter("ExtraArgs", "--output-text-symbols " + androidDir);
 
             //There is an extra /manifest/AndroidManifest.xml file created
@@ -187,8 +187,8 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
             generateJavaStubs.SetParameter("ResolvedUserAssemblies", "@(ResolvedUserAssemblies)");
             generateJavaStubs.SetParameter("ManifestTemplate", manifestPath);
             generateJavaStubs.SetParameter("MergedAndroidManifestOutput", manifestPath);
-            generateJavaStubs.SetParameter("AndroidSdkPlatform", XamarinAndroid.TargetSdkVersion); //TODO: should be an option
-            generateJavaStubs.SetParameter("AndroidSdkDir", AndroidSdk.AndroidSdkPath);
+            generateJavaStubs.SetParameter("AndroidSdkPlatform", XamarinAndroid.TargetSdkVersion.ToString()); //TODO: should be an option
+            generateJavaStubs.SetParameter("AndroidSdkDir", XamarinAndroid.AndroidSdk.AndroidSdkPath);
             generateJavaStubs.SetParameter("OutputDirectory", outputDirectory);
             generateJavaStubs.SetParameter("ResourceDirectory", "$(MonoAndroidResDirIntermediate)");
             generateJavaStubs.SetParameter("AcwMapFile", "$(MonoAndroidIntermediate)acw-map.txt");
@@ -205,8 +205,8 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
 
             //GetAdditionalResourcesFromAssemblies Task, for JavaLibraryReferenceAttribute, etc.
             var getAdditionalResources = target.AddTask("GetAdditionalResourcesFromAssemblies");
-            getAdditionalResources.SetParameter("AndroidSdkDirectory", AndroidSdk.AndroidSdkPath);
-            getAdditionalResources.SetParameter("AndroidNdkDirectory", AndroidSdk.AndroidNdkPath);
+            getAdditionalResources.SetParameter("AndroidSdkDirectory", XamarinAndroid.AndroidSdk.AndroidSdkPath);
+            getAdditionalResources.SetParameter("AndroidNdkDirectory", XamarinAndroid.AndroidSdk.AndroidNdkPath);
             getAdditionalResources.SetParameter("Assemblies", "@(ResolvedUserAssemblies)");
             getAdditionalResources.SetParameter("CacheFile", Path.Combine(intermediateDir, ResourcePaths));
 
