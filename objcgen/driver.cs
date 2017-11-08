@@ -754,8 +754,8 @@ namespace Embeddinator.ObjC {
 							mmp.Append ("--debug ");
 						mmp.Append ("-p "); // generate a plist
 						mmp.Append ($"--target-framework {GetTargetFramework ()} ");
-                        string extensionFlag = Extension ? "-fapplication-extension" : "";
-                        mmp.Append ($"\"--link_flags={extensionFlag} -force_load {Path.GetFullPath (sdk_output_file)}\" ");
+						string extensionFlag = Extension ? "-fapplication-extension" : "";
+						mmp.Append ($"\"--link_flags={extensionFlag} -force_load {Path.GetFullPath (sdk_output_file)}\" ");
 						if (!RunProcess ("/Library/Frameworks/Xamarin.Mac.framework/Versions/Current/bin/mmp", mmp.ToString (), out exitCode))
 							return exitCode;
 
