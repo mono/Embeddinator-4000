@@ -785,6 +785,8 @@ namespace ObjC {
 				headers.Write (", readonly");
 			var pt = property.Property.PropertyType;
 			var property_type = NameGenerator.GetTypeName (pt);
+			if (pt.IsInterface)
+				property_type = $"id<{property_type}>";
 			if (HasClass (pt))
 				property_type += " *";
 
