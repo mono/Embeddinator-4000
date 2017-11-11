@@ -33,6 +33,14 @@ public class AndroidImpl extends DesktopImpl {
         String cacheDir     = context.getCacheDir ().getAbsolutePath ();
         String dataDir      = app.nativeLibraryDir;
         ClassLoader loader  = context.getClassLoader ();
+        java.io.File external0 = android.os.Environment.getExternalStorageDirectory ();
+        String externalDir = new java.io.File (
+                                external0,
+                                "Android/data/" + context.getPackageName () + "/files/.__override__").getAbsolutePath ();
+        String externalLegacyDir = new java.io.File (
+                                external0,
+                                "../legacy/Android/data/" + context.getPackageName () + "/files/.__override__").getAbsolutePath ();
+
 
         mono.android.Runtime.init (
                 language,
@@ -44,9 +52,10 @@ public class AndroidImpl extends DesktopImpl {
                         dataDir,
                 },
                 loader,
-                new java.io.File (
-                        android.os.Environment.getExternalStorageDirectory (),
-                        "Android/data/" + context.getPackageName () + "/files/.__override__").getAbsolutePath (),
+                new String[] {
+                        externalDir,
+                        externalLegacyDir
+                },
                 new String[] {
                         library + ".dll",
                         "Resource.designer.dll"

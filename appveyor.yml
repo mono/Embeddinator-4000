@@ -37,7 +37,7 @@ environment:
 
 cache:
   - packages -> **\packages.config
-  - external\Xamarin.Android -> build.cake
+  - external\Xamarin.Android -> build\Android.cake
 
 #---------------------------------#
 #    build scripts                #
