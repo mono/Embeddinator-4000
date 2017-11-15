@@ -773,7 +773,8 @@ namespace Embeddinator.Generators
 
         public static bool IsAndroidAssembly(this Assembly assembly)
         {
-            return assembly.FullName.StartsWith("Mono.Android, ", StringComparison.Ordinal) || assembly.FullName.StartsWith("Java.Interop, ", StringComparison.Ordinal);
+            return assembly.FullName.StartsWith("Mono.Android, ", StringComparison.Ordinal) ||
+                   assembly.FullName.StartsWith("Java.Interop, ", StringComparison.Ordinal);
         }
     }
 }
