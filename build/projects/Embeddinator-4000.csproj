@@ -141,6 +141,9 @@
     <Compile Include="../../binder/Parser.cs">
       <Link>binder/Parser.cs</Link>
     </Compile>
+    <Compile Include="..\..\binder\Passes\CheckDeclarationsPass.cs">
+      <Link>binder\Passes\CheckDeclarationsPass.cs</Link>
+    </Compile>
     <Compile Include="../../binder/Passes/CheckReservedKeywordsPass.cs">
       <Link>binder/Passes/CheckReservedKeywordsPass.cs</Link>
     </Compile>
@@ -161,9 +164,6 @@
     </Compile>
     <Compile Include="../../binder/Passes/PropertyToGetterSetter.cs">
       <Link>binder/Passes/PropertyToGetterSetter.cs</Link>
-    </Compile>
-    <Compile Include="../../binder/Passes/RenameDuplicatedDecls.cs">
-      <Link>binder/Passes/RenameDuplicatedDecls.cs</Link>
     </Compile>
     <Compile Include="../../binder/Project.cs">
       <Link>binder/Project.cs</Link>
