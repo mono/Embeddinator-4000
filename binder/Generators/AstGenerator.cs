@@ -704,12 +704,14 @@ namespace Embeddinator.Generators
             {
                 property.GetMethod = VisitMethod(propertyInfo.GetMethod);
                 property.GetMethod.Namespace = property.Namespace;
+                property.GetMethod.AssociatedDeclaration = property;
             }
 
             if (propertyInfo.SetMethod != null)
             {
                 property.SetMethod = VisitMethod(propertyInfo.SetMethod);
                 property.SetMethod.Namespace = property.Namespace;
+                property.SetMethod.AssociatedDeclaration = property;
             }
 
             ManagedNames[property] = $"{propertyInfo.DeclaringType.FullName}:{propertyInfo.Name}";
