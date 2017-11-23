@@ -124,6 +124,7 @@ namespace Embeddinator.Generators
             TranslationUnit unit) : base(context, unit)
         {
             Unit = unit;
+            VisitOptions.VisitPropertyAccessors = true;
         }
 
         public override string GeneratedIdentifier(string id)

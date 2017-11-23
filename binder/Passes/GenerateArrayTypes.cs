@@ -26,6 +26,7 @@ namespace Embeddinator.Passes
         {
             Arrays = new Dictionary<string, QualifiedType>();
             Declarations = new List<TypedefDecl>();
+            VisitOptions.VisitPropertyAccessors = true;
         }
 
         public override bool VisitTranslationUnit(TranslationUnit unit)

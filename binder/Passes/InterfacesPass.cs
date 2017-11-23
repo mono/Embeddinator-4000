@@ -90,21 +90,47 @@ namespace Embeddinator.Passes
                 if (!method.IsPure || method.IsFinal)
                     continue;
 
-                var methodImpl = new Method(method)
-                {
-                    IsPure = false,
-                    IsImplicit = true,
-                    IsOverride = true,
-                    SynthKind = FunctionSynthKind.InterfaceInstance,
-                    ExplicitInterfaceImpl = @interface,
-                    Namespace = impl,
-                    CompleteDeclaration = method
-                };
+                var methodImpl = CreateMethod(@interface, impl, method);
 
                 impl.Declarations.Add(methodImpl);
             }
 
+            foreach (var property in @interface.Declarations.OfType<Property>())
+            {
+                if (property.IsImplicit)
+                    continue;
+
+                if (!property.IsPure)
+                    continue;
+
+                if (property.GetMethod != null)
+                {
+                    var getMethodImpl = CreateMethod(@interface, impl, property.GetMethod);
+                    impl.Declarations.Add(getMethodImpl);
+                }
+
+                if (property.SetMethod != null)
+                {
+                    var setMethodImpl = CreateMethod(@interface, impl, property.SetMethod);
+                    impl.Declarations.Add(setMethodImpl);
+                }
+            }
+
             InterfaceImplementations.Add(impl);
+        }
+
+        static Method CreateMethod(Class @interface, Class impl, Method method)
+        {
+            return new Method(method)
+            {
+                IsPure = false,
+                IsImplicit = true,
+                IsOverride = true,
+                SynthKind = FunctionSynthKind.InterfaceInstance,
+                ExplicitInterfaceImpl = @interface,
+                Namespace = impl,
+                CompleteDeclaration = method
+            };
         }
 
         void AddObjectGetterToInterface(Class @interface)

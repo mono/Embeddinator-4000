@@ -260,6 +260,15 @@ namespace Embeddinator.Generators
                 if (IsSystemObjectMethod(method))
                     continue;
 
+                var properties = method.DeclaringType.__GetDeclaredProperties();
+                var isPropertyAccessor = properties.Any(prop => 
+                        {
+                            return (prop.GetMethod == method) || (prop.SetMethod == method);
+                        });
+
+                if (isPropertyAccessor)
+                    continue;
+
                 var decl = VisitMethod(method);
                 @class.Declarations.Add(decl);
             }

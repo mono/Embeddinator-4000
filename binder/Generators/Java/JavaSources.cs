@@ -24,6 +24,7 @@ namespace Embeddinator.Generators
             : base(context, new List<TranslationUnit> { unit })
         {
             TypePrinter = new JavaTypePrinter(context);
+            VisitOptions.VisitPropertyAccessors = true;
         }
 
         public Declaration Declaration;
@@ -429,25 +430,6 @@ namespace Embeddinator.Generators
 
         public override bool VisitTypedefDecl(TypedefDecl typedef)
         {
-            return true;
-        }
-
-        public override bool VisitProperty(Property property)
-        {
-            if (!VisitDeclaration(property))
-                return false;
-
-            if (property.Field == null)
-                return false;
-
-            var getter = property.GetMethod;
-            if (getter != null)
-                VisitMethodDecl(getter);
-
-            var setter = property.SetMethod;
-            if (setter != null)
-                VisitMethodDecl(setter);
-
             return true;
         }
 
