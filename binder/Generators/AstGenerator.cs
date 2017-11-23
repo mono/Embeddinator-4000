@@ -669,6 +669,8 @@ namespace Embeddinator.Generators
             var accessMask = (fieldInfo.Attributes & FieldAttributes.FieldAccessMask);
             field.Access = ConvertFieldAttributesToAccessSpecifier(accessMask);
 
+            ManagedNames[field] = $"{fieldInfo.DeclaringType.FullName}:{fieldInfo.Name}";
+
             return field;
         }
 
@@ -700,6 +702,8 @@ namespace Embeddinator.Generators
                 property.SetMethod = VisitMethod(propertyInfo.SetMethod);
                 property.SetMethod.Namespace = property.Namespace;
             }
+
+            ManagedNames[property] = $"{propertyInfo.DeclaringType.FullName}:{propertyInfo.Name}";
 
             return property;
         }
