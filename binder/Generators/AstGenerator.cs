@@ -120,8 +120,13 @@ namespace Embeddinator.Generators
 
         static string UnmangleTypeName(string name)
         {
-            return string.IsNullOrEmpty(name) ? string.Empty :
-                         name.Replace(new char[] {'`', '<', '>' }, "_");
+            var typeName = string.IsNullOrEmpty(name) ? string.Empty :
+                name.Replace(new char[] {'`', '<', '>' }, "_");
+
+            // Remove prefixes for explicit interface methods.
+            typeName = typeName.Substring(typeName.LastIndexOf(".", StringComparison.Ordinal) + 1);
+
+            return typeName;
         }
 
         public void HandleBaseType(IKVM.Reflection.Type type, Class @class)
