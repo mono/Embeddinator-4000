@@ -145,10 +145,26 @@ namespace Embeddinator.Generators
                 WriteLine("#include <{0}>", include);
         }
 
+        public static Dictionary<string, string> GeneratedMethodNames =
+            new Dictionary<string, string>();
+
         public static string GetMethodIdentifier(Method method)
         {
+            var methodName = (method.IsConstructor || method.IsDestructor) ?
+                method.Name : method.OriginalName;
+
             var @class = method.Namespace as Class;
-            return $"{@class.QualifiedName}_{method.Name}";
+            var name = $"{@class.QualifiedName}_{methodName}";
+
+            var associated = method.AssociatedDeclaration ?? method;
+
+            if (associated.DefinitionOrder != 0)
+                name += $"_{associated.DefinitionOrder}";
+
+            // Store the name so it can be re-used later by other generators.
+            GeneratedMethodNames[method.ManagedQualifiedName()] = name;
+
+            return name;
         }
 
         public override bool VisitDeclaration(Declaration decl)
