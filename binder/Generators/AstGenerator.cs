@@ -13,8 +13,25 @@ namespace Embeddinator.Generators
     {
         public static string ManagedQualifiedName(this Declaration decl)
         {
+            string managedName;
+
+            var field = decl.AssociatedDeclaration as Field;
+            if (decl is Method && field != null)
+            {
+                managedName = ASTGenerator.ManagedNames[field];
+
+                var property = field.AssociatedDeclaration as Property;
+                var isGetter = property.GetMethod == decl;
+                var suffix = isGetter ? "get" : "set";
+                managedName = $"{managedName}:{suffix}";
+            }
+            else
+            {
+                managedName = ASTGenerator.ManagedNames[decl];
+            }
+
             // Replace + with / since that's what mono_class_from_name expects for nested types.
-            return ASTGenerator.ManagedNames[decl].Replace("+", "/");
+            return managedName.Replace("+", "/");
         }
     }
 
