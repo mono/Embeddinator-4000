@@ -58,9 +58,11 @@ namespace Embeddinator.Passes
                 GetMethod = getter,
                 SetMethod = setter,
                 Field = field,
-                QualifiedType = field.QualifiedType
+                QualifiedType = field.QualifiedType,
+                AssociatedDeclaration = field
             };
 
+            field.AssociatedDeclaration = property;
             @class.Declarations.Add(property);
 
             Diagnostics.Debug($"Getter/setter property created from field {field.QualifiedName}");
