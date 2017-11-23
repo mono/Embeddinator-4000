@@ -277,6 +277,19 @@ namespace Embeddinator.Generators
             return true;
         }
 
+        public static string GetMethodIdentifier(Method method)
+        {
+            var name = method.Name;
+
+            var @class = method.Namespace as Class;
+
+            var associated = method.AssociatedDeclaration ?? method;
+            if (associated.DefinitionOrder != 0)
+                name += $"_{associated.DefinitionOrder}";
+
+            return name;
+        }
+
         public override void GenerateMethodSpecifier(Method method, Class @class)
         {
             var keywords = new List<string>();
@@ -305,7 +318,7 @@ namespace Embeddinator.Generators
             if (method.IsConstructor || method.IsDestructor)
                 Write("{0}(", @class.Name);
             else
-                Write("{0} {1}(", method.ReturnType, method.Name);
+                Write("{0} {1}(", method.ReturnType, GetMethodIdentifier(method));
 
             var @params = method.Parameters.Where(m => !m.IsImplicit);
             Write("{0}", TypePrinter.VisitParameters(@params, hasNames: true));
