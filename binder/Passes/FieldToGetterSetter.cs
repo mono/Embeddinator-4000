@@ -30,7 +30,7 @@ namespace Embeddinator.Passes
                 Namespace = @class,
                 ReturnType = field.QualifiedType,
                 Access = field.Access,
-                Field = field,
+                AssociatedDeclaration = field,
                 IsStatic = field.IsStatic,
             };
 
@@ -40,7 +40,7 @@ namespace Embeddinator.Passes
                 Namespace = @class,
                 ReturnType = new QualifiedType(new BuiltinType(PrimitiveType.Void)),
                 Access = field.Access,
-                Field = field,
+                AssociatedDeclaration = field,
                 IsStatic = field.IsStatic,
             };
 
