@@ -210,6 +210,17 @@ public class Tests {
     }
 
     @Test
+    public void testDuplicatedMethods() {
+        DuplicateMethods dup = new DuplicateMethods();
+        dup.doIt();
+        dup.doIt(0);
+        dup.doIt("");
+        dup.doIt(0, 0);
+        dup.find("");
+        dup.find("", "");
+    }
+
+    @Test
     public void testStructs() {
         Point p1 = new Point(1.0f, -1.0f);
         doublesAreEqual(1.0f, p1.getX());
