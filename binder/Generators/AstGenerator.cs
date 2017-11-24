@@ -24,7 +24,7 @@ namespace Embeddinator.Generators
             string managedName;
 
             var property = decl.AssociatedDeclaration as Property;
-            if (decl is Method && property != null)
+            if (decl is Method && property != null && property.IsSynthetized)
             {
                 var managedDecl = property.AssociatedDeclaration ?? property;
                 managedName = ASTGenerator.ManagedNames[managedDecl];

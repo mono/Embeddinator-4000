@@ -41,6 +41,7 @@ namespace Embeddinator.Passes
                 Access = field.Access,
                 AssociatedDeclaration = property,
                 IsStatic = field.IsStatic,
+                SynthKind = FunctionSynthKind.FieldAcessor
             };
             property.GetMethod = getter;
 
@@ -52,6 +53,7 @@ namespace Embeddinator.Passes
                 Access = field.Access,
                 AssociatedDeclaration = property,
                 IsStatic = field.IsStatic,
+                SynthKind = FunctionSynthKind.FieldAcessor
             };
             property.SetMethod = setter;
 
