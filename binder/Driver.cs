@@ -86,9 +86,8 @@ namespace Embeddinator
                 new GenerateObjectTypesPass(),
                 new GenerateArrayTypes(),
                 new CheckIgnoredDeclsPass { CheckDecayedTypes = false },
+                new FieldToGetterSetterPropertyPass(),
                 new CheckDeclarations(),
-                new CheckDuplicatedNamesPass(),
-                new FieldToGetterSetterPropertyPass()
             });
 
             Generator.SetupPasses();
