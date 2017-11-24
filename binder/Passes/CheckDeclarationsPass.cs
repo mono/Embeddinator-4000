@@ -23,6 +23,31 @@ namespace Embeddinator.Passes
 
         HashSet<Declaration> processed = new HashSet<Declaration>();
 
+        void CheckMemberDeclaration(Declaration decl)
+        {
+            var @class = decl.Namespace as Class;
+
+            var property = decl as Property;
+            if (property != null && Options.GeneratorKind == GeneratorKind.Java)
+            {
+                if (property.Name == "Class")
+                    RenameForbidden(property);
+            }
+        }
+
+        private void RenameForbidden(Declaration decl)
+        {
+            int i = 0;
+
+            decl.DefinitionOrder = (uint)++i;
+
+            if (decl.AssociatedDeclaration != null)
+                decl.AssociatedDeclaration.DefinitionOrder = decl.DefinitionOrder;
+
+            Diagnostics.Debug("Found forbidden {0} name: {1}", decl.GetType().Name.ToLowerInvariant(),
+                decl.QualifiedName);
+        }
+
         public override bool VisitClassDecl(Class @class)
         {
             if (!VisitDeclaration(@class))
@@ -36,6 +61,9 @@ namespace Embeddinator.Passes
                 .ToList();
 
             processed.Clear();
+
+            foreach (var member in members)
+                CheckMemberDeclaration(member);
 
             foreach (var member in members.Where(decl => decl.IsGenerated))
             {

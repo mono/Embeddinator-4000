@@ -308,16 +308,16 @@ public class Tests {
         struct1.setBoolean(false);
         assertFalse(struct1.getBoolean());
 
-        assertNotNull(struct1.get_Class());
-        assertFalse(struct1.get_Class().get_Boolean());
-        struct1.set_Class(null);
-        assertNull(struct1.get_Class());
-        struct1.set_Class(new managed.fields.Class(true));
-        assertTrue(struct1.get_Class().get_Boolean());
+        assertNotNull(struct1.getClass_1());
+        assertFalse(struct1.getClass_1().getBoolean());
+        struct1.setClass_1(null);
+        assertNull(struct1.getClass_1());
+        struct1.setClass_1(new managed.fields.Class(true));
+        assertTrue(struct1.getClass_1().getBoolean());
 
         managed.fields.Struct struct2 = new managed.fields.Struct(false);
-        assertNotNull(struct2.get_Class());
-        assertFalse(struct2.get_Boolean());
+        assertNotNull(struct2.getClass_1());
+        assertFalse(struct2.getBoolean());
     }
 
     @Test
