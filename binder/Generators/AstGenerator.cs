@@ -11,6 +11,14 @@ namespace Embeddinator.Generators
 {
     public static class DeclarationExtensions
     {
+        public static Declaration GetRootAssociatedDecl(this Declaration decl)
+        {
+            while (decl.AssociatedDeclaration != null)
+                decl = decl.AssociatedDeclaration;
+
+            return decl;
+        }
+
         public static string ManagedQualifiedName(this Declaration decl)
         {
             string managedName;

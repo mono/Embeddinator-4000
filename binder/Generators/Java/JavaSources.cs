@@ -277,19 +277,11 @@ namespace Embeddinator.Generators
             return true;
         }
 
-        static Declaration GetRootAssociatedDecl(Declaration decl)
-        {
-            while (decl.AssociatedDeclaration != null)
-                decl = decl.AssociatedDeclaration;
-
-            return decl;
-        }
-
         public static string GetMethodIdentifier(Method method)
         {
             var name = method.Name;
 
-            var associated = GetRootAssociatedDecl(method);
+            var associated = method.GetRootAssociatedDecl();
             if (associated.DefinitionOrder != 0)
                 name += $"_{associated.DefinitionOrder}";
 
