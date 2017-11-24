@@ -970,34 +970,46 @@ namespace Embeddinator.ObjC {
 		// At the moment all other values are only from the first plist.
 		static void MergeInfoPlists (string output, string a, string b)
 		{
+			var settings = new XmlReaderSettings () {
+				XmlResolver = null,
+				DtdProcessing = DtdProcessing.Parse
+			};
+
 			var adoc = new XmlDocument ();
 			var bdoc = new XmlDocument ();
-			adoc.Load (a);
-			bdoc.Load (b);
 
-			var a_supported_platforms = ((XmlNode) adoc.SelectSingleNode ("/plist/dict/key[text()='CFBundleSupportedPlatforms']/following-sibling::array"));
-			var b_supported_platforms = ((XmlNode) bdoc.SelectSingleNode ("/plist/dict/key[text()='CFBundleSupportedPlatforms']/following-sibling::array"));
+			// ensure we do not have issues with dtd files when we do not have a connection
+			using (var srA = new StringReader (a))
+			using (var readerA = XmlReader.Create (srA, settings))
+			using (var srB = new StringReader (b))
+			using (var readerB = XmlReader.Create (srB, settings)) {
+				adoc.Load (readerA);
+				bdoc.Load (readerB);
 
-			foreach (XmlNode b_platform in b_supported_platforms.ChildNodes) {
-				var node = adoc.ImportNode (b_platform, true);
-				a_supported_platforms.AppendChild (node);
+				var a_supported_platforms = ((XmlNode)adoc.SelectSingleNode("/plist/dict/key[text()='CFBundleSupportedPlatforms']/following-sibling::array"));
+				var b_supported_platforms = ((XmlNode)bdoc.SelectSingleNode("/plist/dict/key[text()='CFBundleSupportedPlatforms']/following-sibling::array"));
+
+				foreach (XmlNode b_platform in b_supported_platforms.ChildNodes) {
+					var node = adoc.ImportNode (b_platform, true);
+					a_supported_platforms.AppendChild (node);
+				}
+
+				var writerSettings = new XmlWriterSettings ();
+				writerSettings.Encoding = new UTF8Encoding (false);
+				writerSettings.IndentChars = "    ";
+				writerSettings.Indent = true;
+				using (var writer = XmlWriter.Create (output, writerSettings))
+					adoc.Save(writer);
+
+				// Apple's plist reader does not like empty internal subset declaration,
+				// even though this is allowed according to the xml spec: http://stackoverflow.com/a/6192048/183422
+				// So manually fix the xml :(
+				var contents = File.ReadAllText (output);
+				contents = contents.Replace (
+					@"<!DOCTYPE plist PUBLIC ""-//Apple//DTD PLIST 1.0//EN"" ""http://www.apple.com/DTDs/PropertyList-1.0.dtd""[]>",
+					@"<!DOCTYPE plist PUBLIC ""-//Apple//DTD PLIST 1.0//EN"" ""http://www.apple.com/DTDs/PropertyList-1.0.dtd"">");
+				File.WriteAllText (output, contents);
 			}
-
-			var writerSettings = new XmlWriterSettings ();
-			writerSettings.Encoding = new UTF8Encoding (false);
-			writerSettings.IndentChars = "    ";
-			writerSettings.Indent = true;
-			using (var writer = XmlWriter.Create (output, writerSettings))
-				adoc.Save (writer);
-
-			// Apple's plist reader does not like empty internal subset declaration,
-			// even though this is allowed according to the xml spec: http://stackoverflow.com/a/6192048/183422
-			// So manually fix the xml :(
-			var contents = File.ReadAllText (output);
-			contents = contents.Replace (
-				@"<!DOCTYPE plist PUBLIC ""-//Apple//DTD PLIST 1.0//EN"" ""http://www.apple.com/DTDs/PropertyList-1.0.dtd""[]>", 
-				@"<!DOCTYPE plist PUBLIC ""-//Apple//DTD PLIST 1.0//EN"" ""http://www.apple.com/DTDs/PropertyList-1.0.dtd"">");
-			File.WriteAllText (output, contents);
 		}
 
 		string GetSdkVersion (string sdk)

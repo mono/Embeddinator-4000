@@ -192,11 +192,19 @@ namespace Embeddinator
                 string resourcePaths = Path.Combine(Options.OutputDir, XamarinAndroidBuild.IntermediateDir, XamarinAndroidBuild.ResourcePaths);
                 if (File.Exists(resourcePaths))
                 {
-                    var document = new XmlDocument();
-                    document.Load(resourcePaths);
-                    foreach (XmlNode node in document.SelectNodes("/Paths/AdditionalJavaLibraryReferences/AdditionalJavaLibraryReference"))
-                    {
-                        classpath.Add(node.InnerText);
+                    XmlReaderSettings settings = new XmlReaderSettings () {
+                        XmlResolver = null,
+                        DtdProcessing = DtdProcessing.Parse
+                    };
+
+                    var document = new XmlDocument ();
+                    using (StringReader sr = new StringReader (resourcePaths))
+                    using (XmlReader reader = XmlReader.Create (sr, settings)) {
+                        document.Load (reader);
+                        foreach (XmlNode node in document.SelectNodes ("/Paths/AdditionalJavaLibraryReferences/AdditionalJavaLibraryReference"))
+                        {
+                            classpath.Add (node.InnerText);
+                        }
                     }
                 }
 
