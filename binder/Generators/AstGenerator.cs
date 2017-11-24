@@ -11,10 +11,35 @@ namespace Embeddinator.Generators
 {
     public static class DeclarationExtensions
     {
+        public static Declaration GetRootAssociatedDecl(this Declaration decl)
+        {
+            while (decl.AssociatedDeclaration != null)
+                decl = decl.AssociatedDeclaration;
+
+            return decl;
+        }
+
         public static string ManagedQualifiedName(this Declaration decl)
         {
+            string managedName;
+
+            var property = decl.AssociatedDeclaration as Property;
+            if (decl is Method && property != null && property.IsSynthetized)
+            {
+                var managedDecl = property.AssociatedDeclaration ?? property;
+                managedName = ASTGenerator.ManagedNames[managedDecl];
+
+                var isGetter = property.GetMethod == decl;
+                var suffix = isGetter ? "get" : "set";
+                managedName = $"{managedName}:{suffix}";
+            }
+            else
+            {
+                managedName = ASTGenerator.ManagedNames[decl];
+            }
+
             // Replace + with / since that's what mono_class_from_name expects for nested types.
-            return ASTGenerator.ManagedNames[decl].Replace("+", "/");
+            return managedName.Replace("+", "/");
         }
     }
 
@@ -120,8 +145,13 @@ namespace Embeddinator.Generators
 
         static string UnmangleTypeName(string name)
         {
-            return string.IsNullOrEmpty(name) ? string.Empty :
-                         name.Replace(new char[] {'`', '<', '>' }, "_");
+            var typeName = string.IsNullOrEmpty(name) ? string.Empty :
+                name.Replace(new char[] {'`', '<', '>' }, "_");
+
+            // Remove prefixes for explicit interface methods.
+            typeName = typeName.Substring(typeName.LastIndexOf(".", StringComparison.Ordinal) + 1);
+
+            return typeName;
         }
 
         public void HandleBaseType(IKVM.Reflection.Type type, Class @class)
@@ -258,6 +288,15 @@ namespace Embeddinator.Generators
                     continue;
 
                 if (IsSystemObjectMethod(method))
+                    continue;
+
+                var properties = method.DeclaringType.__GetDeclaredProperties();
+                var isPropertyAccessor = properties.Any(prop => 
+                        {
+                            return (prop.GetMethod == method) || (prop.SetMethod == method);
+                        });
+
+                if (isPropertyAccessor)
                     continue;
 
                 var decl = VisitMethod(method);
@@ -669,6 +708,8 @@ namespace Embeddinator.Generators
             var accessMask = (fieldInfo.Attributes & FieldAttributes.FieldAccessMask);
             field.Access = ConvertFieldAttributesToAccessSpecifier(accessMask);
 
+            ManagedNames[field] = $"{fieldInfo.DeclaringType.FullName}:{fieldInfo.Name}";
+
             return field;
         }
 
@@ -693,13 +734,17 @@ namespace Embeddinator.Generators
             {
                 property.GetMethod = VisitMethod(propertyInfo.GetMethod);
                 property.GetMethod.Namespace = property.Namespace;
+                property.GetMethod.AssociatedDeclaration = property;
             }
 
             if (propertyInfo.SetMethod != null)
             {
                 property.SetMethod = VisitMethod(propertyInfo.SetMethod);
                 property.SetMethod.Namespace = property.Namespace;
+                property.SetMethod.AssociatedDeclaration = property;
             }
+
+            ManagedNames[property] = $"{propertyInfo.DeclaringType.FullName}:{propertyInfo.Name}";
 
             return property;
         }
@@ -773,7 +818,8 @@ namespace Embeddinator.Generators
 
         public static bool IsAndroidAssembly(this Assembly assembly)
         {
-            return assembly.FullName.StartsWith("Mono.Android, ", StringComparison.Ordinal) || assembly.FullName.StartsWith("Java.Interop, ", StringComparison.Ordinal);
+            return assembly.FullName.StartsWith("Mono.Android, ", StringComparison.Ordinal) ||
+                   assembly.FullName.StartsWith("Java.Interop, ", StringComparison.Ordinal);
         }
     }
 }

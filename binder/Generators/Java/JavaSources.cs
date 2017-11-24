@@ -1,4 +1,5 @@
-﻿﻿﻿﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -24,6 +25,7 @@ namespace Embeddinator.Generators
             : base(context, new List<TranslationUnit> { unit })
         {
             TypePrinter = new JavaTypePrinter(context);
+            VisitOptions.VisitPropertyAccessors = true;
         }
 
         public Declaration Declaration;
@@ -276,6 +278,26 @@ namespace Embeddinator.Generators
             return true;
         }
 
+        public static string GetMethodIdentifier(Method method)
+        {
+            var name = method.Name;
+
+            if (method.AssociatedDeclaration is Property)
+            {
+                // Property names shoud follow get/set Java convention.
+                if (name.StartsWith("get_", StringComparison.Ordinal))
+                    name = $"get{name.TrimStart("get_")}";
+                else if (name.StartsWith("set_", StringComparison.Ordinal))
+                    name = $"set{name.TrimStart("set_")}";
+            }
+
+            var associated = method.GetRootAssociatedDecl();
+            if (associated.DefinitionOrder != 0)
+                name += $"_{associated.DefinitionOrder}";
+
+            return name;
+        }
+
         public override void GenerateMethodSpecifier(Method method, Class @class)
         {
             var keywords = new List<string>();
@@ -304,7 +326,7 @@ namespace Embeddinator.Generators
             if (method.IsConstructor || method.IsDestructor)
                 Write("{0}(", @class.Name);
             else
-                Write("{0} {1}(", method.ReturnType, method.Name);
+                Write("{0} {1}(", method.ReturnType, GetMethodIdentifier(method));
 
             var @params = method.Parameters.Where(m => !m.IsImplicit);
             Write("{0}", TypePrinter.VisitParameters(@params, hasNames: true));
@@ -429,25 +451,6 @@ namespace Embeddinator.Generators
 
         public override bool VisitTypedefDecl(TypedefDecl typedef)
         {
-            return true;
-        }
-
-        public override bool VisitProperty(Property property)
-        {
-            if (!VisitDeclaration(property))
-                return false;
-
-            if (property.Field == null)
-                return false;
-
-            var getter = property.GetMethod;
-            if (getter != null)
-                VisitMethodDecl(getter);
-
-            var setter = property.SetMethod;
-            if (setter != null)
-                VisitMethodDecl(setter);
-
             return true;
         }
 

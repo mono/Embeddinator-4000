@@ -69,33 +69,9 @@ namespace Embeddinator.Generators
             return ret;
         }
 
-        public static IEnumerable<Declaration> GetOverloadedDeclarations(Declaration decl)
-        {
-            var @class = decl.Namespace as Class;
-            return @class.Declarations.Where(d => d.OriginalName == decl.OriginalName);
-        }
-
         public static string GetCMethodIdentifier(Method method)
         {
-            if (method.CompleteDeclaration != null)
-                method = method.CompleteDeclaration as Method;
-
-            var methodName = (method.IsConstructor) ? "new" : method.OriginalName;
-
-            var @class = method.Namespace as Class;
-            var name = $"{@class.QualifiedOriginalName}_{methodName}";
-
-            // Deal with naming overloads conflicts.
-            var overloads = GetOverloadedDeclarations(method).ToList();
-
-            if (overloads.Count > 1)
-            {
-                var overloadIndex = overloads.FindIndex(m => ReferenceEquals(m, method));
-                if (overloadIndex > 0)
-                    name = $"{name}_{overloadIndex}";
-            }
-
-            return name;
+            return CCodeGenerator.GeneratedMethodNames[method.ManagedQualifiedName()];
         }
 
         public override bool VisitMethodDecl(Method method)

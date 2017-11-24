@@ -433,7 +433,15 @@ namespace Embeddinator.Generators
                 return false;
 
             if (property.Field == null)
-                return false;
+            {
+                if (property.GetMethod != null)
+                    property.GetMethod.Visit(this);
+
+                if (property.SetMethod != null)
+                    property.SetMethod.Visit(this);
+
+                return true;
+            }
 
             GenerateFieldGetter(property);
             NewLine();

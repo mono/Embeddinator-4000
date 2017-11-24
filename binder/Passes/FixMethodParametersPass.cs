@@ -9,6 +9,11 @@ namespace Embeddinator.Passes
     {
         public static string ObjectParameterId => "object";
 
+        public FixMethodParametersPass()
+        {
+            VisitOptions.VisitPropertyAccessors = true;
+        }
+
         void AddObjectParameterToMethod(Method method, Class @class)
         {
             var ptrType = new QualifiedType(
@@ -73,23 +78,10 @@ namespace Embeddinator.Passes
             if (method.IsConstructor)
                 return false;
 
-            var isStaticField = method.Field != null && method.Field.IsStatic;
+            var field = method.AssociatedDeclaration as Field;
+            var isStaticField = field != null && field.IsStatic;
             if (Options.GeneratorKind == GeneratorKind.C && !isStaticField)
                 AddObjectParameterToMethod(method, @class);
-
-            return true;
-        }
-
-        public override bool VisitProperty(Property property)
-        {
-            if (!VisitDeclaration(property))
-                return false;
-
-            if (property.GetMethod != null)
-                property.GetMethod.Visit(this);
-
-            if (property.SetMethod != null)
-                property.SetMethod.Visit(this);
 
             return true;
         }

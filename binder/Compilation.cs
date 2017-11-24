@@ -594,6 +594,7 @@ namespace Embeddinator
             var clangBin = Path.Combine(xcodePath, "usr/bin/clang");
 
             var args = new List<string> {
+                "-Wno-typedef-redefinition",
                 $"-D{DLLExportDefine}",
                 "-framework CoreFoundation",
                 $"-I\"{MonoSdkPath}/include/mono-2.0\"",
