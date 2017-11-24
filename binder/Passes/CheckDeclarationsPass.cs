@@ -37,12 +37,13 @@ namespace Embeddinator.Passes
 
             processed.Clear();
 
-            foreach (var member in members)
+            foreach (var member in members.Where(decl => decl.IsGenerated))
             {
                 processed.Add(member);
 
                 var duplicates = members.FindAll(decl => GetBaseName(member) == GetBaseName(decl))
                     .ToList();
+                duplicates.RemoveAll(decl => !decl.IsGenerated);
 
                 if (duplicates.Count == 0)
                     continue;
@@ -59,8 +60,6 @@ namespace Embeddinator.Passes
         public void HandleDuplicatesC(List<Declaration> duplicates)
         {
             duplicates.RemoveAll(decl => processed.Contains(decl));
-            duplicates.RemoveAll(decl => !decl.IsGenerated);
-
             RenameDuplicates(duplicates);
         }
 
@@ -102,8 +101,6 @@ namespace Embeddinator.Passes
 
         public void HandleDuplicatesJava(List<Declaration> duplicates)
         {
-            duplicates.RemoveAll(decl => !decl.IsGenerated);
-
             // Java does not allow static and instance overloads with the same name.
             // If this is the case, we rename the static overloads to have a suffix since
             // the instance overloads might be part of an interface and need to have their
