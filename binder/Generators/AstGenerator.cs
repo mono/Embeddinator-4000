@@ -15,12 +15,12 @@ namespace Embeddinator.Generators
         {
             string managedName;
 
-            var field = decl.AssociatedDeclaration as Field;
-            if (decl is Method && field != null)
+            var property = decl.AssociatedDeclaration as Property;
+            if (decl is Method && property != null)
             {
-                managedName = ASTGenerator.ManagedNames[field];
+                var managedDecl = property.AssociatedDeclaration ?? property;
+                managedName = ASTGenerator.ManagedNames[managedDecl];
 
-                var property = field.AssociatedDeclaration as Property;
                 var isGetter = property.GetMethod == decl;
                 var suffix = isGetter ? "get" : "set";
                 managedName = $"{managedName}:{suffix}";
