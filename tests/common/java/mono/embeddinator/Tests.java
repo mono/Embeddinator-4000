@@ -241,7 +241,7 @@ public class Tests {
         Point p4 = Point.opSubtraction(p3, p2);
         assertTrue(Point.opEquality(p4, p1));
 
-        Point z = Point.get_Zero();
+        Point z = Point.getZero();
         doublesAreEqual(0.0f, z.getX());
         doublesAreEqual(0.0f, z.getY());
     }
@@ -262,51 +262,51 @@ public class Tests {
 
     @Test
     public void testFieldsInReferences() {
-        assertEquals(Long.MAX_VALUE, managed.fields.Class.get_MaxLong());
+        assertEquals(Long.MAX_VALUE, managed.fields.Class.getMaxLong());
 
-        assertEquals(0, managed.fields.Class.get_Integer());
-        managed.fields.Class.set_Integer(1);
-        assertEquals(1, managed.fields.Class.get_Integer());
+        assertEquals(0, managed.fields.Class.getInteger());
+        managed.fields.Class.setInteger(1);
+        assertEquals(1, managed.fields.Class.getInteger());
 
-        assertTrue(managed.fields.Class.get_Scratch().get_Boolean());
+        assertTrue(managed.fields.Class.getScratch().getBoolean());
 
-        managed.fields.Class.set_Scratch(new managed.fields.Class(false));
-        assertFalse(managed.fields.Class.get_Scratch().get_Boolean());
+        managed.fields.Class.setScratch(new managed.fields.Class(false));
+        assertFalse(managed.fields.Class.getScratch().getBoolean());
 
         managed.fields.Class ref1 = new managed.fields.Class(true);
-        assertTrue(ref1.get_Boolean());
-        ref1.set_Boolean(false);
-        assertFalse(ref1.get_Boolean());
+        assertTrue(ref1.getBoolean());
+        ref1.setBoolean(false);
+        assertFalse(ref1.getBoolean());
 
-        assertNotNull(ref1.get_Structure());
-        assertFalse(ref1.get_Structure().get_Boolean());
-        ref1.set_Structure(new managed.fields.Struct(true));
-        assertTrue(ref1.get_Structure().get_Boolean());
+        assertNotNull(ref1.getStructure());
+        assertFalse(ref1.getStructure().getBoolean());
+        ref1.setStructure(new managed.fields.Struct(true));
+        assertTrue(ref1.getStructure().getBoolean());
 
         managed.fields.Class ref2 = new managed.fields.Class(false);
-        assertNotNull(ref2.get_Structure());
-        assertFalse(ref2.get_Structure().get_Boolean());
+        assertNotNull(ref2.getStructure());
+        assertFalse(ref2.getStructure().getBoolean());
     }
 
     @Test
     public void testFieldsInValueTypes() {
-        assertEquals(0, managed.fields.Struct.get_Integer());
-        managed.fields.Struct.set_Integer(1);
-        assertEquals(1, managed.fields.Struct.get_Integer());
+        assertEquals(0, managed.fields.Struct.getInteger());
+        managed.fields.Struct.setInteger(1);
+        assertEquals(1, managed.fields.Struct.getInteger());
 
-        assertFalse(managed.fields.Struct.get_Scratch().get_Boolean());
+        assertFalse(managed.fields.Struct.getScratch().getBoolean());
 
-        managed.fields.Struct.set_Scratch(new managed.fields.Struct(true));
-        assertTrue(managed.fields.Struct.get_Scratch().get_Boolean());
+        managed.fields.Struct.setScratch(new managed.fields.Struct(true));
+        assertTrue(managed.fields.Struct.getScratch().getBoolean());
 
-        managed.fields.Struct empty = managed.fields.Struct.get_Empty();
+        managed.fields.Struct empty = managed.fields.Struct.getEmpty();
         assertNotNull(empty);
-        assertNull(empty.get_Class());
+        assertNull(empty.getClass_1());
 
         managed.fields.Struct struct1 = new managed.fields.Struct(true);
-        assertTrue(struct1.get_Boolean());
-        struct1.set_Boolean(false);
-        assertFalse(struct1.get_Boolean());
+        assertTrue(struct1.getBoolean());
+        struct1.setBoolean(false);
+        assertFalse(struct1.getBoolean());
 
         assertNotNull(struct1.get_Class());
         assertFalse(struct1.get_Class().get_Boolean());

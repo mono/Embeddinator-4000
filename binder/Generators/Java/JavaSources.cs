@@ -1,4 +1,5 @@
-﻿﻿﻿﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -280,6 +281,15 @@ namespace Embeddinator.Generators
         public static string GetMethodIdentifier(Method method)
         {
             var name = method.Name;
+
+            if (method.AssociatedDeclaration is Property)
+            {
+                // Property names shoud follow get/set Java convention.
+                if (name.StartsWith("get_", StringComparison.Ordinal))
+                    name = $"get{name.TrimStart("get_")}";
+                else if (name.StartsWith("set_", StringComparison.Ordinal))
+                    name = $"set{name.TrimStart("set_")}";
+            }
 
             var associated = method.GetRootAssociatedDecl();
             if (associated.DefinitionOrder != 0)
