@@ -24,15 +24,25 @@ namespace Embeddinator.Passes
 
             var @class = field.Namespace as Class;
 
+            var property = new Property
+            {
+                Name = field.Name,
+                Namespace = field.Namespace,
+                Field = field,
+                QualifiedType = field.QualifiedType,
+                AssociatedDeclaration = field
+            };
+
             var getter = new Method
             {
                 Name = $"get_{field.Name}",
                 Namespace = @class,
                 ReturnType = field.QualifiedType,
                 Access = field.Access,
-                AssociatedDeclaration = field,
+                AssociatedDeclaration = property,
                 IsStatic = field.IsStatic,
             };
+            property.GetMethod = getter;
 
             var setter = new Method
             {
@@ -40,9 +50,10 @@ namespace Embeddinator.Passes
                 Namespace = @class,
                 ReturnType = new QualifiedType(new BuiltinType(PrimitiveType.Void)),
                 Access = field.Access,
-                AssociatedDeclaration = field,
+                AssociatedDeclaration = property,
                 IsStatic = field.IsStatic,
             };
+            property.SetMethod = setter;
 
             var param = new Parameter
             {
@@ -51,21 +62,9 @@ namespace Embeddinator.Passes
             };
             setter.Parameters.Add(param);
 
-            var property = new Property
-            {
-                Name = field.Name,
-                Namespace = field.Namespace,
-                GetMethod = getter,
-                SetMethod = setter,
-                Field = field,
-                QualifiedType = field.QualifiedType,
-                AssociatedDeclaration = field
-            };
-
-            field.AssociatedDeclaration = property;
             @class.Declarations.Add(property);
 
-            Diagnostics.Debug($"Getter/setter property created from field {field.QualifiedName}");
+            Diagnostics.Debug($"Property created from field: '{field.QualifiedName}'");
 
             return true;
         }
