@@ -834,9 +834,9 @@ namespace Embeddinator
 				DtdProcessing = DtdProcessing.Parse
 			};
 
-			using (var srA = new StringReader (a))
+			using (var srA = new StreamReader (a, Encoding.UTF8, true))
  			using (var readerA = XmlReader.Create (srA, settings))
- 			using (var srB = new StringReader (b))
+ 			using (var srB = new StreamReader (b, Encoding.UTF8, true))
  			using (var readerB = XmlReader.Create (srB, settings)) {
 				adoc.Load (readerA);
 				bdoc.Load (readerB);

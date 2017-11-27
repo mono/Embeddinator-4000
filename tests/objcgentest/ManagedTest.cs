@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Xml;
 
 using Embeddinator;
@@ -98,7 +99,7 @@ namespace ExecutionTests
  					DtdProcessing = DtdProcessing.Parse
  				};
 				device_xml = new XmlDocument ();
-				var sr = new StringReader (xmlpath);
+				var sr = new StreamReader (xmlpath, Encoding.UTF8, true);
 				var reader = XmlReader.Create (sr, settings);
 				device_xml.Load (reader);
 			}
