@@ -157,7 +157,7 @@ namespace Embeddinator.Generators
                 case PrimitiveType.IntPtr:
                 case PrimitiveType.UIntPtr:
                 case PrimitiveType.Null: return JavaGenerator.IntPtrType;
-                case PrimitiveType.String: return "String";
+                case PrimitiveType.String: return "java.lang.String";
                 case PrimitiveType.Decimal: return "java.math.BigDecimal";
             }
 

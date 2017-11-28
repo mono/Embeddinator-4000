@@ -131,7 +131,7 @@ public class Tests {
         assertEquals("firstsecond", Parameters.concat("first", "second"));
 
         Ref<Boolean> b = new Ref<Boolean>(true);
-        Ref<String> s = new Ref<String>(null);
+        Ref<java.lang.String> s = new Ref<java.lang.String>(null);
         Parameters.ref(b, s);
         assertFalse(b.get());
         assertEquals("hello", s.get());
@@ -157,7 +157,7 @@ public class Tests {
         assertEquals(2, refULong.get().intValue());
 
         Out<Integer> l = new Out<Integer>();
-        Out<String> os = new Out<String>();
+        Out<java.lang.String> os = new Out<java.lang.String>();
         Parameters.out(null, l, os);
         assertEquals(new Integer(0), l.get());
         assertEquals(null, os.get());

@@ -5,6 +5,7 @@ using CppSharp;
 using CppSharp.AST;
 using CppSharp.Generators;
 using CppSharp.Passes;
+using CppSharp.AST.Extensions;
 
 namespace Embeddinator.Passes
 {
@@ -39,8 +40,13 @@ namespace Embeddinator.Passes
                 var method = decl as Method;
                 if (method != null)
                 {
-                    if (method.Name == "getClass")
+                    if (method.Name == "getClass" || method.Name == "GetClass")
                         RenameForbidden(method);
+
+                    if ((method.Name == "toString" || method.Name == "ToString") &&
+                        (method.Parameters.Count() != 0 ||
+                        !method.ReturnType.Type.IsPrimitiveType(PrimitiveType.String)))
+                       RenameForbidden(method);
                 }
             }
         }
