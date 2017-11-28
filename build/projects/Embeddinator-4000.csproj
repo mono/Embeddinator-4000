@@ -162,9 +162,6 @@
     <Compile Include="../../binder/Passes/InterfacesPass.cs">
       <Link>binder/Passes/InterfacesPass.cs</Link>
     </Compile>
-    <Compile Include="../../binder/Passes/PropertyToGetterSetter.cs">
-      <Link>binder/Passes/PropertyToGetterSetter.cs</Link>
-    </Compile>
     <Compile Include="../../binder/Project.cs">
       <Link>binder/Project.cs</Link>
     </Compile>
