@@ -101,4 +101,13 @@ namespace Arrays {
 		}
 	}
 
+	// https://github.com/mono/Embeddinator-4000/issues/545
+    public class ObjectFactory<T> where T: class
+    {
+    }
+
+    public class ObjectFactoryCollection<T> where T : class
+    {
+        public void AddRange(ObjectFactory<T>[] itemArray) { }
+    }
 }

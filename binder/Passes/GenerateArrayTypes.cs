@@ -102,6 +102,9 @@ namespace Embeddinator.Passes
 
         public override bool VisitFunctionDecl(Function function)
         {
+            if (function.Ignore)
+                return false;
+
             if (function.TranslationUnit != TranslationUnit)
                 return false;
 
