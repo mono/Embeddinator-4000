@@ -142,7 +142,11 @@ namespace Methods {
 		public bool Find (string name) { return true; }
 		public bool Find (string firstName, string lastName) { return true; }
 	}
-	
+
+	public class ReservedMethods {
+		public void getClass () { }
+	}
+
 	// Three extensions on two different types and a _normal_ static method
 	// objc: categories are per type (2 different here) and one should be a _normal_ method
 	public static class SomeExtensions {

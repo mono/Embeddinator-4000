@@ -27,11 +27,21 @@ namespace Embeddinator.Passes
         {
             var @class = decl.Namespace as Class;
 
-            var property = decl as Property;
-            if (property != null && Options.GeneratorKind == GeneratorKind.Java)
+            if (Options.GeneratorKind == GeneratorKind.Java)
             {
-                if (property.Name == "Class")
-                    RenameForbidden(property);
+                var property = decl as Property;
+                if (property != null)
+                {
+                    if (property.Name == "Class")
+                        RenameForbidden(property);
+                }
+
+                var method = decl as Method;
+                if (method != null)
+                {
+                    if (method.Name == "getClass")
+                        RenameForbidden(method);
+                }
             }
         }
 
