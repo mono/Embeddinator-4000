@@ -21,8 +21,8 @@ public class HELLO {
         mono.embeddinator.Runtime.checkExceptions();
     }
 
-    public String wORLD() {
-        String __ret = hello.Native_hello.INSTANCE.Example_HELLO_WORLD(__object);
+    public java.lang.String wORLD() {
+        java.lang.String __ret = hello.Native_hello.INSTANCE.Example_HELLO_WORLD(__object);
         mono.embeddinator.Runtime.checkExceptions();
         return __ret;
     }
