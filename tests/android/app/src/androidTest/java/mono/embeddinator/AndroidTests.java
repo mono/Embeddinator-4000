@@ -125,6 +125,13 @@ public class AndroidTests {
     }
 
     @Test
+    public void sendActivity() {
+        Activity expected = rule.getActivity();
+        Activity actual = AndroidAssertions.sendActivity(expected);
+        assertSame(expected, actual);
+    }
+
+    @Test
     public void virtualCallback() throws Throwable {
         VirtualClass callback = new VirtualClass() {
             @Override

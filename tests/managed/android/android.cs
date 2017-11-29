@@ -104,6 +104,14 @@ namespace Android
         {
             return LocalBroadcastManager.GetInstance(Application.Context);
         }
+
+        [Export("sendActivity")]
+        public static Activity SendActivity(Activity activity)
+        {
+            if (activity == null)
+                throw new Exception("Activity should not be null!");
+            return activity;
+        }
     }
 
     [Register("mono.embeddinator.android.JavaCallbacks")]
