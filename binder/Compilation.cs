@@ -410,7 +410,7 @@ namespace Embeddinator
                             abi = "arm64-v8a";
                             break;
                         case "android-arm":
-                            abi = "armeabi";
+                            abi = "armeabi-v7a";
                             break;
                         case "android-armv7":
                             abi = "armeabi-v7a";
@@ -687,15 +687,12 @@ namespace Embeddinator
             var libName = $"lib{name}.so";
             var ndkPath = XamarinAndroid.AndroidSdk.AndroidNdkPath;
 
-            foreach (var abi in new[] { "armeabi", "armeabi-v7a", "arm64-v8a", "x86", "x86_64" })
+            foreach (var abi in new[] { "armeabi-v7a", "arm64-v8a", "x86", "x86_64" })
             {
                 string extra = string.Empty;
                 AndroidTargetArch targetArch;
                 switch (abi)
                 {
-                    case "armeabi":
-                        targetArch = AndroidTargetArch.Arm;
-                        break;
                     case "armeabi-v7a":
                         targetArch = AndroidTargetArch.Arm;
                         extra = " -march=armv7-a -mfloat-abi=softfp -mfpu=vfpv3-d16";

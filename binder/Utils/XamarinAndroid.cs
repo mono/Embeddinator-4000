@@ -14,7 +14,7 @@ namespace Embeddinator
     /// </summary>
     static class XamarinAndroid
     {
-        public const string TargetFrameworkVersion = "v7.0";
+        public const string TargetFrameworkVersion = "v8.1";
         public const string MinSdkVersion = "9";
         public const int TargetSdkVersion = 24;
         public const string JavaVersion = "1.8";
@@ -55,9 +55,17 @@ namespace Embeddinator
             return GetFullPath(Combine(MonoDroidSdk.BinPath, ".."));
         }
 
+        public static string CombineToXamarinAndroidLibPath(string path)
+        {
+            if (Platform.IsWindows)
+                return Combine(path, "lib");
+            else
+                return Combine(path, "lib", "xamarin.android");
+        }
+
         static string GetMonoDroidLibPath()
         {
-            var libPath = Combine(Path, "lib", "xbuild", "Xamarin", "Android", "lib");
+            var libPath = Combine(CombineToXamarinAndroidLibPath(Path), "xbuild", "Xamarin", "Android", "lib");
             if (!Directory.Exists(libPath))
                 libPath = Combine(Path, "lib");
             return libPath;
@@ -73,10 +81,10 @@ namespace Embeddinator
 
         static readonly Lazy<string[]> targetFrameworks = new Lazy<string[]>(() => new[]
         {
-            Combine(Path, "lib", "xbuild-frameworks", "MonoAndroid", "v1.0"),
-            Combine(Path, "lib", "xbuild-frameworks", "MonoAndroid", "v1.0", "Facades"),
-            Combine(Path, "lib", "xbuild-frameworks", "MonoAndroid", TargetFrameworkVersion),
-            Combine(Path, "lib", "xbuild-frameworks", "MonoAndroid", "v2.3"), //Mono.Android.Export.dll is here
+            Combine(CombineToXamarinAndroidLibPath(Path), "xbuild-frameworks", "MonoAndroid", "v1.0"),
+            Combine(CombineToXamarinAndroidLibPath(Path), "xbuild-frameworks", "MonoAndroid", "v1.0", "Facades"),
+            Combine(CombineToXamarinAndroidLibPath(Path), "xbuild-frameworks", "MonoAndroid", TargetFrameworkVersion),
+            Combine(CombineToXamarinAndroidLibPath(Path), "xbuild-frameworks", "MonoAndroid", "v2.3"), //Mono.Android.Export.dll is here
         });
 
         public static string[] TargetFrameworkDirectories => targetFrameworks.Value;
