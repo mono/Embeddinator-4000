@@ -114,8 +114,11 @@ namespace MonoEmbeddinator4000.Generators
         public override TypePrinterResult VisitPointerType(PointerType pointer,
             TypeQualifiers quals)
         {
-            var pointee = pointer.Pointee;
-            return pointer.QualifiedPointee.Visit(this);
+            return new TypePrinterResult
+            {
+                Type = "com.sun.jna.Pointer",
+                TypeMap = pointer.QualifiedPointee.Visit (this).TypeMap 
+            };
         }
 
         public override TypePrinterResult VisitPrimitiveType(PrimitiveType primitive,
