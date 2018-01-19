@@ -72,7 +72,7 @@ namespace ExecutionTests
 		[TestCase (false)]
 		public void tvOS_simulator (bool debug)
 		{
-			RunManagedTests (Platform.tvOS, "-destination 'platform=tvOS Simulator,name=Apple TV 1080p,OS=latest'", debug: debug);
+			RunManagedTests (Platform.tvOS, "-destination 'platform=tvOS Simulator,name=Apple TV 4K (at 1080p),OS=latest'", debug: debug);
 		}
 
 		[Test]
