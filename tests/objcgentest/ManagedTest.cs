@@ -96,7 +96,9 @@ namespace ExecutionTests
 				device_xml = new XmlDocument ();
 				device_xml.Load (xmlpath);
 			}
-			var nodes = device_xml.SelectNodes ("/MTouch/Device[" + string.Join (" or ", valid_classes.Select ((v) => "DeviceClass = \"" + v + "\"")) + "]/DeviceIdentifier");
+			// filter by device type and ensure that we can use the device for debugging purposes.
+			var xpathQuery = "/MTouch/Device[(" + string.Join(" or ", valid_classes.Select((v) => "DeviceClass = \"" + v + "\"")) + ") and IsUsableForDebugging =\"True\"]/DeviceIdentifier";
+			var nodes = device_xml.SelectNodes (xpathQuery);
 			var devices = new List<string> ();
 			foreach (XmlNode node in nodes)
 				devices.Add (node.InnerText);
