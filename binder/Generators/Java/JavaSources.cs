@@ -191,6 +191,10 @@ namespace Embeddinator.Generators
             {
                 var value = @enum.GetItemValueAsString(item);
 
+                // We need to explicit check for long int literals.
+                if (item.Value > Int32.MaxValue)
+                    value += "L";
+
                 if (@enum.BuiltinType.IsUnsigned)
                     Write($"(new {typeName}({value}));");
                 else

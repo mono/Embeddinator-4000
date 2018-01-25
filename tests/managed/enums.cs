@@ -30,6 +30,10 @@ namespace Enums {
 		Max = Int16.MaxValue,
 	}
 
+	public enum LongEnum : long {
+		Max = Int64.MaxValue
+	}
+
 	public static class Enumer {
 
 		public static ByteFlags Test (ByteEnum b, ref IntEnum i, out ShortEnum s)
