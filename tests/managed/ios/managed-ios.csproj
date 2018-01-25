@@ -8,6 +8,7 @@
     <OutputType>Library</OutputType>
     <RootNamespace>managedios</RootNamespace>
     <AssemblyName>managed-ios</AssemblyName>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DebugSymbols>true</DebugSymbols>
