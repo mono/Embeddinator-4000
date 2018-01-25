@@ -190,6 +190,7 @@ namespace Embeddinator.Generators
             if (item.ExplicitValue)
             {
                 var value = @enum.GetItemValueAsString(item);
+                value = value.StartsWith ("0x", StringComparison.Ordinal) ? value : value + "l";
 
                 if (@enum.BuiltinType.IsUnsigned)
                     Write($"(new {typeName}({value}));");
