@@ -48,8 +48,7 @@ namespace Embeddinator.Passes
             if (@class == null)
                 return false;
 
-            replacementType = new QualifiedType(
-                new PointerType(new QualifiedType(new TagType(@class))));
+            replacementType = new QualifiedType(new PointerType(type));
 
             return true;
         }
@@ -59,10 +58,7 @@ namespace Embeddinator.Passes
             if (!VisitDeclaration(method))
                 return false;
 
-            var @class = method.Namespace as Class;
-
             QualifiedType replacementType;
-
             if (ShouldReplaceType(method.ReturnType, out replacementType))
                 method.ReturnType = replacementType;
 
@@ -72,6 +68,7 @@ namespace Embeddinator.Passes
                     param.QualifiedType = replacementType;
             }
 
+            var @class = method.Namespace as Class;
             if (@class.IsStatic || method.IsStatic)
                 return false;
 

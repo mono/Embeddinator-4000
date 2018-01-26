@@ -114,6 +114,10 @@ public static class Type_Decimal {
 	public static void ReverseDecimalArrRef (ref decimal [] decArr) => decArr = decArr?.Reverse ().ToArray ();
 }
 
+public unsafe static class Type_Pointers {
+	public static void* Ptr { get; } = (void*)IntPtr.Zero;
+}
+
 public class ExposeExtraTypes {
 
 	public TimeSpan TimeOfDay {

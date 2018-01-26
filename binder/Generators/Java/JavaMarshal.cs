@@ -1,4 +1,5 @@
 ﻿﻿﻿using CppSharp.AST;
+﻿﻿using CppSharp.AST.Extensions;
 using CppSharp.Generators;
 
 namespace Embeddinator.Generators
@@ -149,7 +150,8 @@ namespace Embeddinator.Generators
 
             if (IsReferenceIntegerType(type))
             {
-                var integerTypeName = Parameter.Type.Visit(TypePrinter);
+                var unrefType = Parameter.Type.GetPointee();
+                var integerTypeName = unrefType.Visit(TypePrinter);
                 marshal = $"new {integerTypeName}({value})";
             }
 

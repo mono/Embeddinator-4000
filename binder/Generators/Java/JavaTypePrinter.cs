@@ -1,4 +1,5 @@
 ﻿using CppSharp.AST;
+using CppSharp.AST.Extensions;
 using CppSharp.Generators;
 using System;
 using System.Collections.Generic;
@@ -114,7 +115,17 @@ namespace Embeddinator.Generators
         public override TypePrinterResult VisitPointerType(PointerType pointer,
             TypeQualifiers quals)
         {
-            var pointee = pointer.Pointee;
+            // Any of the following types may be a pointer type:
+            //   * sbyte, byte, short, ushort, int, uint, long, ulong, char, float, double, decimal, or bool.
+            //   * Any enum type.
+            //   * Any pointer type.
+            //   * Any user-defined struct type that contains fields of unmanaged types only.
+
+            // The class check is because of extra pointers in the AST added by FixMethodParametersPass.
+            var pointee = pointer.QualifiedPointee;
+            if (!IsByRefParameter && !pointee.Type.IsClass())
+                return JavaGenerator.IntPtrType;
+
             return pointer.QualifiedPointee.Visit(this);
         }
 
