@@ -16,6 +16,11 @@ namespace Embeddinator.Passes
             // Remove get_ or set_ from names in case they are properties.
             var name = decl.Name.TrimStart("get_").TrimStart("set_");
 
+            // Do the same for method names starting with get or set since they
+            // might conflict with properties.
+            name = decl.Name.TrimStart("get").TrimStart("set").
+                             TrimStart("Get").TrimStart("Set");
+
             // Remove prefixes for explicit interface methods.
             name = name.Substring(decl.Name.LastIndexOf(".", StringComparison.Ordinal) + 1);
 
