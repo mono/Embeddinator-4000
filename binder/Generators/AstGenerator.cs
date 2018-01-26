@@ -612,6 +612,20 @@ namespace Embeddinator.Generators
             method.IsVirtual = methodBase.IsVirtual;
             method.IsPure = methodBase.IsAbstract;
 
+            // Check for C# operator methods.
+            if (methodBase.IsSpecialName && methodBase.Name.StartsWith("op", StringComparison.Ordinal))
+            {
+                switch(methodBase.Name)
+                {
+                case "op_Explicit":
+                    method.OperatorKind = CXXOperatorKind.ExplicitConversion;
+                    break;
+                case "op_Implicit":
+                    method.OperatorKind = CXXOperatorKind.Conversion;
+                    break;
+                }
+            }
+
             var accessMask = (methodBase.Attributes & MethodAttributes.MemberAccessMask);
             method.Access = ConvertMemberAttributesToAccessSpecifier(accessMask);
 
