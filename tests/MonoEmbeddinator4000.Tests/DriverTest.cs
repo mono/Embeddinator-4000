@@ -209,6 +209,16 @@ namespace Embeddinator.Tests
             RunDriver("Interfaces");
         }
 
+        [Test, Category ("Slow")]
+        public void DuplicateMscorlibTypes()
+        {
+            options.Compilation.Platform = TargetPlatform.Android;
+            options.GeneratorKind = GeneratorKind.C;
+            RunDriver("mscorlib");
+            options.GeneratorKind = GeneratorKind.Java;
+            RunDriver("mscorlib");
+        }
+
         /// <summary>
         /// Validates we get native libraries from the assembly
         /// </summary>

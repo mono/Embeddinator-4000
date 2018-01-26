@@ -11,26 +11,28 @@
 [assembly: Android.Runtime.ResourceDesignerAttribute("__embeddinator__.Resource", IsApplication=true)]
 
 namespace @__embeddinator__ {
-    using System;
     using Android.Runtime;
     
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("Xamarin.Android.Build.Tasks", "1.0.0.0")]
     public class Resource {
         
-        private static Int32 ReadFieldInt(IntPtr R, String fieldName) {
-            IntPtr fieldId = JNIEnv.GetStaticFieldID(R, fieldName, "I");
+        private static int ReadFieldInt(System.IntPtr R, string fieldName) {
+            System.IntPtr fieldId;
+            fieldId = JNIEnv.GetStaticFieldID(R, fieldName, "I");
             return JNIEnv.GetStaticIntField(R, fieldId);
         }
         
-        private static Int32[] ReadFieldArray(IntPtr R, String fieldName) {
-            IntPtr fieldId = JNIEnv.GetStaticFieldID(R, fieldName, "[I");
-            IntPtr value = JNIEnv.GetStaticObjectField(R, fieldId);
-            return JNIEnv.GetArray<Int32>(value);
+        private static int[] ReadFieldArray(System.IntPtr R, string fieldName) {
+            System.IntPtr fieldId;
+            System.IntPtr value;
+            fieldId = JNIEnv.GetStaticFieldID(R, fieldName, "[I");
+            value = JNIEnv.GetStaticObjectField(R, fieldId);
+            return JNIEnv.GetArray<int>(value);
         }
         
         public static void UpdateIdValues() {
-            IntPtr R;
+            System.IntPtr R;
             R = JNIEnv.FindClass("com.mono.embeddinator.R$attr");
             managedandroid.Resource.Attribute.hello = ReadFieldInt(R, "hello");
             R = JNIEnv.FindClass("com.mono.embeddinator.R$id");

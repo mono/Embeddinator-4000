@@ -100,6 +100,7 @@
     <EmbeddedResource Include="Samples\Enums.cs" />
     <EmbeddedResource Include="Samples\Interfaces.cs" />
     <EmbeddedResource Include="Samples\Resource.Anim.cs" />
+    <EmbeddedResource Include="Samples\mscorlib.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
