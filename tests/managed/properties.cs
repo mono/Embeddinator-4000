@@ -55,6 +55,16 @@ namespace Properties {
 		public bool IsSecret {
 			get { return secret != 0; }
 		}
+
+		// conflict between property get() and get method
+		public Query Foo => new Query();
+		public Query GetFoo() => Foo;
+		public Query Get_Foo() => Foo;
+		public Query GeT_Foo() => Foo;
+
+		// conflict between property set() and set method
+		public Query Bar { get; set; }
+		public Query SetBar() => Bar;
 	}
 
 	public class DuplicateIndexedProperties {
