@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using CppSharp;
 using CppSharp.AST;
+using CppSharp.AST.Extensions;
 using CppSharp.Generators;
 using CppSharp.Passes;
-using CppSharp.AST.Extensions;
+using Embeddinator.Generators;
 
 namespace Embeddinator.Passes
 {
@@ -44,7 +45,7 @@ namespace Embeddinator.Passes
                         RenameForbidden(method);
 
                     if ((method.Name == "toString" || method.Name == "ToString") &&
-                        (method.Parameters.Count() != 0 ||
+                        (method.Parameters.Any() ||
                         !method.ReturnType.Type.IsPrimitiveType(PrimitiveType.String)))
                        RenameForbidden(method);
                 }
@@ -73,10 +74,14 @@ namespace Embeddinator.Passes
             foreach (var @base in @class.Bases)
                 @base.Class.Visit(this);
 
-            var members = @class.Declarations.Where(d => d is Field || d is Function || d is Property)
-                .ToList();
+            // Rename implicit/explicit operators that lead to code conflicts since Java
+            // does not support method return type overloading.
+            CheckForOperatorConflicts(@class);
 
             processed.Clear();
+
+            var members = @class.Declarations.Where(d => d is Field || d is Function || d is Property)
+                .ToList();
 
             foreach (var member in members)
                 CheckMemberDeclaration(member);
@@ -99,6 +104,27 @@ namespace Embeddinator.Passes
             }
 
             return true;
+        }
+
+        CSharpTypePrinter csharpTypePrinter = new CSharpTypePrinter();
+
+        private void CheckForOperatorConflicts(Class @class)
+        {
+            var operators = @class.Declarations.OfType<Method>().
+                Where(f => f.OperatorKind == CXXOperatorKind.Conversion || 
+                           f.OperatorKind == CXXOperatorKind.ExplicitConversion);
+
+            foreach (var op in operators)
+            {
+                op.Name += $"_{op.ReturnType.Visit(csharpTypePrinter)}";
+                Diagnostics.Debug($"Renamed explicit/implicit operator to {op.QualifiedName}");
+
+                if (Options.GeneratorKind == GeneratorKind.Java && op.IsStatic)
+                {
+                    op.IsStatic = false;
+                    op.Parameters[0].GenerationKind = GenerationKind.None;
+                }
+            }
         }
 
         public void HandleDuplicatesC(List<Declaration> duplicates)

@@ -13,6 +13,7 @@ import managed.abstracts.*;
 import managed.methods.*;
 import managed.structs.*;
 import managed.keywords.*;
+import managed.overloads.*;
 
 import static org.junit.Assert.*;
 import org.junit.*;
@@ -218,6 +219,15 @@ public class Tests {
         dup.doIt(0, 0);
         dup.find("");
         dup.find("", "");
+    }
+
+    @Test
+    public void testOperators() {
+        ConflictingOperatorOverload op = new ConflictingOperatorOverload();
+        assertEquals(0, op.opExplicitByte().intValue());
+        assertEquals(1, op.opExplicitInt32());
+        assertEquals(2, op.opImplicitInt16());
+        assertEquals(3, op.opImplicitInt64());
     }
 
     @Test

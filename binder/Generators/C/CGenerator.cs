@@ -175,7 +175,7 @@ namespace Embeddinator.Generators
 
             Write($"{retType} {GetMethodIdentifier(method)}(");
 
-            Write(CTypePrinter.VisitParameters(method.Parameters));
+            Write(CTypePrinter.VisitParameters(method.Parameters.Where(p => p.IsGenerated)));
 
             Write(")");
         }

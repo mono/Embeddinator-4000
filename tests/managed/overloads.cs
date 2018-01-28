@@ -329,4 +329,11 @@ namespace Overloads {
 			return String.Join (" ", values);
 		}
 	}
+
+	public class ConflictingOperatorOverload {
+		public static explicit operator byte(ConflictingOperatorOverload op) => 0;
+		public static explicit operator int(ConflictingOperatorOverload op) => 1;
+		public static implicit operator short(ConflictingOperatorOverload op) => 2;
+		public static implicit operator long(ConflictingOperatorOverload op) => 3;
+	}
 }
