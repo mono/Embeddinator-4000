@@ -273,10 +273,45 @@ MonoClass* mono_embeddinator_search_class(const char* assembly, const char* _nam
     return klass;
 }
 
+static MonoMethod* mono_method_desc_search_in_class_extra(const char* return_type,
+    MonoMethodDesc *desc, MonoClass *klass)
+{
+    MonoMethod* m;
+    gpointer iter = NULL;
+
+    while ((m = mono_class_get_methods (klass, &iter)))
+        if (mono_method_desc_match (desc, m)) {
+            if (return_type == NULL)
+                return m;
+
+            MonoType* ret = *(MonoType**)mono_method_signature(m);
+            char* name = mono_type_full_name(ret);
+            gboolean matches = strcmp(name, return_type) == 0;
+            g_free(name);
+
+            if (!matches) continue;
+
+            return m;
+        }
+
+    return NULL;
+}
+
 MonoMethod* mono_embeddinator_lookup_method(const char* method_name, MonoClass *klass)
 {
+    return mono_embeddinator_lookup_method_ret(NULL, method_name, klass);
+}
+
+MonoMethod* mono_embeddinator_lookup_method_ret(const char* ret_type_name,
+    const char* method_name, MonoClass *klass)
+{
     MonoMethodDesc* desc = mono_method_desc_new(method_name, /*include_namespace=*/true);
-    MonoMethod* method = mono_method_desc_search_in_class(desc, klass);
+
+    // Previously we used mono_method_desc_search_in_class but since it does not take
+    // return types into account, it leads to wrong results in the case of explicit
+    // operators due to return type overloading.
+
+    MonoMethod* method = mono_method_desc_search_in_class_extra(ret_type_name, desc, klass);
     mono_method_desc_free(desc);
 
     if (!method)
