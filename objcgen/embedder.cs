@@ -168,10 +168,13 @@ namespace Embeddinator
 				directories.Add (Path.Combine (PlatformSdkDirectory, "Facades"));
 				foreach (var asm in Assemblies)
 					directories.Add (Path.GetDirectoryName (asm.Location));
-
+				directories.Add (Path.GetDirectoryName (GetPlatformAssembly ()));
+				
 				AssemblyName an = new AssemblyName (resolve_args.Name);
+				Console.WriteLine($"Assebly name is {an}");
 				foreach (var dir in directories) {
 					var filename = Path.Combine (dir, an.Name + ".dll");
+					Console.WriteLine($"Trying yo find {filename}");
 					if (File.Exists (filename))
 						return universe.LoadFile (filename);
 				}
