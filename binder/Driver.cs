@@ -45,6 +45,7 @@ namespace Embeddinator
             if (!Options.Compilation.Platform.HasValue)
                 Options.Compilation.Platform = Platform.Host;
 
+            CGenerator.Options = options;
             Declaration.QualifiedNameSeparator = "_";
         }
 
@@ -85,9 +86,8 @@ namespace Embeddinator
                 new GenerateObjectTypesPass(),
                 new GenerateArrayTypes(),
                 new CheckIgnoredDeclsPass { CheckDecayedTypes = false },
-                new RenameDuplicatedDeclsPass(),
-                new CheckDuplicatedNamesPass(),
-                new FieldToGetterSetterPropertyPass()
+                new FieldToGetterSetterPropertyPass(),
+                new CheckDeclarations(),
             });
 
             Generator.SetupPasses();

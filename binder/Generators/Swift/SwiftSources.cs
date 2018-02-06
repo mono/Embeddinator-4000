@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using CppSharp;
@@ -172,6 +173,21 @@ namespace Embeddinator.Generators
             Write(" ");
             WriteStartBraceIndent();
 
+            var hasNonInterfaceBase = @class.HasBaseClass && @class.BaseClass.IsGenerated
+                && !@class.BaseClass.IsInterface;
+
+            var objectIdent = SwiftGenerator.GeneratedIdentifier("object");
+
+            if (!@class.IsStatic && !@class.IsInterface && !hasNonInterfaceBase)
+            {
+                TypePrinter.PushContext(TypePrinterContextKind.Native);
+                var typeName = @class.Visit(TypePrinter);
+                TypePrinter.PopContext();
+
+                WriteLine($"public var {objectIdent} : {typeName}");
+                NewLine();
+            }
+
             VisitDeclContext(@class);
             WriteCloseBraceIndent();
             PopBlock(NewLineKind.BeforeNextBlock);
@@ -252,7 +268,7 @@ namespace Embeddinator.Generators
 
         public void GenerateMethodInvocation(Method method)
         {
-            var contexts = new List<MarshalContext>();
+            var marshalers = new List<Marshaler>();
             var @params = new List<string>();
 
             if (!method.IsStatic && !(method.IsConstructor || method.IsDestructor))
@@ -261,21 +277,60 @@ namespace Embeddinator.Generators
             int paramIndex = 0;
             foreach (var param in method.Parameters.Where(m => !m.IsImplicit))
             {
-                var ctx = new MarshalContext(Context)
+                var marshal = new SwiftMarshalManagedToNative(Context)
                 {
                     ArgName = param.Name,
                     Parameter = param,
                     ParameterIndex = paramIndex++
                 };
-                contexts.Add(ctx);
+                marshalers.Add(marshal);
 
-                var marshal = new SwiftMarshalManagedToNative(ctx);
                 param.Visit(marshal);
 
-                if (!string.IsNullOrWhiteSpace(marshal.Context.SupportBefore))
-                    Write(marshal.Context.SupportBefore);
+                if (!string.IsNullOrWhiteSpace(marshal.Before))
+                    Write(marshal.Before);
 
-                @params.Add(marshal.Context.Return);
+                @params.Add(marshal.Return);
+            }
+
+            var hasReturn = !method.ReturnType.Type.IsPrimitiveType(PrimitiveType.Void) &&
+                            !(method.IsConstructor || method.IsDestructor);
+
+            if (hasReturn)
+            {
+                TypePrinter.PushContext(TypePrinterContextKind.Native);
+                var typeName = method.ReturnType.Visit(TypePrinter);
+                TypePrinter.PopContext();
+                Write($"let __ret : {typeName.Type} = ");
+            }
+
+            var effectiveMethod = method.CompleteDeclaration as Method ?? method;
+            var nativeMethodId = JavaNative.GetCMethodIdentifier(effectiveMethod);
+            WriteLine($"{nativeMethodId}({string.Join(", ", @params)})");
+
+            foreach (var marshal in marshalers)
+            {
+                if (!string.IsNullOrWhiteSpace(marshal.After))
+                    Write(marshal.After);
+            }
+
+            if (hasReturn)
+            {
+                var marshal = new SwiftMarshalNativeToManaged(Context)
+                {
+                    ReturnType = method.ReturnType,
+                    ReturnVarName = "__ret"
+                };
+
+                method.ReturnType.Visit(marshal);
+
+                if (marshal.Return.ToString().Length == 0)
+                    throw new NotSupportedException($"Cannot marshal return type {method.ReturnType}");
+
+                if (!string.IsNullOrWhiteSpace(marshal.Before))
+                        Write(marshal.Before);
+
+                WriteLine($"return {marshal.Return}");
             }
         }
 

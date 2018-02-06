@@ -9,6 +9,11 @@ namespace Embeddinator.Passes
     {
         public static string ObjectParameterId => "object";
 
+        public FixMethodParametersPass()
+        {
+            VisitOptions.VisitPropertyAccessors = true;
+        }
+
         void AddObjectParameterToMethod(Method method, Class @class)
         {
             var ptrType = new QualifiedType(
@@ -43,8 +48,7 @@ namespace Embeddinator.Passes
             if (@class == null)
                 return false;
 
-            replacementType = new QualifiedType(
-                new PointerType(new QualifiedType(new TagType(@class))));
+            replacementType = new QualifiedType(new PointerType(type));
 
             return true;
         }
@@ -54,10 +58,7 @@ namespace Embeddinator.Passes
             if (!VisitDeclaration(method))
                 return false;
 
-            var @class = method.Namespace as Class;
-
             QualifiedType replacementType;
-
             if (ShouldReplaceType(method.ReturnType, out replacementType))
                 method.ReturnType = replacementType;
 
@@ -67,29 +68,17 @@ namespace Embeddinator.Passes
                     param.QualifiedType = replacementType;
             }
 
+            var @class = method.Namespace as Class;
             if (@class.IsStatic || method.IsStatic)
                 return false;
 
             if (method.IsConstructor)
                 return false;
 
-            var isStaticField = method.Field != null && method.Field.IsStatic;
+            var field = method.AssociatedDeclaration as Field;
+            var isStaticField = field != null && field.IsStatic;
             if (Options.GeneratorKind == GeneratorKind.C && !isStaticField)
                 AddObjectParameterToMethod(method, @class);
-
-            return true;
-        }
-
-        public override bool VisitProperty(Property property)
-        {
-            if (!VisitDeclaration(property))
-                return false;
-
-            if (property.GetMethod != null)
-                property.GetMethod.Visit(this);
-
-            if (property.SetMethod != null)
-                property.SetMethod.Visit(this);
 
             return true;
         }

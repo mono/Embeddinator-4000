@@ -3,7 +3,7 @@ using CppSharp.AST;
 using CppSharp.Generators;
 using CppSharp.Passes;
 
-namespace Embeddinator
+namespace Embeddinator.Passes
 {
     public class CheckReservedKeywords : TranslationUnitPass
     {

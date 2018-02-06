@@ -29,6 +29,18 @@ namespace Embeddinator.Generators
             return "__" + id.Replace('-', '_');
         }
 
+        public static Options Options;
+
+        public static string QualifiedName(Declaration decl)
+        {
+            if (Options.GeneratorKind == GeneratorKind.CPlusPlus)
+                return decl.Name;
+
+            var isSwiftTarget = Options.GeneratorKinds.Contains(GeneratorKind.Swift);
+
+            return (isSwiftTarget && !decl.IsImplicit) ? $"_{decl.QualifiedName}" : decl.QualifiedName;
+        }
+
         public static string ObjectInstanceId => GenId("object");
 
         public static string AssemblyId(TranslationUnit unit)
@@ -112,19 +124,12 @@ namespace Embeddinator.Generators
             TranslationUnit unit) : base(context, unit)
         {
             Unit = unit;
+            VisitOptions.VisitPropertyAccessors = true;
         }
 
         public override string GeneratedIdentifier(string id)
         {
             return CGenerator.GenId(id);
-        }
-
-        public string QualifiedName(Declaration decl)
-        {
-            if (Options.GeneratorKind == GeneratorKind.CPlusPlus)
-                return decl.Name;
-
-            return decl.QualifiedName;
         }
 
         public CManagedToNativeTypePrinter CTypePrinter =>
@@ -140,10 +145,26 @@ namespace Embeddinator.Generators
                 WriteLine("#include <{0}>", include);
         }
 
+        public static Dictionary<string, string> GeneratedMethodNames =
+            new Dictionary<string, string>();
+
         public static string GetMethodIdentifier(Method method)
         {
+            var methodName = (method.IsConstructor || method.IsDestructor) ?
+                method.Name : method.OriginalName;
+
             var @class = method.Namespace as Class;
-            return $"{@class.QualifiedName}_{method.Name}";
+            var name = $"{@class.QualifiedName}_{methodName}";
+
+            var associated = method.AssociatedDeclaration ?? method;
+
+            if (associated.DefinitionOrder != 0)
+                name += $"_{associated.DefinitionOrder}";
+
+            // Store the name so it can be re-used later by other generators.
+            GeneratedMethodNames[method.ManagedQualifiedName()] = name;
+
+            return name;
         }
 
         public override bool VisitDeclaration(Declaration decl)
@@ -162,9 +183,10 @@ namespace Embeddinator.Generators
             Write(")");
         }
 
-        public virtual string GenerateClassObjectAlloc(string type)
+        public virtual string GenerateClassObjectAlloc(Declaration decl)
         {
-            return $"({type}*) calloc(1, sizeof({type}))";
+            var typeName = decl.Visit(CTypePrinter);
+            return $"({typeName}*) calloc(1, sizeof({typeName}))";
         }
 
         public override bool VisitTypedefDecl(TypedefDecl typedef)
@@ -175,7 +197,7 @@ namespace Embeddinator.Generators
             PushBlock();
 
             var typeName = typedef.Type.Visit(CTypePrinter);
-            WriteLine("typedef {0} {1};", typeName, typedef.Name);
+            WriteLine($"typedef {typeName} {typedef};");
 
             var newlineKind = NewLineKind.BeforeNextBlock;
 

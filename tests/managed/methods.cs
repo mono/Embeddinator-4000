@@ -142,7 +142,20 @@ namespace Methods {
 		public bool Find (string name) { return true; }
 		public bool Find (string firstName, string lastName) { return true; }
 	}
-	
+
+	public class String {
+
+	}
+
+	public class ReservedMethods {
+		public void getClass () { }
+
+		public new Methods.String ToString()
+		{
+			return new Methods.String();
+		}
+	}
+
 	// Three extensions on two different types and a _normal_ static method
 	// objc: categories are per type (2 different here) and one should be a _normal_ method
 	public static class SomeExtensions {
@@ -183,7 +196,7 @@ namespace Methods {
 
 		public static string NotAnExtensionMethod ()
 		{
-			return String.Empty;
+			return string.Empty;
 		}
 	}
 }

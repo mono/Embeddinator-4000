@@ -43,6 +43,17 @@ namespace Embeddinator
             temp = s.Split(separators, StringSplitOptions.RemoveEmptyEntries);
             return String.Join( newVal, temp );
         }
+
+        public static string TrimStart(this string target, string trimString)
+        {
+            string result = target;
+            while (result.StartsWith(trimString, StringComparison.Ordinal))
+            {
+                result = result.Substring(trimString.Length);
+            }
+        
+            return result;
+        }
     }
 
     public static class Helpers

@@ -17,5 +17,5 @@ public interface Native_hello extends com.sun.jna.Library
         mono.embeddinator.Runtime.loadLibrary("hello", Native_hello.class);
 
     public com.sun.jna.Pointer Example_Hello_new();
-    public String Example_Hello_World(com.sun.jna.Pointer object);
+    public java.lang.String Example_Hello_World(com.sun.jna.Pointer object);
 }

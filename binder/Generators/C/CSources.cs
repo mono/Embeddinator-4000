@@ -230,8 +230,8 @@ namespace Embeddinator.Generators
 
             if (method.IsConstructor)
             {
-                var alloc = GenerateClassObjectAlloc(@class.QualifiedName);
-                WriteLine($"{@class.QualifiedName}* {objectId} = {alloc};");
+                var alloc = GenerateClassObjectAlloc(@class);
+                WriteLine($"{@class.Visit(CTypePrinter)}* {objectId} = {alloc};");
 
                 var classId = $"class_{@class.QualifiedName}";
                 WriteLine("MonoObject* {0} = mono_object_new({1}.domain, {2});",
@@ -270,26 +270,25 @@ namespace Embeddinator.Generators
                 WriteLine($"void* {argsId}[{numParamsToMarshal}];");
             }
 
-            var contexts = new List<MarshalContext>();
+            var marshalers = new List<Marshaler>();
 
             int paramIndex = 0;
             foreach (var param in paramsToMarshal)
             {
-                var ctx = new MarshalContext(Context)
+                var marshal = new CMarshalNativeToManaged(Context)
                 {
                     ArgName = param.Name,
                     Parameter = param,
                     ParameterIndex = paramIndex
                 };
-                contexts.Add(ctx);
+                marshalers.Add(marshal);
 
-                var marshal = new CMarshalNativeToManaged(EmbedOptions, ctx);
                 param.Visit(marshal);
 
-                if (!string.IsNullOrWhiteSpace(marshal.Context.SupportBefore))
-                    Write(marshal.Context.SupportBefore);
+                if (!string.IsNullOrWhiteSpace(marshal.Before))
+                    Write(marshal.Before);
 
-                WriteLine($"{argsId}[{paramIndex++}] = {marshal.Context.Return};");
+                WriteLine($"{argsId}[{paramIndex++}] = {marshal.Return};");
                 NeedNewLine();
             }
 
@@ -338,12 +337,12 @@ namespace Embeddinator.Generators
 
             NeedNewLine();
 
-            foreach (var marshalContext in contexts)
+            foreach (var marshal in marshalers)
             {
-                if (!string.IsNullOrWhiteSpace(marshalContext.SupportAfter))
+                if (!string.IsNullOrWhiteSpace(marshal.After))
                 {
                     NewLineIfNeeded();
-                    Write(marshalContext.SupportAfter);
+                    Write(marshal.After);
                 }
             }
         }
@@ -373,22 +372,22 @@ namespace Embeddinator.Generators
             if (!method.IsConstructor && needsReturn)
             {
                 var resultId = GeneratedIdentifier("result");
-                var ctx = new MarshalContext(Context)
+
+                var marshal = new CMarshalManagedToNative(Context)
                 {
                     ArgName = resultId,
                     ReturnVarName = resultId,
                     ReturnType = retType
                 };
 
-                var marshal = new CMarshalManagedToNative(EmbedOptions, ctx);
                 retType.Visit(marshal);
 
                 NewLineIfNeeded();
 
-                if (!string.IsNullOrWhiteSpace(marshal.Context.SupportBefore))
-                    Write(marshal.Context.SupportBefore);
+                if (!string.IsNullOrWhiteSpace(marshal.Before))
+                    Write(marshal.Before);
 
-                returnCode = marshal.Context.Return.ToString();
+                returnCode = marshal.Return.ToString();
             }
             else
             {
@@ -434,7 +433,15 @@ namespace Embeddinator.Generators
                 return false;
 
             if (property.Field == null)
-                return false;
+            {
+                if (property.GetMethod != null)
+                    property.GetMethod.Visit(this);
+
+                if (property.SetMethod != null)
+                    property.SetMethod.Visit(this);
+
+                return true;
+            }
 
             GenerateFieldGetter(property);
             NewLine();
@@ -471,20 +478,19 @@ namespace Embeddinator.Generators
 
             WriteLine($"MonoObject* {resultId} = mono_field_get_value_object({domainId}, {fieldId}, {instanceId});");
 
-            var ctx = new MarshalContext(Context)
+            var marshal = new CMarshalManagedToNative(Context)
             {
                 ArgName = resultId,
                 ReturnVarName = resultId,
                 ReturnType = property.QualifiedType
             };
 
-            var marshal = new CMarshalManagedToNative(EmbedOptions, ctx);
             property.QualifiedType.Visit(marshal);
 
-            if (!string.IsNullOrWhiteSpace(marshal.Context.SupportBefore))
-                Write(marshal.Context.SupportBefore);
+            if (!string.IsNullOrWhiteSpace(marshal.Before))
+                Write(marshal.Before);
 
-            WriteLine($"return {marshal.Context.Return.ToString()};");
+            WriteLine($"return {marshal.Return.ToString()};");
 
             WriteCloseBraceIndent();
         }
@@ -503,15 +509,18 @@ namespace Embeddinator.Generators
 
             GenerateFieldLookup(field);
 
-            var ctx = new MarshalContext(Context) { ArgName = "value" };
-            var marshal = new CMarshalNativeToManaged(EmbedOptions, ctx);
+            var marshal = new CMarshalNativeToManaged(Context)
+            {
+                ArgName = "value"
+            };
+
             property.QualifiedType.Visit(marshal);
 
-            if (!string.IsNullOrWhiteSpace(marshal.Context.SupportBefore))
-                Write(marshal.Context.SupportBefore);
+            if (!string.IsNullOrWhiteSpace(marshal.Before))
+                Write(marshal.Before);
 
             var valueId = GeneratedIdentifier("value");
-            WriteLine($"void* {valueId} = {marshal.Context.Return.ToString()};");
+            WriteLine($"void* {valueId} = {marshal.Return.ToString()};");
 
             if (field.IsStatic)
             {

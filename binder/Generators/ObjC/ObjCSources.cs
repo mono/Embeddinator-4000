@@ -23,9 +23,9 @@ namespace Embeddinator.Generators
             this.GenerateObjCMethodSignature(method);
         }
 
-        public override string GenerateClassObjectAlloc(string type)
+        public override string GenerateClassObjectAlloc(Declaration decl)
         {
-            return $"[[{type} alloc]init]";
+            return $"[[{decl.Visit(CTypePrinter)} alloc]init]";
         }
 
         public override bool VisitClassDecl(Class @class)

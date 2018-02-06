@@ -94,7 +94,7 @@ function SetupTestProjectC(name, depends)
     end
 
     filter { "not system:windows" }
-      buildoptions { "-std=gnu99" }
+      buildoptions { "-std=gnu99", "-Wno-typedef-redefinition" }
 
     filter { "action:vs*" }
       buildoptions { "/wd4018" } -- eglib signed/unsigned warnings

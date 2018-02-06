@@ -1,9 +1,7 @@
-﻿﻿﻿﻿﻿﻿﻿using CppSharp;
+﻿using System.Linq;
+using CppSharp;
 using CppSharp.AST;
 using CppSharp.Generators;
-using CppSharp.Generators.AST;
-using System;
-using System.Linq;
 using Embeddinator.Passes;
 
 namespace Embeddinator.Generators
@@ -102,14 +100,13 @@ namespace Embeddinator.Generators
             PushBlock();
 
             var enumName = Options.GeneratorKind != GeneratorKind.CPlusPlus ?
-                @enum.QualifiedName : @enum.Name;
+                CGenerator.QualifiedName(@enum) : @enum.Name;
             
             Write($"typedef enum {enumName}");
 
             if (Options.GeneratorKind == GeneratorKind.CPlusPlus)
             {
-                var typePrinter = CTypePrinter;
-                var typeName = typePrinter.VisitPrimitiveType(
+                var typeName = CTypePrinter.VisitPrimitiveType(
                     @enum.BuiltinType.Type, new TypeQualifiers());
 
                 if (@enum.BuiltinType.Type != PrimitiveType.Int)
@@ -168,23 +165,6 @@ namespace Embeddinator.Generators
             WriteLine(";");
 
             PopBlock();
-
-            return true;
-        }
-
-        public override bool VisitProperty(Property property)
-        {
-            if (!VisitDeclaration(@property))
-                return false;
-
-            if (property.Field == null)
-                return false;
-
-            var getter = property.GetMethod;
-            VisitMethodDecl(getter);
-
-            var setter = property.SetMethod;
-            VisitMethodDecl(setter);
 
             return true;
         }

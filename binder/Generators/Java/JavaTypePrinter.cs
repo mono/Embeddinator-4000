@@ -1,4 +1,5 @@
 ﻿using CppSharp.AST;
+using CppSharp.AST.Extensions;
 using CppSharp.Generators;
 using System;
 using System.Collections.Generic;
@@ -114,7 +115,17 @@ namespace Embeddinator.Generators
         public override TypePrinterResult VisitPointerType(PointerType pointer,
             TypeQualifiers quals)
         {
-            var pointee = pointer.Pointee;
+            // Any of the following types may be a pointer type:
+            //   * sbyte, byte, short, ushort, int, uint, long, ulong, char, float, double, decimal, or bool.
+            //   * Any enum type.
+            //   * Any pointer type.
+            //   * Any user-defined struct type that contains fields of unmanaged types only.
+
+            // The class check is because of extra pointers in the AST added by FixMethodParametersPass.
+            var pointee = pointer.QualifiedPointee;
+            if (!IsByRefParameter && !pointee.Type.IsClass())
+                return JavaGenerator.IntPtrType;
+
             return pointer.QualifiedPointee.Visit(this);
         }
 
@@ -152,17 +163,13 @@ namespace Embeddinator.Generators
                 case PrimitiveType.ULong: return "UnsignedLong";
                 case PrimitiveType.LongLong: return "LongLong";
                 case PrimitiveType.ULongLong: return "UnsignedLongLong";
-                case PrimitiveType.Int128: return "__int128";
-                case PrimitiveType.UInt128: return "__uint128_t";
-                case PrimitiveType.Half: return "__fp16";
                 case PrimitiveType.Float: return useReferencePrimitiveTypes ? "Float" : "float";
                 case PrimitiveType.Double: return useReferencePrimitiveTypes ? "Double" : "double";
                 case PrimitiveType.IntPtr:
                 case PrimitiveType.UIntPtr:
                 case PrimitiveType.Null: return JavaGenerator.IntPtrType;
-                case PrimitiveType.String: return "String";
+                case PrimitiveType.String: return "java.lang.String";
                 case PrimitiveType.Decimal: return "java.math.BigDecimal";
-
             }
 
             throw new NotSupportedException();

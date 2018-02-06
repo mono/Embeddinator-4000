@@ -100,7 +100,7 @@ namespace Embeddinator.Passes
         {
             var typedef = new TypedefDecl
             {
-                Name = @class.QualifiedName,
+                Name = CGenerator.QualifiedName(@class),
                 Namespace = TranslationUnit,
                 QualifiedType = new QualifiedType(new TagType(MonoEmbedObject))
             };

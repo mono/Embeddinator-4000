@@ -1,4 +1,5 @@
-﻿﻿﻿﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -24,6 +25,7 @@ namespace Embeddinator.Generators
             : base(context, new List<TranslationUnit> { unit })
         {
             TypePrinter = new JavaTypePrinter(context);
+            VisitOptions.VisitPropertyAccessors = true;
         }
 
         public Declaration Declaration;
@@ -189,6 +191,10 @@ namespace Embeddinator.Generators
             {
                 var value = @enum.GetItemValueAsString(item);
 
+                // We need to explicit check for long int literals.
+                if (item.Value > Int32.MaxValue)
+                    value += "L";
+
                 if (@enum.BuiltinType.IsUnsigned)
                     Write($"(new {typeName}({value}));");
                 else
@@ -276,6 +282,26 @@ namespace Embeddinator.Generators
             return true;
         }
 
+        public static string GetMethodIdentifier(Method method)
+        {
+            var name = method.Name;
+
+            if (method.AssociatedDeclaration is Property)
+            {
+                // Property names shoud follow get/set Java convention.
+                if (name.StartsWith("get_", StringComparison.Ordinal))
+                    name = $"get{name.TrimStart("get_")}";
+                else if (name.StartsWith("set_", StringComparison.Ordinal))
+                    name = $"set{name.TrimStart("set_")}";
+            }
+
+            var associated = method.GetRootAssociatedDecl();
+            if (associated.DefinitionOrder != 0)
+                name += $"_{associated.DefinitionOrder}";
+
+            return name;
+        }
+
         public override void GenerateMethodSpecifier(Method method, Class @class)
         {
             var keywords = new List<string>();
@@ -304,7 +330,7 @@ namespace Embeddinator.Generators
             if (method.IsConstructor || method.IsDestructor)
                 Write("{0}(", @class.Name);
             else
-                Write("{0} {1}(", method.ReturnType, method.Name);
+                Write("{0} {1}(", method.ReturnType, GetMethodIdentifier(method));
 
             var @params = method.Parameters.Where(m => !m.IsImplicit);
             Write("{0}", TypePrinter.VisitParameters(@params, hasNames: true));
@@ -349,7 +375,7 @@ namespace Embeddinator.Generators
 
         public void GenerateMethodInvocation(Method method)
         {
-            var contexts = new List<MarshalContext>();
+            var marshalers = new List<Marshaler>();
             var @params = new List<string>();
 
             if (!method.IsStatic && !(method.IsConstructor || method.IsDestructor))
@@ -358,21 +384,20 @@ namespace Embeddinator.Generators
             int paramIndex = 0;
             foreach (var param in method.Parameters.Where(m => !m.IsImplicit))
             {
-                var ctx = new MarshalContext(Context)
+                var marshal = new JavaMarshalManagedToNative(Context)
                 {
                     ArgName = param.Name,
                     Parameter = param,
                     ParameterIndex = paramIndex++
                 };
-                contexts.Add(ctx);
+                marshalers.Add(marshal);
 
-                var marshal = new JavaMarshalManagedToNative(ctx);
                 param.Visit(marshal);
 
-                if (!string.IsNullOrWhiteSpace(marshal.Context.SupportBefore))
-                        Write(marshal.Context.SupportBefore);
+                if (!string.IsNullOrWhiteSpace(marshal.Before))
+                        Write(marshal.Before);
 
-                @params.Add(marshal.Context.Return);
+                @params.Add(marshal.Return);
             }
 
             PrimitiveType primitive;
@@ -402,54 +427,34 @@ namespace Embeddinator.Generators
 
             WriteLine("mono.embeddinator.Runtime.checkExceptions();");
 
-            foreach (var marshal in contexts)
+            foreach (var marshal in marshalers)
             {
-                if (!string.IsNullOrWhiteSpace(marshal.SupportAfter))
-                    Write(marshal.SupportAfter);
+                if (!string.IsNullOrWhiteSpace(marshal.After))
+                    Write(marshal.After);
             }
 
             if (hasReturn)
             {
-                var ctx = new MarshalContext(Context)
+                var marshal = new JavaMarshalNativeToManaged(Context)
                 {
                     ReturnType = method.ReturnType,
                     ReturnVarName = "__ret"
                 };
 
-                var marshal = new JavaMarshalNativeToManaged(ctx);
                 method.ReturnType.Visit(marshal);
 
-                if (marshal.Context.Return.ToString().Length == 0)
+                if (marshal.Return.ToString().Length == 0)
                     throw new System.Exception();
 
-                if (!string.IsNullOrWhiteSpace(marshal.Context.SupportBefore))
-                        Write(marshal.Context.SupportBefore);
+                if (!string.IsNullOrWhiteSpace(marshal.Before))
+                        Write(marshal.Before);
 
-                WriteLine($"return {marshal.Context.Return};");
+                WriteLine($"return {marshal.Return};");
             }
         }
 
         public override bool VisitTypedefDecl(TypedefDecl typedef)
         {
-            return true;
-        }
-
-        public override bool VisitProperty(Property property)
-        {
-            if (!VisitDeclaration(property))
-                return false;
-
-            if (property.Field == null)
-                return false;
-
-            var getter = property.GetMethod;
-            if (getter != null)
-                VisitMethodDecl(getter);
-
-            var setter = property.SetMethod;
-            if (setter != null)
-                VisitMethodDecl(setter);
-
             return true;
         }
 

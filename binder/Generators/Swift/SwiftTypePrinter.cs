@@ -29,7 +29,7 @@ namespace Embeddinator.Generators
         public override TypePrinterResult VisitClassDecl(Class @class)
         {
             if (ContextKind == TypePrinterContextKind.Native)
-                return VisitPrimitiveType(PrimitiveType.IntPtr);
+                return $"UnsafeMutablePointer<{CGenerator.QualifiedName(@class)}>!";
 
             return VisitDeclaration(@class);
         }
@@ -37,11 +37,13 @@ namespace Embeddinator.Generators
         public override TypePrinterResult VisitParameter(Parameter param, bool hasName)
         {
             Parameter = param;
-            var type = param.QualifiedType.Visit(this);
+
             var name = hasName ? $"{param.Name}" : string.Empty;
+            var inout = IsByRefParameter ? "inout " : string.Empty;
+            var type = param.QualifiedType.Visit(this);
+
             Parameter = null;
 
-            var inout = IsByRefParameter ? "inout " : string.Empty;
             return $"{name} : {inout}{type}";
         }
 
@@ -57,6 +59,9 @@ namespace Embeddinator.Generators
         {
             var isNative = ContextKind == TypePrinterContextKind.Native;
 
+            if (isNative && IsByRefParameter && primitive == PrimitiveType.String)
+                return "GString";
+
             switch (primitive)
             {
                 case PrimitiveType.Bool: return isNative ? "CBool" : "Bool";
@@ -64,27 +69,24 @@ namespace Embeddinator.Generators
                 case PrimitiveType.Char16: return "CChar16";
                 case PrimitiveType.Char32: return "CChar32";
                 case PrimitiveType.WideChar: return "CWideChar";
-                case PrimitiveType.Char: return "Character";
+                case PrimitiveType.Char: return isNative ? "gunichar2" : "Character";
                 case PrimitiveType.SChar: return isNative ? "CChar" : "Int8";
                 case PrimitiveType.UChar: return isNative ? "CUnsignedChar" : "UInt8";
                 case PrimitiveType.Short: return isNative ? "CShort" : "Int16";
                 case PrimitiveType.UShort: return isNative ? "CUnsignedShort" : "UInt16";
                 case PrimitiveType.Int: return isNative ? "CInt" : "Int32";
                 case PrimitiveType.UInt: return isNative ? "CUnsignedInt" : "UInt32";
-                case PrimitiveType.Long: return isNative ? "CLong" : "Int64";
-                case PrimitiveType.ULong: return isNative ? "CUnsignedLong" : "UInt64";
+                case PrimitiveType.Long: return isNative ? "CLongLong" : "Int64";
+                case PrimitiveType.ULong: return isNative ? "CUnsignedLongLong" : "UInt64";
                 case PrimitiveType.LongLong: return isNative ? "CLongLong" : "LongLong";
                 case PrimitiveType.ULongLong: return isNative ? "CUnsignedLongLong" : "UnsignedLongLong";
-                case PrimitiveType.Int128: return "__int128";
-                case PrimitiveType.UInt128: return "__uint128_t";
-                case PrimitiveType.Half: return "__fp16";
                 case PrimitiveType.Float: return isNative ? "CFloat" : "Float";
                 case PrimitiveType.Double: return isNative ? "CDouble" : "Double";
                 case PrimitiveType.IntPtr:
                 case PrimitiveType.UIntPtr:
                 case PrimitiveType.Null: return SwiftGenerator.IntPtrType;
-                case PrimitiveType.String: return "String";
-                case PrimitiveType.Decimal: return "Decimal";
+                case PrimitiveType.String: return isNative ? "UnsafePointer<CChar>" : "String";
+                case PrimitiveType.Decimal: return isNative ? "MonoDecimal" : "Decimal";
             }
 
             throw new NotSupportedException();

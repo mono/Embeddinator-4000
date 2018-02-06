@@ -26,6 +26,7 @@ namespace Embeddinator.Passes
         {
             Arrays = new Dictionary<string, QualifiedType>();
             Declarations = new List<TypedefDecl>();
+            VisitOptions.VisitPropertyAccessors = true;
         }
 
         public override bool VisitTranslationUnit(TranslationUnit unit)
@@ -53,7 +54,7 @@ namespace Embeddinator.Passes
 
             var typedef = new TypedefDecl
             {
-                Name = string.Format("_{0}", typeName),
+                Name = $"_{typeName}",
                 Namespace = @namespace,
                 QualifiedType = new QualifiedType(new TagType(MonoEmbedArray))
             };
@@ -101,6 +102,9 @@ namespace Embeddinator.Passes
 
         public override bool VisitFunctionDecl(Function function)
         {
+            if (function.Ignore)
+                return false;
+
             if (function.TranslationUnit != TranslationUnit)
                 return false;
 

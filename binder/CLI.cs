@@ -178,10 +178,13 @@ namespace Embeddinator
             }
 
             //NOTE: Choosing Java generator, needs to imply the C generator
-            if (Generators.Contains(GeneratorKind.Java) && !Generators.Contains(GeneratorKind.C))
+            if ((Generators.Contains(GeneratorKind.Java) || Generators.Contains(GeneratorKind.Swift)) &&
+                !Generators.Contains(GeneratorKind.C))
             {
                 Generators.Insert(0, GeneratorKind.C);
             }
+
+            options.GeneratorKinds = Generators;
 
             var targetPlatform = ConvertToTargetPlatform(Platform);
             options.Compilation.Platform = targetPlatform;

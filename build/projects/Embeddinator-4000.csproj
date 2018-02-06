@@ -123,6 +123,9 @@
     <Compile Include="../../binder/Generators/Swift/SwiftGenerator.cs">
       <Link>binder/Generators/Swift/SwiftGenerator.cs</Link>
     </Compile>
+    <Compile Include="../../binder/Generators/Swift/SwiftMarshal.cs">
+      <Link>binder/Generators/Swift/SwiftMarshal.cs</Link>
+    </Compile>
     <Compile Include="../../binder/Generators/Swift/SwiftSources.cs">
       <Link>binder/Generators/Swift/SwiftSources.cs</Link>
     </Compile>
@@ -137,6 +140,9 @@
     </Compile>
     <Compile Include="../../binder/Parser.cs">
       <Link>binder/Parser.cs</Link>
+    </Compile>
+    <Compile Include="..\..\binder\Passes\CheckDeclarationsPass.cs">
+      <Link>binder\Passes\CheckDeclarationsPass.cs</Link>
     </Compile>
     <Compile Include="../../binder/Passes/CheckReservedKeywordsPass.cs">
       <Link>binder/Passes/CheckReservedKeywordsPass.cs</Link>
@@ -155,12 +161,6 @@
     </Compile>
     <Compile Include="../../binder/Passes/InterfacesPass.cs">
       <Link>binder/Passes/InterfacesPass.cs</Link>
-    </Compile>
-    <Compile Include="../../binder/Passes/PropertyToGetterSetter.cs">
-      <Link>binder/Passes/PropertyToGetterSetter.cs</Link>
-    </Compile>
-    <Compile Include="../../binder/Passes/RenameDuplicatedDecls.cs">
-      <Link>binder/Passes/RenameDuplicatedDecls.cs</Link>
     </Compile>
     <Compile Include="../../binder/Project.cs">
       <Link>binder/Project.cs</Link>
@@ -193,12 +193,6 @@
       <Link>binder/Utils/XamarinAndroidBuild.cs</Link>
     </Compile>
     <None Include="packages.config" />
-    <Compile Include="..\..\binder\Generators\Swift\SwiftMarshal.cs">
-      <Link>binder\Generators\Swift\SwiftMarshal.cs</Link>
-    </Compile>
-    <Compile Include="..\..\binder\Generators\Swift\SwiftNative.cs">
-      <Link>binder\Generators\Swift\SwiftNative.cs</Link>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="IKVM.Reflection.csproj">

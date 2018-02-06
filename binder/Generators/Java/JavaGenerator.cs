@@ -86,7 +86,6 @@ namespace Embeddinator.Generators
 
         public override bool SetupPasses()
         {
-            Context.TranslationUnitPasses.AddPass(new PropertyToGetterSetterPass());
             Context.TranslationUnitPasses.RenameDeclsLowerCase(
                 RenameTargets.Function | RenameTargets.Method | RenameTargets.Property);
             Context.TranslationUnitPasses.AddPass(new InterfacesPass());

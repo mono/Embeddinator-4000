@@ -18,13 +18,13 @@ The work on the C and Java generators occurs in the [`master`](https://github.co
 
 Then, if you prefer the command line, you can either:
 
-`> msbuild build/Embeddinator-4000.sln`
+`> msbuild Embeddinator-4000.sln`
 
 or run the provided compilation shell script:
 
-`> build/Compile.sh`
+`> build.sh`
 
-If you're more GUI oriented, you can open the solution file at `build/Embeddinator-4000.sln` and hit F5 to build it.
+If you're more GUI oriented, you can open the solution file at `Embeddinator-4000.sln` and hit F5 to build it.
 
 Once complete you should be able to run the tool with
 

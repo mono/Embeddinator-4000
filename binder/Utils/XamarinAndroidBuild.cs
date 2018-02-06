@@ -18,7 +18,8 @@ namespace Embeddinator
         public const string IntermediateDir = "obj";
         public const string ResourcePaths = "resourcepaths.cache";
 
-        const string LibraryProjectDir = "library_project_imports";
+        const string LibraryProjectDir = "lp";
+        const string ImportsDirectory = "jl";
         const string LinkMode = "SdkOnly";
 
         static ProjectRootElement CreateProject()
@@ -102,6 +103,7 @@ namespace Embeddinator
 
             //Aapt Task to generate R.txt
             var aapt = target.AddTask("Aapt");
+            aapt.Condition = $"Exists('{resourceDir}')";
             aapt.SetParameter("ImportsDirectory", outputDirectory);
             aapt.SetParameter("OutputImportDirectory", outputDirectory);
             aapt.SetParameter("ManifestFiles", manifestPath);
@@ -196,10 +198,12 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
             //ResolveLibraryProjectImports Task, extracts Android resources
             var resolveLibraryProject = target.AddTask("ResolveLibraryProjectImports");
             resolveLibraryProject.SetParameter("Assemblies", "@(ResolvedUserAssemblies)");
+            resolveLibraryProject.SetParameter("AssemblyIdentityMapFile", Path.Combine(intermediateDir, LibraryProjectDir, "map.cache"));
+            resolveLibraryProject.SetParameter("CacheFile", Path.Combine(intermediateDir, "libraryprojectimports.cache"));
             resolveLibraryProject.SetParameter("UseShortFileNames", "False");
-            resolveLibraryProject.SetParameter("ImportsDirectory", intermediateDir);
+            resolveLibraryProject.SetParameter("ImportsDirectory", ImportsDirectory);
             resolveLibraryProject.SetParameter("OutputDirectory", intermediateDir);
-            resolveLibraryProject.SetParameter("OutputImportDirectory", intermediateDir);
+            resolveLibraryProject.SetParameter("OutputImportDirectory", Path.Combine(intermediateDir, LibraryProjectDir));
             resolveLibraryProject.AddOutputItem("ResolvedAssetDirectories", "ResolvedAssetDirectories");
             resolveLibraryProject.AddOutputItem("ResolvedResourceDirectories", "ResolvedResourceDirectories");
 
@@ -209,15 +213,16 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
             getAdditionalResources.SetParameter("AndroidNdkDirectory", XamarinAndroid.AndroidSdk.AndroidNdkPath);
             getAdditionalResources.SetParameter("Assemblies", "@(ResolvedUserAssemblies)");
             getAdditionalResources.SetParameter("CacheFile", Path.Combine(intermediateDir, ResourcePaths));
+            getAdditionalResources.SetParameter("DesignTimeBuild", "False");
 
             //Create ItemGroup of Android files
             var androidResources = target.AddItemGroup();
             foreach (var assembly in assemblies)
             {
                 var assemblyName = assembly.GetName().Name;
-                androidResources.AddItem("AndroidAsset", Path.Combine(intermediateDir, assemblyName, LibraryProjectDir, "assets", "**", "*"));
-                androidResources.AddItem("AndroidJavaSource", Path.Combine(intermediateDir, assemblyName, LibraryProjectDir, "java", "**", "*.java"));
-                androidResources.AddItem("AndroidResource", Path.Combine(intermediateDir, assemblyName, LibraryProjectDir, "res", "**", "*"));
+                androidResources.AddItem("AndroidAsset", Path.Combine(intermediateDir, LibraryProjectDir, assemblyName, ImportsDirectory, "assets", "**", "*"));
+                androidResources.AddItem("AndroidJavaSource", Path.Combine(intermediateDir, LibraryProjectDir, assemblyName, ImportsDirectory, "java", "**", "*.java"));
+                androidResources.AddItem("AndroidResource", Path.Combine(intermediateDir, LibraryProjectDir, assemblyName, ImportsDirectory, "res", "**", "*"));
             }
 
             //Copy Task, to copy AndroidAsset files

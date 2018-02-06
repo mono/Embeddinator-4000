@@ -66,6 +66,7 @@ namespace Embeddinator.ObjC {
 
 			var os = new OptionSet {
 				{ "c|compile", "Compiles the generated output", v => embedder.CompileCode = true },
+				{ "e|extension", "Compiles the generated output as extension safe api", v => embedder.Extension = true },
 				{ "d|debug", "Build the native library with debug information.", v => embedder.Debug = true },
 				{ "gen=", $"Target generator (default {embedder.TargetLanguage})", v => embedder.SetTarget (v) },
 				{ "abi=", "A comma-separated list of ABIs to compile. If not specified, all ABIs applicable to the selected platform will be built. Valid values (also depends on platform): i386, x86_64, armv7, armv7s, armv7k, arm64.", (v) =>
@@ -166,6 +167,8 @@ namespace Embeddinator.ObjC {
 		}
 
 		public bool CompileCode { get; set; }
+
+		public bool Extension { get; set; }
 
 		public bool Debug { get; set; }
 
@@ -409,7 +412,7 @@ namespace Embeddinator.ObjC {
 				break;
 			case Platform.iOS:
 				build_infos = new BuildInfo [] {
-					new BuildInfo { Sdk = "iPhoneOS", Architectures = new string [] { "armv7", "armv7s", "arm64" }, SdkName = "iphoneos", MinVersion = "8.0", XamariniOSSDK = "MonoTouch.iphoneos.sdk" },
+					new BuildInfo { Sdk = "iPhoneOS", Architectures = new string [] { "armv7", "armv7s", "arm64" }, SdkName = "iphoneos", MinVersion = "8.0", XamariniOSSDK = "MonoTouch.iphoneos.sdk", CompilerFlags = "-fembed-bitcode", LinkerFlags = "-fembed-bitcode" },
 					new BuildInfo { Sdk = "iPhoneSimulator", Architectures = new string [] { "i386", "x86_64" }, SdkName = "ios-simulator", MinVersion = "8.0", XamariniOSSDK = "MonoTouch.iphonesimulator.sdk" },
 				};
 				break;
@@ -507,6 +510,11 @@ namespace Embeddinator.ObjC {
 							common_options.Append ("-DTOKENLOOKUP ");
 						}
 					}
+
+					if (Extension) {
+						common_options.Append("-fapplication-extension ");
+					}
+
 					common_options.Append ("-fobjc-arc ");
 					common_options.Append ("-ObjC ");
 					common_options.Append ("-Wall ");
@@ -746,7 +754,8 @@ namespace Embeddinator.ObjC {
 							mmp.Append ("--debug ");
 						mmp.Append ("-p "); // generate a plist
 						mmp.Append ($"--target-framework {GetTargetFramework ()} ");
-						mmp.Append ($"\"--link_flags=-force_load {Path.GetFullPath (sdk_output_file)}\" ");
+						string extensionFlag = Extension ? "-fapplication-extension" : "";
+						mmp.Append ($"\"--link_flags={extensionFlag} -force_load {Path.GetFullPath (sdk_output_file)}\" ");
 						if (!RunProcess ("/Library/Frameworks/Xamarin.Mac.framework/Versions/Current/bin/mmp", mmp.ToString (), out exitCode))
 							return exitCode;
 

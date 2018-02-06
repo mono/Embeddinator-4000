@@ -22,6 +22,7 @@ namespace Embeddinator
         readonly CodeCompileUnit unit = new CodeCompileUnit();
         readonly CSharpCodeProvider csc = new CSharpCodeProvider();
         readonly CodeGeneratorOptions options = new CodeGeneratorOptions();
+        readonly List<IKVM.Reflection.Assembly> usedAssemblies = new List<IKVM.Reflection.Assembly>();
 
         public IList<IKVM.Reflection.Assembly> Assemblies { get; set; }
 
@@ -77,7 +78,6 @@ namespace Embeddinator
                 new CodeAttributeArgument("IsApplication", new CodeSnippetExpression("true"))));
 
             var ns = new CodeNamespace("__embeddinator__");
-            ns.Imports.Add(new CodeNamespaceImport("System"));
             ns.Imports.Add(new CodeNamespaceImport("Android.Runtime"));
             unit.Namespaces.Add(ns);
 
@@ -91,18 +91,21 @@ namespace Embeddinator
                 new CodeAttributeArgument(new CodeSnippetExpression("\"Xamarin.Android.Build.Tasks\"")),
                 new CodeAttributeArgument(new CodeSnippetExpression("\"1.0.0.0\""))));
 
+            var intPtr = new CodeTypeReference(typeof(IntPtr));
+
             var readFieldInt = new CodeMemberMethod
             {
                 Name = "ReadFieldInt",
                 Attributes = MemberAttributes.Private | MemberAttributes.Static,
-                ReturnType = new CodeTypeReference("Int32"),
+                ReturnType = new CodeTypeReference(typeof(int)),
             };
-            readFieldInt.Parameters.Add(new CodeParameterDeclarationExpression("IntPtr", "R"));
-            readFieldInt.Parameters.Add(new CodeParameterDeclarationExpression("String", "fieldName"));
+            readFieldInt.Parameters.Add(new CodeParameterDeclarationExpression(intPtr, "R"));
+            readFieldInt.Parameters.Add(new CodeParameterDeclarationExpression(typeof(string), "fieldName"));
             resource.Members.Add(readFieldInt);
 
+            readFieldInt.Statements.Add(new CodeVariableDeclarationStatement(intPtr, "fieldId"));
             readFieldInt.Statements.Add(new CodeAssignStatement(
-                new CodeSnippetExpression("IntPtr fieldId"),
+                new CodeVariableReferenceExpression("fieldId"),
                 new CodeSnippetExpression("JNIEnv.GetStaticFieldID(R, fieldName, \"I\")")));
             readFieldInt.Statements.Add(new CodeMethodReturnStatement(new CodeSnippetExpression("JNIEnv.GetStaticIntField(R, fieldId)")));
 
@@ -110,19 +113,21 @@ namespace Embeddinator
             {
                 Name = "ReadFieldArray",
                 Attributes = MemberAttributes.Private | MemberAttributes.Static,
-                ReturnType = new CodeTypeReference("Int32[]"),
+                ReturnType = new CodeTypeReference(typeof(int[])),
             };
-            readFieldArray.Parameters.Add(new CodeParameterDeclarationExpression("IntPtr", "R"));
-            readFieldArray.Parameters.Add(new CodeParameterDeclarationExpression("String", "fieldName"));
+            readFieldArray.Parameters.Add(new CodeParameterDeclarationExpression(intPtr, "R"));
+            readFieldArray.Parameters.Add(new CodeParameterDeclarationExpression(typeof(string), "fieldName"));
             resource.Members.Add(readFieldArray);
 
+            readFieldArray.Statements.Add(new CodeVariableDeclarationStatement(intPtr, "fieldId"));
+            readFieldArray.Statements.Add(new CodeVariableDeclarationStatement(intPtr, "value"));
             readFieldArray.Statements.Add(new CodeAssignStatement(
-                new CodeSnippetExpression("IntPtr fieldId"),
+                new CodeVariableReferenceExpression("fieldId"),
                 new CodeSnippetExpression("JNIEnv.GetStaticFieldID(R, fieldName, \"[I\")")));
             readFieldArray.Statements.Add(new CodeAssignStatement(
-                new CodeSnippetExpression("IntPtr value"),
+                new CodeVariableReferenceExpression("value"),
                 new CodeSnippetExpression("JNIEnv.GetStaticObjectField(R, fieldId)")));
-            readFieldArray.Statements.Add(new CodeMethodReturnStatement(new CodeSnippetExpression("JNIEnv.GetArray<Int32>(value)")));
+            readFieldArray.Statements.Add(new CodeMethodReturnStatement(new CodeSnippetExpression("JNIEnv.GetArray<int>(value)")));
 
             var updateIdValues = new CodeMemberMethod
             {
@@ -131,7 +136,7 @@ namespace Embeddinator
             };
             resource.Members.Add(updateIdValues);
 
-            updateIdValues.Statements.Add(new CodeVariableDeclarationStatement("IntPtr", "R"));
+            updateIdValues.Statements.Add(new CodeVariableDeclarationStatement(intPtr, "R"));
 
             foreach (var assembly in Assemblies)
             {
@@ -208,6 +213,8 @@ namespace Embeddinator
                                         throw new Exception($"Type {field.FieldType.FullName} from member {nested.FullName}.{field.Name} not supported for Resource fields!");
                                     }
                                     updateIdValues.Statements.Add(new CodeAssignStatement(left, right));
+                                    if (!usedAssemblies.Contains(assembly))
+                                        usedAssemblies.Add(assembly);
                                 }
                             }
                         }
@@ -229,7 +236,7 @@ namespace Embeddinator
             parameters.ReferencedAssemblies.Add(XamarinAndroid.FindAssembly("System.Runtime.dll"));
             parameters.ReferencedAssemblies.Add(XamarinAndroid.FindAssembly("Java.Interop.dll"));
             parameters.ReferencedAssemblies.Add(XamarinAndroid.FindAssembly("Mono.Android.dll"));
-            foreach (var assembly in Assemblies)
+            foreach (var assembly in usedAssemblies)
             {
                 parameters.ReferencedAssemblies.Add(assembly.Location);
             }
