@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Xml;
 
 using Embeddinator;
@@ -93,8 +94,14 @@ namespace ExecutionTests
 				var cachedir = Cache.CreateTemporaryDirectory ();
 				var xmlpath = Path.Combine (cachedir, "devices.xml");
 				Asserts.RunProcess ("/Library/Frameworks/Xamarin.iOS.framework/Versions/Current/bin/mlaunch", $"--listdev={Utils.Quote (xmlpath)} --output-format=xml", "mlaunch --listdev");
+				var settings = new XmlReaderSettings () {
+ 					XmlResolver = null,
+ 					DtdProcessing = DtdProcessing.Parse
+ 				};
 				device_xml = new XmlDocument ();
-				device_xml.Load (xmlpath);
+				var sr = new StreamReader (xmlpath, Encoding.UTF8, true);
+				var reader = XmlReader.Create (sr, settings);
+				device_xml.Load (reader);
 			}
 			// filter by device type and ensure that we can use the device for debugging purposes.
 			var xpathQuery = "/MTouch/Device[(" + string.Join(" or ", valid_classes.Select((v) => "DeviceClass = \"" + v + "\"")) + ") and IsUsableForDebugging =\"True\"]/DeviceIdentifier";
