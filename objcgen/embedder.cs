@@ -168,8 +168,7 @@ namespace Embeddinator
 				directories.Add (Path.Combine (PlatformSdkDirectory, "Facades"));
 				foreach (var asm in Assemblies)
 					directories.Add (Path.GetDirectoryName (asm.Location));
-				directories.Add (Path.GetDirectoryName (GetPlatformAssembly ()));
-				
+
 				AssemblyName an = new AssemblyName (resolve_args.Name);
 				foreach (var dir in directories) {
 					var filename = Path.Combine (dir, an.Name + ".dll");
