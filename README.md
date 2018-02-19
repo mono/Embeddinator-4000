@@ -40,7 +40,7 @@ Open the solution file `Embeddinator-4000.sln` with Visual Studio or Xamarin Stu
 
 To generate bindings for a managed library you invoke the `Embeddinator-4000.exe` command line tool.
 
-_Important: please follow the instructions in `objcgen`'s [README](https://github.com/mono/Embeddinator-4000/blob/objc/objcgen/README.md) to use the new and improved Objective-C generator (will eventually fusion with `Embeddinator-4000.exe`._
+_Important: please follow the instructions in `objcgen`'s [README](https://github.com/mono/Embeddinator-4000/blob/objc/objcgen/README.md) to use the new and improved Objective-C generator (will eventually fusion with `Embeddinator-4000.exe`)._
 
 If you do not pass any arguments, you will get a list of the tool options:
 
