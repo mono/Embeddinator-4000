@@ -1,5 +1,5 @@
 #!/bin/bash -e
-
+set -x
 cd $(dirname $0)
 make Make.config.inc -s
 
