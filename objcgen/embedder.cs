@@ -132,24 +132,24 @@ namespace Embeddinator
 		public TargetLanguage TargetLanguage { get; private set; } = TargetLanguage.ObjectiveC;
 		public CompilationTarget CompilationTarget { get; set; } = CompilationTarget.SharedLibrary;
 
-		public string PlatformSdkDirectory
+		public string [] PlatformSdkDirectories
 		{
 			get
 			{
 				switch (Platform) {
 					case Platform.iOS:
-						return "/Library/Frameworks/Xamarin.iOS.framework/Versions/Current/lib/mono/Xamarin.iOS";
+						return new[] { "/Library/Frameworks/Xamarin.iOS.framework/Versions/Current/lib/mono/Xamarin.iOS" };
 					case Platform.tvOS:
-						return "/Library/Frameworks/Xamarin.iOS.framework/Versions/Current/lib/mono/Xamarin.TVOS";
+						return new[] { "/Library/Frameworks/Xamarin.iOS.framework/Versions/Current/lib/mono/Xamarin.TVOS" };
 					case Platform.watchOS:
-						return "/Library/Frameworks/Xamarin.iOS.framework/Versions/Current/lib/mono/Xamarin.WatchOS";
+						return new[] { "/Library/Frameworks/Xamarin.iOS.framework/Versions/Current/lib/mono/Xamarin.WatchOS" };
 					case Platform.macOS:
 					case Platform.macOSSystem:
-						return "/Library/Frameworks/Mono.framework/Versions/Current/lib/mono/4.5";
+						return new[] { "/Library/Frameworks/Mono.framework/Versions/Current/lib/mono/4.5", "/Library/Frameworks/Xamarin.Mac.framework/Versions/Current/lib/mono/4.5" };
 					case Platform.macOSFull:
-						return "/Library/Frameworks/Xamarin.Mac.framework/Versions/Current/lib/mono/4.5";
+						return new[] { "/Library/Frameworks/Xamarin.Mac.framework/Versions/Current/lib/mono/4.5" };
 					case Platform.macOSModern:
-						return "/Library/Frameworks/Xamarin.Mac.framework/Versions/Current/lib/mono/Xamarin.Mac";
+						return new[] { "/Library/Frameworks/Xamarin.Mac.framework/Versions/Current/lib/mono/Xamarin.Mac" };
 					default:
 						throw ErrorHelper.CreateError (99, "Internal error: invalid platform {0}. Please file a bug report with a test case (https://github.com/mono/Embeddinator-4000/issues).", Platform);
 				}
@@ -164,8 +164,10 @@ namespace Embeddinator
 
 			universe.AssemblyResolve += (object sender, IKVM.Reflection.ResolveEventArgs resolve_args) => {
 				var directories = new List<string> ();
-				directories.Add (PlatformSdkDirectory);
-				directories.Add (Path.Combine (PlatformSdkDirectory, "Facades"));
+				foreach (var v in PlatformSdkDirectories) {
+					directories.Add (v);
+					directories.Add (Path.Combine (v, "Facades"));
+				}
 				foreach (var asm in Assemblies)
 					directories.Add (Path.GetDirectoryName (asm.Location));
 
@@ -175,7 +177,7 @@ namespace Embeddinator
 					if (File.Exists (filename))
 						return universe.LoadFile (filename);
 				}
-				throw ErrorHelper.CreateError (13, $"Can't find the assembly '{resolve_args.Name}', referenced by '{resolve_args.RequestingAssembly.FullName}'.");
+				throw ErrorHelper.CreateError (13, $"Can't find the assembly '{resolve_args.Name}', referenced by '{resolve_args.RequestingAssembly.FullName}' with directories {String.Join (" ", directories.ToArray ())}.");
 			};
 
 			foreach (var arg in args) {
