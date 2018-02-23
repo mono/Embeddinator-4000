@@ -177,7 +177,7 @@ namespace Embeddinator
 					if (File.Exists (filename))
 						return universe.LoadFile (filename);
 				}
-				throw ErrorHelper.CreateError (13, $"Can't find the assembly '{resolve_args.Name}', referenced by '{resolve_args.RequestingAssembly.FullName}'."); 
+				throw ErrorHelper.CreateError (13, $"Can't find the assembly '{resolve_args.Name}', referenced by '{resolve_args.RequestingAssembly.FullName}'.");
 			};
 
 			foreach (var arg in args) {
