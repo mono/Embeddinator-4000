@@ -438,7 +438,6 @@ namespace Embeddinator
 							options.Append ($"-dynamiclib ");
 							options.Append (build_info.LinkerFlags).Append (" ");
 							options.Append ("-lobjc ");
-							options.Append ("-lc++ ");
 							options.Append ("-framework CoreFoundation ");
 							options.Append ("-framework Foundation ");
 							options.Append ($"-install_name {Utils.Quote ("@rpath/" + output_file)} ");
@@ -522,7 +521,6 @@ namespace Embeddinator
 							options.Append ($"-dynamiclib ");
 							options.Append (build_info.LinkerFlags).Append (" ");
 							options.Append ("-lobjc ");
-							options.Append ("-lc++ ");
 							options.Append ("-framework CoreFoundation ");
 							options.Append ("-framework Foundation ");
 							options.Append ($"-install_name {Utils.Quote ($"@loader_path/../Frameworks/{LibraryName}.framework/Versions/A/{LibraryName}")} ");
