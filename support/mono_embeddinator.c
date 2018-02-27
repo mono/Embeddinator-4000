@@ -126,7 +126,7 @@ static gchar* strrchr_seperator (const gchar* filename)
 #endif
     char *p;
 
-    p = strrchr (filename, G_DIR_SEPARATOR);
+    p = (char*)strrchr (filename, G_DIR_SEPARATOR);
 #ifdef G_OS_WIN32
     p2 = strrchr (filename, '/');
     if (p2 > p)
@@ -199,7 +199,7 @@ mono_embeddinator_install_assembly_load_hook(mono_embeddinator_assembly_load_hoo
 {
     mono_embeddinator_assembly_load_hook_t prev = g_assembly_load_hook;
     g_assembly_load_hook = hook;
-    return prev;
+    return (mono_embeddinator_assembly_load_hook_t)prev;
 }
 
 MonoClass* mono_embeddinator_search_class(const char* assembly, const char* _namespace,
@@ -259,7 +259,7 @@ void* mono_embeddinator_install_error_report_hook(mono_embeddinator_error_report
     mono_embeddinator_error_report_hook_t prev = g_error_report_hook;
     g_error_report_hook = hook;
 
-    return prev;
+    return (void*)prev;
 }
 
 void mono_embeddinator_error(mono_embeddinator_error_t error)

@@ -58,7 +58,7 @@ MonoObject* mono_embeddinator_get_object (id native, bool assertOnFailure)
 		NSLog (@"`%@` is not a managed instance and cannot be used like one", [native description]);
 		abort ();
 	}
-	int gchandle = (int) [native performSelector:@selector (xamarinGetGCHandle)];
+	long gchandle = (long) [native performSelector:@selector (xamarinGetGCHandle)];
 	return mono_gchandle_get_target (gchandle);
 }
 
@@ -181,7 +181,7 @@ NSDate* mono_embeddinator_get_nsdate (E4KDateTime* datetime)
 		MonoObject* utcdtboxed = mono_runtime_invoke (dttoutcmethod, datetime, NULL, &toutcex);
 		if (toutcex)
 			mono_embeddinator_throw_exception (toutcex);
-		datetime = mono_object_unbox (utcdtboxed);
+		datetime = (E4KDateTime*)mono_object_unbox (utcdtboxed);
 	}
 
 	MonoObject* ticks_ex = nil;

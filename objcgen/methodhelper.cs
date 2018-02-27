@@ -100,7 +100,7 @@ namespace ObjC {
 
 			var method = "__method";
 			if (IsVirtual) {
-				implementation.WriteLine ($"MonoMethod* __virtual_method = mono_object_get_virtual_method ({instance}, __method);");
+				implementation.WriteLine ($"MonoMethod* __virtual_method = mono_object_get_virtual_method ((MonoObject *){instance}, __method);");
 				method = "__virtual_method";
 			}
 			if (!IsConstructor && (ReturnType != "void"))
