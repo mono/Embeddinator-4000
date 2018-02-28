@@ -64,6 +64,7 @@
     <Compile Include="utils.cs" />
     <Compile Include="CachedValue.cs" />
     <Compile Include="TypeMapper.cs" />
+    <Compile Include="Logger.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="support\" />

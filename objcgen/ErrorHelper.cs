@@ -93,8 +93,10 @@ namespace Embeddinator.ObjC
 			foreach (var ex in exceptions)
 				error |= ShowInternal (ex);
 
-			if (error)
+			if (error) {
+				DumpLog (); 
 				Exit (1);
+			}
 		}
 
 		static public void Show (Exception e)
@@ -107,8 +109,18 @@ namespace Embeddinator.ObjC
 			foreach (var ex in exceptions)
 				error |= ShowInternal (ex);
 
-			if (error)
+			if (error) {
+				DumpLog (); 
 				Exit (1);
+			}
+		}
+
+		static void DumpLog ()
+		{
+#if DEBUG
+			Console.WriteLine ("Debug Log:");
+			Logger.Dump ();
+#endif
 		}
 
 		static void Exit (int exitCode)

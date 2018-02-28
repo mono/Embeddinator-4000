@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Embeddinator.ObjC
 {
@@ -42,6 +43,8 @@ namespace Embeddinator.ObjC
 
 		public void Register (ProcessedMemberBase member)
 		{
+			Logger.Log ($"TypeMapper Register: {member} {String.Join (" ", member.Selectors)}");
+			
 			var typeRegistration = GetRegistrationForType (member.DeclaringType);
 			if (typeRegistration == null) {
 				typeRegistration = new Dictionary<string, ProcessedMemberBase> ();

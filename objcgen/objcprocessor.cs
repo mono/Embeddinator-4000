@@ -393,6 +393,7 @@ namespace Embeddinator.ObjC {
 
 		public override void Process (ProcessedType pt)
 		{
+			Logger.Log ($"Processing Type: {pt.TypeName}");
 			Types.Add (pt);
 			if (pt.IsNativeReference)
 				return;
