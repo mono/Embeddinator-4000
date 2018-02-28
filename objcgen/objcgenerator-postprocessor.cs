@@ -153,6 +153,16 @@ namespace Embeddinator.ObjC {
 		}
 	}
 
+	static class RestrictedNames
+	{
+		static readonly HashSet<string> Names = new HashSet<string> { "static", "auto" };
+
+		public static bool IsRestrictedName (string name)
+		{
+			return Names.Contains (name);
+		}
+	}
+
 	static class RestrictedObjSelectors
 	{
 		static readonly HashSet<string> ImportantObjcSelectors = new HashSet<string> { "hash", "class", "superclass", "isEqual:", "self", "isKindOfClass:",

@@ -232,6 +232,8 @@ namespace Embeddinator.ObjC {
 		{
 			string pName = p.Name;
 			string ptname = GetTypeName (p.ParameterType);
+			if (RestrictedNames.IsRestrictedName (pName))
+				pName = "managed" + pName;
 			if (p.Name.Length < 3) {
 				if (!ObjCTypeToArgument.TryGetValue (ptname, out pName))
 					pName = "anObject";
