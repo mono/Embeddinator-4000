@@ -4,6 +4,12 @@ using System.Linq;
 
 namespace Embeddinator.ObjC
 {
+	public enum DuplicationStatus
+	{ 
+		None,
+		Unresolvable
+	}
+	
 	public class TypeMapper
 	{
 		Dictionary<ProcessedType, Dictionary<string, ProcessedMemberBase>> MappedTypes = new Dictionary<ProcessedType, Dictionary<string, ProcessedMemberBase>> ();
@@ -55,13 +61,17 @@ namespace Embeddinator.ObjC
 			}
 		}
 
-		public void CheckForDuplicateSelectors (ProcessedMemberBase member)
+		public DuplicationStatus CheckForDuplicateSelectors (ProcessedMemberBase member)
 		{
 			if (IsSelectorTaken (member)) {
 				foreach (var conflictMethod in WithSameSelector (member))
 					conflictMethod.FallBackToTypeName = true;
 				member.FallBackToTypeName = true;
 			}
+			// Check to see if FallBackToTypeName is insufficient and scream
+			if (IsSelectorTaken (member))
+				return DuplicationStatus.Unresolvable;
+			return DuplicationStatus.None;
 		}
 	}
 }

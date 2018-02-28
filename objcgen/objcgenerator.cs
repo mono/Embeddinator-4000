@@ -923,7 +923,7 @@ namespace Embeddinator.ObjC {
 		// TODO override with attribute ? e.g. [ObjC.Selector ("foo")]
 		string ImplementMethod (ProcessedMethod method)
 		{
-			Logger.Log ($"Generating Method Impl: {method.ManagedName}");
+			Logger.Log ($"Generating Method Impl: {method}");
 
 			MethodInfo info = method.Method;
 
@@ -1034,7 +1034,7 @@ namespace Embeddinator.ObjC {
 
 		protected override void Generate (ProcessedMethod method)
 		{
-			Logger.Log ($"Generating Method: {method.ManagedName}");
+			Logger.Log ($"Generating Method: {method}");
 
 			MethodHelper builder;
 			switch (method.MethodType) {

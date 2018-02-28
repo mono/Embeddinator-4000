@@ -35,7 +35,10 @@ namespace Embeddinator.ObjC {
 
 				ProcessPotentialName (processedMethod);
 
-				Mapper.CheckForDuplicateSelectors (processedMethod);
+				if (Mapper.CheckForDuplicateSelectors (processedMethod) == DuplicationStatus.Unresolvable) {
+					Delayed.Add (ErrorHelper.CreateWarning (1052, $"Element {method.Name} is not generated its name conflicts with other elements on the same class."));
+					continue;
+				}
 
 				Mapper.Register (processedMethod);
 
@@ -72,7 +75,10 @@ namespace Embeddinator.ObjC {
 
 				ProcessPotentialName (processedProperty);
 
-				Mapper.CheckForDuplicateSelectors (processedProperty);
+				if (Mapper.CheckForDuplicateSelectors (processedProperty) == DuplicationStatus.Unresolvable){
+					Delayed.Add (ErrorHelper.CreateWarning (1052, $"Element {processedProperty.Name} is not generated its name conflicts with other elements on the same class."));
+					continue;
+				}
 
 				Mapper.Register (processedProperty);
 
@@ -97,7 +103,10 @@ namespace Embeddinator.ObjC {
 		{
 			foreach (ProcessedProperty processedProperty in properties) {
 
-				Mapper.CheckForDuplicateSelectors (processedProperty);
+				if (Mapper.CheckForDuplicateSelectors (processedProperty) == DuplicationStatus.Unresolvable) {
+					Delayed.Add (ErrorHelper.CreateWarning (1052, $"Element {processedProperty.Name} is not generated its name conflicts with other elements on the same class."));
+					continue;
+				}
 
 				Mapper.Register (processedProperty);
 
@@ -119,7 +128,10 @@ namespace Embeddinator.ObjC {
 			foreach (ProcessedFieldInfo processedField in fields) {
 				ProcessPotentialName (processedField);
 
-				Mapper.CheckForDuplicateSelectors (processedField);
+				if (Mapper.CheckForDuplicateSelectors (processedField) == DuplicationStatus.Unresolvable) {
+					Delayed.Add (ErrorHelper.CreateWarning (1052, $"Element {processedField.Name} is not generated its name conflicts with other elements on the same class."));
+					continue;
+				}
 
 				Mapper.Register (processedField);
 
@@ -129,8 +141,9 @@ namespace Embeddinator.ObjC {
 
 		protected IEnumerable<ProcessedConstructor> PostProcessConstructors (IEnumerable<ProcessedConstructor> constructors)
 		{
-			foreach (ProcessedConstructor processedConstructor in constructors) {				
-				Mapper.CheckForDuplicateSelectors (processedConstructor);
+			foreach (ProcessedConstructor processedConstructor in constructors) {
+				if (Mapper.CheckForDuplicateSelectors (processedConstructor) == DuplicationStatus.Unresolvable)
+					continue;
 
 				Mapper.Register (processedConstructor);
 
