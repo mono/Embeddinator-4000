@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
+using CppSharp;
 
-namespace MonoEmbeddinator4000
+namespace Embeddinator
 {
     public static class StringExtensions
     {
@@ -41,6 +43,17 @@ namespace MonoEmbeddinator4000
             temp = s.Split(separators, StringSplitOptions.RemoveEmptyEntries);
             return String.Join( newVal, temp );
         }
+
+        public static string TrimStart(this string target, string trimString)
+        {
+            string result = target;
+            while (result.StartsWith(trimString, StringComparison.Ordinal))
+            {
+                result = result.Substring(trimString.Length);
+            }
+        
+            return result;
+        }
     }
 
     public static class Helpers
@@ -71,5 +84,97 @@ namespace MonoEmbeddinator4000
                 CopyAll(sourceSubDir, nextTargetSubDir);
             }
         }
+
+        public static string FindDirectory(string dir)
+        {
+            const int searchDepth = 3;
+
+            //Try searching from path of assembly
+            string assemblyDir = Path.GetDirectoryName(typeof(Helpers).Assembly.Location);
+            for (int i = 0; i <= searchDepth; i++)
+            {
+                string searchDir = Path.Combine(assemblyDir, dir);
+                if (Directory.Exists(searchDir))
+                    return Path.GetFullPath(searchDir);
+
+                assemblyDir = Path.Combine(assemblyDir, "..");
+            }
+
+            //Try searching from current directory
+            string currentDir = dir;
+            for (int i = 0; i <= searchDepth; i++)
+            {
+                if (Directory.Exists(currentDir))
+                    return Path.GetFullPath(currentDir);
+
+                currentDir = Path.Combine("..", currentDir);
+            }
+
+            throw new Exception($"Cannot find {Path.GetFileName(dir)}!");
+        }
+
+        public static ProcessOutput Invoke(string program, string arguments, Dictionary<string, string> envVars = null)
+        {
+            var process = new Process
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = program,
+                    Arguments = arguments,
+                    WindowStyle = ProcessWindowStyle.Hidden,
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true
+                }
+            };
+
+            if (envVars != null)
+                foreach (var kvp in envVars)
+                    process.StartInfo.EnvironmentVariables[kvp.Key] = kvp.Value;
+
+            var standardOut = new StringBuilder();
+            process.OutputDataReceived += (sender, args) => {
+                if (!string.IsNullOrWhiteSpace(args.Data))
+                    standardOut.AppendLine(args.Data);
+            };
+
+            var standardError = new StringBuilder();
+            process.ErrorDataReceived += (sender, args) => {
+                if (!string.IsNullOrWhiteSpace(args.Data))
+                    standardError.AppendLine(args.Data);
+            };
+
+            process.Start();
+            process.BeginOutputReadLine();
+            process.BeginErrorReadLine();
+            process.WaitForExit();
+
+            var output = new ProcessOutput
+            {
+                ExitCode = process.ExitCode,
+                StandardOutput = standardOut.ToString(),
+                StandardError = standardError.ToString()
+            };
+
+            Diagnostics.Debug("Invoking: {0} {1}", program, arguments);
+            Diagnostics.PushIndent();
+            if (standardOut.Length > 0)
+                Diagnostics.Message("{0}", standardOut.ToString());
+            if (standardError.Length > 0)
+                Diagnostics.Message("{0}", standardError.ToString());
+            Diagnostics.PopIndent();
+
+            return output;
+        }
+    }
+
+    /// <summary>
+    /// Represents the output of a process invocation.
+    /// </summary>
+    public struct ProcessOutput
+    {
+        public int ExitCode;
+        public string StandardOutput;
+        public string StandardError;
     }
 }

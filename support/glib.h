@@ -187,6 +187,7 @@ GString     *g_string_prepend       (GString *string, const gchar *val);
 GString     *g_string_insert        (GString *string, gssize pos, const gchar *val);
 GString     *g_string_set_size      (GString *string, gsize len);
 GString     *g_string_erase         (GString *string, gssize pos, gssize len);
+void         g_string_null          (GString *string);
 
 #define g_string_sprintfa g_string_append_printf
 
@@ -209,6 +210,8 @@ GString     *g_string_erase         (GString *string, gssize pos, gssize len);
 #else
 #define  eg_unreachable()
 #endif
+
+void g_assertion_message (const gchar *format, ...);
 
 #define  g_assert(x)     G_STMT_START { if (G_UNLIKELY (!(x))) g_assertion_message ("* Assertion at %s:%d, condition `%s' not met\n", __FILE__, __LINE__, #x);  } G_STMT_END
 #define  g_assert_not_reached() G_STMT_START { g_assertion_message ("* Assertion: should not be reached at %s:%d\n", __FILE__, __LINE__); eg_unreachable(); } G_STMT_END

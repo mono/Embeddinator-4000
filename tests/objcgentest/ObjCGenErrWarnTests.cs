@@ -4,7 +4,7 @@ using System.Text;
 using System.Collections.Generic;
 
 using NUnit.Framework;
-using Embeddinator;
+using Embeddinator.ObjC;
 using DriverTest;
 
 namespace ObjCGenErrWarnTests {

@@ -5,9 +5,7 @@ using System.Text;
 using IKVM.Reflection;
 using Type = IKVM.Reflection.Type;
 
-using ObjC;
-
-namespace Embeddinator {
+namespace Embeddinator.ObjC {
 
 	// While processing user assemblies, we may come across conditions that will affect
 	// final code generation that we need to pass to the generation pass

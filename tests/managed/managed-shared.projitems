@@ -11,6 +11,10 @@
   <ItemGroup>
   </ItemGroup>
   <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)builtins.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)constructors.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)enums.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)equalsHashOverrides.cs" />
@@ -32,6 +36,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)nestedClasses.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)arrays.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)duplicates.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)keywords.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)abstracts.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="$(MSBuildThisFileDirectory)subscripts.tt">

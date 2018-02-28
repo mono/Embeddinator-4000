@@ -1,52 +1,24 @@
 using System.Collections.Generic;
+using System.Linq;
 using CppSharp.AST;
 using CppSharp.Generators;
 using CppSharp.Passes;
 using CppSharp.Utils;
-using MonoEmbeddinator4000.Generators;
+using Embeddinator.Generators;
 
-namespace MonoEmbeddinator4000.Passes
+namespace Embeddinator.Passes
 {
-    public class GetReferencedClasses : TranslationUnitPass
+    public class GetReferencedDecls : TranslationUnitPass
     {
-        public OrderedSet<Class> Classes = new OrderedSet<Class>();
+        public OrderedSet<Declaration> Declarations = new OrderedSet<Declaration>();
+        public IEnumerable<Class> Classes => Declarations.OfType<Class>();
+        public IEnumerable<Enumeration> Enums => Declarations.OfType<Enumeration>();
 
-        public override bool VisitTranslationUnit(TranslationUnit unit)
+        protected TranslationUnit TranslationUnit;
+
+        public GetReferencedDecls()
         {
-            return base.VisitTranslationUnit(unit);
-        }
-
-        public override bool VisitClassDecl(Class @class)
-        {
-            // Check if we already handled this class.
-            if (Classes.Contains(@class))
-                return false;
-
-            Classes.Add(@class);
-
-            return base.VisitClassDecl(@class);
-        }
-
-        public override bool VisitTagType(TagType tag, TypeQualifiers quals)
-        {
-            var @class = tag.Declaration as Class;
-
-            if (@class == null)
-                return false;
-
-            return VisitClassDecl(@class);
-        }
-    }
-
-    public class GenerateObjectTypesPass : GetReferencedClasses
-    {
-        TranslationUnit TranslationUnit;
-
-        public List<TypedefDecl> Declarations;
-
-        public GenerateObjectTypesPass()
-        {
-            Declarations = new List<TypedefDecl>();
+            ClearVisitedDeclarations = true;
         }
 
         public override bool VisitTranslationUnit(TranslationUnit unit)
@@ -54,14 +26,56 @@ namespace MonoEmbeddinator4000.Passes
             TranslationUnit = unit;
             var ret = base.VisitTranslationUnit(unit);
 
-            foreach (var @class in Classes)
+            return ret;
+        }
+
+        public override bool VisitDeclaration(Declaration decl)
+        {
+            if (AlreadyVisited(@decl))
+                return false;
+
+            if (Declarations.Contains(@decl))
+                return false;
+
+            if (decl == TranslationUnit)
+                return true;
+
+            if (decl is TranslationUnit)
+                return false;
+
+            if (decl is Parameter || decl is Property)
+                return true;
+
+            if (decl is Class || decl is Enumeration || decl is TypedefDecl)
+                Declarations.Add(decl);
+
+            // No need to continue visiting after a declaration of another
+            // translation unit is encountered.
+            return decl.Namespace != null && decl.Namespace.TranslationUnit == TranslationUnit;
+        }
+    }
+
+    public class GenerateObjectTypesPass : GetReferencedDecls
+    {
+        public List<TypedefDecl> Typedefs;
+
+        public GenerateObjectTypesPass()
+        {
+            Typedefs = new List<TypedefDecl>();
+        }
+
+        public override bool VisitTranslationUnit(TranslationUnit unit)
+        {
+            var ret = base.VisitTranslationUnit(unit);
+
+            foreach (var @class in Classes.Where(c => c.TranslationUnit == TranslationUnit))
                 HandleClass(@class);
 
-            unit.Declarations.InsertRange(0, Declarations);
+            unit.Declarations.InsertRange(0, Typedefs);
+
+            Typedefs.Clear();
             Declarations.Clear();
-            
             TranslationUnit = null;
-            Classes.Clear();
 
             return ret;
         }
@@ -80,18 +94,18 @@ namespace MonoEmbeddinator4000.Passes
                 AddObjectFieldsToClass(@class);
         }
         
-        public static Class MonoEmbedObject = new Class { Name = "MonoEmbedObject" };
+        public static Class MonoEmbedObject = new Class { Name = "MonoEmbedObject", IsImplicit = true };
 
         void CreateTypedefObjectForClass(Class @class)
         {
             var typedef = new TypedefDecl
             {
-                Name = @class.QualifiedName,
+                Name = CGenerator.QualifiedName(@class),
                 Namespace = TranslationUnit,
                 QualifiedType = new QualifiedType(new TagType(MonoEmbedObject))
             };
 
-            Declarations.Add(typedef);
+            Typedefs.Add(typedef);
         }
 
         void AddObjectFieldsToClass(Class @class)
@@ -103,7 +117,8 @@ namespace MonoEmbeddinator4000.Passes
                 Name = CGenerator.ObjectInstanceId,
                 QualifiedType = new QualifiedType(ptrType),
                 Access = AccessSpecifier.Public,
-                Namespace = @class
+                Namespace = @class,
+                IsImplicit = true
             };
 
             @class.Fields.Add(field);

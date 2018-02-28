@@ -2,7 +2,7 @@
 using System.IO;
 using System.Text;
 
-namespace Embeddinator {
+namespace Embeddinator.ObjC {
 	
 	public class SourceWriter : TextWriter {
 

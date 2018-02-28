@@ -1,21 +1,31 @@
+﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using CppSharp;
 using CppSharp.AST;
 using CppSharp.AST.Extensions;
 using CppSharp.Generators;
-using CppSharp.Generators.CSharp;
 
-namespace MonoEmbeddinator4000.Generators
+namespace Embeddinator.Generators
 {
-    public class JavaSources : CSharpSources
+    [DebuggerDisplay("Decl = {Declaration}")]
+    public class JavaSources : CodeGenerator
     {
+        public JavaTypePrinter TypePrinter;
+
         public JavaSources(BindingContext context, Declaration decl)
-            : base(context, new List<TranslationUnit> { decl.TranslationUnit })
+            : this(context, decl.TranslationUnit)
         {
             Declaration = decl;
+        }
+
+        public JavaSources(BindingContext context, TranslationUnit unit)
+            : base(context, new List<TranslationUnit> { unit })
+        {
             TypePrinter = new JavaTypePrinter(context);
+            VisitOptions.VisitPropertyAccessors = true;
         }
 
         public Declaration Declaration;
@@ -25,10 +35,12 @@ namespace MonoEmbeddinator4000.Generators
         public static IEnumerable<string> GetPackageNames(Declaration decl)
         {
             var namespaces = Declaration.GatherNamespaces(decl.Namespace)
-                .ToList();
-            namespaces.Remove(namespaces.First());
+                .Where(ns => !(ns is TranslationUnit));
 
-            return namespaces.Select(n => n.Name.ToLowerInvariant());
+            var names = namespaces.Select(n => n.Name.ToLowerInvariant()).ToList();
+            names.Insert(0, JavaGenerator.GetNativeLibPackageName(decl.TranslationUnit));
+
+            return names;
         }
 
         public override string FilePath
@@ -50,10 +62,10 @@ namespace MonoEmbeddinator4000.Generators
 
         public override void Process()
         {
-            GenerateFilePreamble(CommentKind.JavaDoc);
+            GenerateFilePreamble(CommentKind.JavaDoc, "Embeddinator-4000");
 
             GenerateJavaPackage(Declaration);
-            NewLine();
+            GenerateJavaImports();
 
             PushBlock();
             Declaration.Visit(this);
@@ -62,9 +74,24 @@ namespace MonoEmbeddinator4000.Generators
 
         public void GenerateJavaPackage(Declaration decl)
         {
+            PushBlock();
             var package = string.Join(".", GetPackageNames(decl));
             if (!string.IsNullOrWhiteSpace(package))
                 WriteLine($"package {package};");
+            PopBlock(NewLineKind.BeforeNextBlock);
+        }
+
+        public void GenerateJavaImports()
+        {
+            PushBlock();
+            WriteLine("import mono.embeddinator.*;");
+            WriteLine("import com.sun.jna.*;");
+            PopBlock(NewLineKind.BeforeNextBlock);
+        }
+
+        public override bool VisitDeclaration(Declaration decl)
+        {
+            return decl.IsGenerated && !AlreadyVisited(decl);
         }
 
         public override bool VisitDeclContext(DeclarationContext context)
@@ -78,25 +105,60 @@ namespace MonoEmbeddinator4000.Generators
 
         public override bool VisitEnumDecl(Enumeration @enum)
         {
+            if (!VisitDeclaration(@enum))
+                return false;
+
             if (@enum.IsIncomplete)
                 return true;
 
             PushBlock(BlockKind.Enum);
             GenerateDeclarationCommon(@enum);
 
-            Write("{0} enum {1} ", AccessIdentifier(@enum.Access),
-                SafeIdentifier(@enum.Name));
+            Write("{0} final class {1} ", AccessIdentifier(@enum.Access), @enum.Name);
 
             WriteStartBraceIndent();
             GenerateEnumItems(@enum);
 
             NewLine();
 
-            var typeName = TypePrinter.VisitPrimitiveType(@enum.BuiltinType.Type,
-                                                          new TypeQualifiers());
+            var typeName = @enum.BuiltinType.Visit(TypePrinter);
             WriteLine($"private final {typeName} id;");
-            WriteLine($"{@enum.Name}(int id) {{ this.id = id; }}");
-            WriteLine("public int getValue() { return id; }");
+            WriteLine($"{@enum.Name}({typeName} id) {{ this.id = id; }}");
+            WriteLine($"public {typeName} getValue() {{ return id; }}");
+
+            NewLine();
+            var value = @enum.BuiltinType.IsUnsigned ? "n.intValue()" : "n";
+            WriteLine($"public static {@enum.Name} fromOrdinal({typeName} n) {{");
+            WriteLineIndent($"return valuesMap.containsKey({value}) ? valuesMap.get({value}) : new {@enum.Name}(n);");
+            WriteLine("}");
+
+            TypePrinter.PushContext(TypePrinterContextKind.Template);
+            var refTypeName = @enum.BuiltinType.Visit(TypePrinter);
+            TypePrinter.PopContext();
+
+            NewLine();
+            WriteLine($"private static final java.util.Map<{refTypeName}, {@enum.Name}> valuesMap = ");
+            WriteLineIndent($"new java.util.HashMap<{refTypeName}, {@enum.Name}>();");
+
+            NewLine();
+            WriteLine("static {");
+            PushIndent();
+
+            WriteLine("try {");
+            PushIndent();
+
+            WriteLine($"java.lang.reflect.Field[] constants = {@enum.Name}.class.getFields();");
+            WriteLine($"for (final java.lang.reflect.Field field : constants) {{");
+            WriteLineIndent($"{@enum.Name} item = ({@enum.Name}) field.get(null);");
+            WriteLineIndent($"valuesMap.put(item.getValue(), item);");
+            WriteLine("}");
+
+            PopIndent();
+            WriteLine("} catch(java.lang.IllegalAccessException ex) {");
+            WriteLine("}");
+
+            PopIndent();
+            WriteLine("}");
 
             WriteCloseBraceIndent();
             PopBlock(NewLineKind.BeforeNextBlock);
@@ -106,20 +168,38 @@ namespace MonoEmbeddinator4000.Generators
 
         public override void GenerateEnumItems(Enumeration @enum)
         {
-            base.GenerateEnumItems(@enum);
-            WriteLine(";");
+            for (int i = 0; i < @enum.Items.Count; i++)
+            {
+                if (@enum.Items[i].Visit(this))
+                    NewLine();
+            }
         }
 
         public override bool VisitEnumItemDecl(Enumeration.Item item)
         {
+            if (!VisitDeclaration(item))
+                return false;
+
             if (item.Comment != null)
                 GenerateInlineSummary(item.Comment);
 
-            Write(item.Name);
-
             var @enum = item.Namespace as Enumeration;
+            Write($"public static final {@enum.Name} {item.Name} = new {@enum.Name}");
+
+            var typeName = @enum.BuiltinType.Visit(TypePrinter);
             if (item.ExplicitValue)
-                Write("({0})", @enum.GetItemValueAsString(item));
+            {
+                var value = @enum.GetItemValueAsString(item);
+
+                // We need to explicit check for long int literals.
+                if (item.Value > Int32.MaxValue)
+                    value += "L";
+
+                if (@enum.BuiltinType.IsUnsigned)
+                    Write($"(new {typeName}({value}));");
+                else
+                    Write($"(({typeName}){value});");
+            }
 
             return true;
         }
@@ -133,23 +213,17 @@ namespace MonoEmbeddinator4000.Generators
             if (@class.IsAbstract)
                 keywords.Add("abstract");
 
-            if (@class.IsFinal)
+            if (@class.IsFinal || @class.IsStatic)
                 keywords.Add("final");
 
-            if (@class.IsStatic)
-                keywords.Add("static");
-
             keywords.Add(@class.IsInterface ? "interface" : "class");
-            keywords.Add(SafeIdentifier(@class.Name));
+            keywords.Add(@class.Name);
 
             keywords = keywords.Where(s => !string.IsNullOrWhiteSpace(s)).ToList();
             if (keywords.Count != 0)
-                Write("{0} ", string.Join(" ", keywords));
+                Write("{0}", string.Join(" ", keywords));
 
-            var bases = new List<BaseClassSpecifier>();
-
-            if (@class.NeedsBase)
-                bases.AddRange(@class.Bases.Where(@base => @base.IsClass));
+            var bases = @class.Bases.Where(@base => @base.IsClass && @base.Class.IsGenerated).ToList();
 
             if (bases.Count > 0 && !@class.IsStatic)
             {
@@ -158,39 +232,81 @@ namespace MonoEmbeddinator4000.Generators
                 if (classes.Count() > 0)
                     Write(" extends {0}", string.Join(", ", classes));
 
-                var interfaces = bases.Where(@base => @base.Class.IsInterface)
+                var implements = @class.IsInterface ? "extends" : "implements";
+                var interfaces = bases.Where(@base => @base.Class.IsInterface && @base.Class.IsGenerated)
                                       .Select(@base => @base.Class.Visit(TypePrinter).Type);
                 if (interfaces.Count() > 0)
-                    Write(" implements {0}", string.Join(", ", interfaces));
+                    Write($" {implements} {string.Join(", ", interfaces)}");
             }
         }
 
         public override bool VisitClassDecl(Class @class)
         {
-            GenerateClassSpecifier(@class);
-            Write(" ");
+            if (!VisitDeclaration(@class))
+                return false;
 
+            GenerateClassSpecifier(@class);
+
+            Write(" ");
             WriteStartBraceIndent();
+
+            var hasNonInterfaceBase = @class.HasBaseClass && @class.BaseClass.IsGenerated
+                && !@class.BaseClass.IsInterface;
+
+            var objectIdent = JavaGenerator.GeneratedIdentifier("object");
+
+            if (!@class.IsStatic && !@class.IsInterface)
+            {
+                if (!hasNonInterfaceBase)
+                {
+                    WriteLine($"public {JavaGenerator.IntPtrType} {objectIdent};");
+                    NewLine();
+                }
+                
+                Write($"public {@class.Name}({JavaGenerator.IntPtrType} object) {{ ");
+                WriteLine(hasNonInterfaceBase ? "super(object); }" : $"this.{objectIdent} = object; }}");
+                NewLine();
+
+                var implementsInterfaces = @class.Bases.Any(b => b.Class.IsGenerated && b.Class.IsInterface);
+                if (implementsInterfaces)
+                {
+                    WriteLine("@Override");
+                    WriteLine($"public com.sun.jna.Pointer __getObject() {{ return this.{objectIdent}; }}");
+                    NewLine();
+                }
+            }
+
             VisitDeclContext(@class);
             WriteCloseBraceIndent();
 
             return true;
         }
 
-        private string FormatMethodParameters(IEnumerable<Parameter> @params)
+        public static string GetMethodIdentifier(Method method)
         {
-            return string.Join(", ",
-                from param in @params
-                where param.Kind != ParameterKind.IndirectReturnType && !param.Ignore
-                let typeName = param.CSharpType(TypePrinter)
-                select string.Format("{0} {1}", typeName, param.Name));
+            var name = method.Name;
+
+            if (method.AssociatedDeclaration is Property)
+            {
+                // Property names shoud follow get/set Java convention.
+                if (name.StartsWith("get_", StringComparison.Ordinal))
+                    name = $"get{name.TrimStart("get_")}";
+                else if (name.StartsWith("set_", StringComparison.Ordinal))
+                    name = $"set{name.TrimStart("set_")}";
+            }
+
+            var associated = method.GetRootAssociatedDecl();
+            if (associated.DefinitionOrder != 0)
+                name += $"_{associated.DefinitionOrder}";
+
+            return name;
         }
 
         public override void GenerateMethodSpecifier(Method method, Class @class)
         {
             var keywords = new List<string>();
 
-            if (method.IsGeneratedOverride())
+            if (method.IsGeneratedOverride() || method.IsOverride)
             {
                 Write("@Override");
                 NewLine();
@@ -204,27 +320,29 @@ namespace MonoEmbeddinator4000.Generators
             if (method.IsStatic)
                 keywords.Add("static");
 
-            if (method.IsPure)
+            if (method.IsPure && !@class.IsInterface)
                 keywords.Add("abstract");
 
             keywords = keywords.Where(s => !string.IsNullOrWhiteSpace(s)).ToList();
             if (keywords.Count != 0)
                 Write("{0} ", string.Join(" ", keywords));
 
-            var functionName = GetMethodIdentifier(method);
-
             if (method.IsConstructor || method.IsDestructor)
-                Write("{0}(", functionName);
+                Write("{0}(", @class.Name);
             else
-                Write("{0} {1}(", method.ReturnType, functionName);
+                Write("{0} {1}(", method.ReturnType, GetMethodIdentifier(method));
 
-            Write(FormatMethodParameters(method.Parameters));
+            var @params = method.Parameters.Where(m => !m.IsImplicit);
+            Write("{0}", TypePrinter.VisitParameters(@params, hasNames: true));
 
             Write(")");
         }
 
         public override bool VisitMethodDecl(Method method)
         {
+            if (!VisitDeclaration(method))
+                return false;
+
             PushBlock(BlockKind.Method, method);
 
             var @class = method.Namespace as Class;
@@ -237,20 +355,15 @@ namespace MonoEmbeddinator4000.Generators
             else
             {
                 Write(" ");
-
                 WriteStartBraceIndent();
 
-                PrimitiveType primitive;
-                var isPrimitive = method.OriginalReturnType.Type.IsPrimitiveType(out primitive);
+                var hasNonInterfaceBase = @class.HasBaseClass && @class.BaseClass.IsGenerated
+                    && !@class.BaseClass.IsInterface;
 
-                var hasReturn = primitive != PrimitiveType.Void;
-                if ((!(method.IsConstructor || method.IsDestructor)) && hasReturn)
-                {
-                    if (isPrimitive && primitive != PrimitiveType.String)
-                        WriteLine("return {0};", primitive == PrimitiveType.Bool ? "false" : "0");
-                    else
-                        WriteLine("return null;");
-                }
+                if (method.IsConstructor && hasNonInterfaceBase)
+                    WriteLine("super((com.sun.jna.Pointer)null);");
+
+                GenerateMethodInvocation(method);
 
                 WriteCloseBraceIndent();
             }
@@ -260,14 +373,94 @@ namespace MonoEmbeddinator4000.Generators
             return true;
         }
 
+        public void GenerateMethodInvocation(Method method)
+        {
+            var marshalers = new List<Marshaler>();
+            var @params = new List<string>();
+
+            if (!method.IsStatic && !(method.IsConstructor || method.IsDestructor))
+                @params.Add("__object");
+
+            int paramIndex = 0;
+            foreach (var param in method.Parameters.Where(m => !m.IsImplicit))
+            {
+                var marshal = new JavaMarshalManagedToNative(Context)
+                {
+                    ArgName = param.Name,
+                    Parameter = param,
+                    ParameterIndex = paramIndex++
+                };
+                marshalers.Add(marshal);
+
+                param.Visit(marshal);
+
+                if (!string.IsNullOrWhiteSpace(marshal.Before))
+                        Write(marshal.Before);
+
+                @params.Add(marshal.Return);
+            }
+
+            PrimitiveType primitive;
+            method.ReturnType.Type.IsPrimitiveType(out primitive);
+
+            var hasReturn = primitive != PrimitiveType.Void && !(method.IsConstructor || method.IsDestructor);
+            if (hasReturn)
+            {
+                TypePrinter.PushContext(TypePrinterContextKind.Native);
+                var typeName = method.ReturnType.Visit(TypePrinter);
+                TypePrinter.PopContext();
+                Write($"{typeName.Type} __ret = ");
+            }
+
+            if (method.IsConstructor)
+                Write("__object = ");
+
+            // Get the effective method for synthetized interface method implementations.
+            var effectiveMethod = method.CompleteDeclaration as Method ?? method;
+            var unit = effectiveMethod.TranslationUnit;
+            var package = string.Join(".", GetPackageNames(unit));
+            var nativeMethodId = JavaNative.GetCMethodIdentifier(effectiveMethod);
+            Write($"{package}.{JavaNative.GetNativeLibClassName(unit)}.INSTANCE.{nativeMethodId}(");
+
+            Write(string.Join(", ", @params));
+            WriteLine(");");
+
+            WriteLine("mono.embeddinator.Runtime.checkExceptions();");
+
+            foreach (var marshal in marshalers)
+            {
+                if (!string.IsNullOrWhiteSpace(marshal.After))
+                    Write(marshal.After);
+            }
+
+            if (hasReturn)
+            {
+                var marshal = new JavaMarshalNativeToManaged(Context)
+                {
+                    ReturnType = method.ReturnType,
+                    ReturnVarName = "__ret"
+                };
+
+                method.ReturnType.Visit(marshal);
+
+                if (marshal.Return.ToString().Length == 0)
+                    throw new System.Exception();
+
+                if (!string.IsNullOrWhiteSpace(marshal.Before))
+                        Write(marshal.Before);
+
+                WriteLine($"return {marshal.Return};");
+            }
+        }
+
         public override bool VisitTypedefDecl(TypedefDecl typedef)
         {
             return true;
         }
 
-        public override bool VisitProperty(Property property)
+        public override bool VisitFieldDecl(Field field)
         {
-            // Ignore properties since they're converted to getter/setter pais.
+            // Ignore fields since they're converted to properties (getter/setter pairs).
             return true;
         }
 

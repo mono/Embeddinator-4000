@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 
 using IKVM.Reflection;
 using Type = IKVM.Reflection.Type;
-using Embeddinator;
-using System.Globalization;
 
-namespace ObjC {
+namespace Embeddinator.ObjC {
 	// A set of post-processing steps needed to add hints
 	// to the input of the generation step
 	public partial class ObjCProcessor {
@@ -49,7 +48,7 @@ namespace ObjC {
 		{
 			MethodInfo method = processedMethod.Method;
 			if (IsOperatorOrFriendlyVersion (method)) {
-				string nameOverride = OperatorOverloads.GetObjCName (processedMethod.Method.Name, processedMethod.Method.ParameterCount);
+				string nameOverride = OperatorOverloads.GetObjCName (processedMethod.Method.Name, processedMethod.Method.GetParameters ().Length);
 				if (nameOverride != null)
 					processedMethod.NameOverride = nameOverride;
 			}

@@ -1,7 +1,7 @@
 ﻿using NUnit.Framework;
 using System;
 using System.IO;
-using Embeddinator;
+using Embeddinator.ObjC;
 
 namespace DriverTest {
 
@@ -157,15 +157,15 @@ namespace DriverTest {
 
 			foreach (var ct in new string [] { "library", "sharedlibrary", "dylib" }) {
 				embedder.SetCompilationTarget (ct);
-				Assert.That (embedder.CompilationTarget, Is.EqualTo (global::Embeddinator.CompilationTarget.SharedLibrary), ct);
+				Assert.That (embedder.CompilationTarget, Is.EqualTo (global::Embeddinator.ObjC.CompilationTarget.SharedLibrary), ct);
 			}
 			foreach (var ct in new string [] { "framework" }) {
 				embedder.SetCompilationTarget (ct);
-				Assert.That (embedder.CompilationTarget, Is.EqualTo (global::Embeddinator.CompilationTarget.Framework), ct);
+				Assert.That (embedder.CompilationTarget, Is.EqualTo (global::Embeddinator.ObjC.CompilationTarget.Framework), ct);
 			}
 			foreach (var ct in new string [] { "static", "staticlibrary" }) {
 				embedder.SetCompilationTarget (ct);
-				Assert.That (embedder.CompilationTarget, Is.EqualTo (global::Embeddinator.CompilationTarget.StaticLibrary), ct);
+				Assert.That (embedder.CompilationTarget, Is.EqualTo (global::Embeddinator.ObjC.CompilationTarget.StaticLibrary), ct);
 			}
 		}
 

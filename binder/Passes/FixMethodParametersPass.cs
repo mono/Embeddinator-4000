@@ -1,21 +1,33 @@
 using CppSharp.AST;
 using CppSharp.Generators;
 using CppSharp.Passes;
+using System.Linq;
 
-namespace MonoEmbeddinator4000.Passes
+namespace Embeddinator.Passes
 {
     public class FixMethodParametersPass : TranslationUnitPass
     {
         public static string ObjectParameterId => "object";
+
+        public FixMethodParametersPass()
+        {
+            VisitOptions.VisitPropertyAccessors = true;
+        }
 
         void AddObjectParameterToMethod(Method method, Class @class)
         {
             var ptrType = new QualifiedType(
                 new PointerType(new QualifiedType(new TagType(@class))));
 
+            var objectId = ObjectParameterId;
+
+            // Check if the method already provides a parameter named "object"
+            if (method.Parameters.Any(p => p.Name == ObjectParameterId))
+                objectId = $"__{objectId}";
+
             var param = new Parameter
             {
-                Name = ObjectParameterId,
+                Name = objectId,
                 Namespace = @class,
                 QualifiedType = ptrType,
                 IsImplicit = true
@@ -36,10 +48,9 @@ namespace MonoEmbeddinator4000.Passes
             if (@class == null)
                 return false;
 
-            replacementType = new QualifiedType(
-                new PointerType(new QualifiedType(new TagType(@class))));
+            replacementType = new QualifiedType(new PointerType(type));
 
-            return !@class.IsValueType;
+            return true;
         }
 
         public override bool VisitMethodDecl(Method method)
@@ -47,10 +58,7 @@ namespace MonoEmbeddinator4000.Passes
             if (!VisitDeclaration(method))
                 return false;
 
-            var @class = method.Namespace as Class;
-
             QualifiedType replacementType;
-
             if (ShouldReplaceType(method.ReturnType, out replacementType))
                 method.ReturnType = replacementType;
 
@@ -60,13 +68,16 @@ namespace MonoEmbeddinator4000.Passes
                     param.QualifiedType = replacementType;
             }
 
+            var @class = method.Namespace as Class;
             if (@class.IsStatic || method.IsStatic)
                 return false;
 
             if (method.IsConstructor)
                 return false;
 
-            if (Options.GeneratorKind == GeneratorKind.C)
+            var field = method.AssociatedDeclaration as Field;
+            var isStaticField = field != null && field.IsStatic;
+            if (Options.GeneratorKind == GeneratorKind.C && !isStaticField)
                 AddObjectParameterToMethod(method, @class);
 
             return true;

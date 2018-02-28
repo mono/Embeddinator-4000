@@ -6,6 +6,10 @@ public static class Platform {
 	// static get-only property
 	public static bool IsWindows {
 		get {
+#if PCL || NETSTANDARD1_6
+			//NOTE: maybe there is something more precise than this
+			return Environment.NewLine == "\r\n";
+#else
 			switch (Environment.OSVersion.Platform) {
 			case PlatformID.Win32NT:
 			case PlatformID.Win32S:
@@ -14,6 +18,7 @@ public static class Platform {
 				return true;
 			}
 			return false;
+#endif
 		}
 	}
 	
@@ -50,6 +55,16 @@ namespace Properties {
 		public bool IsSecret {
 			get { return secret != 0; }
 		}
+
+		// conflict between property get() and get method
+		public Query Foo => new Query();
+		public Query GetFoo() => Foo;
+		public Query Get_Foo() => Foo;
+		public Query GeT_Foo() => Foo;
+
+		// conflict between property set() and set method
+		public Query Bar { get; set; }
+		public Query SetBar() => Bar;
 	}
 
 	public class DuplicateIndexedProperties {

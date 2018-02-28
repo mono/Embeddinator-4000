@@ -4,7 +4,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace Embeddinator
+namespace Embeddinator.ObjC
 {
 	public static class Utils
 	{

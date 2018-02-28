@@ -1,10 +1,10 @@
 using CppSharp;
 using CppSharp.AST;
 using CppSharp.Generators;
-using MonoEmbeddinator4000.Passes;
+using Embeddinator.Passes;
 using System.Linq;
  
-namespace MonoEmbeddinator4000.Generators
+namespace Embeddinator.Generators
 {
     public class ObjCHeaders : CHeaders
     {
@@ -26,7 +26,7 @@ namespace MonoEmbeddinator4000.Generators
 
         public override void WriteForwardDecls()
         {
-            var refs = new GetReferencedClasses();
+            var refs = new GetReferencedDecls();
             TranslationUnit.Visit(refs);
 
             var classes = refs.Classes.ToList();
@@ -41,8 +41,7 @@ namespace MonoEmbeddinator4000.Generators
             PopBlock(NewLineKind.BeforeNextBlock);
         }
 
-        public override void GenerateMethodSignature(Method method,
-            bool isSource)
+        public override void GenerateMethodSpecifier(Method method, Class @class)
         {
             this.GenerateObjCMethodSignature(method);
         }

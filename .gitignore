@@ -20,7 +20,6 @@ obj/
 *.sdf
 *.opensdf
 *.pdb
-*.config
 *.filters
 *.metagen
 *.ilk
@@ -28,6 +27,7 @@ obj/
 *.dylib
 bindings.h
 bindings.m
+/build/.vagrant
 /build/gen
 /build/lib
 /build/obj
@@ -37,13 +37,11 @@ bindings.m
 /build/projects/packages
 /external/jna
 /external/ikvm
-/tests/**/gen/c
-/tests/**/gen/objc
-/tests/**/gen/java
 packages
+.nuget/.nugetapikey
+/tests/android/**/.project
 
 ### Xcode ###
-build/
 DerivedData/
 *.pbxuser
 !default.pbxuser
@@ -66,3 +64,11 @@ xcuserdata/
 *.ipa
 *.dSYM.zip
 *.dSYM
+*.nupkg
+*.bak
+.cake/**
+!.cake/packages.config
+.vscode/
+.vs/
+Resource.designer.cs
+external/Xamarin.Android

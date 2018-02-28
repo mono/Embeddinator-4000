@@ -2,78 +2,73 @@ using CppSharp;
 using CppSharp.AST;
 using CppSharp.Passes;
 
-namespace MonoEmbeddinator4000.Passes
+namespace Embeddinator.Passes
 {
-    public class FieldToGetterSetterPass : TranslationUnitPass
+    public class FieldToGetterSetterPropertyPass : TranslationUnitPass
     {
-        public override bool VisitClassDecl(Class @class)
-        {
-            if (@class.CompleteDeclaration != null)
-                return VisitClassDecl(@class.CompleteDeclaration as Class);
-
-            return base.VisitClassDecl(@class);
-        }
-
         public override bool VisitFieldDecl(Field field)
         {
             if (!VisitDeclaration(field))
                 return false;
 
-            var @class = field.Namespace as Class;
-            if (@class == null)
+            if (field.Access == AccessSpecifier.Private)
                 return false;
 
-            if (field.Access == AccessSpecifier.Private)
-                return true;
+            if (field.IsImplicit)
+                return false;
 
-            // Check if we already have a synthetized getter/setter.
-            //var existing = @class.Methods.FirstOrDefault(
-            //    method => method.Parameters.SingleOrDefault(
-            //        (Parameter p) =>
-            //    {
-            //        Class paramClass;
-            //        if(!p.Type.TryGetClass(out paramClass))
-            //            return false;
-
-            //        return paramClass == @class;
-            //    }));
-
-            //if (existing != null)
-            //    return false;
+            if (!field.IsGenerated)
+                return false;
 
             field.GenerationKind = GenerationKind.None;
 
-            var getter = new Method
+            var @class = field.Namespace as Class;
+
+            var property = new Property
             {
-                Name = string.Format("get{0}", field.Name),
-                Namespace = @class,
-                ReturnType = field.QualifiedType,
-                Access = field.Access
+                Name = field.Name,
+                Namespace = field.Namespace,
+                Field = field,
+                QualifiedType = field.QualifiedType,
+                AssociatedDeclaration = field
             };
 
-            @class.Methods.Add(getter);
+            var getter = new Method
+            {
+                Name = $"get_{field.Name}",
+                Namespace = @class,
+                ReturnType = field.QualifiedType,
+                Access = field.Access,
+                AssociatedDeclaration = property,
+                IsStatic = field.IsStatic,
+                SynthKind = FunctionSynthKind.FieldAcessor
+            };
+            property.GetMethod = getter;
 
             var setter = new Method
             {
-                Name = string.Format("set{0}", field.Name),
+                Name = $"set_{field.Name}",
                 Namespace = @class,
+                ReturnType = new QualifiedType(new BuiltinType(PrimitiveType.Void)),
                 Access = field.Access,
-                
+                AssociatedDeclaration = property,
+                IsStatic = field.IsStatic,
+                SynthKind = FunctionSynthKind.FieldAcessor
             };
+            property.SetMethod = setter;
 
             var param = new Parameter
             {
                 Name = "value",
-                QualifiedType = field.QualifiedType
+                QualifiedType = field.QualifiedType,
             };
             setter.Parameters.Add(param);
 
-            @class.Methods.Add(setter);
+            @class.Declarations.Add(property);
 
-            Diagnostics.Debug("Getter/setter created from field: {0}::{1}",
-                @class.QualifiedOriginalName, field.Name);
+            Diagnostics.Debug($"Property created from field: '{field.QualifiedName}'");
 
-            return false;
+            return true;
         }
     }
 }

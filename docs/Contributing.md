@@ -5,6 +5,54 @@ The **Embeddinator-4000** project is under the Mono umbrella and most of the [co
 * Bug reporting: Issues and enhancement requests are presently tracked in [github](https://github.com/mono/Embeddinator-4000/issues) (not bugzilla).
 * Chat: https://gitter.im/managed-interop
 
+## C/Java
+
+The work on the C and Java generators occurs in the [`master`](https://github.com/mono/Embeddinator-4000/tree/master) branch. Here are the steps to build it from our repository/branch:
+
+```
+> git clone https://github.com/mono/Embeddinator-4000.git
+> cd Embeddinator-4000
+> git branch master
+> git pull && git submodule update --init --recursive
+```
+
+Then, if you prefer the command line, you can either:
+
+`> msbuild Embeddinator-4000.sln`
+
+or run the provided compilation shell script:
+
+`> build.sh`
+
+If you're more GUI oriented, you can open the solution file at `Embeddinator-4000.sln` and hit F5 to build it.
+
+Once complete you should be able to run the tool with
+
+```
+$ mono build/lib/Debug/Embeddinator-4000.exe
+```
+
+Tests can be executed by running `make` from the `tests/common` directory.
+
+Or running the `tests/RunTestsuite.sh` shell script.
+
+### Cake
+
+We will slowly be moving our build scripts to Cake. We only have a few build targets setup so far. You may also need to run `git submodule update --init` before attempting a build.
+
+On OS X, you can setup your environment for Android by running a shell script:
+```
+./build.sh -t Generate-Android -v diagnostic
+```
+On Windows, in Powershell:
+```
+.\build.ps1 -t Generate-Android -v diagnostic
+```
+This will download a master build of Xamarin.Android and extract it into `/external/Xamarin.Android`. 
+
+`Embeddinator-4000.exe` will be compiled to `build/lib/Release`. The Cake script will also run Embeddinator against a test assembly, so you can be sure your system is setup properly.
+
+*NOTE: as soon as a preview build containing our changes for Xamarin.Android is available, we will update these instructions.*
 
 ## Objective-C
 

@@ -1,9 +1,7 @@
 ﻿using System;
 using System.IO;
 
-using Embeddinator;
-
-namespace ObjC {
+namespace Embeddinator.ObjC {
 	
 	public class ComparableHelper : MethodHelper {
 

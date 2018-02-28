@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace MonoEmbeddinator4000
+namespace Embeddinator
 {
     public enum ParserDiagnosticLevel
     {
@@ -60,9 +60,9 @@ namespace MonoEmbeddinator4000
 
     public class Parser
     {
-        public delegate void ParsedDelegate<T>(ParserResult<T> result);
+        public delegate bool AssemblyParsedDelegate(ParserResult<IKVM.Reflection.Assembly> result);
 
-        public ParsedDelegate<IKVM.Reflection.Assembly> OnAssemblyParsed = delegate { };
+        public AssemblyParsedDelegate OnAssemblyParsed = delegate { return true; };
 
         public bool AllowMissingAssembly;
 
@@ -104,30 +104,9 @@ namespace MonoEmbeddinator4000
             return AllowMissingAssembly ? universe.CreateMissingAssembly(args.Name) : null;
         }
 
-        public void ParseAssembly(ProjectInput input, ParserResult<IKVM.Reflection.Assembly> result)
+        ParserResult<IKVM.Reflection.Assembly> ParseAssembly(ProjectInput input)
         {
-            try
-            {
-                try
-                {
-                    var res = Universe.LoadFile(input.FullPath);
-                    result.Output = res;
-                }
-                catch (Exception ex)
-                {
-                    result.Message = ex.ToString();
-                    result.Kind = ParserResultKind.Error;
-                }
-            }
-            finally
-            {
-                OnAssemblyParsed(result);
-            }
-        }
-
-        ParserResult<T> ParseInput<T>(ProjectInput input, ParserHandler<T> handler)
-        {
-            var result = new ParserResult<T>
+            var result = new ParserResult<IKVM.Reflection.Assembly>
             {
                 Input = input
             };
@@ -138,7 +117,21 @@ namespace MonoEmbeddinator4000
                 return result;
             }
 
-            handler(input, result);
+            try
+            {
+                var res = Universe.LoadFile(input.FullPath);
+                result.Output = res;
+            }
+            catch (Exception ex)
+            {
+                result.Message = ex.ToString();
+                result.Kind = ParserResultKind.Error;
+            }
+            finally
+            {
+                OnAssemblyParsed(result);
+            }
+
             return result;
         }
 
@@ -148,8 +141,8 @@ namespace MonoEmbeddinator4000
 
             foreach (var input in project.AssemblyInputs)
             {
-                var result = ParseInput<IKVM.Reflection.Assembly>(input, ParseAssembly);
-                hasErrors |= result.HasErrors;
+                var result = ParseAssembly(input);
+                hasErrors |= result.Kind != ParserResultKind.Success || result.HasErrors;
             }
 
             return !hasErrors;

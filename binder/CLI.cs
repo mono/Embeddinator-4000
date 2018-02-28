@@ -1,15 +1,15 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using CppSharp;
 using CppSharp.Generators;
 
-namespace MonoEmbeddinator4000
+namespace Embeddinator
 {
     public class CLI
     {
-        static string Generator;
+        static List<GeneratorKind> Generators;
         static string Platform;
         static string OutputDir;
         static string VsVersion;
@@ -28,7 +28,7 @@ namespace MonoEmbeddinator4000
                 .Select(s => s.StartsWith("VS", StringComparison.InvariantCulture) ? s.Substring(2) : s));
 
             var optionSet = new Mono.Options.OptionSet() {
-                { "gen=", "target generator (C, C++, Obj-C, Java)", v => Generator = v },
+                { "gen=", "target generator (C, C++, Obj-C, Java, Swift)", v => Generators.Add(ConvertToGeneratorKind(v)) },
                 { "p|platform=", "target platform (iOS, macOS, Android, Windows)", v => Platform = v },
                 { "o|out|outdir=", "output directory", v => OutputDir = v },
                 { "c|compile", "compiles the generated output", v => CompileCode = true },
@@ -41,7 +41,7 @@ namespace MonoEmbeddinator4000
                 { "h|help",  "show this message and exit",  v => showHelp = v != null },
             };
 
-            Generator = "C";
+            Generators = new List<GeneratorKind>();
             VsVersion = "latest";
 
             try
@@ -103,6 +103,8 @@ namespace MonoEmbeddinator4000
                 return GeneratorKind.ObjectiveC;
             case "java":
                 return GeneratorKind.Java;
+            case "swift":
+                return GeneratorKind.Swift;
             }
 
             throw new NotSupportedException("Unknown target generator: " + gen);
@@ -124,6 +126,8 @@ namespace MonoEmbeddinator4000
         {
             switch (platform.ToLowerInvariant())
             {
+            case "linux":
+                return TargetPlatform.Linux;
             case "windows":
                 return TargetPlatform.Windows;
             case "android":
@@ -149,20 +153,17 @@ namespace MonoEmbeddinator4000
             options.Verbose = Verbose;
             options.OutputDir = OutputDir;
             options.CompileCode = CompileCode;
-            options.Target = Target;
-            options.DebugMode = DebugMode;
+            options.Compilation.Target = Target;
+            options.Compilation.DebugMode = DebugMode;
 
             if (options.OutputDir == null)
                 options.OutputDir = Directory.GetCurrentDirectory();
 
-            if (string.IsNullOrEmpty(Generator))
+            if (Generators.Count == 0)
             {
                 Console.Error.WriteLine("Please specify a target generator.");
                 return false;
             }
-
-            var generator = ConvertToGeneratorKind(Generator);
-            options.GeneratorKind = generator;
 
             if (string.IsNullOrEmpty(Platform))
             {
@@ -170,22 +171,37 @@ namespace MonoEmbeddinator4000
                 return false;
             }
 
+            if (Generators.Contains(GeneratorKind.ObjectiveC))
+            {
+                Console.Error.WriteLine("Please use the objcgen tool for Objective-C generation.");
+                return false;
+            }
+
+            //NOTE: Choosing Java generator, needs to imply the C generator
+            if ((Generators.Contains(GeneratorKind.Java) || Generators.Contains(GeneratorKind.Swift)) &&
+                !Generators.Contains(GeneratorKind.C))
+            {
+                Generators.Insert(0, GeneratorKind.C);
+            }
+
+            options.GeneratorKinds = Generators;
+
             var targetPlatform = ConvertToTargetPlatform(Platform);
-            options.Platform = targetPlatform;
+            options.Compilation.Platform = targetPlatform;
 
             var vsVersion = ConvertToVsVersion(VsVersion);
-            options.VsVersion = vsVersion;
+            options.Compilation.VsVersion = vsVersion;
 
             return true;
         }
 
-        static void Main(string[] args)
+        static int Main(string[] args)
         {
             ParseCommandLineArgs(args);
 
             var options = new Options();
             if (!SetupOptions(options))
-                return;
+                return -1;
 
             var project = new Project();
 
@@ -195,9 +211,17 @@ namespace MonoEmbeddinator4000
             foreach (var assembly in Assemblies)
                 project.Assemblies.Add(assembly);
 
-            var driver = new Driver(project, options);
+            foreach (var generator in Generators)
+            {
+                options.GeneratorKind = generator;
 
-            driver.Run();
+                var driver = new Driver(project, options);
+
+                if (!driver.Run())
+                    return -1;
+            }
+
+            return 0;
         }
     }
 }

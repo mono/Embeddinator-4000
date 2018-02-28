@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Embeddinator
+namespace Embeddinator.ObjC
 {
 	public class TypeMapper
 	{

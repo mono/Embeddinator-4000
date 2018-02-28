@@ -133,7 +133,7 @@ function install_mono () {
 	log "Downloading Mono $MIN_MONO_VERSION from $MONO_URL to $PROVISION_DOWNLOAD_DIR..."
 	local MONO_NAME=`basename $MONO_URL`
 	local MONO_PKG=$PROVISION_DOWNLOAD_DIR/$MONO_NAME
-	curl -L $MONO_URL > $MONO_PKG
+	curl --retry 3 -L $MONO_URL > $MONO_PKG
 
 	log "Installing Mono $MIN_MONO_VERSION from $MONO_URL..."
 	sudo installer -pkg $MONO_PKG -target /
@@ -205,7 +205,7 @@ function install_pkg () {
 	log "Downloading $PRODUCT $MIN_VERSION from $URL to $PROVISION_DOWNLOAD_DIR..."
 	local NAME=`basename $URL`
 	local PKG=$PROVISION_DOWNLOAD_DIR/$NAME
-	curl -L $URL > $PKG
+	curl --retry 3 -L $URL > $PKG
 
 	log "Installing $PRODUCT $MIN_VERSION from $URL..."
 	sudo installer -pkg $PKG -target /

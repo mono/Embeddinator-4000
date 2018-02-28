@@ -15,7 +15,7 @@ OBJCGEN_FILES := \
 	$(shell grep "EmbeddedResource Include" *.csproj | sed 's/.*Include="\(.*\)".*/\1/' | sed 's_\\_/_'g) \
 
 bin/Debug/objcgen.exe: $(OBJCGEN_FILES)
-	nuget restore ../generator.sln
+	nuget restore ../Embeddinator-4000.sln
 	msbuild objcgen.csproj
 
 SHELLCHECK:=$(shell which shellcheck)
