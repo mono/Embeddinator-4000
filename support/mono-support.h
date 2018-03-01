@@ -23,12 +23,12 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#if defined (XAMARIN_IOS) || defined (XAMARIN_MAC)
-#include <xamarin/xamarin.h>
-
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#if defined (XAMARIN_IOS) || defined (XAMARIN_MAC)
+#include <xamarin/xamarin.h>
 
 typedef void * gpointer;
 typedef uint16_t    mono_unichar2;
