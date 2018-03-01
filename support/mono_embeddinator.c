@@ -199,7 +199,7 @@ mono_embeddinator_install_assembly_load_hook(mono_embeddinator_assembly_load_hoo
 {
     mono_embeddinator_assembly_load_hook_t prev = g_assembly_load_hook;
     g_assembly_load_hook = hook;
-    return (mono_embeddinator_assembly_load_hook_t)prev;
+    return prev;
 }
 
 MonoClass* mono_embeddinator_search_class(const char* assembly, const char* _namespace,

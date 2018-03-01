@@ -530,7 +530,7 @@ namespace ObjC {
 				break;
 			case TypeCode.DateTime:
 				postwriter.WriteLine ($"E4KDateTime {presarrval} = mono_array_get ({presarr}, E4KDateTime, {pindex});");
-				postwriter.WriteLine ($"{presobj} = mono_embeddinator_get_nsdate ((E4KDateTime *) &{presarrval});");
+				postwriter.WriteLine ($"{presobj} = mono_embeddinator_get_nsdate (&{presarrval});");
 				break;
 			case TypeCode.Byte:
 				postwriter.WriteLine ($"NSData* {presobj} = [NSData dataWithBytes:mono_array_addr ({presarr}, unsigned char, 0) length:{parrlength}];");
@@ -745,7 +745,7 @@ namespace ObjC {
 				implementation.WriteLine ($"E4KDateTime __mdatetime = mono_embeddinator_get_system_datetime ({(is_by_ref ? "*" : string.Empty)}{paramaterName}, &__mono_context);");
 				implementation.WriteLine ($"{argumentName} = &__mdatetime;");
 				if (is_by_ref)
-					post.AppendLine ($"*{paramaterName} = mono_embeddinator_get_nsdate ((E4KDateTime *)&__mdatetime);");
+					post.AppendLine ($"*{paramaterName} = mono_embeddinator_get_nsdate (&__mdatetime);");
 				break;
 			case TypeCode.Boolean:
 			case TypeCode.Char:
@@ -1092,7 +1092,7 @@ namespace ObjC {
 				break;
 			case TypeCode.DateTime:
 				implementation.WriteLine ($"E4KDateTime __resarrval = mono_array_get (__resarr, E4KDateTime, __residx);");
-				implementation.WriteLine ($"__resobj = mono_embeddinator_get_nsdate ((E4KDateTime *)&__resarrval);");
+				implementation.WriteLine ($"__resobj = mono_embeddinator_get_nsdate (&__resarrval);");
 				break;
 			case TypeCode.Byte:
 				implementation.WriteLine ("NSData* __resobj = [NSData dataWithBytes:mono_array_addr (__resarr, unsigned char, 0) length:__resarrlength];");
