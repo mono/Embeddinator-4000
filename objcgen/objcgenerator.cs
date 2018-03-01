@@ -630,10 +630,12 @@ namespace Embeddinator.ObjC {
 			case TypeCode.Double:
 				var typeName = NameGenerator.GetTypeName (type);
 				string returnValue;
-				if (typeCode == TypeCode.SByte)
+				if (typeCode == TypeCode.SByte) {
 					returnValue = $"charValue"; // GetTypeName returns signed char
-				else
-					returnValue = $"{typeName.CamelCase (true)}Value";
+				} else {
+					string returnValueTypeName = type.IsEnum ? NameGenerator.GetTypeName (type.GetEnumUnderlyingType ()) : typeName;
+					returnValue = $"{returnValueTypeName.CamelCase (true)}Value";
+				}
 
 				implementation.WriteLine ($"NSNumber* {pnameRet} = {(is_by_ref ? $"(*{parameterName})" : parameterName)}[{pnameIdx}];");
 				implementation.WriteLine ($"if (!{pnameRet} || [{pnameRet} isKindOfClass:[NSNull class]])");
