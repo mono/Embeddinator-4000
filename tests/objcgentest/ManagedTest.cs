@@ -18,16 +18,6 @@ namespace ExecutionTests
 	[TestFixture]
 	public class ManagedTest
 	{
-		[TearDown]
-		public void TearDown ()
-		{
-			// If we fail, dump the Log to help track down the failure
-			if (TestContext.CurrentContext.Result.FailCount > 0) {
-				Console.WriteLine ("Test failure. Dumping log:");
-				Logger.Dump ();
-			}
-		}
-		
 		[Test]
 		[TestCase (true)]
 		[TestCase (false)]
