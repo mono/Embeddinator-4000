@@ -47,6 +47,9 @@ namespace Embeddinator
 
             string binPath = MonoDroidSdk.BinPath;
 
+            if (binPath == null)
+                throw new Exception ($"Cannot find Android SDK installed.");
+
             //On Windows, it is generally correct, but probe for "lib"
             if (File.Exists(Combine(binPath, "lib")))
                 return GetFullPath(MonoDroidSdk.BinPath);
