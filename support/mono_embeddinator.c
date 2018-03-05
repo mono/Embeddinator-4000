@@ -393,7 +393,7 @@ MonoClass* mono_embeddinator_get_decimal_class ()
 
 MonoClass* mono_embeddinator_get_datetime_class ()
 {
-    static MonoClass* datetimeclass = nil;
+    static MonoClass* datetimeclass = 0;
     if (!datetimeclass) {
         datetimeclass = mono_class_from_name (mono_get_corlib (), "System", "DateTime");
     }
