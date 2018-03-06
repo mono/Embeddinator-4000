@@ -26,8 +26,10 @@
 #pragma once
 
 #ifdef  __cplusplus
+#if !defined (__OBJC__)
 #include <cstdbool>
 #include <cstdint>
+#endif
 #else
 #include <stdbool.h>
 #include <stdint.h>

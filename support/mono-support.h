@@ -23,8 +23,13 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #if defined (XAMARIN_IOS) || defined (XAMARIN_MAC)
 #include <xamarin/xamarin.h>
+
 typedef void * gpointer;
 typedef uint16_t    mono_unichar2;
 
@@ -149,4 +154,8 @@ typedef struct {
 	unsigned long long DateData;
 } E4KDateTime;
 
+#endif
+
+#ifdef __cplusplus
+} /* extern "C" */
 #endif
