@@ -7,7 +7,7 @@
     <OutputType>Library</OutputType>
     <RootNamespace>objcgentest</RootNamespace>
     <AssemblyName>objcgentest</AssemblyName>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DebugSymbols>true</DebugSymbols>
@@ -46,8 +46,12 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\build\projects\Embeddinator-4000.csproj">
+      <Project>{e46ab94e-5081-b7e4-99f8-4206054e886c}</Project>
+      <Name>Embeddinator-4000</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\objcgen\objcgen.csproj">
-      <Project>{C166803B-011F-4EAF-B8C2-D7DBBA3CF1EC}</Project>
+      <Project>{c166803b-011f-4eaf-b8c2-d7dbba3cf1ec}</Project>
       <Name>objcgen</Name>
     </ProjectReference>
     <ProjectReference Include="..\managedwarn\managedwarn.csproj">
@@ -159,6 +163,9 @@
     <EmbeddedResource Include="xcodetemplate\tvos\src\ViewController.m" />
     <EmbeddedResource Include="xcodetemplate\tvos\test\Info.plist" />
     <EmbeddedResource Include="xcodetemplate\tvos\test\tvosTests.m" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
