@@ -29,6 +29,10 @@ namespace Embeddinator.ObjC {
 			headers.WriteLine ("#endif");
 			headers.WriteLine ();
 
+			headers.WriteLine ("#ifdef __cplusplus");
+			headers.WriteLine ("extern \"C\" {");
+			headers.WriteLine ("#endif");
+
 			headers.WriteLine ("// forward declarations");
 			foreach (var t in types.Where ((arg) => arg.IsClass))
 				headers.WriteLine ($"@class {t.TypeName};");
@@ -88,6 +92,10 @@ namespace Embeddinator.ObjC {
 
 			headers.WriteLine ("NS_ASSUME_NONNULL_END");
 			headers.WriteLine ();
+
+			headers.WriteLine ("#ifdef __cplusplus");
+			headers.WriteLine ("} /* extern \"C\" */");
+			headers.WriteLine ("#endif");
 		}
 
 		protected override void Generate (ProcessedAssembly a)
@@ -369,7 +377,7 @@ namespace Embeddinator.ObjC {
 					}
 					builder.WriteInvoke (args);
 					implementation.Write (postInvoke);
-					implementation.WriteLine ("_object = mono_embeddinator_create_object (__instance);");
+					implementation.WriteLine ("_object = (MonoEmbedObject *)mono_embeddinator_create_object (__instance);");
 					implementation.Indent--;
 					implementation.WriteLine ("}");
 					if (Processor.Types.HasClass (t.BaseType))
@@ -404,7 +412,7 @@ namespace Embeddinator.ObjC {
 				implementation.Indent++;
 				implementation.WriteLine ($"MonoObject* __instance = mono_object_new (__mono_context.domain, {managed_name}_class);");
 				// no call to `WriteInvoke` since there is not such method if we reached this case
-				implementation.WriteLine ("_object = mono_embeddinator_create_object (__instance);");
+				implementation.WriteLine ("_object = (MonoEmbedObject *)mono_embeddinator_create_object (__instance);");
 				implementation.Indent--;
 				implementation.WriteLine ("}");
 				if (HasClass (t.BaseType))
@@ -556,7 +564,7 @@ namespace Embeddinator.ObjC {
 				postwriter.WriteLine ($"if ({presarrval}) {{");
 				postwriter.Indent++;
 				postwriter.WriteLine ($"{tname}* {ptemp} = [[{tname} alloc] initForSuper];");
-				postwriter.WriteLine ($"{ptemp}->_object = mono_embeddinator_create_object ({presarrval});");
+				postwriter.WriteLine ($"{ptemp}->_object = (MonoEmbedObject *)mono_embeddinator_create_object ({presarrval});");
 				postwriter.WriteLine ($"{presobj} = {ptemp};");
 				postwriter.Indent--;
 				postwriter.WriteLine ("} else");
@@ -1130,7 +1138,7 @@ namespace Embeddinator.ObjC {
 				implementation.WriteLine ("if (__resarrval) {");
 				implementation.Indent++;
 				implementation.WriteLine ($"{tname}* __tmpobj = [[{tname} alloc] initForSuper];");
-				implementation.WriteLine ("__tmpobj->_object = mono_embeddinator_create_object (__resarrval);");
+				implementation.WriteLine ("__tmpobj->_object = (MonoEmbedObject *)mono_embeddinator_create_object (__resarrval);");
 				implementation.WriteLine ("__resobj = __tmpobj;");
 				implementation.Indent--;
 				implementation.WriteLine ("} else");
@@ -1175,7 +1183,7 @@ namespace Embeddinator.ObjC {
 				break;
 			case TypeCode.DateTime:
 				implementation.WriteLine ("void* __unboxedresult = mono_object_unbox (__result);");
-				implementation.WriteLine ("return mono_embeddinator_get_nsdate (__unboxedresult);");
+				implementation.WriteLine ("return mono_embeddinator_get_nsdate ((E4KDateTime *)__unboxedresult);");
 				break;
 			case TypeCode.Boolean:
 			case TypeCode.Char:
@@ -1208,7 +1216,7 @@ namespace Embeddinator.ObjC {
 				if (HasProtocol (t))
 					tname = "__" + tname + "Wrapper";
 				implementation.WriteLine ($"{tname}* __peer = [[{tname} alloc] initForSuper];");
-				implementation.WriteLine ("__peer->_object = mono_embeddinator_create_object (__result);");
+				implementation.WriteLine ("__peer->_object = (MonoEmbedObject *)mono_embeddinator_create_object (__result);");
 				implementation.WriteLine ("return __peer;");
 				break;
 			default:
