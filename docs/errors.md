@@ -220,7 +220,7 @@ Note: The list of reserved selectors will evolve with new versions of the tool.
 
 <h3><a name="EM1052"/>Element `E` is not generated its name conflicts with other elements on the same class.</h3>
 
-This is a **warning** that Element `E` is not generated its name conflicts with other elements on the same class.
+This is a **warning** that Element `E` is not generated as its name conflicts with other elements on the same class.
 
 
 <!-- 2xxx: code generation -->

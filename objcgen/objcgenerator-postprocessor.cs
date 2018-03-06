@@ -36,7 +36,7 @@ namespace Embeddinator.ObjC {
 				ProcessPotentialName (processedMethod);
 
 				if (Mapper.CheckForDuplicateSelectors (processedMethod) == DuplicationStatus.Unresolvable) {
-					Delayed.Add (ErrorHelper.CreateWarning (1052, $"Element {method.Name} is not generated its name conflicts with other elements on the same class."));
+					Delayed.Add (ErrorHelper.CreateWarning (1052, $"Element {method.Name} is not generated as its name conflicts with other elements on the same class."));
 					continue;
 				}
 
@@ -76,7 +76,7 @@ namespace Embeddinator.ObjC {
 				ProcessPotentialName (processedProperty);
 
 				if (Mapper.CheckForDuplicateSelectors (processedProperty) == DuplicationStatus.Unresolvable){
-					Delayed.Add (ErrorHelper.CreateWarning (1052, $"Element {processedProperty.Name} is not generated its name conflicts with other elements on the same class."));
+					Delayed.Add (ErrorHelper.CreateWarning (1052, $"Element {processedProperty.Name} is not generated as its name conflicts with other elements on the same class."));
 					continue;
 				}
 
@@ -104,7 +104,7 @@ namespace Embeddinator.ObjC {
 			foreach (ProcessedProperty processedProperty in properties) {
 
 				if (Mapper.CheckForDuplicateSelectors (processedProperty) == DuplicationStatus.Unresolvable) {
-					Delayed.Add (ErrorHelper.CreateWarning (1052, $"Element {processedProperty.Name} is not generated its name conflicts with other elements on the same class."));
+					Delayed.Add (ErrorHelper.CreateWarning (1052, $"Element {processedProperty.Name} is not generated as its name conflicts with other elements on the same class."));
 					continue;
 				}
 
@@ -129,7 +129,7 @@ namespace Embeddinator.ObjC {
 				ProcessPotentialName (processedField);
 
 				if (Mapper.CheckForDuplicateSelectors (processedField) == DuplicationStatus.Unresolvable) {
-					Delayed.Add (ErrorHelper.CreateWarning (1052, $"Element {processedField.Name} is not generated its name conflicts with other elements on the same class."));
+					Delayed.Add (ErrorHelper.CreateWarning (1052, $"Element {processedField.Name} is not generated as its name conflicts with other elements on the same class."));
 					continue;
 				}
 

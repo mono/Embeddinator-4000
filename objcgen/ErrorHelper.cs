@@ -2,7 +2,7 @@
 
 using System;
 using System.Collections.Generic;
-
+using System.Diagnostics;
 using ProductException = Embeddinator.ObjC.EmbeddinatorException;
 
 namespace Embeddinator.ObjC
@@ -115,12 +115,11 @@ namespace Embeddinator.ObjC
 			}
 		}
 
+		[Conditional ("DEBUG")]
 		static void DumpLog ()
 		{
-#if DEBUG
 			Console.WriteLine ("Debug Log:");
 			Logger.Dump ();
-#endif
 		}
 
 		static void Exit (int exitCode)
