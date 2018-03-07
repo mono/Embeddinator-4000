@@ -729,23 +729,23 @@ namespace ObjC {
 			switch (Type.GetTypeCode (t)) {
 			case TypeCode.String:
 				if (is_by_ref) {
-					implementation.WriteLine ($"MonoString* __string = *{paramaterName} ? mono_string_new (__mono_context.domain, [*{paramaterName} UTF8String]) : nil;");
-					implementation.WriteLine ($"{argumentName} = &__string;");
-					post.AppendLine ($"*{paramaterName} = mono_embeddinator_get_nsstring (__string);");
+					implementation.WriteLine ($"MonoString* __string_{paramaterName} = *{paramaterName} ? mono_string_new (__mono_context.domain, [*{paramaterName} UTF8String]) : nil;");
+					implementation.WriteLine ($"{argumentName} = &__string_{paramaterName};");
+					post.AppendLine ($"*{paramaterName} = mono_embeddinator_get_nsstring (__string_{paramaterName});");
 				} else
 					implementation.WriteLine ($"{argumentName} = {paramaterName} ? mono_string_new (__mono_context.domain, [{paramaterName} UTF8String]) : nil;");
 				break;
 			case TypeCode.Decimal:
-				implementation.WriteLine ($"MonoDecimal __mdec = mono_embeddinator_get_system_decimal ({(is_by_ref ? "*" : string.Empty)}{paramaterName}, &__mono_context);");
-				implementation.WriteLine ($"{argumentName} = &__mdec;");
+				implementation.WriteLine ($"MonoDecimal __mdec_{paramaterName} = mono_embeddinator_get_system_decimal ({(is_by_ref ? "*" : string.Empty)}{paramaterName}, &__mono_context);");
+				implementation.WriteLine ($"{argumentName} = &__mdec_{paramaterName};");
 				if (is_by_ref)
-					post.AppendLine ($"*{paramaterName} = mono_embeddinator_get_nsdecimalnumber (&__mdec);");
+					post.AppendLine ($"*{paramaterName} = mono_embeddinator_get_nsdecimalnumber (&__mdec_{paramaterName});");
 				break;
 			case TypeCode.DateTime:
-				implementation.WriteLine ($"E4KDateTime __mdatetime = mono_embeddinator_get_system_datetime ({(is_by_ref ? "*" : string.Empty)}{paramaterName}, &__mono_context);");
-				implementation.WriteLine ($"{argumentName} = &__mdatetime;");
+				implementation.WriteLine ($"E4KDateTime __mdatetime_{paramaterName} = mono_embeddinator_get_system_datetime ({(is_by_ref ? "*" : string.Empty)}{paramaterName}, &__mono_context);");
+				implementation.WriteLine ($"{argumentName} = &__mdatetime_{paramaterName};");
 				if (is_by_ref)
-					post.AppendLine ($"*{paramaterName} = mono_embeddinator_get_nsdate (&__mdatetime);");
+					post.AppendLine ($"*{paramaterName} = mono_embeddinator_get_nsdate (&__mdatetime_{paramaterName});");
 				break;
 			case TypeCode.Boolean:
 			case TypeCode.Char:
