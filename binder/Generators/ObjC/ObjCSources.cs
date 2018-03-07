@@ -2,7 +2,7 @@ using CppSharp;
 using CppSharp.AST;
 using CppSharp.Generators;
 
-namespace MonoEmbeddinator4000.Generators
+namespace Embeddinator.Generators
 {
     public class ObjCSources : CSources
     {
@@ -18,15 +18,14 @@ namespace MonoEmbeddinator4000.Generators
             base.Process();
         }
         
-        public override void GenerateMethodSignature(Method method,
-            bool isSource)
+        public override void GenerateMethodSpecifier(Method method, Class @class)
         {
             this.GenerateObjCMethodSignature(method);
         }
 
-        public override string GenerateClassObjectAlloc(string type)
+        public override string GenerateClassObjectAlloc(Declaration decl)
         {
-            return $"[[{type} alloc]init]";
+            return $"[[{decl.Visit(CTypePrinter)} alloc]init]";
         }
 
         public override bool VisitClassDecl(Class @class)

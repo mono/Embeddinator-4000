@@ -6,6 +6,7 @@ namespace Arrays {
 	public class Arr {
 		public string [] StringArrMethod () => new [] { "Hola", "Hello", "Bonjour" };
 		public ValueHolder [] ValueHolderArrMethod () => new [] { new ValueHolder (1), new ValueHolder (2), new ValueHolder (3) };
+		public ValueType [] ValueTypeArrMethod () => new [] { new ValueType (1), new ValueType (2), new ValueType (3) };
 		public bool [] BoolArrMethod () => new [] { true, false, true };
 		public char [] CharArrMethod () => new [] { 'a', 'b', '@' };
 		public double [] DoubleArrMethod () => new [] { 1.5, 5.1, 3.1416 };
@@ -24,6 +25,7 @@ namespace Arrays {
 		public string [] StringArr { get; } = new [] { "Hola", "Hello", "Bonjour" };
 		public int [] IntArr { get; } = new [] { int.MaxValue, int.MinValue, 0 };
 		public ValueHolder [] ValueHolderArr { get; } = new [] { new ValueHolder (1), new ValueHolder (2), new ValueHolder (3) };
+		public ValueType [] ValueTypeArr { get; } = new [] { new ValueType (1), new ValueType (2), new ValueType (3) };
 		public byte [] ByteArr { get; } = new byte [] { 0x0, 0x01, 0x02, 0x04, 0x08 };
 		public IMakeItUp [] InterfaceArr { get; } = new [] { Supplier.Create (), Supplier.Create (), Supplier.Create () };
 
@@ -40,6 +42,7 @@ namespace Arrays {
 		public float [] FloatArrMethod (float [] floatArr) => floatArr;
 		public double [] DoubleArrMethod (double [] doubleArr) => doubleArr;
 		public ValueHolder [] ValueHolderArrMethod (ValueHolder [] valhArr) => valhArr;
+		public ValueType[] ValueTypeArrMethod(ValueType [] valTypeArr) => valTypeArr;
 		public IMakeItUp [] InterfaceArrMethod (IMakeItUp [] interArr) => interArr;
 		public byte [] ByteArrMethod (byte [] byteArr) => byteArr;
 
@@ -53,6 +56,32 @@ namespace Arrays {
 		public void ByteArrRef (ref byte [] byteArr) => byteArr = byteArr?.Reverse ().ToArray ();
 		public void ValueHolderArrRef (ref ValueHolder [] valueArr) => valueArr = valueArr?.Reverse ().ToArray ();
 		public void IMakeItUpArrRef (ref IMakeItUp [] interArr) => interArr = interArr != null ? new [] { Supplier.Create () } : null;
+
+		public enum Enum
+		{
+			A = 0,
+			B,
+			C
+		}
+
+		public static Enum EnumArrayLast (Enum[] array)
+		{
+			return array.Last();
+		}
+		public static int SumByteArray (byte[] array)
+		{
+			return array.Sum(n => n); 
+		}
+		
+		public static int[] ReturnsIntArray ()
+		{
+			return new int[] { 1, 2, 3 }; 
+		}
+
+		public static string[] ReturnsStringArray ()
+		{
+			return new string[] { "1", "2", "3" };
+		}
 	}
 
 	public class ValueHolder {
@@ -62,4 +91,23 @@ namespace Arrays {
 			IntValue = intValue;
 		}
 	}
+
+	public struct ValueType {
+		public int IntValue;
+
+		public ValueType(int intValue)
+		{
+			IntValue = intValue;
+		}
+	}
+
+	// https://github.com/mono/Embeddinator-4000/issues/545
+    public class ObjectFactory<T> where T: class
+    {
+    }
+
+    public class ObjectFactoryCollection<T> where T : class
+    {
+        public void AddRange(ObjectFactory<T>[] itemArray) { }
+    }
 }

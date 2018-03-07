@@ -71,7 +71,7 @@ namespace Interfaces {
 
 		public static IFormatProvider GetCulture (string name)
 		{
-			return System.Globalization.CultureInfo.GetCultureInfo (name);
+			return new System.Globalization.CultureInfo (name);
 		}
 
 		public static string Format (double value, IFormatProvider provider)
@@ -79,4 +79,71 @@ namespace Interfaces {
 			return String.Format (provider, "{0}", value);
 		}
 	}
+
+	public interface GenericInterface<T>
+	{
+
+	}
+
+	public class ClassWithGenericInterface : GenericInterface<int>, IOperations
+	{
+		public int AddInt (int a, int b)
+		{
+			return a + b;
+		}	
+	}
+
+    public interface IBase
+    {
+        void Hello();
+    }
+
+    public interface IMore : IBase
+    {
+        void World();
+    }
+
+    public class MoreExplicit : IMore
+    {
+        void IBase.Hello() { }
+
+        void IMore.World() { }
+    }
+
+    public interface IConflict
+    {
+        string TestProperty { get; }
+
+        string TestField { get; }
+
+        void Hello();
+    }
+
+    public class Conflicted : IBase, IConflict
+    {
+        void IBase.Hello() { }
+
+        void IConflict.Hello() { }
+
+        public void Hello() { }
+
+        public void Hello(string foo) { }
+
+        string IConflict.TestProperty
+        {
+            get { return "IConflict.TestProperty"; }
+        }
+
+        public static string TestProperty
+        {
+            get { return "TestProperty"; }
+        }
+
+        string IConflict.TestField
+        {
+            get { return "IConflict.TestField"; }
+        }
+
+        public static string TestField = "TestField";
+    }
 }

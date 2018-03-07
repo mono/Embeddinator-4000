@@ -1,10 +1,10 @@
+﻿using System.Linq;
 using CppSharp;
 using CppSharp.AST;
 using CppSharp.Generators;
-using System.Linq;
-using System;
+using Embeddinator.Passes;
 
-namespace MonoEmbeddinator4000.Generators
+namespace Embeddinator.Generators
 {
     public class CHeaders : CCodeGenerator
     {
@@ -27,12 +27,25 @@ namespace MonoEmbeddinator4000.Generators
             WriteLine("#pragma once");
             NewLine();
 
+            WriteInclude("glib.h");
             WriteInclude("mono_embeddinator.h");
+            WriteInclude("c-support.h");
+
+            // Find dependent headers
+            var referencedDecls = new GetReferencedDecls();
+            Unit.Visit(referencedDecls);
+
+            var dependencies = referencedDecls.Declarations
+                .Where(d => !d.IsImplicit && d.TranslationUnit != Unit)
+                .Select(d => d.TranslationUnit).Distinct();
+
+            foreach (var dep in dependencies)
+                WriteInclude($"{dep.TranslationUnit.FileNameWithoutExtension}.h");
         }
 
         public override void Process()
         {
-            GenerateFilePreamble(CommentKind.BCPL);
+            GenerateFilePreamble(CommentKind.BCPL, "Embeddinator-4000");
 
             PushBlock();
             WriteHeaders();
@@ -62,22 +75,42 @@ namespace MonoEmbeddinator4000.Generators
 
         public virtual void WriteForwardDecls()
         {
+            var getReferencedDecls = new GetReferencedDecls();
+            Unit.Visit(getReferencedDecls);
+            
+            foreach (var decl in getReferencedDecls.Enums.Where(
+                c => c.TranslationUnit == TranslationUnit && c.IsGenerated))
+                    decl.Visit(this);
+        }
+
+        public override bool VisitDeclContext(DeclarationContext context)
+        {
+            foreach (var decl in context.Declarations.Where(d => !(d is Enumeration)))
+                if (decl.IsGenerated)
+                    decl.Visit(this);
+
+            return true;
         }
 
         public override bool VisitEnumDecl(Enumeration @enum)
         {
+            if (!VisitDeclaration(@enum))
+                return false;
+
             PushBlock();
 
-            Write("enum {0}", @enum.Name);
+            var enumName = Options.GeneratorKind != GeneratorKind.CPlusPlus ?
+                CGenerator.QualifiedName(@enum) : @enum.Name;
+            
+            Write($"typedef enum {enumName}");
 
             if (Options.GeneratorKind == GeneratorKind.CPlusPlus)
             {
-                var typePrinter = CTypePrinter;
-                var typeName = typePrinter.VisitPrimitiveType(
+                var typeName = CTypePrinter.VisitPrimitiveType(
                     @enum.BuiltinType.Type, new TypeQualifiers());
 
                 if (@enum.BuiltinType.Type != PrimitiveType.Int)
-                    Write(" : {0}", typeName);
+                    Write($" : {typeName}");
             }
 
             NewLine();
@@ -85,10 +118,13 @@ namespace MonoEmbeddinator4000.Generators
 
             foreach (var item in @enum.Items)
             {
-                Write(string.Format("{0}", item.Name));
+                var enumItemName = Options.GeneratorKind != GeneratorKind.CPlusPlus ?
+                    $"{@enum.QualifiedName}_{item.Name}" : item.Name;
+
+                Write(enumItemName);
 
                 if (item.ExplicitValue)
-                    Write(string.Format(" = {0}", @enum.GetItemValueAsString(item)));
+                    Write($" = {@enum.GetItemValueAsString(item)}");
 
                 if (item != @enum.Items.Last())
                     WriteLine(",");
@@ -96,7 +132,7 @@ namespace MonoEmbeddinator4000.Generators
 
             NewLine();
             PopIndent();
-            WriteLine("};");
+            WriteLine($"}} {enumName};");
 
             PopBlock(NewLineKind.BeforeNextBlock);
 
@@ -105,6 +141,9 @@ namespace MonoEmbeddinator4000.Generators
 
         public override bool VisitClassDecl(Class @class)
         {
+            if (!VisitDeclaration(@class))
+                return false;
+
             PushBlock();
 
             VisitDeclContext(@class);
@@ -116,9 +155,13 @@ namespace MonoEmbeddinator4000.Generators
 
         public override bool VisitMethodDecl(Method method)
         {
+            if (!VisitDeclaration(method))
+                return false;
+
             PushBlock();
 
-            GenerateMethodSignature(method, isSource: false);
+            Write("MONO_EMBEDDINATOR_API ");
+            GenerateMethodSpecifier(method, method.Namespace as Class);
             WriteLine(";");
 
             PopBlock();

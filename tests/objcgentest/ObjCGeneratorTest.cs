@@ -1,9 +1,10 @@
 ﻿using NUnit.Framework;
 using System;
-using ObjC;
 
 using IKVM.Reflection;
 using Type = IKVM.Reflection.Type;
+
+using Embeddinator.ObjC;
 
 namespace ObjCGeneratorTest {
 	

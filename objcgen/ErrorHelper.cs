@@ -2,10 +2,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using ProductException = Embeddinator.ObjC.EmbeddinatorException;
 
-using ProductException = Embeddinator.EmbeddinatorException;
-
-namespace Embeddinator
+namespace Embeddinator.ObjC
 {
 	static class ErrorHelper
 	{
@@ -93,8 +93,10 @@ namespace Embeddinator
 			foreach (var ex in exceptions)
 				error |= ShowInternal (ex);
 
-			if (error)
+			if (error) {
+				DumpLog (); 
 				Exit (1);
+			}
 		}
 
 		static public void Show (Exception e)
@@ -107,8 +109,17 @@ namespace Embeddinator
 			foreach (var ex in exceptions)
 				error |= ShowInternal (ex);
 
-			if (error)
+			if (error) {
+				DumpLog (); 
 				Exit (1);
+			}
+		}
+
+		[Conditional ("DEBUG")]
+		static void DumpLog ()
+		{
+			Console.WriteLine ("Debug Log:");
+			Logger.Dump ();
 		}
 
 		static void Exit (int exitCode)

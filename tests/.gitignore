@@ -3,7 +3,8 @@
 **/gen/java
 **/c
 **/objc
-**/java
 **/obj
 **/*.Tests
-**/*.dylib
+*.dylib
+*.jar
+!MonoEmbeddinator4000.Tests

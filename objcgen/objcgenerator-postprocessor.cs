@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 
 using IKVM.Reflection;
 using Type = IKVM.Reflection.Type;
-using Embeddinator;
-using System.Globalization;
 
-namespace ObjC {
+namespace Embeddinator.ObjC {
 	// A set of post-processing steps needed to add hints
 	// to the input of the generation step
 	public partial class ObjCProcessor {
@@ -36,7 +35,10 @@ namespace ObjC {
 
 				ProcessPotentialName (processedMethod);
 
-				Mapper.CheckForDuplicateSelectors (processedMethod);
+				if (Mapper.CheckForDuplicateSelectors (processedMethod) == DuplicationStatus.Unresolvable) {
+					Delayed.Add (ErrorHelper.CreateWarning (1052, $"Element {method.Name} is not generated as its name conflicts with other elements on the same class."));
+					continue;
+				}
 
 				Mapper.Register (processedMethod);
 
@@ -49,7 +51,7 @@ namespace ObjC {
 		{
 			MethodInfo method = processedMethod.Method;
 			if (IsOperatorOrFriendlyVersion (method)) {
-				string nameOverride = OperatorOverloads.GetObjCName (processedMethod.Method.Name, processedMethod.Method.ParameterCount);
+				string nameOverride = OperatorOverloads.GetObjCName (processedMethod.Method.Name, processedMethod.Method.GetParameters ().Length);
 				if (nameOverride != null)
 					processedMethod.NameOverride = nameOverride;
 			}
@@ -73,7 +75,10 @@ namespace ObjC {
 
 				ProcessPotentialName (processedProperty);
 
-				Mapper.CheckForDuplicateSelectors (processedProperty);
+				if (Mapper.CheckForDuplicateSelectors (processedProperty) == DuplicationStatus.Unresolvable){
+					Delayed.Add (ErrorHelper.CreateWarning (1052, $"Element {processedProperty.Name} is not generated as its name conflicts with other elements on the same class."));
+					continue;
+				}
 
 				Mapper.Register (processedProperty);
 
@@ -98,7 +103,10 @@ namespace ObjC {
 		{
 			foreach (ProcessedProperty processedProperty in properties) {
 
-				Mapper.CheckForDuplicateSelectors (processedProperty);
+				if (Mapper.CheckForDuplicateSelectors (processedProperty) == DuplicationStatus.Unresolvable) {
+					Delayed.Add (ErrorHelper.CreateWarning (1052, $"Element {processedProperty.Name} is not generated as its name conflicts with other elements on the same class."));
+					continue;
+				}
 
 				Mapper.Register (processedProperty);
 
@@ -120,7 +128,10 @@ namespace ObjC {
 			foreach (ProcessedFieldInfo processedField in fields) {
 				ProcessPotentialName (processedField);
 
-				Mapper.CheckForDuplicateSelectors (processedField);
+				if (Mapper.CheckForDuplicateSelectors (processedField) == DuplicationStatus.Unresolvable) {
+					Delayed.Add (ErrorHelper.CreateWarning (1052, $"Element {processedField.Name} is not generated as its name conflicts with other elements on the same class."));
+					continue;
+				}
 
 				Mapper.Register (processedField);
 
@@ -130,14 +141,25 @@ namespace ObjC {
 
 		protected IEnumerable<ProcessedConstructor> PostProcessConstructors (IEnumerable<ProcessedConstructor> constructors)
 		{
-			foreach (ProcessedConstructor processedConstructor in constructors) {				
-				Mapper.CheckForDuplicateSelectors (processedConstructor);
+			foreach (ProcessedConstructor processedConstructor in constructors) {
+				if (Mapper.CheckForDuplicateSelectors (processedConstructor) == DuplicationStatus.Unresolvable)
+					continue;
 
 				Mapper.Register (processedConstructor);
 
 				processedConstructor.Freeze ();
 				yield return processedConstructor;
 			}
+		}
+	}
+
+	static class RestrictedNames
+	{
+		static readonly HashSet<string> Names = new HashSet<string> { "static", "auto" };
+
+		public static bool IsRestrictedName (string name)
+		{
+			return Names.Contains (name);
 		}
 	}
 

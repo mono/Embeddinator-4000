@@ -7,9 +7,7 @@ using System.Text;
 using IKVM.Reflection;
 using Type = IKVM.Reflection.Type;
 
-using Embeddinator;
-
-namespace ObjC {
+namespace Embeddinator.ObjC {
 	
 	public partial class ObjCGenerator : Generator {
 
@@ -19,6 +17,8 @@ namespace ObjC {
 
 		public override void Generate ()
 		{
+			Logger.Log ($"Begin Generator");
+
 			var types = Processor.Types;
 			headers.WriteLine ("#include \"embeddinator.h\"");
 			headers.WriteLine ("#import <Foundation/Foundation.h>");
@@ -100,6 +100,8 @@ namespace ObjC {
 
 		protected override void Generate (ProcessedAssembly a)
 		{
+			Logger.Log ($"Generating Assembly: {a.Name}");
+
 			var originalName = a.Name;
 			var name = a.SafeName;
 			implementation.WriteLine ($"static void __lookup_assembly_{name} ()");
@@ -162,6 +164,8 @@ namespace ObjC {
 
 		void GenerateCategory (Type definedType, Type extendedType, List<ProcessedMethod> methods)
 		{
+			Logger.Log ($"Generating Catagory: {definedType.Name}");
+
 			var etn = NameGenerator.GetTypeName (extendedType).Replace (" *", String.Empty);
 			var name = $"{etn} ({NameGenerator.GetTypeName (definedType)})";
 			headers.WriteLine ($"/** Category {name}");
@@ -186,6 +190,8 @@ namespace ObjC {
 
 		void GenerateEnum (ProcessedType type)
 		{
+			Logger.Log ($"Generating Enum: {type.TypeName}");
+
 			Type t = type.Type;
 			var managed_name = type.ObjCName;
 			var underlying_type = t.GetEnumUnderlyingType ();
@@ -226,6 +232,8 @@ namespace ObjC {
 
 		void GenerateProtocol (ProcessedType type)
 		{
+			Logger.Log ($"Generating Protocol: {type.TypeName}");
+
 			Type t = type.Type;
 			var pbuilder = new ProtocolHelper (headers, implementation, private_headers) {
 				AssemblyQualifiedName = t.AssemblyQualifiedName,
@@ -279,6 +287,8 @@ namespace ObjC {
 
 		protected override void Generate (ProcessedType type)
 		{
+			Logger.Log ($"Generating Type: {type.TypeName}");
+
 			Type t = type.Type;
 			var aname = t.Assembly.GetName ().Name.Sanitize ();
 			var static_type = t.IsSealed && t.IsAbstract;
@@ -628,10 +638,12 @@ namespace ObjC {
 			case TypeCode.Double:
 				var typeName = NameGenerator.GetTypeName (type);
 				string returnValue;
-				if (typeCode == TypeCode.SByte)
+				if (typeCode == TypeCode.SByte) {
 					returnValue = $"charValue"; // GetTypeName returns signed char
-				else
-					returnValue = $"{typeName.CamelCase (true)}Value";
+				} else {
+					string returnValueTypeName = type.IsEnum ? NameGenerator.GetTypeName (type.GetEnumUnderlyingType ()) : typeName;
+					returnValue = $"{returnValueTypeName.CamelCase (true)}Value";
+				}
 
 				implementation.WriteLine ($"NSNumber* {pnameRet} = {(is_by_ref ? $"(*{parameterName})" : parameterName)}[{pnameIdx}];");
 				implementation.WriteLine ($"if (!{pnameRet} || [{pnameRet} isKindOfClass:[NSNull class]])");
@@ -780,6 +792,8 @@ namespace ObjC {
 
 		protected override void Generate (ProcessedProperty property)
 		{
+			Logger.Log ($"Generating Property: {property.Name}");
+
 			var getter = property.GetMethod;
 			var setter = property.SetMethod;
 			// setter-only properties are handled as methods (and should not reach this code)
@@ -810,6 +824,8 @@ namespace ObjC {
 
 		protected void Generate (ProcessedFieldInfo field)
 		{
+			Logger.Log ($"Generating Field: {field.Name}");
+
 			FieldInfo fi = field.Field;
 			bool read_only = fi.IsInitOnly || fi.IsLiteral;
 
@@ -917,6 +933,8 @@ namespace ObjC {
 		// TODO override with attribute ? e.g. [ObjC.Selector ("foo")]
 		string ImplementMethod (ProcessedMethod method)
 		{
+			Logger.Log ($"Generating Method Impl: {method}");
+
 			MethodInfo info = method.Method;
 
 			var type = info.DeclaringType;
@@ -963,6 +981,8 @@ namespace ObjC {
 
 		void GenerateDefaultValuesWrapper (ProcessedMemberWithParameters member)
 		{
+			Logger.Log ($"Generating Default Value Wrapper: {member.ObjCSelector}");
+
 			ProcessedMethod method = member as ProcessedMethod;
 			ProcessedConstructor ctor = member as ProcessedConstructor;
 			if (method == null && ctor == null)
@@ -1024,6 +1044,8 @@ namespace ObjC {
 
 		protected override void Generate (ProcessedMethod method)
 		{
+			Logger.Log ($"Generating Method: {method}");
+
 			MethodHelper builder;
 			switch (method.MethodType) {
 			case MethodType.DefaultValueWrapper:

@@ -67,6 +67,12 @@ mono_embeddinator_context_t* mono_embeddinator_get_context();
 MONO_EMBEDDINATOR_API
 void mono_embeddinator_set_assembly_path (const char *path);
 
+/*
+ * Override the default path (current executable / mono default installation) where runtime assemblies will be loaded.
+ */
+MONO_EMBEDDINATOR_API
+void mono_embeddinator_set_runtime_assembly_path (const char *path);
+
 /** 
  * Sets the current context.
  */
@@ -126,8 +132,12 @@ typedef enum
     MONO_EMBEDDINATOR_EXCEPTION_THROWN,
     // Mono failed to load assembly
     MONO_EMBEDDINATOR_ASSEMBLY_OPEN_FAILED,
+    // Mono failed to lookup class
+    MONO_EMBEDDINATOR_CLASS_LOOKUP_FAILED,
     // Mono failed to lookup method
-    MONO_EMBEDDINATOR_METHOD_LOOKUP_FAILED
+    MONO_EMBEDDINATOR_METHOD_LOOKUP_FAILED,
+    // Failed to load Mono runtime shared library symbols
+    MONO_EMBEDDINATOR_MONO_RUNTIME_MISSING_SYMBOLS
 } mono_embeddinator_error_type_t;
 
 /**
@@ -140,6 +150,12 @@ typedef struct
     MonoException* exception;
     const char* string;
 } mono_embeddinator_error_t;
+
+/**
+ * Converts an error object to its string representation.
+ */
+MONO_EMBEDDINATOR_API
+char* mono_embeddinator_error_to_string(mono_embeddinator_error_t error);
 
 /**
  * Fires an error and calls the installed error hook for handling.
@@ -155,12 +171,6 @@ typedef void (*mono_embeddinator_error_report_hook_t)(mono_embeddinator_error_t)
  */
 MONO_EMBEDDINATOR_API
 void* mono_embeddinator_install_error_report_hook(mono_embeddinator_error_report_hook_t hook);
-
-
-struct MonoEmbedArray
-{
-    GArray* array;
-};
 
 struct MonoEmbedObject
 {

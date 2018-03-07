@@ -12,6 +12,7 @@ while ! test -z $1; do
 			PROVISION_MONO=1
 			PROVISION_XI=1
 			PROVISION_XM=1
+			PROVISION_XCODE=1
 			shift
 			;;
 		--provision-mono)
@@ -26,10 +27,15 @@ while ! test -z $1; do
 			PROVISION_XM=1
 			shift
 			;;
+		--provision-xcode)
+			PROVISION_XCODE=1
+			shift
+			;;
 		--provision-all)
 			PROVISION_MONO=1
 			PROVISION_XI=1
 			PROVISION_XM=1
+			PROVISION_XCODE=1
 			shift
 			;;
 		--ignore-mono)
@@ -42,6 +48,10 @@ while ! test -z $1; do
 			;;
 		--ignore-xamarin-mac)
 			IGNORE_XM=1
+			shift
+			;;
+		--ignore-xcode)
+			IGNORE_XCODE=1
 			shift
 			;;
 		*)
@@ -133,7 +143,7 @@ function install_mono () {
 	log "Downloading Mono $MIN_MONO_VERSION from $MONO_URL to $PROVISION_DOWNLOAD_DIR..."
 	local MONO_NAME=`basename $MONO_URL`
 	local MONO_PKG=$PROVISION_DOWNLOAD_DIR/$MONO_NAME
-	curl -L $MONO_URL > $MONO_PKG
+	curl --retry 3 -L $MONO_URL > $MONO_PKG
 
 	log "Installing Mono $MIN_MONO_VERSION from $MONO_URL..."
 	sudo installer -pkg $MONO_PKG -target /
@@ -205,7 +215,7 @@ function install_pkg () {
 	log "Downloading $PRODUCT $MIN_VERSION from $URL to $PROVISION_DOWNLOAD_DIR..."
 	local NAME=`basename $URL`
 	local PKG=$PROVISION_DOWNLOAD_DIR/$NAME
-	curl -L $URL > $PKG
+	curl --retry 3 -L $URL > $PKG
 
 	log "Installing $PRODUCT $MIN_VERSION from $URL..."
 	sudo installer -pkg $PKG -target /
@@ -307,11 +317,39 @@ function check_xamarin_mac () {
 	ok "Found Xamarin.Mac $ACTUAL_XM_VERSION (at least $MIN_XM_VERSION and not more than $MAX_XM_VERSION is required)"
 }
 
+function check_xcode () {
+	if ! test -z $IGNORE_XCODE; then return; fi
+
+	if ! test -f /Library/Frameworks/Xamarin.iOS.framework/Versions/Current/Version; then
+		if ! test -z $PROVISION_XI; then
+			install_xamarin_ios
+		else
+			fail "You must install Xamarin.iOS"
+			return
+		fi
+	fi
+	local CURRENT_XCODE_PATH=$(xcode-select -p)
+	local REQUESTED_XCODE=$(awk '/RecommendedXcodeVersion/{getline; print}' /Library/Frameworks/Xamarin.iOS.framework/Versions/Current/Versions.plist | sed -e 's/<[^>]*>//g' | sed -e 's/\.//g' | xargs)
+	local NEEDED_XCODE_PATH=/Applications/Xcode$REQUESTED_XCODE.app/Contents/Developer
+	if test "$NEEDED_XCODE_PATH" != "$CURRENT_XCODE_PATH"; then
+		if ! test -z $PROVISION_XCODE; then
+			log "Setting selected xcode to $NEEDED_XCODE_PATH"
+			sudo xcode-select -s $NEEDED_XCODE_PATH
+		else
+			fail "You must set xcode-select to $NEEDED_XCODE_PATH"
+			return
+		fi
+	else
+		ok "Found Xcode $CURRENT_XCODE_PATH selected already"
+	fi
+}
+
 echo "Checking system..."
 
 check_mono
 check_xamarin_ios
 check_xamarin_mac
+check_xcode
 
 if test -z $FAIL; then
 	echo "System check succeeded"

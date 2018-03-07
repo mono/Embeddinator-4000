@@ -71,6 +71,17 @@ g_strdup (const gchar *str)
   return NULL;
 }
 
+void
+g_assertion_message (const gchar *format, ...)
+{
+  va_list args;
+
+  va_start (args, format);
+  fprintf (stderr, format, args);
+  va_end (args);
+  exit (0);
+}
+
 #define INITIAL_CAPACITY 16
 
 #define element_offset(p,i) ((p)->array.data + (i) * (p)->element_size)
@@ -286,15 +297,30 @@ g_array_set_size (GArray *array, gint length)
   } \
 }
 
+void
+g_string_null (GString *string)
+{
+  if (string->str)
+      g_free(string->str);
+
+  string->str = 0;
+  string->len = 0;
+  string->allocated_len = 0;
+}
+
 GString *
 g_string_new_len (const gchar *init, gssize len)
 {
   GString *ret = g_new (GString, 1);
 
-  if (init == NULL)
+  if (init == NULL) {
     ret->len = 0;
-  else
-    ret->len = len < 0 ? strlen(init) : len;
+    ret->allocated_len = 0;
+    ret->str = 0;
+    return ret;
+  }
+  
+  ret->len = len < 0 ? strlen(init) : len;
   ret->allocated_len = MAX(ret->len + 1, 16);
   ret->str = (char*)g_malloc(ret->allocated_len);
   if (init)

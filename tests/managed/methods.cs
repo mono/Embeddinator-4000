@@ -38,10 +38,55 @@ namespace Methods {
 			@string = @string == null ? "hello" : null;
 		}
 
+		public static void RefUnsignedCharPlusOne (ref byte val)
+		{
+			val++;
+		}
+
+		public static void RefUnsignedShortPlusOne (ref ushort val)
+		{
+			val++;
+		}
+
+		public static void RefUnsignedIntPlusOne (ref uint val)
+		{
+			val++;
+		}
+
+		public static void RefUnsignedLongPlusOne (ref ulong val)
+		{
+			val++;
+		}
+
 		public static void Out (string @string, out int length, out string upper)
 		{
 			length = @string == null ? 0 : @string.Length;
 			upper =  @string == null ? null : @string.ToUpperInvariant ();
+		}
+
+		public static int RefClass (ref Static @static)
+		{
+			return @static.Id;
+		}
+
+		public static void RefClassAssignPlus (ref Static @static, int plus)
+		{
+			@static = Static.Create(@static.Id + plus);
+		}
+
+		public static void RefClassRetNull (ref Static @static)
+		{
+			@static = null;
+		}
+
+		public static bool RefClassPassNull (ref Static @static)
+		{
+			return @static == null;
+		}
+
+		public static void OutClass (out Static @static, int Id)
+		{
+			@static = Static.Create(Id);
 		}
 	}
 
@@ -97,7 +142,20 @@ namespace Methods {
 		public bool Find (string name) { return true; }
 		public bool Find (string firstName, string lastName) { return true; }
 	}
-	
+
+	public class String {
+
+	}
+
+	public class ReservedMethods {
+		public void getClass () { }
+
+		public new Methods.String ToString()
+		{
+			return new Methods.String();
+		}
+	}
+
 	// Three extensions on two different types and a _normal_ static method
 	// objc: categories are per type (2 different here) and one should be a _normal_ method
 	public static class SomeExtensions {
@@ -138,7 +196,7 @@ namespace Methods {
 
 		public static string NotAnExtensionMethod ()
 		{
-			return String.Empty;
+			return string.Empty;
 		}
 	}
 }

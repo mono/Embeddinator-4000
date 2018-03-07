@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<resources>
+    <declare-styleable name="Theme">
+        <attr name="hello" format="string" />
+    </declare-styleable>
+    <declare-styleable name="THIS_IS_CAPS">
+        <attr name="camelCase" format="string" />
+        <attr name="THIS_IS_CAPS" format="string" />
+    </declare-styleable>
+</resources>

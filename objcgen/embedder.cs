@@ -6,9 +6,7 @@ using IKVM.Reflection;
 using System.Text;
 using System.Xml;
 
-using ObjC;
-
-namespace Embeddinator
+namespace Embeddinator.ObjC
 {
 	public class Embedder
 	{
@@ -42,6 +40,8 @@ namespace Embeddinator
 		public bool CompileCode { get; set; }
 
 		public bool Debug { get; set; }
+
+		public bool Extension { get; set; }
 
 		public bool Shared { get { return CompilationTarget == CompilationTarget.SharedLibrary; } }
 

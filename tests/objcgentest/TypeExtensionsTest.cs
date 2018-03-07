@@ -1,7 +1,6 @@
 ﻿using NUnit.Framework;
 using System;
-using ObjC;
-using Embeddinator;
+using Embeddinator.ObjC;
 
 using IKVM.Reflection;
 using Type = IKVM.Reflection.Type;

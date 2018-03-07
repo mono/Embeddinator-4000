@@ -1,9 +1,10 @@
 using CppSharp.AST;
+using CppSharp.AST.Extensions;
 using CppSharp.Passes;
-using MonoEmbeddinator4000.Generators;
+using Embeddinator.Generators;
 using System.Collections.Generic;
 
-namespace MonoEmbeddinator4000.Passes
+namespace Embeddinator.Passes
 {
     /// <summary>
     /// This pass is responsible for gathering a unique set of array types,
@@ -25,6 +26,7 @@ namespace MonoEmbeddinator4000.Passes
         {
             Arrays = new Dictionary<string, QualifiedType>();
             Declarations = new List<TypedefDecl>();
+            VisitOptions.VisitPropertyAccessors = true;
         }
 
         public override bool VisitTranslationUnit(TranslationUnit unit)
@@ -42,7 +44,7 @@ namespace MonoEmbeddinator4000.Passes
             return ret;
         }
 
-        public static Class MonoEmbedArray = new Class { Name = "MonoEmbedArray" };
+        public static Class MonoEmbedArray = new Class { Name = "MonoEmbedArray", IsImplicit = true };
 
         QualifiedType GenerateArrayType(ArrayType array, Declaration decl)
         {
@@ -52,12 +54,13 @@ namespace MonoEmbeddinator4000.Passes
 
             var typedef = new TypedefDecl
             {
-                Name = string.Format("_{0}", typeName),
+                Name = $"_{typeName}",
                 Namespace = @namespace,
                 QualifiedType = new QualifiedType(new TagType(MonoEmbedArray))
             };
 
-            Declarations.Add(typedef);
+            if (!array.Type.IsPrimitiveType())
+                Declarations.Add(typedef);
 
             var typedefType = new TypedefType(typedef);
             var arrayType = new ManagedArrayType(array, typedefType);
@@ -99,6 +102,12 @@ namespace MonoEmbeddinator4000.Passes
 
         public override bool VisitFunctionDecl(Function function)
         {
+            if (function.Ignore)
+                return false;
+
+            if (function.TranslationUnit != TranslationUnit)
+                return false;
+
             QualifiedType newType;
 
             var retType = function.ReturnType;

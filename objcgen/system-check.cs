@@ -2,7 +2,7 @@
 using System.IO;
 using System.Reflection;
 
-namespace Embeddinator
+namespace Embeddinator.ObjC
 {
 	public static class SystemCheck
 	{

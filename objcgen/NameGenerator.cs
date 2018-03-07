@@ -1,11 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Embeddinator;
 using IKVM.Reflection;
 using Type = IKVM.Reflection.Type;
 
-namespace ObjC {
+namespace Embeddinator.ObjC {
 	public static class NameGenerator {
 		public static Dictionary<string, string> ObjCTypeToArgument = new Dictionary<string, string> {
 			{ "int", "anInt" },
@@ -63,10 +62,11 @@ namespace ObjC {
 			if (t.IsByRef) {
 				var et = t.GetElementType ();
 				var typecode = Type.GetTypeCode (et);
+
 				if (typecode == TypeCode.Decimal || typecode == TypeCode.DateTime) // This is boxed into NSDecimalNumber/NSDate
 					return GetTypeName (et) + "_Nonnull * _Nullable";
 
-				return GetTypeName (et) + (et.IsValueType ? " " : " _Nonnull ") + "* _Nullable";
+				return GetTypeName (et) + " * " + (et.IsValueType ? "_Nullable" : "_Nonnull");
 			}
 
 			if (t.IsEnum)
@@ -233,6 +233,8 @@ namespace ObjC {
 		{
 			string pName = p.Name;
 			string ptname = GetTypeName (p.ParameterType);
+			if (RestrictedNames.IsRestrictedName (pName))
+				pName = "managed" + pName;
 			if (p.Name.Length < 3) {
 				if (!ObjCTypeToArgument.TryGetValue (ptname, out pName))
 					pName = "anObject";

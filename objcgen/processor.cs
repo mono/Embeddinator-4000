@@ -1,9 +1,10 @@
 ﻿﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using IKVM.Reflection;
 using Type = IKVM.Reflection.Type;
 
-namespace Embeddinator {
+namespace Embeddinator.ObjC {
 
 	public abstract partial class Processor {
 
@@ -18,6 +19,8 @@ namespace Embeddinator {
 
 		public virtual void Process (IEnumerable<ProcessedAssembly> input)
 		{
+			Logger.Log ($"Processing: {input.Count ()} assemblies");
+
 			foreach (var a in input) {
 				// ignoring/warning one is not an option as they could be different (e.g. different builds/versions)
 				if (!AddIfUnique (a))
@@ -37,6 +40,8 @@ namespace Embeddinator {
 		{
 			if (!a.UserCode)
 				return;
+
+			Logger.Log ($"Processing Assembly: {a.Name}");
 
 			foreach (var t in GetTypes (a.Assembly)) {
 				var pt = new ProcessedType (t) {

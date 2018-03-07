@@ -1,15 +1,16 @@
-using System;
+﻿﻿﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using CppSharp;
 using CppSharp.AST;
 using CppSharp.Generators;
 using CppSharp.Passes;
-using MonoEmbeddinator4000.Generators;
-using MonoEmbeddinator4000.Passes;
+using Embeddinator.Generators;
+using Embeddinator.Passes;
 using BindingContext = CppSharp.Generators.BindingContext;
 
-namespace MonoEmbeddinator4000
+namespace Embeddinator
 {
     public partial class Driver
     {
@@ -28,8 +29,6 @@ namespace MonoEmbeddinator4000
             Project = project;
             Options = options;
 
-            Options.MainModule.LibraryName = null;
-
             Options.GenerateSupportFiles = 
                 Options.GeneratorKind == GeneratorKind.C ||
                 Options.GeneratorKind == GeneratorKind.CPlusPlus ||
@@ -43,31 +42,31 @@ namespace MonoEmbeddinator4000
             if (Options.Verbose)
                 Diagnostics.Level = DiagnosticKind.Debug;
 
+            if (!Options.Compilation.Platform.HasValue)
+                Options.Compilation.Platform = Platform.Host;
+
+            CGenerator.Options = options;
             Declaration.QualifiedNameSeparator = "_";
         }
 
         bool Parse()
         {
             var parser = new Parser();
+
+            foreach (var assembly in Project.Assemblies)
+            {
+                parser.AddAssemblyResolveDirectory(Path.GetDirectoryName(assembly));
+            }
+
+            if (Options.Compilation.Platform == TargetPlatform.Android)
+            {
+                foreach (var dir in XamarinAndroid.TargetFrameworkDirectories)
+                {
+                    parser.AddAssemblyResolveDirectory(dir);
+                }
+            }
+
             parser.OnAssemblyParsed += HandleAssemblyParsed;
-
-            try
-            {
-                var libDir = Path.Combine(MonoTouchSdk.LibDir, "32bits");
-                parser.AddAssemblyResolveDirectory(libDir);
-            }
-            catch (Exception)
-            {
-            }
-
-            try
-            {
-                var libDir = Path.GetDirectoryName(XamMacSdk.UnifiedFullProfileFrameworkAssembly);
-                parser.AddAssemblyResolveDirectory(libDir);
-            }
-            catch (Exception)
-            {
-            }
 
             return parser.Parse(Project);
         }
@@ -81,49 +80,24 @@ namespace MonoEmbeddinator4000
             foreach (var assembly in Assemblies)
                 astGenerator.Visit(assembly);
 
-            var passes = new List<TranslationUnitPass>
+            Context.TranslationUnitPasses.Passes.AddRange(new List<TranslationUnitPass>
             {
                 new CheckReservedKeywords(),
                 new GenerateObjectTypesPass(),
                 new GenerateArrayTypes(),
-                new CheckIgnoredDeclsPass { CheckDecayedTypes = false }
-            };
-
-            if (Options.GeneratorKind == GeneratorKind.C ||
-                Options.GeneratorKind == GeneratorKind.ObjectiveC)
-            {
-                passes.Add(new RenameEnumItemsPass());
-                passes.Add(new FixMethodParametersPass());
-            }
+                new CheckIgnoredDeclsPass { CheckDecayedTypes = false },
+                new FieldToGetterSetterPropertyPass(),
+                new CheckDeclarations(),
+            });
 
             Generator.SetupPasses();
 
-            passes.AddRange(new TranslationUnitPass[]
+            Context.TranslationUnitPasses.Passes.AddRange(new TranslationUnitPass[]
             {
-                new RenameDuplicatedDeclsPass(),
-                new CheckDuplicatedNamesPass()
+                new CheckReservedKeywords(),
             });
 
-            Context.TranslationUnitPasses.Passes.AddRange(passes);
-
             Context.RunPasses();
-        }
-
-        public static string GetSupportDirectory()
-        {
-            var directory = new DirectoryInfo (Directory.GetCurrentDirectory());
-
-            while (directory != null)
-            {
-                var path = Path.Combine(directory.FullName, "support");
-
-                if (Directory.Exists(path))
-                    return path;
-
-                directory = directory.Parent;
-            }
-
-            throw new Exception("Support directory was not found");
         }
 
         void GenerateSupportFiles()
@@ -131,10 +105,17 @@ namespace MonoEmbeddinator4000
             // Search for the location of support directory and bundle files with output.
             try
             {
-                var path = GetSupportDirectory();
+                var path = Helpers.FindDirectory("support");
 
                 foreach (var file in Directory.EnumerateFiles(path))
+                {
+                    // Skip Objective-C support files if we are not targetting it.
+                    if (Options.GeneratorKind != GeneratorKind.ObjectiveC &&
+                        (Path.GetExtension(file) == ".m" || file.Contains("objc")))
+                        continue;
+
                     Output.WriteOutput(Path.GetFileName(file), File.ReadAllText(file));
+                }
             }
             catch (Exception)
             {
@@ -177,6 +158,9 @@ namespace MonoEmbeddinator4000
                 case GeneratorKind.Java:
                     generator = new JavaGenerator(Context);
                     break;
+                case GeneratorKind.Swift:
+                    generator = new SwiftGenerator(Context);
+                    break;
                 default:
                     throw new NotImplementedException();
             }
@@ -184,7 +168,7 @@ namespace MonoEmbeddinator4000
             return generator;
         }
 
-        void WriteFiles()
+        bool WriteFiles()
         {
             if (!Directory.Exists(Options.OutputDir))
                 Directory.CreateDirectory(Options.OutputDir);
@@ -209,6 +193,16 @@ namespace MonoEmbeddinator4000
 
                 Diagnostics.Message("Generated: {0}", path);
             }
+
+            if (Options.GeneratorKind == GeneratorKind.Java && Options.Compilation.Platform == TargetPlatform.Android)
+            {
+                Diagnostics.Message("Generating Java stubs...");
+                var project = XamarinAndroidBuild.GenerateJavaStubsProject(Assemblies, Options.OutputDir);
+                if (!MSBuild(project))
+                    return false;
+            }
+
+            return true;
         }
 
         bool ValidateAssemblies()
@@ -227,17 +221,17 @@ namespace MonoEmbeddinator4000
             return true;
         }
 
-        public void Run()
+        public bool Run()
         {
             if (!ValidateAssemblies())
-                return;
+                return false;
 
             Project.BuildInputs();
 
             Diagnostics.Message("Parsing assemblies...");
             Diagnostics.PushIndent();
             if (!Parse())
-                return;
+                return false;
             Diagnostics.PopIndent();
 
             Diagnostics.Message("Processing assemblies...");
@@ -248,16 +242,25 @@ namespace MonoEmbeddinator4000
             Diagnostics.Message("Generating binding code...");
             Diagnostics.PushIndent();
             Generate();
-            WriteFiles();
+            if (!WriteFiles())
+                return false;
             Diagnostics.PopIndent();
 
             if (Options.CompileCode)
             {
                 Diagnostics.Message("Compiling binding code...");
                 Diagnostics.PushIndent();
-                CompileCode();
+                var compiled = CompileCode();
                 Diagnostics.PopIndent();
+
+                if (!compiled)
+                {
+                    Diagnostics.Message("Failed to compile generated code.");
+                    return false;
+                }
             }
+
+            return true;
         }
 
         void HandleParserResult<T>(ParserResult<T> result)
@@ -291,14 +294,27 @@ namespace MonoEmbeddinator4000
             }
         }
 
-        void HandleAssemblyParsed(ParserResult<IKVM.Reflection.Assembly> result)
+        bool HandleAssemblyParsed(ParserResult<IKVM.Reflection.Assembly> result)
         {
             HandleParserResult(result);
 
-            if (result.Kind != ParserResultKind.Success)
-                return;
+            if (result.Output.GetReferencedAssemblies().Any(ass => ass.Name == "Mono.Android") &&
+                Options.Compilation.Platform != TargetPlatform.Android)
+            {
+                Console.Error.WriteLine("Assembly references Mono.Android.dll, plase specify target platform as Android.");
 
-            Assemblies.Add(result.Output);
+                result.Kind = ParserResultKind.Error;
+                return false;
+            }
+
+            if (result.Kind != ParserResultKind.Success)
+                return false;
+
+            //NOTE: this can happen if multiple generators are running
+            if (!Assemblies.Contains(result.Output))
+                Assemblies.Add(result.Output);
+
+            return true;
         }
     }
 }

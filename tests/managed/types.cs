@@ -106,6 +106,10 @@ public static class Type_Decimal {
 	public static void ReverseDecimalArrRef (ref decimal [] decArr) => decArr = decArr?.Reverse ().ToArray ();
 }
 
+public unsafe static class Type_Pointers {
+	public static void* Ptr { get; } = (void*)IntPtr.Zero;
+}
+
 public class ExposeExtraTypes {
 
 	public TimeSpan TimeOfDay {
@@ -114,6 +118,8 @@ public class ExposeExtraTypes {
 }
 
 public static class Type_DateTime {
+	public static string Now { get { return DateTime.Now.ToString (); } }
+
 	public static DateTime ReturnDate (DateTime datetime) => datetime;
 	public static void RefDate (ref DateTime datetime) => datetime = DateTime.MinValue;
 	public static DateTime [] ReverseDates (DateTime [] dates) => dates?.Reverse ().ToArray ();

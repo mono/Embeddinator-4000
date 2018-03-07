@@ -5,12 +5,13 @@ using System.Linq;
 using System.Text;
 using System.Xml;
 
-using Embeddinator;
+using Embeddinator.ObjC;
 
 using Xamarin;
 using DriverTest;
 
 using NUnit.Framework;
+using NUnit.Framework.Interfaces;
 
 namespace ExecutionTests
 {

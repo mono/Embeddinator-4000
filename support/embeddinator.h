@@ -58,12 +58,6 @@
 #endif
 
 /**
- * Arrays
- */
-
-typedef struct MonoEmbedArray MonoEmbedArray;
-
-/**
  * Objects
  */
 

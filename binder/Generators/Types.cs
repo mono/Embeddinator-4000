@@ -1,6 +1,6 @@
 using CppSharp.AST;
 
-namespace MonoEmbeddinator4000.Generators
+namespace Embeddinator.Generators
 {
     public class ManagedArrayType : DecayedType
     {

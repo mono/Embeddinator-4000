@@ -1,21 +1,60 @@
-using System;
+﻿﻿﻿﻿﻿﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using IKVM.Reflection;
-using CppSharp;
 using CppSharp.AST;
 using CppSharp.AST.Extensions;
 using CppSharp.Generators;
-using System.IO;
+using IKVM.Reflection;
 
-namespace MonoEmbeddinator4000.Generators
+namespace Embeddinator.Generators
 {
+    public static class DeclarationExtensions
+    {
+        public static Declaration GetRootAssociatedDecl(this Declaration decl)
+        {
+            while (decl.AssociatedDeclaration != null)
+                decl = decl.AssociatedDeclaration;
+
+            return decl;
+        }
+
+        public static string ManagedQualifiedName(this Declaration decl)
+        {
+            string managedName;
+
+            var property = decl.AssociatedDeclaration as Property;
+            if (decl is Method && property != null && property.IsSynthetized)
+            {
+                var managedDecl = property.AssociatedDeclaration ?? property;
+                managedName = ASTGenerator.ManagedNames[managedDecl];
+
+                var isGetter = property.GetMethod == decl;
+                var suffix = isGetter ? "get" : "set";
+                managedName = $"{managedName}:{suffix}";
+            }
+            else
+            {
+                managedName = ASTGenerator.ManagedNames[decl];
+            }
+
+            // Replace + with / since that's what mono_class_from_name expects for nested types.
+            return managedName.Replace("+", "/");
+        }
+    }
+
     public class ASTGenerator
     {
         ASTContext ASTContext { get; set; }
         Options Options { get; set; }
 
         private Assembly CurrentAssembly;
+
+        public static Dictionary<Declaration, string> ManagedNames
+            = new Dictionary<Declaration, string>();
+
+        public static Dictionary<TranslationUnit, Assembly> ManagedAssemblies
+            = new Dictionary<TranslationUnit, Assembly>();
 
         public ASTGenerator(ASTContext context, Options options)
         {
@@ -25,18 +64,16 @@ namespace MonoEmbeddinator4000.Generators
 
         TranslationUnit GetTranslationUnit(Assembly assembly)
         {
-            var assemblyName = Path.GetFileName(assembly.Location);
-            return GetTranslationUnit(assemblyName);
-        }
+            var assemblyName = Options.LibraryName ?? Path.GetFileName (assembly.Location);
 
-        TranslationUnit GetTranslationUnit(string assemblyName)
-        {
             var unit = ASTContext.TranslationUnits.Find(m => m.FileName.Equals(assemblyName));
             if (unit != null)
                 return unit;
 
             unit = ASTContext.FindOrCreateTranslationUnit(assemblyName);
             unit.FilePath = assemblyName;
+
+            ManagedAssemblies[unit] = assembly;
 
             return unit;
         }
@@ -45,13 +82,13 @@ namespace MonoEmbeddinator4000.Generators
         {
             CurrentAssembly = assembly;
 
-            var assemblyName = Path.GetFileName (assembly.Location);
-            var name = Options.LibraryName ?? assemblyName;
-
-            var unit = GetTranslationUnit(name);
+            var unit = GetTranslationUnit(assembly);
 
             foreach (var type in assembly.ExportedTypes)
             {
+                if (!type.IsPublic && (type.IsNested && !type.IsNestedPublic))
+                    continue;
+
                 var typeInfo = type.GetTypeInfo();
                 Visit(typeInfo);
             }
@@ -81,11 +118,14 @@ namespace MonoEmbeddinator4000.Generators
         {
             var @namespace = VisitNamespace(typeInfo);
             var decl = @namespace.Declarations.FirstOrDefault(
-                d => d.Name == typeInfo.Name);
+                d => d.Name == UnmangleTypeName(typeInfo.Name));
 
             // If we have already processed this declaration, return it.
             if (decl != null)
                 return decl;
+
+            if (typeInfo.IsGenericType && !typeInfo.IsGenericTypeDefinition)
+                return Visit(typeInfo.GetGenericTypeDefinition().GetTypeInfo());
 
             if (typeInfo.IsEnum)
                 decl = VisitEnum(typeInfo);
@@ -97,26 +137,62 @@ namespace MonoEmbeddinator4000.Generators
             if (decl.Namespace == null)
                 throw new Exception("Declaration should have a namespace");
 
+            if (typeInfo.IsGenericParameter || typeInfo.IsGenericType || typeInfo.IsAndroidSubclass())
+                decl.GenerationKind = GenerationKind.None;
+
             return decl;
         }
 
         static string UnmangleTypeName(string name)
         {
-            return string.IsNullOrEmpty(name) ? string.Empty :
-                         name.Replace(new char[] {'`', '<', '>' }, "_");
+            var typeName = string.IsNullOrEmpty(name) ? string.Empty :
+                name.Replace(new char[] {'`', '<', '>' }, "_");
+
+            // Remove prefixes for explicit interface methods.
+            typeName = typeName.Substring(typeName.LastIndexOf(".", StringComparison.Ordinal) + 1);
+
+            return typeName;
+        }
+
+        public void HandleBaseType(IKVM.Reflection.Type type, Class @class)
+        {
+            if (type.FullName == "System.Object" || type.FullName == "System.ValueType")
+                return;
+
+            var baseClass = Visit(type.GetTypeInfo()) as Class;
+            var specifier = new BaseClassSpecifier { Type = new TagType(baseClass) };
+            @class.Bases.Add(specifier);
         }
 
         public Class VisitRecord(TypeInfo type)
         {
+            var isStatic = type.IsSealed && type.IsAbstract;
+
             var @class = new Class
             {
                 Name = UnmangleTypeName(type.Name),
-                Type = type.IsInterface ? ClassType.Interface : ClassType.RefType,
-                IsFinal = type.IsSealed
+                Type = ClassType.RefType,
+                IsStatic = isStatic,
+                IsFinal = type.IsSealed && !isStatic,
+                IsAbstract = type.IsAbstract && !isStatic
             };
+
+            if (type.IsInterface)
+                @class.Type = ClassType.Interface;
+
+            if (type.IsValueType)
+                @class.Type = ClassType.ValueType;
 
             HandleNamespace(type, @class);
             VisitMembers(type, @class);
+
+            if (type.BaseType != null)
+                HandleBaseType(type.BaseType, @class);
+
+            foreach (var @interface in type.ImplementedInterfaces)
+                HandleBaseType(@interface, @class);
+
+            ManagedNames[@class] = type.FullName;
 
             return @class;
         }
@@ -135,14 +211,16 @@ namespace MonoEmbeddinator4000.Generators
             var @enum = new Enumeration
             {
                 Name = UnmangleTypeName(type.Name),
-                Type = VisitType(underlyingType).Type
+                BuiltinType = VisitType(underlyingType).Type as BuiltinType
             };
             HandleNamespace(type, @enum);
 
             if (Options.GeneratorKind == GeneratorKind.CPlusPlus)
-                @enum.Modifiers = Enumeration.EnumModifiers.Scoped;
+                @enum.Modifiers |= Enumeration.EnumModifiers.Scoped;
 
-            var builtinType = @enum.Type as BuiltinType;
+            bool flags = type.HasCustomAttribute("System", "FlagsAttribute");
+            if (flags)
+                @enum.Modifiers |= Enumeration.EnumModifiers.Flags;
 
             foreach (var item in type.DeclaredFields)
             {
@@ -158,7 +236,7 @@ namespace MonoEmbeddinator4000.Generators
 
                 var rawValue = item.GetRawConstantValue();
 
-                if (builtinType.IsUnsigned)
+                if (@enum.BuiltinType.IsUnsigned)
                     enumItem.Value = Convert.ToUInt64(rawValue);
                 else
                     enumItem.Value = (ulong) Convert.ToInt64(rawValue);
@@ -166,32 +244,72 @@ namespace MonoEmbeddinator4000.Generators
                 @enum.AddItem(enumItem);
             }
 
+            ManagedNames[@enum] = type.FullName;
+
             return @enum;
+        }
+
+        public bool IsSystemObjectMethod(MethodInfo method)
+        {
+            if (method.Match ("System.Int32", "CompareTo", "System.Object"))
+                return true;
+
+            if (method.Match ("System.Boolean", "Equals", "System.Object"))
+                return true;
+
+            if (method.Match ("System.Int32", "GetHashCode"))
+                return true;
+
+            return false;
         }
 
         public void VisitMembers(TypeInfo type, Class @class)
         {
             foreach (var ctor in type.DeclaredConstructors)
             {
+                if (ctor.IsStatic)
+                    continue;
+
+                if (!ctor.IsPublic)
+                    continue;
+
                 var decl = VisitConstructor(ctor, @class);
                 @class.Declarations.Add(decl);
             }
 
             foreach (var method in type.DeclaredMethods)
             {
+                if (!method.IsPublic && !method.IsExplicitInterfaceMethod())
+                {
+                    continue;
+                }
+
                 if (method.IsGenericMethod)
                     continue;
 
-                var decl = VisitMethod(method, @class);
+                if (IsSystemObjectMethod(method))
+                    continue;
+
+                var properties = method.DeclaringType.__GetDeclaredProperties();
+                var isPropertyAccessor = properties.Any(prop => 
+                        {
+                            return (prop.GetMethod == method) || (prop.SetMethod == method);
+                        });
+
+                if (isPropertyAccessor)
+                    continue;
+
+                var decl = VisitMethod(method);
                 @class.Declarations.Add(decl);
             }
 
             foreach (var field in type.DeclaredFields)
             {
+                if (!field.IsPublic)
+                    continue;
+
                 var decl = VisitField(field);
-                
-                // TODO: Ignore fields until we implement usage of FieldToPropertyPass
-                //@class.Declarations.Add(decl);
+                @class.Declarations.Add(decl);
             }
 
             foreach (var @event in type.DeclaredEvents)
@@ -305,15 +423,16 @@ namespace MonoEmbeddinator4000.Generators
             }
 
             return string.Format("{0}:{1}({2})", method.DeclaringType.FullName,
-                method.Name, string.Join(", ", @params));
+                method.Name, string.Join(",", @params));
         }
 
-        Method VisitMethod(MethodInfo methodInfo, Class @class)
+        Method VisitMethod(MethodInfo methodInfo)
         {
             var method = VisitMethodBase(methodInfo);
             method.ReturnType = VisitType(methodInfo.ReturnType);
 
-            if (method.ReturnType.Type == null)
+            if (method.ReturnType.Type == null
+             || method.ReturnType.Type is UnsupportedType)
                 method.Ignore = true;
 
             return method;
@@ -346,6 +465,9 @@ namespace MonoEmbeddinator4000.Generators
                 }
                 else if (managedType.IsArray)
                 {
+                    if (Options.GeneratorKind == GeneratorKind.Java || Options.GeneratorKind == GeneratorKind.Swift)
+                        return new QualifiedType(new UnsupportedType { Description = managedType.FullName });
+
                     var array = new ArrayType
                     {
                         SizeType = ArrayType.ArraySize.Variable,
@@ -358,6 +480,12 @@ namespace MonoEmbeddinator4000.Generators
                 throw new NotImplementedException();
             }
 
+            if (managedType.IsEnum)
+            {
+                var @enum = Visit(managedType.GetTypeInfo());
+                return new QualifiedType(new TagType(@enum));
+            }
+
             CppSharp.AST.Type type = null;
             TypeQualifiers qualifiers = new TypeQualifiers();
             switch (IKVM.Reflection.Type.GetTypeCode(managedType))
@@ -366,7 +494,6 @@ namespace MonoEmbeddinator4000.Generators
                 type = new BuiltinType(PrimitiveType.Null);
                 break;
             case TypeCode.Object:
-            case TypeCode.Decimal:
             case TypeCode.DateTime:
                 if (managedType.FullName == "System.Void")
                 {
@@ -374,7 +501,7 @@ namespace MonoEmbeddinator4000.Generators
                     break;
                 }
                 var currentUnit = GetTranslationUnit(CurrentAssembly);
-                if (managedType.Assembly.GetName().Name != currentUnit.FileNameWithoutExtension
+                if (managedType.Assembly != ManagedAssemblies[currentUnit]
                     || managedType.IsGenericType)
                 {
                     type = new UnsupportedType { Description = managedType.FullName };
@@ -384,15 +511,16 @@ namespace MonoEmbeddinator4000.Generators
                 type = new TagType(decl);
                 break;
             case TypeCode.DBNull:
-                throw new NotSupportedException();
+                type = new UnsupportedType() { Description = "DBNull" };
+                break;
             case TypeCode.Boolean:
                 type = new BuiltinType(PrimitiveType.Bool);
                 break;
             case TypeCode.Char:
-                type = new BuiltinType(PrimitiveType.WideChar);
+                type = new BuiltinType(PrimitiveType.Char);
                 break;
             case TypeCode.SByte:
-                type = new BuiltinType(PrimitiveType.Char);
+                type = new BuiltinType(PrimitiveType.SChar);
                 break;
             case TypeCode.Byte:
                 type = new BuiltinType(PrimitiveType.UChar);
@@ -410,10 +538,10 @@ namespace MonoEmbeddinator4000.Generators
                 type = new BuiltinType(PrimitiveType.UInt);
                 break;
             case TypeCode.Int64:
-                type = new BuiltinType(PrimitiveType.LongLong);
+                type = new BuiltinType(PrimitiveType.Long);
                 break;
             case TypeCode.UInt64:
-                type = new BuiltinType(PrimitiveType.ULongLong);
+                type = new BuiltinType(PrimitiveType.ULong);
                 break;
             case TypeCode.Single:
                 type = new BuiltinType(PrimitiveType.Float);
@@ -422,11 +550,10 @@ namespace MonoEmbeddinator4000.Generators
                 type = new BuiltinType(PrimitiveType.Double);
                 break;
             case TypeCode.String:
-                // TODO: Convert C and Obj-C generators to use primitive type strings.
-                if (Options.GeneratorKind == GeneratorKind.Java)
-                    type = new BuiltinType(PrimitiveType.String);
-                else
-                    type = new CILType(typeof(string));
+                type = new BuiltinType(PrimitiveType.String);
+                break;
+            case TypeCode.Decimal:
+                type = new BuiltinType(PrimitiveType.Decimal);
                 break;
             }
 
@@ -466,12 +593,15 @@ namespace MonoEmbeddinator4000.Generators
                 IsFinal = methodBase.IsFinal
             };
             method.Name = UnmangleTypeName(methodBase.Name);
-            method.OriginalName = GetInternalMethodName(methodBase);
+
+            ManagedNames[method] = GetInternalMethodName(methodBase);
 
             var parameters = methodBase.GetParameters();
             foreach (var param in parameters)
             {
                 var paramDecl = VisitParameter(param);
+                paramDecl.Namespace = method;
+
                 method.Parameters.Add(paramDecl);
 
                 if (paramDecl.Ignore)
@@ -481,9 +611,22 @@ namespace MonoEmbeddinator4000.Generators
             method.IsStatic = methodBase.IsStatic;
             method.IsVirtual = methodBase.IsVirtual;
             method.IsPure = methodBase.IsAbstract;
-            //method.IsFinal = methodBase.IsFinal;
+
             var accessMask = (methodBase.Attributes & MethodAttributes.MemberAccessMask);
             method.Access = ConvertMemberAttributesToAccessSpecifier(accessMask);
+
+            //NOTE: if this is an explicit interface method, mark it public and modify the name
+            if (!methodBase.DeclaringType.IsAndroidSubclass() && methodBase.IsExplicitInterfaceMethod())
+            {
+                //We also need to check for collisions
+                string name = method.Name.Split('.').Last();
+                if (!methodBase.DeclaringType.GetMethods().Any(m => m.IsPublic && !m.IsStatic && m.Name == name))
+                {
+                    method.Access = AccessSpecifier.Public;
+                    method.OriginalName =
+                        method.Name = name;
+                }
+            }
 
             return method;
         }
@@ -494,10 +637,11 @@ namespace MonoEmbeddinator4000.Generators
         /// <returns></returns>
         static ParameterUsage ConvertToParameterUsage(ParameterInfo param)
         {
+            if (param.IsOut)
+                return ParameterUsage.Out;
+
             if (param.ParameterType.IsByRef)
                 return ParameterUsage.InOut;
-            else if (param.IsOut)
-                return ParameterUsage.Out;
 
             return ParameterUsage.In;
         }
@@ -514,7 +658,8 @@ namespace MonoEmbeddinator4000.Generators
 
             var type = param.QualifiedType.Type;
 
-            if (type == null || (type.IsPointer() && type.GetFinalPointee() == null))
+            if (type == null || (type.IsPointer() && type.GetFinalPointee() == null) ||
+                type is UnsupportedType)
                 param.Ignore = true;
 
             if (paramInfo.ParameterType.ContainsGenericParameters)
@@ -549,14 +694,21 @@ namespace MonoEmbeddinator4000.Generators
 
         public Field VisitField(FieldInfo fieldInfo)
         {
-            var field = new Field()
+            var field = new Field
             {
                 Name = UnmangleTypeName(fieldInfo.Name),
-                QualifiedType = VisitType(fieldInfo.FieldType)
+                Namespace = Visit(fieldInfo.DeclaringType.GetTypeInfo()) as Class,
+                QualifiedType = VisitType(fieldInfo.FieldType),
+                IsStatic = fieldInfo.IsStatic
             };
+
+            if (field.Type is UnsupportedType)
+                field.Ignore = true;
 
             var accessMask = (fieldInfo.Attributes & FieldAttributes.FieldAccessMask);
             field.Access = ConvertFieldAttributesToAccessSpecifier(accessMask);
+
+            ManagedNames[field] = $"{fieldInfo.DeclaringType.FullName}:{fieldInfo.Name}";
 
             return field;
         }
@@ -568,19 +720,107 @@ namespace MonoEmbeddinator4000.Generators
 
         public Property VisitProperty(PropertyInfo propertyInfo, Class @class)
         {
-            var property = new Property()
+            var property = new Property
             {
                 Name = UnmangleTypeName(propertyInfo.Name),
+                Namespace = Visit(propertyInfo.DeclaringType.GetTypeInfo()) as Class,
                 QualifiedType = VisitType(propertyInfo.PropertyType),
             };
 
+            if (property.Type is UnsupportedType)
+                property.Ignore = true;
+
             if (propertyInfo.GetMethod != null)
-                property.GetMethod = VisitMethod(propertyInfo.GetMethod, @class);
+            {
+                property.GetMethod = VisitMethod(propertyInfo.GetMethod);
+                property.GetMethod.Namespace = property.Namespace;
+                property.GetMethod.AssociatedDeclaration = property;
+            }
 
             if (propertyInfo.SetMethod != null)
-                property.SetMethod = VisitMethod(propertyInfo.SetMethod, @class);
+            {
+                property.SetMethod = VisitMethod(propertyInfo.SetMethod);
+                property.SetMethod.Namespace = property.Namespace;
+                property.SetMethod.AssociatedDeclaration = property;
+            }
+
+            ManagedNames[property] = $"{propertyInfo.DeclaringType.FullName}:{propertyInfo.Name}";
 
             return property;
         }
     }
+
+    public static class TypeExtensions {
+        
+        public static bool Is (this IKVM.Reflection.Type self, string @namespace, string name)
+        {
+            return (self.Namespace == @namespace) && (self.Name == name);
+        }
+
+        public static bool Match (this MethodInfo self, string returnType, string name,
+            params string[] parameterTypes)
+        {
+            if (self.Name != name)
+                return false;
+            var parameters = self.GetParameters ();
+            var pc = parameters.Length;
+            if (pc != parameterTypes.Length)
+                return false;
+            if (self.ReturnType.FullName != returnType)
+                return false;
+            for (int i = 0; i < pc; i++) {
+                // parameter type not specified, useful for generics
+                if (parameterTypes [i] == null)
+                    continue;
+                if (parameterTypes [i] != parameters [i].ParameterType.FullName)
+                    return false;
+            }
+            return true;
+        }
+
+        public static bool HasCustomAttribute (this IKVM.Reflection.Type self, string @namespace, string name)
+        {
+            foreach (var ca in self.CustomAttributes) {
+                if (ca.AttributeType.Is (@namespace, name))
+                    return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// NOTE: Explicit interface implementations will be IsVirtual=True and IsFinal=True
+        /// See https://msdn.microsoft.com/en-us/library/system.reflection.methodbase.isfinal(v=vs.110).aspx
+        /// </summary>
+        public static bool IsExplicitInterfaceMethod(this MethodBase method)
+        {
+            return !method.IsPublic && method.IsVirtual && method.IsFinal;
+        }
+
+        public static bool IsAndroidSubclass (this IKVM.Reflection.Type type)
+        {
+            foreach (var @interface in type.GetInterfaces())
+            {
+                if (@interface.Assembly.IsAndroidAssembly())
+                    return true;
+            }
+
+            do
+            {
+                if (type == null)
+                    return false;
+                if (type.Assembly.IsAndroidAssembly())
+                    return true;
+
+                type = type.BaseType;
+
+            } while (true);
+        }
+
+        public static bool IsAndroidAssembly(this Assembly assembly)
+        {
+            return assembly.FullName.StartsWith("Mono.Android, ", StringComparison.Ordinal) ||
+                   assembly.FullName.StartsWith("Java.Interop, ", StringComparison.Ordinal);
+        }
+    }
 }
+

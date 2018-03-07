@@ -1,19 +1,24 @@
-using CppSharp;
+﻿﻿using CppSharp;
 using CppSharp.AST;
 using CppSharp.AST.Extensions;
-using System.Linq;
+using CppSharp.Generators;
 
-namespace MonoEmbeddinator4000.Generators
+namespace Embeddinator.Generators
 {
-    public class CMarshalPrinter : MarshalPrinter<MarshalContext>
+    public class CMarshaler : Marshaler
     {
-        public CMarshalPrinter(MarshalContext marshalContext)
-            : base(marshalContext)
+        public CMarshaler(BindingContext context)
+            : base(context)
         {
         }
 
+        public Options Options => Context.Options as Options;
+
+        public bool IsByRefParameter => (Parameter != null) &&
+            (Parameter.IsOut || Parameter.IsInOut);
+
         public CManagedToNativeTypePrinter CTypePrinter =>
-            CGenerator.GetCTypePrinter(CppSharp.Generators.GeneratorKind.C);
+            CGenerator.GetCTypePrinter(GeneratorKind.C);
 
         public virtual bool VisitManagedArrayType(ManagedArrayType array,
             TypeQualifiers quals)
@@ -32,120 +37,111 @@ namespace MonoEmbeddinator4000.Generators
         }
     }
 
-    public class CMarshalManagedToNative : CMarshalPrinter
+    public class CMarshalManagedToNative : CMarshaler
     {
-        public Options Options { get; private set; }
         public bool UnboxPrimitiveValues { get; set; }
 
-        public CMarshalManagedToNative(Options options, MarshalContext marshalContext)
-            : base(marshalContext)
+        public CMarshalManagedToNative(BindingContext context)
+            : base(context)
         {
-            Options = options;
             UnboxPrimitiveValues = true;
         }
 
         public override bool VisitManagedArrayType(ManagedArrayType array,
             TypeQualifiers quals)
         {
-            var support = Context.SupportBefore;
+            var arrayId = CGenerator.GenId($"{ArgName}_array");
+            Before.WriteLine("MonoArray* {0} = (MonoArray*) {1};",
+                                            arrayId, ArgName);
 
-            var arrayId = CGenerator.GenId($"{Context.ArgName}_array");
-            support.WriteLine("MonoArray* {0} = (MonoArray*) {1};",
-                                            arrayId, Context.ArgName);
-
-            var arraySizeId = CGenerator.GenId($"{Context.ArgName}_array_size");
-            support.WriteLine("uintptr_t {0} = mono_array_length({1});",
+            var arraySizeId = CGenerator.GenId($"{ArgName}_array_size");
+            Before.WriteLine("uintptr_t {0} = mono_array_length({1});",
                                             arraySizeId, arrayId);
 
-            var typePrinter = CTypePrinter;
-            typePrinter.PrintScopeKind = TypePrintScopeKind.Local;
-            var arrayTypedefName = array.Typedef.Visit(typePrinter);
+            CTypePrinter.PrintScopeKind = TypePrintScopeKind.Local;
+            var arrayTypedefName = array.Typedef.Visit(CTypePrinter);
 
-            typePrinter.PrintScopeKind = TypePrintScopeKind.Qualified;
-            var arrayElementName = array.Array.Type.Visit(typePrinter);
+            CTypePrinter.PrintScopeKind = TypePrintScopeKind.Qualified;
+            var arrayElementName = array.Array.Type.Visit(CTypePrinter);
+            if (array.Array.Type.IsClass())
+                arrayElementName += "*";
             var elementSize = $"sizeof({arrayElementName})";
-
-            var nativeArrayId = CGenerator.GenId($"{Context.ArgName}_native_array");
-            support.WriteLine("{0} {1};", arrayTypedefName, nativeArrayId);
-            support.WriteLine("{0}.array = g_array_sized_new(/*zero_terminated=*/FALSE," +
+    
+            var nativeArrayId = CGenerator.GenId($"{ArgName}_native_array");
+            Before.WriteLine("{0} {1};", arrayTypedefName, nativeArrayId);
+            Before.WriteLine("{0}.array = g_array_sized_new(/*zero_terminated=*/FALSE," +
                 " /*clear_=*/TRUE, {1}, {2});", nativeArrayId, elementSize, arraySizeId);
 
-            var elementClassId = CGenerator.GenId($"{Context.ArgName}_element_class");
-            support.WriteLine("MonoClass* {0} = mono_class_get_element_class({1});",
+            var elementClassId = CGenerator.GenId($"{ArgName}_element_class");
+            Before.WriteLine("MonoClass* {0} = mono_class_get_element_class({1});",
                 elementClassId,
-                CMarshalNativeToManaged.GenerateArrayTypeLookup(array.Array.Type, support));
+                CMarshalNativeToManaged.GenerateArrayTypeLookup(array.Array.Type, Before));
 
-            var elementSizeId = CGenerator.GenId($"{Context.ArgName}_array_element_size");
-            support.WriteLine("gint32 {0} = mono_class_array_element_size({1});",
+            var elementSizeId = CGenerator.GenId($"{ArgName}_array_element_size");
+            Before.WriteLine("gint32 {0} = mono_class_array_element_size({1});",
                 elementSizeId, elementClassId);
 
             var iteratorId = CGenerator.GenId("i");
-            support.WriteLine("for (int {0} = 0; {0} < {1}; {0}++)",
+            Before.WriteLine("for (int {0} = 0; {0} < {1}; {0}++)",
                 iteratorId, arraySizeId);
-            support.WriteStartBraceIndent();
+            Before.WriteStartBraceIndent();
 
-            var elementId = CGenerator.GenId($"{Context.ArgName}_array_element");
+            var elementId = CGenerator.GenId($"{ArgName}_array_element");
+            
+            if (CMarshalNativeToManaged.IsValueType(array.Array.Type))
+            {
+                var addressId = $"mono_array_addr_with_size({arrayId}, {elementSizeId}, {iteratorId})";
+                if (array.Array.Type.IsClass())
+                    Before.WriteLine("MonoObject* {0} = mono_value_box({1}.domain, {2}, {3});",
+                        elementId, CGenerator.GenId("mono_context"), elementClassId, addressId);
+                else
+                    Before.WriteLine("char* {0} = {1};",
+                        elementId, addressId);
+            }
+            else
+                Before.WriteLine("MonoObject* {0} = *(MonoObject**) mono_array_addr_with_size({1}, {2}, {3});",
+                    elementId, arrayId, elementSizeId, iteratorId);
 
-            var isValueType = CMarshalNativeToManaged.IsValueType(array.Array.Type);
-            support.WriteLine("{5} {0} = {4}mono_array_addr_with_size({1}, {2}, {3});",
-                elementId, arrayId, elementSizeId, iteratorId,
-                isValueType ? string.Empty : "*(MonoObject**)",
-                isValueType ? "char*" : "MonoObject*");
-
-            var ctx = new MarshalContext(Context.Context)
+            var marshal = new CMarshalManagedToNative(Context)
             {
                 ArgName = elementId,
                 ReturnVarName = elementId,
-                ReturnType = array.Array.QualifiedType
+                ReturnType = array.Array.QualifiedType,
+                UnboxPrimitiveValues = false
             };
 
-            var marshal = new CMarshalManagedToNative(Options, ctx) { UnboxPrimitiveValues = false };
             array.Array.QualifiedType.Visit(marshal);
 
-            if (!string.IsNullOrWhiteSpace(marshal.Context.SupportBefore))
-                support.Write(marshal.Context.SupportBefore.ToString());
+            if (!string.IsNullOrWhiteSpace(marshal.Before))
+                Before.Write(marshal.Before.ToString());
 
-            support.WriteLine("g_array_append_val({0}.array, {1});", nativeArrayId,
-                marshal.Context.Return.ToString());
+            Before.WriteLine("g_array_append_val({0}.array, {1});", nativeArrayId,
+                marshal.Return.ToString());
 
-            support.WriteCloseBraceIndent();
+            Before.WriteCloseBraceIndent();
 
-            Context.Return.Write("{0}", nativeArrayId);
+            Return.Write("{0}", nativeArrayId);
             return false;
         }
 
-        bool HandleSpecialCILType(CILType cilType)
+        public override bool VisitEnumDecl(Enumeration @enum)
         {
-            var type = cilType.Type;
-
-            if (type == typeof(string))
-            {
-                var stringId = CGenerator.GenId("string");
-                Context.SupportBefore.WriteLine("char* {0} = mono_string_to_utf8(" +
-                    "(MonoString*) {1});", stringId, Context.ArgName);
-
-                Context.Return.Write("{0}", stringId);
-                return true;
-            }
-
-            return false;
+            VisitPrimitiveType(@enum.BuiltinType.Type);
+            return true;
         }
 
         public override bool VisitClassDecl(Class @class)
         {
             var typeName = @class.Visit(CTypePrinter);
-            var objectId = $"{Context.ArgName}_obj";
-            Context.SupportBefore.WriteLine("{1}* {0} = ({1}*) mono_embeddinator_create_object({2});",
-                objectId, typeName, Context.ArgName);
-            Context.Return.Write("{0}", objectId);
+            var objectId = $"{ArgName}_obj";
+            Before.WriteLine("{1}* {0} = {2} ? ({1}*) mono_embeddinator_create_object({2}) : 0;",
+                objectId, typeName, ArgName);
+            Return.Write("{0}", objectId);
             return true;
         }
 
         public override bool VisitCILType(CILType type, TypeQualifiers quals)
         {
-            if (HandleSpecialCILType(type))
-                return true;
-
             return base.VisitCILType(type, quals);
         }
 
@@ -153,6 +149,20 @@ namespace MonoEmbeddinator4000.Generators
             TypeQualifiers quals)
         {
             return VisitPrimitiveType(builtin.Type);
+        }
+
+        public override bool VisitPointerType(PointerType pointer, TypeQualifiers quals)
+        {
+            var pointee = pointer.Pointee;
+
+            PrimitiveType primitive;
+            if (pointee.IsPrimitiveType(out primitive))
+            {
+                Return.Write("{0}", ArgName);
+                return true;
+            }
+
+            return base.VisitPointerType(pointer, quals);
         }
 
         public bool VisitPrimitiveType(PrimitiveType primitive)
@@ -164,6 +174,7 @@ namespace MonoEmbeddinator4000.Generators
                 case PrimitiveType.Bool:
                 case PrimitiveType.WideChar:
                 case PrimitiveType.Char:
+                case PrimitiveType.SChar:
                 case PrimitiveType.UChar:
                 case PrimitiveType.Short:
                 case PrimitiveType.UShort:
@@ -175,38 +186,47 @@ namespace MonoEmbeddinator4000.Generators
                 case PrimitiveType.ULongLong:
                 case PrimitiveType.Float:
                 case PrimitiveType.Double:
-                case PrimitiveType.LongDouble:
+                case PrimitiveType.Decimal:
                 case PrimitiveType.Null:
+                {
                     var typePrinter = CTypePrinter;
-                    var typeName = Context.ReturnType.Visit(typePrinter);
+                    var typeName = ReturnType.Visit(typePrinter);
 
-                    var valueId = Context.ArgName;
+                    var valueId = ArgName;
 
                     if (UnboxPrimitiveValues)
                     {
                         var unboxId = CGenerator.GenId("unbox");
-                        Context.SupportBefore.WriteLine("void* {0} = mono_object_unbox({1});",
-                            unboxId, Context.ArgName);
+                        Before.WriteLine("void* {0} = mono_object_unbox({1});",
+                            unboxId, ArgName);
                         valueId = unboxId;
                     }
 
-                    Context.Return.Write("*(({0}*){1})", typeName, valueId);
+                    Return.Write("*(({0}*){1})", typeName, valueId);
                     return true;
+                }
+                case PrimitiveType.String:
+                {
+	                var stringId = CGenerator.GenId("string");
+	                Before.WriteLine("char* {0} = mono_string_to_utf8(" +
+	                    "(MonoString*) {1});", stringId, ArgName);
+	
+	                Return.Write("{0}", stringId);
+	                return true;
+                }
             }
 
-            throw new System.NotSupportedException();
+            throw new System.NotImplementedException(primitive.ToString());
         }
     }
 
-    public class CMarshalNativeToManaged : CMarshalPrinter
+    public class CMarshalNativeToManaged : CMarshaler
     {
-        public Options Options { get; private set; }
         public bool PrimitiveValuesByValue { get; set; }
 
-        public CMarshalNativeToManaged (Options options, MarshalContext marshalContext)
-            : base (marshalContext)
+        public CMarshalNativeToManaged (BindingContext context)
+            : base (context)
         {
-            Options = options;
             PrimitiveValuesByValue = false;
         }
 
@@ -218,9 +238,9 @@ namespace MonoEmbeddinator4000.Generators
                     return "mono_get_void_class()";
                 case PrimitiveType.Bool:
                     return "mono_get_boolean_class()";
-                case PrimitiveType.WideChar:
-                    return "mono_get_char_class()";
                 case PrimitiveType.Char:
+                    return "mono_get_char_class()";
+                case PrimitiveType.SChar:
                     return "mono_get_sbyte_class()";
                 case PrimitiveType.UChar:
                     return "mono_get_byte_class()";
@@ -248,6 +268,8 @@ namespace MonoEmbeddinator4000.Generators
                     return "mono_get_uintptr_class()";
                 case PrimitiveType.String:
                     return "mono_get_string_class()";
+                case PrimitiveType.Decimal:
+                    return "mono_embeddinator_get_decimal_class()";
                 default:
                     throw new System.NotImplementedException();
             }
@@ -278,16 +300,8 @@ namespace MonoEmbeddinator4000.Generators
                 var tagType = type as TagType;
                 var decl = tagType.Declaration;
 
-                var @namespace = string.Empty;
-                var ids = string.Join(", ",
-                    decl.QualifiedName.Split('.').Select(n => $"\"{n}\""));
-
-                var unit = decl.TranslationUnit;
-
                 var classId = $"class_{decl.QualifiedName}";
-                var monoImageName = $"{CGenerator.AssemblyId(unit)}_image";
-                gen.WriteLine("{0} = mono_class_from_name({1}, \"{2}\", \"{3}\");",
-                    classId, monoImageName, @namespace, decl.OriginalName);
+                gen.WriteLine($"{classId} = {CSources.GenerateMonoClassFromNameCall(decl)}");
 
                 return classId;
             }
@@ -304,7 +318,7 @@ namespace MonoEmbeddinator4000.Generators
         {
             type = type.Desugar();
 
-            if (type is BuiltinType)
+            if (type is BuiltinType && !type.IsPrimitiveType(PrimitiveType.String))
                 return true;
 
             if (!(type is TagType))
@@ -327,109 +341,134 @@ namespace MonoEmbeddinator4000.Generators
         public override bool VisitManagedArrayType(ManagedArrayType array,
             TypeQualifiers quals)
         {
-            var support = Context.SupportBefore;
-
             var contextId = CGenerator.GenId("mono_context");
-            var arrayId = CGenerator.GenId($"{Context.ArgName}_array");
-            var elementClassId = CGenerator.GenId($"{Context.ArgName}_element_class");
+            var arrayId = CGenerator.GenId($"{ArgName}_array");
+            var elementClassId = CGenerator.GenId($"{ArgName}_element_class");
 
             var managedArray = array.Array;
             var elementType = managedArray.Type;
-            support.WriteLine("MonoClass* {0} = mono_class_get_element_class({1});",
-                elementClassId, GenerateArrayTypeLookup(elementType, support));
+            Before.WriteLine("MonoClass* {0} = mono_class_get_element_class({1});",
+                elementClassId, GenerateArrayTypeLookup(elementType, Before));
 
-            support.WriteLine("MonoArray* {0} = mono_array_new({1}.domain, {2}, {3}.array->len);",
-                arrayId, contextId, elementClassId, Context.ArgName);
-
-            var iteratorId = CGenerator.GenId("i");
-            support.WriteLine("for (int {0} = 0; {0} < {1}.array->len; {0}++)",
-                              iteratorId, Context.ArgName);
-            support.WriteStartBraceIndent();
-
-            var typePrinter = CTypePrinter;
-            string elementTypeName = elementType.Visit(typePrinter);
-
-            var elementId = CGenerator.GenId($"{Context.ArgName}_array_element");
-            support.WriteLine("{0} {1} = g_array_index({2}.array, {0}, {3});",
-                elementTypeName, elementId, Context.ArgName, iteratorId);
-
-            var ctx = new MarshalContext(Context.Context)
-            {
-                ArgName = elementId,
-            };
-
-            var marshal = new CMarshalNativeToManaged (Options, ctx) { PrimitiveValuesByValue = true };
-            elementType.Visit(marshal);
-
-            if (!string.IsNullOrWhiteSpace(marshal.Context.SupportBefore))
-                support.Write(marshal.Context.SupportBefore.ToString());
+            Before.WriteLine("MonoArray* {0} = mono_array_new({1}.domain, {2}, {3}.array->len);",
+                arrayId, contextId, elementClassId, ArgName);
 
             var isValueType = IsValueType(elementType);
+
+            var elementSizeId = string.Empty;
+            if (array.Array.Type.IsClass() && isValueType)
+            {
+                elementSizeId = CGenerator.GenId($"{ArgName}_array_element_size");
+                Before.WriteLine("gint32 {0} = mono_class_array_element_size({1});",
+                    elementSizeId, elementClassId);
+            }
+
+            var iteratorId = CGenerator.GenId("i");
+            Before.WriteLine("for (int {0} = 0; {0} < {1}.array->len; {0}++)",
+                              iteratorId, ArgName);
+            Before.WriteStartBraceIndent();
+
+            string elementTypeName = elementType.Visit(CTypePrinter);
+
+            var elementId = CGenerator.GenId($"{ArgName}_array_element");
+            if (elementType.IsClass())
+            {
+                elementTypeName += "*";
+                Before.WriteLine("{0} {1} = g_array_index({2}.array, {0}, {3});",
+                    elementTypeName, elementId, ArgName, iteratorId);
+            }
+            else
+                Before.WriteLine("{0} {1} = g_array_index({2}.array, {0}, {3});",
+                    elementTypeName, elementId, ArgName, iteratorId);
+
+            var marshal = new CMarshalNativeToManaged (Context)
+            {
+                ArgName = elementId,
+                PrimitiveValuesByValue = true
+            };
+
+            elementType.Visit(marshal);
+
+            if (!string.IsNullOrWhiteSpace(marshal.Before))
+                Before.Write(marshal.Before.ToString());
+
             if (isValueType)
             {
-                support.WriteLine("mono_array_set({0}, {1}, {2}, {3});",
-                    arrayId, elementTypeName, iteratorId,
-                    marshal.Context.Return.ToString());
+                if (elementType.IsClass())
+                {
+                    var srcId = CGenerator.GenId("src");
+                    var ptrId = CGenerator.GenId("ptr");
+                    Before.WriteLine("char* {0} = {1};", srcId, marshal.Return.ToString());
+                    Before.WriteLine("char* {0} = mono_array_addr_with_size({1}, {2}, {3});", 
+                        ptrId, arrayId, elementSizeId, iteratorId);
+                    Before.WriteLine("memcpy({0}, {1}, {2});",
+                        ptrId, srcId, elementSizeId);
+                }
+                else
+                    Before.WriteLine("mono_array_set({0}, {1}, {2}, {3});",
+                        arrayId, elementTypeName, iteratorId,
+                        marshal.Return.ToString());
             }
             else
             {
-                support.WriteLine("mono_array_setref({0}, {1}, {2});",
-                    arrayId, iteratorId, marshal.Context.Return.ToString());
+                Before.WriteLine("mono_array_setref({0}, {1}, {2});",
+                    arrayId, iteratorId, marshal.Return.ToString());
             }
 
-            support.WriteCloseBraceIndent();
+            Before.WriteCloseBraceIndent();
 
-            Context.Return.Write("{0}", arrayId);
+            Return.Write("{0}", arrayId);
 
             return true;
+        }
+
+        public override bool VisitEnumDecl(Enumeration @enum)
+        {
+            var byValue = PrimitiveValuesByValue ? string.Empty : "&";
+            Return.Write($"{byValue}{ArgName}");
+            return true;
+        }
+
+        public static string GenParamId(Marshaler marshal)
+        {
+            return $"{CGenerator.GenId(marshal.ArgName)}_{marshal.ParameterIndex}";
         }
 
         public override bool VisitClassDecl(Class @class)
         {
-            var instanceId = CGenerator.GenId($"{Context.ArgName}_instance");
+            var arg = IsByRefParameter ? $"(*{ArgName})" : ArgName;
             var handle = CSources.GetMonoObjectField(Options, CSources.MonoObjectFieldUsage.Parameter,
-                Context.ArgName, "_handle");
-            Context.SupportBefore.WriteLine($"MonoObject* {instanceId} = mono_gchandle_get_target({handle});");
-            Context.Return.Write("{0}", instanceId);
-            return true;
-        }
+                arg, "_handle");
 
-        bool HandleSpecialCILType(CILType cilType)
-        {
-            var type = cilType.Type;
+            var @object = $"{arg} ? mono_gchandle_get_target({handle}) : 0";
 
-            if (type == typeof(string))
+            if (@class.IsValueType)
+                @object = $"mono_object_unbox({@object})";
+
+            if (IsByRefParameter)
             {
-                var argId = $"{CGenerator.GenId(Context.ArgName)}_{Context.ParameterIndex}";
-                var contextId = CGenerator.GenId("mono_context");
-                var stringText = Context.ArgName;
+                var argId = GenParamId(this);
+                var objId = $"{argId}_obj";
 
-                var param = Context.Parameter;
-                var isByRef = param != null && (param.IsOut || param.IsInOut);
-                if (isByRef)
-                {
-                    stringText = string.Format ("({0}->len != 0) ? {0}->str : \"\"",
-                        Context.ArgName);
+                Before.WriteLine($"MonoObject* {objId} = {@object};");
+                Before.WriteLine($"MonoObject* {argId} = {objId};");
 
-                    Context.SupportAfter.WriteLine ("g_string_truncate({0}, 0);", Context.ArgName);
-                    Context.SupportAfter.WriteLine ("g_string_append({0}, mono_string_to_utf8(" +
-                        "(MonoString*) {1}));", Context.ArgName, argId);
-                }
+                After.WriteLine($"if ({objId} != {argId})");
+                After.WriteStartBraceIndent();
+                After.WriteLine($"mono_embeddinator_destroy_object({arg});");
+                After.WriteLine($"{arg} = ({argId} != 0) ? mono_embeddinator_create_object({argId}) : 0;");
+                After.WriteCloseBraceIndent();
 
-                Context.SupportBefore.WriteLine("MonoString* {0} = mono_string_new({1}.domain, {2});",
-                    argId, contextId, stringText);
-                Context.Return.Write("{0}{1}", isByRef ? "&" : string.Empty, argId);
+                Return.Write($"&{argId}");
                 return true;
             }
 
-            return false;
+            Return.Write($"{@object}");
+            return true;
         }
 
         public override bool VisitCILType(CILType type, TypeQualifiers quals)
         {
-            if (HandleSpecialCILType(type))
-                return true;
-
             return base.VisitCILType(type, quals);
         }
 
@@ -439,13 +478,57 @@ namespace MonoEmbeddinator4000.Generators
             return VisitPrimitiveType(builtin.Type);
         }
 
+        public void HandleRefOutNonDefaultIntegerEnum(Enumeration @enum)
+        {
+            // This deals with marshaling of managed enums with non-C default
+            // backing types (ie. enum : short).
+
+            // Unlike C++ or Objective-C, C enums always have the default integer
+            // type size, so we need to create a local variable of the right type
+            // for marshaling with the managed runtime and cast it back to the
+            // correct type.
+
+            var backingType = @enum.BuiltinType.Type;
+            var typePrinter = new CppTypePrinter();
+            var integerType = typePrinter.VisitPrimitiveType(backingType);
+            var newArgName = CGenerator.GenId(ArgName);
+            Before.WriteLine("{0} {1} = *(({0}*) {2});",
+                integerType, newArgName, ArgName);
+            Return.Write("&{0}", newArgName);
+            After.WriteLine("*{0} = ({1}) {2};", ArgName,
+                @enum.Visit(CTypePrinter), newArgName);
+        }
+
         public override bool VisitPointerType(PointerType pointer,
             TypeQualifiers quals)
         {
-            if (pointer.Pointee is ArrayType)
+            var pointee = pointer.Pointee;
+
+            Enumeration @enum;
+            if (pointee.TryGetEnum(out @enum))
+            {
+                var backingType = @enum.BuiltinType.Type;
+                if (backingType != PrimitiveType.Int)
+                {
+                    HandleRefOutNonDefaultIntegerEnum(@enum);
+                    return true;
+                }
+
+                Return.Write("{0}", ArgName);
+                return true;
+            }
+
+            if (pointee is ArrayType)
             {
                 // TODO: Handle out/ref array types.
-                Context.Return.Write("0");
+                Return.Write("0");
+                return true;
+            }
+
+            PrimitiveType primitive;
+            if (pointee.IsPrimitiveType(out primitive))
+            {
+                Return.Write("{0}", ArgName);
                 return true;
             }
 
@@ -454,7 +537,7 @@ namespace MonoEmbeddinator4000.Generators
 
         public bool VisitPrimitiveType(PrimitiveType primitive)
         {
-            var param = Context.Parameter;
+            var param = Parameter;
             switch (primitive)
             {
                 case PrimitiveType.Void:
@@ -462,6 +545,7 @@ namespace MonoEmbeddinator4000.Generators
                 case PrimitiveType.Bool:
                 case PrimitiveType.Char:
                 case PrimitiveType.WideChar:
+                case PrimitiveType.SChar:
                 case PrimitiveType.UChar:
                 case PrimitiveType.Short:
                 case PrimitiveType.UShort:
@@ -473,17 +557,36 @@ namespace MonoEmbeddinator4000.Generators
                 case PrimitiveType.ULongLong:
                 case PrimitiveType.Float:
                 case PrimitiveType.Double:
-                case PrimitiveType.LongDouble:
+                case PrimitiveType.Decimal:
                 case PrimitiveType.Null:
+                {
                     var prefix = "&";
-                    if ((param != null && (param.IsInOut || param.IsOut))
-                        || PrimitiveValuesByValue)
+                    if (IsByRefParameter || PrimitiveValuesByValue)
                         prefix = string.Empty;
-                    Context.Return.Write ("{0}{1}", prefix, Context.ArgName);
+                    Return.Write ("{0}{1}", prefix, ArgName);
                     return true;
+                }
+                case PrimitiveType.String:
+                {
+                    var argId = GenParamId(this);
+                    var contextId = CGenerator.GenId("mono_context");
+                    var @string = ArgName;
+
+                    if (IsByRefParameter)
+                    {
+                        @string = $"{ArgName}->str";
+                        After.WriteLine("mono_embeddinator_marshal_string_to_gstring({0}, {1});",
+                            ArgName, argId);
+                    }
+
+                    Before.WriteLine("MonoString* {0} = ({2}) ? mono_string_new({1}.domain, {2}) : 0;",
+                        argId, contextId, @string);
+                    Return.Write("{0}{1}", IsByRefParameter ? "&" : string.Empty, argId);
+                    return true;
+                }
             }
 
-            throw new System.NotSupportedException();
+            throw new System.NotImplementedException(primitive.ToString());
         }
     }
 }

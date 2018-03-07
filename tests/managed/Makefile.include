@@ -1,3 +1,14 @@
+ifeq ($(OS),Windows_NT)
+    detected_OS := Windows
+else
+    detected_OS := $(shell uname -s)
+endif
+
+ifeq ($(detected_OS),Windows)
+MSBUILD = msbuild.exe
+else
+MSBUILD = /Library/Frameworks/Mono.framework/Versions/Current/Commands/msbuild
+endif
 
 CONFIG?=Debug
 
@@ -8,13 +19,18 @@ MACOS_MODERN_MANAGED_DLL=$(TOP)/tests/managed/macos-modern/bin/$(CONFIG)/managed
 MACOS_FULL_MANAGED_DLL=$(TOP)/tests/managed/macos-full/bin/$(CONFIG)/managed-macos-full.dll
 MACOS_SYSTEM_MANAGED_DLL=$(TOP)/tests/managed/macos-system/bin/$(CONFIG)/managed-macos-system.dll
 
+ifeq ($(detected_OS),Darwin)
 ALL_MANAGED_DLLS = \
 	$(GENERIC_MANAGED_DLL) \
 	$(IOS_MANAGED_DLL) \
 	$(TVOS_MANAGED_DLL) \
 	$(MACOS_MODERN_MANAGED_DLL) \
 	$(MACOS_FULL_MANAGED_DLL) \
-	$(MACOS_SYSTEM_MANAGED_DLL) \
+	$(MACOS_SYSTEM_MANAGED_DLL)
+else
+ALL_MANAGED_DLLS = \
+	$(GENERIC_MANAGED_DLL)
+endif
 
 MANAGED_DEPENDENCIES = \
 	$(wildcard $(TOP)/tests/managed/*.projitems) \
@@ -25,7 +41,7 @@ MANAGED_DEPENDENCIES = \
 	$(wildcard $(TOP)/tests/managed/*.tt) \
 
 $(ALL_MANAGED_DLLS): $(MANAGED_DEPENDENCIES)
-	/Library/Frameworks/Mono.framework/Versions/Current/Commands/msbuild $(wildcard $(abspath $(dir $@)../../*.csproj)) /p:Configuration=$(CONFIG)
+	$(MSBUILD) $(wildcard $(abspath $(dir $@)../../*.csproj)) /p:Configuration=$(CONFIG)
 
 # each project file wants to generate subscripts.cs, and running in parallel breaks badly.
 .NOTPARALLEL:
