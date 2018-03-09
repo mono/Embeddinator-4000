@@ -127,4 +127,10 @@ public static class Type_DateTime {
 
 	public static DateTime Max { get; } = DateTime.MaxValue;
 	public static DateTime Min { get; } = DateTime.MinValue;
+
+	public static bool Between (DateTime dt1, DateTime dt2)
+	{
+		var now = DateTime.Now;
+		return (now >= dt1) && (now <= dt2);
+	}
 }
