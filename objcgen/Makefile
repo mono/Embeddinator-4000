@@ -2,7 +2,7 @@ all: bin/Debug/objcgen.exe shellcheck
 
 -include Make.config.inc
 
-PACKAGE_VERSION=0.2.0
+PACKAGE_VERSION=0.3.0
 PACKAGE_FULLVERSION=$(PACKAGE_VERSION).$(COMMIT_DISTANCE)
 
 Make.config.inc: Makefile

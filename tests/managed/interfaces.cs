@@ -6,9 +6,9 @@ namespace Interfaces {
 
 		bool Boolean { get; }
 
-		string Convert (int integer);
+		string Convert (int value);
 
-		string Convert (long longint);
+		string Convert (long value);
 	}
 
 	// not public - only the contract is exposed thru a static type

@@ -48,7 +48,7 @@ namespace DriverTest
 
 			string output;
 			int exitCode;
-			Assert.IsTrue (Embedder.RunProcess ("xcrun", $"lipo -info {tmpdir}/libLibrary.dylib", out exitCode, out output), "lipo");
+			Assert.IsTrue (Utils.RunProcess ("xcrun", $"lipo -info {tmpdir}/libLibrary.dylib", out exitCode, out output), "lipo");
 			StringAssert.IsMatch ($"Non-fat file: .* is architecture: {abi}", output, "architecture");
 		}
 
@@ -91,7 +91,7 @@ namespace DriverTest
 
 			File.WriteAllText (cs_path, code);
 
-			if (!Embedder.RunProcess ("/Library/Frameworks/Mono.framework/Versions/Current/bin/csc", $"/target:library {Embedder.Quote (cs_path)} /out:{Embedder.Quote (dll_path)}", out exitCode))
+			if (!Utils.RunProcess ("/Library/Frameworks/Mono.framework/Versions/Current/bin/csc", $"/target:library {Utils.Quote (cs_path)} /out:{Utils.Quote (dll_path)}", out exitCode))
 				Assert.Fail ("Failed to compile test code");
 
 			return dll_path;

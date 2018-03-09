@@ -82,7 +82,7 @@ static gchar* strrchr_seperator (const gchar* filename)
 #endif
     char *p;
 
-    p = strrchr (filename, G_DIR_SEPARATOR);
+    p = (char*)strrchr (filename, G_DIR_SEPARATOR);
 #ifdef G_OS_WIN32
     p2 = strrchr (filename, '/');
     if (p2 > p)
@@ -334,7 +334,7 @@ void* mono_embeddinator_install_error_report_hook(mono_embeddinator_error_report
     mono_embeddinator_error_report_hook_t prev = g_error_report_hook;
     g_error_report_hook = hook;
 
-    return prev;
+    return (void*)prev;
 }
 
 void mono_embeddinator_error(mono_embeddinator_error_t error)
@@ -389,4 +389,13 @@ MonoClass* mono_embeddinator_get_decimal_class ()
         decimalclass = mono_class_from_name (mono_get_corlib (), "System", "Decimal");
     }
     return decimalclass;
+}
+
+MonoClass* mono_embeddinator_get_datetime_class ()
+{
+    static MonoClass* datetimeclass = 0;
+    if (!datetimeclass) {
+        datetimeclass = mono_class_from_name (mono_get_corlib (), "System", "DateTime");
+    }
+    return datetimeclass;
 }

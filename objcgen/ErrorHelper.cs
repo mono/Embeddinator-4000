@@ -2,7 +2,7 @@
 
 using System;
 using System.Collections.Generic;
-
+using System.Diagnostics;
 using ProductException = Embeddinator.ObjC.EmbeddinatorException;
 
 namespace Embeddinator.ObjC
@@ -93,8 +93,10 @@ namespace Embeddinator.ObjC
 			foreach (var ex in exceptions)
 				error |= ShowInternal (ex);
 
-			if (error)
+			if (error) {
+				DumpLog (); 
 				Exit (1);
+			}
 		}
 
 		static public void Show (Exception e)
@@ -107,8 +109,17 @@ namespace Embeddinator.ObjC
 			foreach (var ex in exceptions)
 				error |= ShowInternal (ex);
 
-			if (error)
+			if (error) {
+				DumpLog (); 
 				Exit (1);
+			}
+		}
+
+		[Conditional ("DEBUG")]
+		static void DumpLog ()
+		{
+			Console.WriteLine ("Debug Log:");
+			Logger.Dump ();
 		}
 
 		static void Exit (int exitCode)

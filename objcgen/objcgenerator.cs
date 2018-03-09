@@ -17,6 +17,8 @@ namespace Embeddinator.ObjC {
 
 		public override void Generate ()
 		{
+			Logger.Log ($"Begin Generator");
+
 			var types = Processor.Types;
 			headers.WriteLine ("#include \"embeddinator.h\"");
 			headers.WriteLine ("#import <Foundation/Foundation.h>");
@@ -26,6 +28,10 @@ namespace Embeddinator.ObjC {
 			headers.WriteLine ("#error Embeddinator code must be built with ARC.");
 			headers.WriteLine ("#endif");
 			headers.WriteLine ();
+
+			headers.WriteLine ("#ifdef __cplusplus");
+			headers.WriteLine ("extern \"C\" {");
+			headers.WriteLine ("#endif");
 
 			headers.WriteLine ("// forward declarations");
 			foreach (var t in types.Where ((arg) => arg.IsClass))
@@ -86,10 +92,16 @@ namespace Embeddinator.ObjC {
 
 			headers.WriteLine ("NS_ASSUME_NONNULL_END");
 			headers.WriteLine ();
+
+			headers.WriteLine ("#ifdef __cplusplus");
+			headers.WriteLine ("} /* extern \"C\" */");
+			headers.WriteLine ("#endif");
 		}
 
 		protected override void Generate (ProcessedAssembly a)
 		{
+			Logger.Log ($"Generating Assembly: {a.Name}");
+
 			var originalName = a.Name;
 			var name = a.SafeName;
 			implementation.WriteLine ($"static void __lookup_assembly_{name} ()");
@@ -152,6 +164,8 @@ namespace Embeddinator.ObjC {
 
 		void GenerateCategory (Type definedType, Type extendedType, List<ProcessedMethod> methods)
 		{
+			Logger.Log ($"Generating Catagory: {definedType.Name}");
+
 			var etn = NameGenerator.GetTypeName (extendedType).Replace (" *", String.Empty);
 			var name = $"{etn} ({NameGenerator.GetTypeName (definedType)})";
 			headers.WriteLine ($"/** Category {name}");
@@ -164,7 +178,7 @@ namespace Embeddinator.ObjC {
 			implementation.WriteLine ();
 
 			foreach (var mi in methods) {
-				ImplementMethod (mi.Method, mi.Method.Name.CamelCase (), mi, isExtension: true);
+				ImplementMethod (mi);
 			}
 
 			headers.WriteLine ("@end");
@@ -176,6 +190,8 @@ namespace Embeddinator.ObjC {
 
 		void GenerateEnum (ProcessedType type)
 		{
+			Logger.Log ($"Generating Enum: {type.TypeName}");
+
 			Type t = type.Type;
 			var managed_name = type.ObjCName;
 			var underlying_type = t.GetEnumUnderlyingType ();
@@ -216,6 +232,8 @@ namespace Embeddinator.ObjC {
 
 		void GenerateProtocol (ProcessedType type)
 		{
+			Logger.Log ($"Generating Protocol: {type.TypeName}");
+
 			Type t = type.Type;
 			var pbuilder = new ProtocolHelper (headers, implementation, private_headers) {
 				AssemblyQualifiedName = t.AssemblyQualifiedName,
@@ -269,6 +287,8 @@ namespace Embeddinator.ObjC {
 
 		protected override void Generate (ProcessedType type)
 		{
+			Logger.Log ($"Generating Type: {type.TypeName}");
+
 			Type t = type.Type;
 			var aname = t.Assembly.GetName ().Name.Sanitize ();
 			var static_type = t.IsSealed && t.IsAbstract;
@@ -304,11 +324,11 @@ namespace Embeddinator.ObjC {
 					default_init |= pcount == 0;
 
 					var parameters = ctor.Parameters;
-					string name = ctor.ObjCName;
+					string name = ctor.BaseName;
 					string signature = ".ctor()";
 					if (parameters.Length > 0) {
-						name = ctor.GetObjcSignature ();
-						signature = ctor.GetMonoSignature ();
+						name = ctor.ObjCSignature;
+						signature = ctor.MonoSignature;
 					}
 
 					if (ctor.Unavailable) {
@@ -357,7 +377,7 @@ namespace Embeddinator.ObjC {
 					}
 					builder.WriteInvoke (args);
 					implementation.Write (postInvoke);
-					implementation.WriteLine ("_object = mono_embeddinator_create_object (__instance);");
+					implementation.WriteLine ("_object = (MonoEmbedObject *)mono_embeddinator_create_object (__instance);");
 					implementation.Indent--;
 					implementation.WriteLine ("}");
 					if (Processor.Types.HasClass (t.BaseType))
@@ -392,7 +412,7 @@ namespace Embeddinator.ObjC {
 				implementation.Indent++;
 				implementation.WriteLine ($"MonoObject* __instance = mono_object_new (__mono_context.domain, {managed_name}_class);");
 				// no call to `WriteInvoke` since there is not such method if we reached this case
-				implementation.WriteLine ("_object = mono_embeddinator_create_object (__instance);");
+				implementation.WriteLine ("_object = (MonoEmbedObject *)mono_embeddinator_create_object (__instance);");
 				implementation.Indent--;
 				implementation.WriteLine ("}");
 				if (HasClass (t.BaseType))
@@ -518,6 +538,10 @@ namespace Embeddinator.ObjC {
 				postwriter.WriteLine ($"MonoDecimal {presarrval} = mono_array_get ({presarr}, MonoDecimal, {pindex});");
 				postwriter.WriteLine ($"{presobj} = mono_embeddinator_get_nsdecimalnumber (&{presarrval});");
 				break;
+			case TypeCode.DateTime:
+				postwriter.WriteLine ($"E4KDateTime {presarrval} = mono_array_get ({presarr}, E4KDateTime, {pindex});");
+				postwriter.WriteLine ($"{presobj} = mono_embeddinator_get_nsdate (&{presarrval});");
+				break;
 			case TypeCode.Byte:
 				postwriter.WriteLine ($"NSData* {presobj} = [NSData dataWithBytes:mono_array_addr ({presarr}, unsigned char, 0) length:{parrlength}];");
 				break;
@@ -540,7 +564,7 @@ namespace Embeddinator.ObjC {
 				postwriter.WriteLine ($"if ({presarrval}) {{");
 				postwriter.Indent++;
 				postwriter.WriteLine ($"{tname}* {ptemp} = [[{tname} alloc] initForSuper];");
-				postwriter.WriteLine ($"{ptemp}->_object = mono_embeddinator_create_object ({presarrval});");
+				postwriter.WriteLine ($"{ptemp}->_object = (MonoEmbedObject *)mono_embeddinator_create_object ({presarrval});");
 				postwriter.WriteLine ($"{presobj} = {ptemp};");
 				postwriter.Indent--;
 				postwriter.WriteLine ("} else");
@@ -614,10 +638,12 @@ namespace Embeddinator.ObjC {
 			case TypeCode.Double:
 				var typeName = NameGenerator.GetTypeName (type);
 				string returnValue;
-				if (typeCode == TypeCode.SByte)
+				if (typeCode == TypeCode.SByte) {
 					returnValue = $"charValue"; // GetTypeName returns signed char
-				else
-					returnValue = $"{typeName.CamelCase (true)}Value";
+				} else {
+					string returnValueTypeName = type.IsEnum ? NameGenerator.GetTypeName (type.GetEnumUnderlyingType ()) : typeName;
+					returnValue = $"{returnValueTypeName.CamelCase (true)}Value";
+				}
 
 				implementation.WriteLine ($"NSNumber* {pnameRet} = {(is_by_ref ? $"(*{parameterName})" : parameterName)}[{pnameIdx}];");
 				implementation.WriteLine ($"if (!{pnameRet} || [{pnameRet} isKindOfClass:[NSNull class]])");
@@ -634,6 +660,15 @@ namespace Embeddinator.ObjC {
 				implementation.WriteLine ($"continue;");
 				implementation.Indent--;
 				implementation.WriteLine ($"mono_array_set ({pnameArr}, MonoDecimal, {pnameIdx}, mono_embeddinator_get_system_decimal ({pnameRet}, &__mono_context));");
+				break;
+			case TypeCode.DateTime:
+				var dtparname = is_by_ref ? $"(*{parameterName})" : parameterName;
+				implementation.WriteLine ($"NSDate* {pnameRet} = {dtparname}[{pnameIdx}];");
+				implementation.WriteLine ($"if (!{pnameRet} || [{pnameRet} isKindOfClass:[NSNull class]])");
+				implementation.Indent++;
+				implementation.WriteLine ($"continue;");
+				implementation.Indent--;
+				implementation.WriteLine ($"mono_array_set ({pnameArr}, E4KDateTime, {pnameIdx}, mono_embeddinator_get_system_datetime ({pnameRet}, &__mono_context));");
 				break;
 			case TypeCode.String:
 				implementation.WriteLine ($"NSString* {pnameRet} = {(is_by_ref ? $"(*{parameterName})" : parameterName)}[{pnameIdx}];");
@@ -706,17 +741,23 @@ namespace Embeddinator.ObjC {
 			switch (Type.GetTypeCode (t)) {
 			case TypeCode.String:
 				if (is_by_ref) {
-					implementation.WriteLine ($"MonoString* __string = *{paramaterName} ? mono_string_new (__mono_context.domain, [*{paramaterName} UTF8String]) : nil;");
-					implementation.WriteLine ($"{argumentName} = &__string;");
-					post.AppendLine ($"*{paramaterName} = mono_embeddinator_get_nsstring (__string);");
+					implementation.WriteLine ($"MonoString* __string_{paramaterName} = *{paramaterName} ? mono_string_new (__mono_context.domain, [*{paramaterName} UTF8String]) : nil;");
+					implementation.WriteLine ($"{argumentName} = &__string_{paramaterName};");
+					post.AppendLine ($"*{paramaterName} = mono_embeddinator_get_nsstring (__string_{paramaterName});");
 				} else
 					implementation.WriteLine ($"{argumentName} = {paramaterName} ? mono_string_new (__mono_context.domain, [{paramaterName} UTF8String]) : nil;");
 				break;
 			case TypeCode.Decimal:
-				implementation.WriteLine ($"MonoDecimal __mdec = mono_embeddinator_get_system_decimal ({(is_by_ref ? "*" : string.Empty)}{paramaterName}, &__mono_context);");
-				implementation.WriteLine ($"{argumentName} = &__mdec;");
+				implementation.WriteLine ($"MonoDecimal __mdec_{paramaterName} = mono_embeddinator_get_system_decimal ({(is_by_ref ? "*" : string.Empty)}{paramaterName}, &__mono_context);");
+				implementation.WriteLine ($"{argumentName} = &__mdec_{paramaterName};");
 				if (is_by_ref)
-					post.AppendLine ($"*{paramaterName} = mono_embeddinator_get_nsdecimalnumber (&__mdec);");
+					post.AppendLine ($"*{paramaterName} = mono_embeddinator_get_nsdecimalnumber (&__mdec_{paramaterName});");
+				break;
+			case TypeCode.DateTime:
+				implementation.WriteLine ($"E4KDateTime __mdatetime_{paramaterName} = mono_embeddinator_get_system_datetime ({(is_by_ref ? "*" : string.Empty)}{paramaterName}, &__mono_context);");
+				implementation.WriteLine ($"{argumentName} = &__mdatetime_{paramaterName};");
+				if (is_by_ref)
+					post.AppendLine ($"*{paramaterName} = mono_embeddinator_get_nsdate (&__mdatetime_{paramaterName});");
 				break;
 			case TypeCode.Boolean:
 			case TypeCode.Char:
@@ -751,37 +792,40 @@ namespace Embeddinator.ObjC {
 
 		protected override void Generate (ProcessedProperty property)
 		{
-			PropertyInfo pi = property.Property;
-			var getter = pi.GetGetMethod ();
-			var setter = pi.GetSetMethod ();
+			Logger.Log ($"Generating Property: {property.Name}");
+
+			var getter = property.GetMethod;
+			var setter = property.SetMethod;
 			// setter-only properties are handled as methods (and should not reach this code)
 			if (getter == null && setter != null)
 				throw new EmbeddinatorException (99, "Internal error `setter only`. Please file a bug report with a test case (https://github.com/mono/Embeddinator-4000/issues");
 
-			var name = pi.Name.CamelCase ();
-
 			headers.Write ("@property (nonatomic");
-			if (getter.IsStatic)
+			if (getter.Method.IsStatic)
 				headers.Write (", class");
 			if (setter == null)
 				headers.Write (", readonly");
-			var pt = pi.PropertyType;
+			var pt = property.Property.PropertyType;
 			var property_type = NameGenerator.GetTypeName (pt);
+			if (pt.IsInterface)
+				property_type = $"id<{property_type}>";
 			if (HasClass (pt))
 				property_type += " *";
 
 			var spacing = property_type [property_type.Length - 1] == '*' ? string.Empty : " ";
-			headers.WriteLine ($") {property_type}{spacing}{name};");
+			headers.WriteLine ($") {property_type}{spacing}{property.Name};");
 
-			ImplementMethod (getter, name, property.GetMethod, pi: pi);
+			ImplementMethod (property.GetMethod);
 			if (setter == null)
 				return;
 
-			ImplementMethod (setter, "set" + pi.Name, property.SetMethod, pi: pi);
+			ImplementMethod (property.SetMethod);
 		}
 
 		protected void Generate (ProcessedFieldInfo field)
 		{
+			Logger.Log ($"Generating Field: {field.Name}");
+
 			FieldInfo fi = field.Field;
 			bool read_only = fi.IsInitOnly || fi.IsLiteral;
 
@@ -799,10 +843,9 @@ namespace Embeddinator.ObjC {
 			if (bound)
 				field_type += " *";
 
-			var name = fi.Name.CamelCase ();
 
 			var spacing = field_type [field_type.Length - 1] == '*' ? string.Empty : " ";
-			headers.WriteLine ($") {field_type}{spacing}{name};");
+			headers.WriteLine ($") {field_type}{spacing}{field.Name};");
 
 			// it's similar, but different from implementing a method
 
@@ -811,7 +854,7 @@ namespace Embeddinator.ObjC {
 			var return_type = GetReturnType (type, fi.FieldType);
 
 			implementation.Write (fi.IsStatic ? '+' : '-');
-			implementation.WriteLine ($" ({return_type}) {name}");
+			implementation.WriteLine ($" ({return_type}) {field.GetterName}");
 			implementation.WriteLine ("{");
 			implementation.Indent++;
 			implementation.WriteLine ("static MonoClassField* __field = nil;");
@@ -845,7 +888,7 @@ namespace Embeddinator.ObjC {
 			if (read_only)
 				return;
 			implementation.Write (fi.IsStatic ? '+' : '-');
-			implementation.WriteLine ($" (void) set{fi.Name}:({field_type})value");
+			implementation.WriteLine ($" (void) {field.SetterName}:({field_type})value");
 			implementation.WriteLine ("{");
 			implementation.Indent++;
 			implementation.WriteLine ("static MonoClassField* __field = nil;");
@@ -888,30 +931,32 @@ namespace Embeddinator.ObjC {
 		}
 
 		// TODO override with attribute ? e.g. [ObjC.Selector ("foo")]
-		// HACK - This should take a ProcessedMethod and not much of this stuff - https://github.com/mono/Embeddinator-4000/issues/276
-		string ImplementMethod (MethodInfo info, string name, ProcessedMethod method, bool isExtension = false, PropertyInfo pi = null)
+		string ImplementMethod (ProcessedMethod method)
 		{
+			Logger.Log ($"Generating Method Impl: {method}");
+
+			MethodInfo info = method.Method;
+
 			var type = info.DeclaringType;
 			var managed_type_name = NameGenerator.GetObjCName (type);
-			
-			string objcsig = method.GetObjcSignature (name, isExtension);
-			string monosig = method.GetMonoSignature (info.Name);
+
+			string objcsig = method.ObjCSignature;
 
 			var builder = new MethodHelper (headers, implementation) {
 				AssemblySafeName = type.Assembly.GetName ().Name.Sanitize (),
 				IsStatic = info.IsStatic,
-				IsExtension = isExtension,
+				IsExtension = method.IsExtension,
 				ReturnType = GetReturnType (type, info.ReturnType),
 				ManagedTypeName = type.FullName,
 				MetadataToken = info.MetadataToken,
-				MonoSignature = monosig,
+				MonoSignature = method.MonoSignature,
 				ObjCSignature = objcsig,
 				ObjCTypeName = managed_type_name,
 				IsValueType = type.IsValueType,
 				IsVirtual = info.IsVirtual && !info.IsFinal,
 			};
 
-			if (pi == null)
+			if (!method.IsPropertyImplementation)
 				builder.WriteHeaders ();
 			
 			builder.BeginImplementation ();
@@ -921,7 +966,7 @@ namespace Embeddinator.ObjC {
 			string postInvoke = String.Empty;
 			var args = "nil";
 			if (parametersInfo.Length > 0) {
-				Generate (parametersInfo, isExtension, out postInvoke);
+				Generate (parametersInfo, method.IsExtension, out postInvoke);
 				args = "__args";
 			}
 
@@ -936,6 +981,8 @@ namespace Embeddinator.ObjC {
 
 		void GenerateDefaultValuesWrapper (ProcessedMemberWithParameters member)
 		{
+			Logger.Log ($"Generating Default Value Wrapper: {member.ObjCSelector}");
+
 			ProcessedMethod method = member as ProcessedMethod;
 			ProcessedConstructor ctor = member as ProcessedConstructor;
 			if (method == null && ctor == null)
@@ -963,9 +1010,8 @@ namespace Embeddinator.ObjC {
 				}
 			}
 
-			string name = method != null ? method.BaseName : ctor.ObjCName;
-			string objcsig = method != null ? method.GetObjcSignature () : ctor.GetObjcSignature ();
-			string monosig = method != null ? method.GetMonoSignature () : ctor.GetMonoSignature ();
+			string name = member.BaseName;
+			string objcsig = member.ObjCSignature;
 
 			var type = mb.DeclaringType;
 
@@ -998,6 +1044,8 @@ namespace Embeddinator.ObjC {
 
 		protected override void Generate (ProcessedMethod method)
 		{
+			Logger.Log ($"Generating Method: {method}");
+
 			MethodHelper builder;
 			switch (method.MethodType) {
 			case MethodType.DefaultValueWrapper:
@@ -1013,7 +1061,7 @@ namespace Embeddinator.ObjC {
 				builder = new EquatableHelper (method, headers, implementation);
 				break;
 			default:
-				ImplementMethod (method.Method, method.BaseName, method);
+				ImplementMethod (method);
 				return;
 			}
 			builder.WriteHeaders ();
@@ -1064,6 +1112,10 @@ namespace Embeddinator.ObjC {
 				implementation.WriteLine ($"MonoDecimal __resarrval = mono_array_get (__resarr, MonoDecimal, __residx);");
 				implementation.WriteLine ($"__resobj = mono_embeddinator_get_nsdecimalnumber (&__resarrval);");
 				break;
+			case TypeCode.DateTime:
+				implementation.WriteLine ($"E4KDateTime __resarrval = mono_array_get (__resarr, E4KDateTime, __residx);");
+				implementation.WriteLine ($"__resobj = mono_embeddinator_get_nsdate (&__resarrval);");
+				break;
 			case TypeCode.Byte:
 				implementation.WriteLine ("NSData* __resobj = [NSData dataWithBytes:mono_array_addr (__resarr, unsigned char, 0) length:__resarrlength];");
 				break;
@@ -1086,7 +1138,7 @@ namespace Embeddinator.ObjC {
 				implementation.WriteLine ("if (__resarrval) {");
 				implementation.Indent++;
 				implementation.WriteLine ($"{tname}* __tmpobj = [[{tname} alloc] initForSuper];");
-				implementation.WriteLine ("__tmpobj->_object = mono_embeddinator_create_object (__resarrval);");
+				implementation.WriteLine ("__tmpobj->_object = (MonoEmbedObject *)mono_embeddinator_create_object (__resarrval);");
 				implementation.WriteLine ("__resobj = __tmpobj;");
 				implementation.Indent--;
 				implementation.WriteLine ("} else");
@@ -1129,6 +1181,10 @@ namespace Embeddinator.ObjC {
 				implementation.WriteLine ("void* __unboxedresult = mono_object_unbox (__result);");
 				implementation.WriteLine ("return mono_embeddinator_get_nsdecimalnumber (__unboxedresult);");
 				break;
+			case TypeCode.DateTime:
+				implementation.WriteLine ("void* __unboxedresult = mono_object_unbox (__result);");
+				implementation.WriteLine ("return mono_embeddinator_get_nsdate ((E4KDateTime *)__unboxedresult);");
+				break;
 			case TypeCode.Boolean:
 			case TypeCode.Char:
 			case TypeCode.SByte:
@@ -1160,7 +1216,7 @@ namespace Embeddinator.ObjC {
 				if (HasProtocol (t))
 					tname = "__" + tname + "Wrapper";
 				implementation.WriteLine ($"{tname}* __peer = [[{tname} alloc] initForSuper];");
-				implementation.WriteLine ("__peer->_object = mono_embeddinator_create_object (__result);");
+				implementation.WriteLine ("__peer->_object = (MonoEmbedObject *)mono_embeddinator_create_object (__result);");
 				implementation.WriteLine ("return __peer;");
 				break;
 			default:
@@ -1249,6 +1305,8 @@ namespace Embeddinator.ObjC {
 				return string.Format (arrayCreator, $"{NameGenerator.GetObjCName (type)}_class");
 			case TypeCode.Decimal:
 				return string.Format (arrayCreator, "mono_embeddinator_get_decimal_class ()");
+			case TypeCode.DateTime:
+				return string.Format (arrayCreator, "mono_embeddinator_get_datetime_class ()");
 			default:
 				throw new NotImplementedException ($"Converting type {type.FullName} to mono class");
 			}

@@ -208,4 +208,10 @@ MonoObject* mono_embeddinator_get_cultureinfo_invariantculture_object ();
 MONO_EMBEDDINATOR_API
 MonoClass* mono_embeddinator_get_decimal_class ();
 
+/**
+ * Gets DateTime MonoClass.
+ */
+MONO_EMBEDDINATOR_API
+MonoClass* mono_embeddinator_get_datetime_class ();
+
 MONO_EMBEDDINATOR_END_DECLS

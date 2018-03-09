@@ -61,10 +61,12 @@ namespace Embeddinator.ObjC {
 		{
 			if (t.IsByRef) {
 				var et = t.GetElementType ();
-				if (Type.GetTypeCode (et) == TypeCode.Decimal) // This is boxed into NSDecimalNumber
+				var typecode = Type.GetTypeCode (et);
+
+				if (typecode == TypeCode.Decimal || typecode == TypeCode.DateTime) // This is boxed into NSDecimalNumber/NSDate
 					return GetTypeName (et) + "_Nonnull * _Nullable";
 
-				return GetTypeName (et) + (et.IsValueType ? " " : " _Nonnull ") + "* _Nullable";
+				return GetTypeName (et) + " * " + (et.IsValueType ? "_Nullable" : "_Nonnull");
 			}
 
 			if (t.IsEnum)
@@ -117,6 +119,8 @@ namespace Embeddinator.ObjC {
 				return "NSString *";
 			case TypeCode.Decimal:
 				return "NSDecimalNumber *";
+			case TypeCode.DateTime:
+				return "NSDate *";
 			default:
 				throw new NotImplementedException ($"Converting type {t.Name} to a native type name");
 			}
@@ -174,6 +178,8 @@ namespace Embeddinator.ObjC {
 				return "string";
 			case TypeCode.Decimal:
 				return "System.Decimal";
+			case TypeCode.DateTime:
+				return "System.DateTime";
 			default:
 				throw new NotImplementedException ($"Converting type {t.Name} to a mono type name");
 			}
@@ -205,6 +211,8 @@ namespace Embeddinator.ObjC {
 				return $"NSArray<{GetObjCName (t)} *> *";
 			case TypeCode.Decimal:
 				return "NSArray <NSDecimalNumber *> *";
+			case TypeCode.DateTime:
+				return "NSArray <NSDate *> *";
 			default:
 				throw new NotImplementedException ($"Converting type {t.Name} to a native type name");
 			}
@@ -225,6 +233,8 @@ namespace Embeddinator.ObjC {
 		{
 			string pName = p.Name;
 			string ptname = GetTypeName (p.ParameterType);
+			if (RestrictedNames.IsRestrictedName (pName))
+				pName = "managed" + pName;
 			if (p.Name.Length < 3) {
 				if (!ObjCTypeToArgument.TryGetValue (ptname, out pName))
 					pName = "anObject";
