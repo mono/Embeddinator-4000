@@ -22,7 +22,9 @@ public class AndroidImpl extends DesktopImpl {
         );
         context.registerReceiver (new mono.android.app.NotifyTimeZoneChanges(), timezoneChangedFilter);
 
+        // dependencies must be loaded prior to library in API < 18
         System.loadLibrary("monodroid");
+        System.loadLibrary("monosgen-2.0");
         System.loadLibrary(library);
         setAssemblyPrefix();
 
