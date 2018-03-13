@@ -67,7 +67,7 @@ namespace Embeddinator.ObjC
 					}
 				},
 				{ "o|out|outdir=", "Output directory", v => embedder.OutputDirectory = v },
-				{ "p|platform=", $"Target platform (iOS, macOS [default], watchOS, tvOS)", v => embedder.SetPlatform (v) },
+				{ "p|platform=", $"Target platform (iOS, macOS [default], macos-[modern|full|system], watchOS, tvOS)", v => embedder.SetPlatform (v) },
 				{ "vs=", $"Visual Studio version for compilation (unsupported)", v => { throw new EmbeddinatorException (2, $"Option `--vs` is not supported"); } },
 				{ "h|?|help", "Displays the help", v => action = Action.Help },
 				{ "v|verbose", "generates diagnostic verbose output", v => ErrorHelper.Verbosity++ },
