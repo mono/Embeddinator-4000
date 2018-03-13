@@ -525,7 +525,8 @@ namespace Embeddinator.ObjC {
 			case TypeCode.UInt16:
 			case TypeCode.UInt32:
 			case TypeCode.UInt64:
-				var ctype = NameGenerator.GetTypeName (t);
+				var ut = t.IsEnum ? t.GetEnumUnderlyingType () : t;
+				var ctype = NameGenerator.GetTypeName (ut);
 				string ctypep;
 				if (typecode == TypeCode.SByte)
 					ctypep = "Char"; // GetTypeName returns signed char
@@ -1099,7 +1100,8 @@ namespace Embeddinator.ObjC {
 			case TypeCode.UInt16:
 			case TypeCode.UInt32:
 			case TypeCode.UInt64:
-				var ctype = NameGenerator.GetTypeName (t);
+				var dt = t.IsEnum ? t.GetEnumUnderlyingType () : t;
+				var ctype = NameGenerator.GetTypeName (dt);
 				string ctypep;
 				if (typecode == TypeCode.SByte)
 					ctypep = "Char"; // GetTypeName returns signed char
