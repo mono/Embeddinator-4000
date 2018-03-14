@@ -42,5 +42,20 @@ namespace Enums {
 			i = i == IntEnum.Min ? IntEnum.Max : IntEnum.Min;
 			return ByteFlags.Bit5 | ByteFlags.Bit1;
 		}
+
+		public static int Count (IntEnum[] values)
+		{
+			return values == null ? 0 : values.Length;
+		}
+
+		// NSData is not ideal if `byte` is used as the underlying type
+		public static ByteEnum[] Bucket { get; set; }
+	}
+
+	public class github561 {
+		[Flags]
+		public enum ModeOfTransportW { Bus = 0b1, Tram = 0b10, Train = 0b100, }
+
+		public ModeOfTransportW[] ModesOfTransport { get; set; }
 	}
 }
