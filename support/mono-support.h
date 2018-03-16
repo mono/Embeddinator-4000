@@ -28,8 +28,13 @@
 #include <stdint.h>
 #include "embeddinator.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #if defined (XAMARIN_IOS) || defined (XAMARIN_MAC)
 #include <xamarin/xamarin.h>
+
 typedef void * gpointer;
 typedef uint16_t    mono_unichar2;
 
@@ -207,8 +212,8 @@ mono_threads_detach_coop (gpointer cookie, gpointer *dummy);
 
 #endif
 
-#ifndef MONODECIMAL
-#define MONODECIMAL
+#ifndef E4KDEFS
+#define E4KDEFS
 
 // from: https://github.com/mono/mono/blob/master/mono/metadata/decimal-ms.h
 typedef struct {
@@ -245,4 +250,18 @@ typedef struct {
 	} v;
 } MonoDecimal;
 
+typedef enum {
+	E4KDateTimeKind_Unspecified,
+	E4KDateTimeKind_Utc,
+	E4KDateTimeKind_Local
+} E4KDateTimeKind;
+
+typedef struct {
+	unsigned long long DateData;
+} E4KDateTime;
+
+#endif
+
+#ifdef __cplusplus
+} /* extern "C" */
 #endif

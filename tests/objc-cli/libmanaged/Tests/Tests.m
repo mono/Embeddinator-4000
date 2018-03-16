@@ -320,19 +320,19 @@
 
 	Fields_Struct *empty = [Fields_Struct empty];
 	XCTAssertNotNil (empty, "empty / struct static readonly");
-	XCTAssertNil ([empty class], "empty / class uninitialized");
+	XCTAssertNil ([empty managedClass], "empty / class uninitialized");
 
 	Fields_Struct *struct1 = [[Fields_Struct alloc] initWithEnabled:true];
 	XCTAssertTrue (struct1.boolean, "init / boolean / true");
 	struct1.boolean = false;
 	XCTAssertFalse (struct1.boolean, "init / boolean / set 1");
 
-	XCTAssertNotNil (struct1.class, "init / class initialized 1");
-	XCTAssertFalse (struct1.class.boolean, "init / class / boolean / default");
-	struct1.class = nil;
-	XCTAssertNil (struct1.class, "init / class set 1");
-	struct1.class = [[Fields_Class alloc] initWithEnabled:true];
-	XCTAssertTrue (struct1.class.boolean, "init / class / boolean / true");
+	XCTAssertNotNil (struct1.managedClass, "init / class initialized 1");
+	XCTAssertFalse (struct1.managedClass.boolean, "init / class / boolean / default");
+	struct1.managedClass = nil;
+	XCTAssertNil (struct1.managedClass, "init / class set 1");
+	struct1.managedClass = [[Fields_Class alloc] initWithEnabled:true];
+	XCTAssertTrue (struct1.managedClass.boolean, "init / class / boolean / true");
 
 	Fields_Struct *struct2 = [[Fields_Struct alloc] initWithEnabled:false];
 	XCTAssertNotNil ([struct2 class], "init / class initialized 2");
@@ -507,7 +507,48 @@
 
 	NSArray<NSDecimalNumber *> *decimalrefNilarr = nil;
 	[Type_Decimal reverseDecimalArrRefDecArr:&decimalrefNilarr];
-	XCTAssertNil(decimalrefNilarr, "decimalrefNilarr");
+	XCTAssertNil (decimalrefNilarr, "decimalrefNilarr");
+
+	NSDate *distantFuture = [Type_DateTime returnDateDatetime:[NSDate distantFuture]];
+	XCTAssertNotNil (distantFuture, "distantFuture");
+
+	NSDate *verydistantFuture = [NSDate dateWithTimeIntervalSinceReferenceDate:[distantFuture timeIntervalSinceReferenceDate] * 8];
+	NSDate *netmaxverydistantFuture = [Type_DateTime returnDateDatetime:verydistantFuture];
+	NSDate *nsnetmax = [NSDate dateWithTimeIntervalSinceReferenceDate:(NSTimeInterval) 252423993600];
+	XCTAssertEqualWithAccuracy ([nsnetmax timeIntervalSinceReferenceDate], [netmaxverydistantFuture timeIntervalSinceReferenceDate], 0.001, "netmaxverydistantFuture");
+
+	NSDate *distantPast = [Type_DateTime returnDateDatetime:[NSDate distantPast]];
+	NSDate *nsnetmin = [NSDate dateWithTimeIntervalSinceReferenceDate:(NSTimeInterval) -63113904000];
+	XCTAssertEqualWithAccuracy ([nsnetmin timeIntervalSinceReferenceDate], [distantPast timeIntervalSinceReferenceDate], 0.001, "DateTime distantPast");
+
+	NSDate *netmax = Type_DateTime.max;
+	XCTAssertEqualWithAccuracy ([nsnetmax timeIntervalSinceReferenceDate], [netmax timeIntervalSinceReferenceDate], 0.001, "DateTime Max");
+
+	NSDate *netmin = Type_DateTime.min;
+	XCTAssertEqualWithAccuracy ([nsnetmin timeIntervalSinceReferenceDate], [netmin timeIntervalSinceReferenceDate], 0.001, "DateTime Min");
+
+	NSDate *refdate = nil;
+	[Type_DateTime refDateDatetime:&refdate];
+	XCTAssertEqualWithAccuracy ([nsnetmin timeIntervalSinceReferenceDate], [refdate timeIntervalSinceReferenceDate], 0.001, "DateTime refdate");
+
+	NSDate *nilTest = [Type_DateTime returnDateDatetime:nil];
+	XCTAssertEqualWithAccuracy ([nsnetmin timeIntervalSinceReferenceDate], [nilTest timeIntervalSinceReferenceDate], 0.001, "DateTime nilTest");
+
+	NSArray<NSDate *> *datesArr = @[netmax, netmin];
+	[Type_DateTime reverseRefDatesDates:&datesArr];
+	XCTAssertEqualWithAccuracy ([nsnetmin timeIntervalSinceReferenceDate], [datesArr[0] timeIntervalSinceReferenceDate], 0.001, "DateTime reverseRefDatesDates Min");
+	XCTAssertEqualWithAccuracy ([nsnetmax timeIntervalSinceReferenceDate], [datesArr[1] timeIntervalSinceReferenceDate], 0.001, "DateTime reverseRefDatesDates Max");
+
+	NSArray<NSDate *> *revdatesArr = [Type_DateTime reverseDatesDates:@[netmax, netmin]];
+	XCTAssertEqualWithAccuracy ([nsnetmin timeIntervalSinceReferenceDate], [revdatesArr[0] timeIntervalSinceReferenceDate], 0.001, "DateTime reverseDatesDates Min");
+	XCTAssertEqualWithAccuracy ([nsnetmax timeIntervalSinceReferenceDate], [revdatesArr[1] timeIntervalSinceReferenceDate], 0.001, "DateTime reverseDatesDates Max");
+
+	NSArray<NSDate *> *refnilarrdate = nil;
+	[Type_DateTime reverseRefDatesDates:&refnilarrdate];
+	XCTAssertNil (refnilarrdate, "DateTime refnilarrdate");
+
+	NSArray<NSDate *> *revdatesnillArr = [Type_DateTime reverseDatesDates:nil];
+	XCTAssertNil (revdatesnillArr, "DateTime revdatesnillArr");
 }
 
 - (void) testObjectIndexedSubscripting {
@@ -1311,6 +1352,12 @@
 	while ([thread isFinished] == NO) {
 		usleep (1000); // there's no [NSThread join]...
 	}
+}
+
+- (void)testRestrictedNames {
+	Duplicates_WithRestrictedNamed * d = [[Duplicates_WithRestrictedNamed alloc] init];
+	Class c = [d class];
+	XCTAssertNotEqual(42, [d hash], "Must not call instance Hash ()");
 }
 
 #pragma clang diagnostic pop

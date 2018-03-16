@@ -200,4 +200,12 @@ namespace Embeddinator.ObjC {
 			return false;
 		}
 	}
+
+	public static class EnumerableExtensions {
+		public static IEnumerable<T> Yield<T> (this T item)
+		{
+			yield return item;
+		}
+	}
+
 }

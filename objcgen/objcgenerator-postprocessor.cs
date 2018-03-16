@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 
@@ -10,10 +11,11 @@ namespace Embeddinator.ObjC {
 	// A set of post-processing steps needed to add hints
 	// to the input of the generation step
 	public partial class ObjCProcessor {
+
+		TypeMapper Mapper = new TypeMapper ();
+
 		protected IEnumerable<ProcessedMethod> PostProcessMethods (IEnumerable<ProcessedMethod> methods)
 		{
-			HashSet<string> duplicateNames = FindDuplicateNames (methods);
-
 			var equals = new HashSet<MethodInfo> ();
 			foreach (var m in methods) {
 				if (m.MethodType == MethodType.NSObjectProcotolIsEqual)
@@ -28,25 +30,37 @@ namespace Embeddinator.ObjC {
 					continue;
 				}
 
-				if (duplicateNames.Contains (CreateStringRep (method)) && method.Name != "CompareTo") // HACK
-					processedMethod.FallBackToTypeName = true;
-
 				if (IsOperatorOrFriendlyVersion (method))
 					processedMethod.IsOperator = true;
 
-				ProcessPotentialNameOverride (processedMethod);
+				ProcessPotentialName (processedMethod);
 
+				if (Mapper.CheckForDuplicateSelectors (processedMethod) == DuplicationStatus.Unresolvable) {
+					Delayed.Add (ErrorHelper.CreateWarning (1052, $"Element {method.Name} is not generated as its name conflicts with other elements on the same class."));
+					continue;
+				}
+
+				Mapper.Register (processedMethod);
+
+				processedMethod.Freeze ();
 				yield return processedMethod;
 			}
 		}
 
-		void ProcessPotentialNameOverride (ProcessedMethod processedMethod)
+		void ProcessPotentialName (ProcessedMethod processedMethod)
 		{
 			MethodInfo method = processedMethod.Method;
 			if (IsOperatorOrFriendlyVersion (method)) {
 				string nameOverride = OperatorOverloads.GetObjCName (processedMethod.Method.Name, processedMethod.Method.GetParameters ().Length);
 				if (nameOverride != null)
 					processedMethod.NameOverride = nameOverride;
+			}
+
+			string objCSignature = processedMethod.ObjCSignature;
+			if (RestrictedObjSelectors.IsImportantSelector (objCSignature)) {
+				string newName = "managed" + method.Name.PascalCase ();
+				processedMethod.NameOverride = newName;
+				Delayed.Add (ErrorHelper.CreateWarning (1051, $"Element {method.Name} is generated instead as {newName} because its name conflicts with an important objective-c selector."));
 			}
 		}
 
@@ -55,84 +69,120 @@ namespace Embeddinator.ObjC {
 			return method.IsOperatorMethod () || OperatorOverloads.MatchesOperatorFriendlyName (method);
 		}
 
-		protected IEnumerable<ProcessedProperty> PostProcessProperties (IEnumerable<PropertyInfo> properties)
+		protected IEnumerable<ProcessedProperty> PostProcessProperties (IEnumerable<ProcessedProperty> properties)
 		{
-			foreach (PropertyInfo property in properties) {
-				ProcessedProperty processedProperty = new ProcessedProperty (property, this);
+			foreach (ProcessedProperty processedProperty in properties) {
+
+				ProcessPotentialName (processedProperty);
+
+				if (Mapper.CheckForDuplicateSelectors (processedProperty) == DuplicationStatus.Unresolvable){
+					Delayed.Add (ErrorHelper.CreateWarning (1052, $"Element {processedProperty.Name} is not generated as its name conflicts with other elements on the same class."));
+					continue;
+				}
+
+				Mapper.Register (processedProperty);
+
+				processedProperty.Freeze ();
 				yield return processedProperty;
 			}
 		}
 
-		protected IEnumerable<ProcessedProperty> PostProcessSubscriptProperties (IEnumerable<PropertyInfo> properties)
+		void ProcessPotentialName (ProcessedProperty processedProperty)
 		{
-			foreach (PropertyInfo property in properties) {
-				ProcessedProperty processedProperty = new ProcessedProperty (property, this);
+			string getSignature = processedProperty.HasGetter ? processedProperty.GetMethod.ObjCSignature : "";
+			string setSignature = processedProperty.HasSetter ? processedProperty.SetMethod.ObjCSignature : "";
+
+			if (RestrictedObjSelectors.IsImportantSelector (getSignature) || RestrictedObjSelectors.IsImportantSelector (setSignature)) {
+				string newName = "managed" + processedProperty.Name.PascalCase ();
+				Delayed.Add (ErrorHelper.CreateWarning (1051, $"Element {processedProperty.Name} is generated instead as {newName} because its name conflicts with an important objective-c selector."));
+				processedProperty.NameOverride = newName;
+			}
+		}
+
+		protected IEnumerable<ProcessedProperty> PostProcessSubscriptProperties (IEnumerable<ProcessedProperty> properties)
+		{
+			foreach (ProcessedProperty processedProperty in properties) {
+
+				if (Mapper.CheckForDuplicateSelectors (processedProperty) == DuplicationStatus.Unresolvable) {
+					Delayed.Add (ErrorHelper.CreateWarning (1052, $"Element {processedProperty.Name} is not generated as its name conflicts with other elements on the same class."));
+					continue;
+				}
+
+				Mapper.Register (processedProperty);
+
 				yield return processedProperty;
 			}
 		}
 
-		protected IEnumerable<ProcessedFieldInfo> PostProcessFields (IEnumerable<FieldInfo> fields)
+		void ProcessPotentialName (ProcessedFieldInfo processedField)
 		{
-			foreach (FieldInfo field in fields) {
-				ProcessedFieldInfo processedField = new ProcessedFieldInfo (field, this);
+			if (RestrictedObjSelectors.IsImportantSelector (processedField.GetterName) || RestrictedObjSelectors.IsImportantSelector (processedField.SetterName)) {
+				string newName = "managed" + processedField.Name.PascalCase ();
+				Delayed.Add (ErrorHelper.CreateWarning (1051, $"Element {processedField.Name} is generated instead as {newName} because its name conflicts with an important objective-c selector."));
+				processedField.NameOverride = newName;
+			}
+		}
+
+		protected IEnumerable<ProcessedFieldInfo> PostProcessFields (IEnumerable<ProcessedFieldInfo> fields)
+		{
+			foreach (ProcessedFieldInfo processedField in fields) {
+				ProcessPotentialName (processedField);
+
+				if (Mapper.CheckForDuplicateSelectors (processedField) == DuplicationStatus.Unresolvable) {
+					Delayed.Add (ErrorHelper.CreateWarning (1052, $"Element {processedField.Name} is not generated as its name conflicts with other elements on the same class."));
+					continue;
+				}
+
+				Mapper.Register (processedField);
+
 				yield return processedField;
 			}
 		}
 
-		protected IEnumerable<ProcessedConstructor> PostProcessConstructors (IEnumerable<ConstructorInfo> constructors)
+		protected IEnumerable<ProcessedConstructor> PostProcessConstructors (IEnumerable<ProcessedConstructor> constructors)
 		{
-			HashSet<string> duplicateNames = FindDuplicateNames (constructors);
+			foreach (ProcessedConstructor processedConstructor in constructors) {
+				if (Mapper.CheckForDuplicateSelectors (processedConstructor) == DuplicationStatus.Unresolvable)
+					continue;
 
-			foreach (ConstructorInfo constructor in constructors) {
-				ProcessedConstructor processedConstructor = new ProcessedConstructor (constructor, this);
+				Mapper.Register (processedConstructor);
 
-				if (duplicateNames.Contains (CreateStringRep(constructor)))
-					processedConstructor.FallBackToTypeName = true;
-
+				processedConstructor.Freeze ();
 				yield return processedConstructor;
 			}
 		}
+	}
 
-		static string CreateStringRep (ConstructorInfo constructor)
-		{
-			StringBuilder str = new StringBuilder ();
-			foreach (var arg in constructor.GetParameters ())
-				str.Append (arg.Name + ":"); // This format is arbitrary
-			return str.ToString ();
-		}
+	static class RestrictedNames
+	{
+		static readonly HashSet<string> Names = new HashSet<string> { "static", "auto" };
 
-		static string CreateStringRep (MethodInfo method)
+		public static bool IsRestrictedName (string name)
 		{
-			StringBuilder str = new StringBuilder (method.Name);
-			foreach (var arg in method.GetParameters ())
-				str.Append (":"); // This format is arbitrary
-			return str.ToString ();
-		}
-
-		static string CreateStringRep (MemberInfo i)
-		{
-			if (i is ConstructorInfo)
-				return CreateStringRep ((ConstructorInfo)i);
-			if (i is MethodInfo)
-				return CreateStringRep ((MethodInfo)i);
-			return i.Name;
-		}
-
-		// temporary quasi-duplicate
-		static HashSet<string> FindDuplicateNames (IEnumerable<ProcessedMethod> members)
-		{
-			Dictionary<string, int> methodNames = new Dictionary<string, int> ();
-			foreach (var member in members)
-				methodNames.IncrementValue (CreateStringRep (member.Method));
-			return new HashSet<string> (methodNames.Where (x => x.Value > 1).Select (x => x.Key));
-		}
-
-		static HashSet<string> FindDuplicateNames (IEnumerable<MemberInfo> members)
-		{
-			Dictionary<string, int> methodNames = new Dictionary<string, int> ();
-			foreach (MemberInfo member in members)
-				methodNames.IncrementValue (CreateStringRep (member));
-			return new HashSet<string> (methodNames.Where (x => x.Value > 1).Select (x => x.Key));
+			return Names.Contains (name);
 		}
 	}
+
+	static class RestrictedObjSelectors
+	{
+		static readonly HashSet<string> ImportantObjcSelectors = new HashSet<string> { "hash", "class", "superclass", "isEqual:", "self", "isKindOfClass:",
+			"isMemberOfClass:", "respondsToSelector:", "conformsToProtocol:", "description", "debugDescription", "performSelector:", "performSelector:withObject:",
+			"performSelector:withObject:withObject:", "isProxy", "retain", "release", "autorelease", "retainCount", "zone" };
+
+		static public bool IsImportantSelector (string selector)
+		{
+			if (selector.StartsWith ("get", StringComparison.Ordinal))
+				selector = selector.Substring (3).CamelCase ();
+
+			if (selector.StartsWith ("set", StringComparison.Ordinal)) {
+				selector = selector.Substring (3).CamelCase ();
+				int colonLocation = selector.IndexOf (':');
+				if (colonLocation > 0)
+					selector = selector.Substring (0, colonLocation);
+			}
+
+			return ImportantObjcSelectors.Contains (selector);
+		}
+	}
+
 }

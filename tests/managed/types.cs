@@ -81,14 +81,6 @@ public static class Type_String
 	public static string NonEmptyString { get { return "Hello World"; } }
 }
 
-/// <summary>
-/// NOTE: DateTime types are not exposed, this is for verifying DateTime.Now works
-/// </summary>
-public static class Type_DateTime
-{
-    public static string Now { get { return DateTime.Now.ToString(); } }
-}
-
 // objc: this type won't be generated (Exception is not supported) but the generation will succeed (with warnings)
 public class MyException : Exception {
 }
@@ -122,5 +114,23 @@ public class ExposeExtraTypes {
 
 	public TimeSpan TimeOfDay {
 		get { return DateTime.Now.TimeOfDay; }
+	}
+}
+
+public static class Type_DateTime {
+	public static string Now { get { return DateTime.Now.ToString (); } }
+
+	public static DateTime ReturnDate (DateTime datetime) => datetime;
+	public static void RefDate (ref DateTime datetime) => datetime = DateTime.MinValue;
+	public static DateTime [] ReverseDates (DateTime [] dates) => dates?.Reverse ().ToArray ();
+	public static void ReverseRefDates (ref DateTime [] dates) => dates = dates?.Reverse ().ToArray ();
+
+	public static DateTime Max { get; } = DateTime.MaxValue;
+	public static DateTime Min { get; } = DateTime.MinValue;
+
+	public static bool Between (DateTime dt1, DateTime dt2)
+	{
+		var now = DateTime.Now;
+		return (now >= dt1) && (now <= dt2);
 	}
 }

@@ -1,5 +1,6 @@
 ﻿﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using IKVM.Reflection;
 using Type = IKVM.Reflection.Type;
 
@@ -16,16 +17,15 @@ namespace Embeddinator.ObjC {
 
 		protected List<Exception> Delayed = new List<Exception> ();
 
-		public virtual void Process (IEnumerable<Assembly> input)
+		public virtual void Process (IEnumerable<ProcessedAssembly> input)
 		{
+			Logger.Log ($"Processing: {input.Count ()} assemblies");
+
 			foreach (var a in input) {
-				var pa = new ProcessedAssembly (a) {
-					UserCode = true,
-				};
 				// ignoring/warning one is not an option as they could be different (e.g. different builds/versions)
-				if (!AddIfUnique (pa))
-					throw ErrorHelper.CreateError (12, $"The assembly name `{pa.Name}` is not unique");
-				assemblyQueue.Enqueue (pa);
+				if (!AddIfUnique (a))
+					throw ErrorHelper.CreateError (12, $"The assembly name `{a.Name}` is not unique");
+				assemblyQueue.Enqueue (a);
 			}
 
 			while (assemblyQueue.Count > 0) {
@@ -40,6 +40,8 @@ namespace Embeddinator.ObjC {
 		{
 			if (!a.UserCode)
 				return;
+
+			Logger.Log ($"Processing Assembly: {a.Name}");
 
 			foreach (var t in GetTypes (a.Assembly)) {
 				var pt = new ProcessedType (t) {
