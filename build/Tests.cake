@@ -1,5 +1,6 @@
 var managedDll = Directory("./tests/managed/generic/bin") + Directory(configuration) + File("managed.dll");
 var fsharpManagedDll = Directory("./tests/managed/fsharp-generic/bin") + Directory(configuration) + File("fsharpManaged.dll");
+var fsharpCoreDll = Directory("./tests/managed/fsharp-generic/bin") + Directory(configuration) + File("FSharp.Core.dll");
 
 /// ---------------------------
 /// Managed test projects
@@ -131,6 +132,8 @@ Task("Build-C-Tests")
             System.IO.Path.GetFileName(managedDll));
         System.IO.File.Copy(fsharpManagedDll, $"{mkDir}/bin/{configuration}/" +
             System.IO.Path.GetFileName(fsharpManagedDll));
+        System.IO.File.Copy(fsharpCoreDll, $"{mkDir}/bin/{configuration}/" +
+            System.IO.Path.GetFileName(fsharpCoreDll));
 
         if (IsRunningOnWindows())
         {
