@@ -39,6 +39,7 @@ package:: bin/Debug/objcgen.exe Make.config.inc
 	ln -fs $(PACKAGE_FULLVERSION) $(FRAMEWORK_DIR)/Versions/Current
 	cp bin/Debug/objcgen.{exe,pdb} $(FRAMEWORK_DIR)/Versions/Current/bin/
 	cp bin/Debug/Mono.Options.dll $(FRAMEWORK_DIR)/Versions/Current/bin/
+	cp bin/Debug/IKVM.Reflection.dll $(FRAMEWORK_DIR)/Versions/Current/bin/
 	cp script/objcgen  $(FRAMEWORK_DIR)/Commands/
 	chmod +x $(FRAMEWORK_DIR)/Commands/objcgen
 
