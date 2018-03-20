@@ -4,4 +4,5 @@
     <AssemblyName>managed</AssemblyName>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
+  <Import Project="..\managed-shared.projitems" Label="Shared" />
 </Project>
