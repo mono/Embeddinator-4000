@@ -26,6 +26,7 @@ namespace Embeddinator.ObjC
 
 	public enum CompilationTarget
 	{
+		Default,
 		SharedLibrary,
 		StaticLibrary,
 		Framework,

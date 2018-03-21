@@ -223,6 +223,16 @@ Note: The list of reserved selectors will evolve with new versions of the tool.
 This is a **warning** that Element `E` is not generated as its name conflicts with other elements on the same class.
 
 
+<h3><a name="EM1053"/>Target `E` is not supported for Xamarin.iOS and Xamarin.Mac. Only the `framework` option is considered supported and should be used.</h3>
+
+This is a **warning** that target `E` is considered unsupported for Xamarin.iOS and Xamarin.Mac use cases. 
+
+Consumption of static or dynamic Embeddinator libraries may require additional work steps or tweaks, and should be avoided in most use cases.
+
+Consider removing your --target parameter or pass --target=framework instead.
+
+
+
 <!-- 2xxx: code generation -->
 
 # EM2xxx: Code Generation

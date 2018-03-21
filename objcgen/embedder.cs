@@ -130,7 +130,7 @@ namespace Embeddinator.ObjC
 		public List<Assembly> Assemblies { get; private set; } = new List<Assembly> ();
 		public Platform Platform { get; set; } = Platform.macOS;
 		public TargetLanguage TargetLanguage { get; private set; } = TargetLanguage.ObjectiveC;
-		public CompilationTarget CompilationTarget { get; set; } = CompilationTarget.SharedLibrary;
+		public CompilationTarget CompilationTarget { get; set; } = CompilationTarget.Default;
 
 		public string [] PlatformSdkDirectories
 		{
@@ -156,8 +156,36 @@ namespace Embeddinator.ObjC
 			}
 		}
 
+		void ValidateSettings ()
+		{
+			if (CompilationTarget == CompilationTarget.Default) {
+				switch (Platform) {
+				case Platform.macOS:
+					CompilationTarget = CompilationTarget.SharedLibrary;
+					break;
+				case Platform.iOS:
+				case Platform.tvOS:
+				case Platform.watchOS:
+				case Platform.macOSSystem:
+				case Platform.macOSFull:
+				case Platform.macOSModern:
+					CompilationTarget = CompilationTarget.Framework;
+					break;
+				default:
+					throw ErrorHelper.CreateError (99, "Internal error: invalid platform {0}. Please file a bug report with a test case (https://github.com/mono/Embeddinator-4000/issues).", Platform);
+
+				}
+			}
+
+			if (Platform != Platform.macOS && CompilationTarget != CompilationTarget.Framework) {
+				ErrorHelper.Warning (1053, "Target {0} is not supported for Xamarin.iOS and Xamarin.Mac. Only the `framework` option is considered supported and should be used.", CompilationTarget);
+			}
+		}
+
 		public int Generate (List<string> args)
 		{
+			ValidateSettings ();
+
 			Console.WriteLine ("Parsing assemblies...");
 
 			var universe = new Universe (UniverseOptions.MetadataOnly);
