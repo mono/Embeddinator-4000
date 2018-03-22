@@ -292,12 +292,16 @@ MonoMethod* mono_embeddinator_lookup_method(const char* method_name, MonoClass *
 
 void mono_embeddinator_throw_exception(MonoObject *exception)
 {
+    #if defined(__OBJC__) && defined(NATIVEEXCEPTION)
+    xamarin_process_managed_exception(exception);
+    #elif
     mono_embeddinator_error_t error;
     error.type = MONO_EMBEDDINATOR_EXCEPTION_THROWN;
     error.exception = (MonoException*) exception;
     error.string = 0;
 
     mono_embeddinator_error(error);
+    #endif
 }
 
 char* mono_embeddinator_error_to_string(mono_embeddinator_error_t error)
