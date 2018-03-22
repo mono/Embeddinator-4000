@@ -292,7 +292,7 @@ namespace Embeddinator.ObjC
 					break;
 				case Platform.iOS:
 					build_infos = new BuildInfo[] {
-					new BuildInfo { Sdk = "iPhoneOS", Architectures = new string [] { "armv7", "armv7s", "arm64" }, SdkName = "iphoneos", MinVersion = "8.0", XamariniOSSDK = "MonoTouch.iphoneos.sdk", CompilerFlags = "-fembed-bitcode", LinkerFlags = "-fembed-bitcode" },
+					new BuildInfo { Sdk = "iPhoneOS", Architectures = new string [] { "armv7", "armv7s", "arm64" }, SdkName = "iphoneos", MinVersion = "8.0", XamariniOSSDK = "MonoTouch.iphoneos.sdk" },
 					new BuildInfo { Sdk = "iPhoneSimulator", Architectures = new string [] { "i386", "x86_64" }, SdkName = "ios-simulator", MinVersion = "8.0", XamariniOSSDK = "MonoTouch.iphonesimulator.sdk" },
 				};
 					break;
@@ -391,15 +391,9 @@ namespace Embeddinator.ObjC
 						}
 					}
 
-					if (Extension)
-					{
-						common_options.Append("-fapplication-extension ");
-					}
 
 					if (NativeException)
-					{
-						common_options.Append("-DNATIVEEXCEPTION ");
-					}
+						common_options.Append ("-DNATIVEEXCEPTION ");
 
 					common_options.Append ("-fobjc-arc ");
 					common_options.Append ("-ObjC ");
@@ -642,8 +636,9 @@ namespace Embeddinator.ObjC
 								mmp.Append ("--debug ");
 							mmp.Append ("-p "); // generate a plist
 							mmp.Append ($"--target-framework {GetTargetFramework ()} ");
-							string extensionFlag = Extension ? "-fapplication-extension" : "";
-							mmp.Append ($"\"--link_flags={extensionFlag} -force_load {Path.GetFullPath (sdk_output_file)}\" ");
+							mmp.Append ($"\"--link_flags=-force_load {Path.GetFullPath (sdk_output_file)}\" ");
+							if (NativeException)
+								mmp.Append ("--marshal-managed-exceptions=throwobjectivecexception ");
 							if (!Utils.RunProcess ("/Library/Frameworks/Xamarin.Mac.framework/Versions/Current/bin/mmp", mmp.ToString (), out exitCode))
 								return exitCode;
 
@@ -693,7 +688,7 @@ namespace Embeddinator.ObjC
 							mtouch.Append ($"--target-framework {GetTargetFramework ()} ");
 							mtouch.Append ($"\"--gcc_flags=-force_load {Path.GetFullPath (sdk_output_file)}\" ");
 							if (NativeException)
-								mtouch.Append("--marshal-managed-exceptions=throwobjectivecexception ");
+								mtouch.Append ("--marshal-managed-exceptions=throwobjectivecexception ");
 							if (!Utils.RunProcess ("/Library/Frameworks/Xamarin.iOS.framework/Versions/Current/bin/mtouch", mtouch.ToString (), out exitCode))
 								return exitCode;
 
