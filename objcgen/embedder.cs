@@ -43,6 +43,8 @@ namespace Embeddinator.ObjC
 
 		public bool Extension { get; set; }
 
+		public bool NoBitcode { get; set; }
+
 		public bool Shared { get { return CompilationTarget == CompilationTarget.SharedLibrary; } }
 
 		public bool EnableLinker { get; set; }
@@ -279,6 +281,8 @@ namespace Embeddinator.ObjC
 
 			BuildInfo[] build_infos;
 
+			string bitcodeFlags = NoBitCode ? null : "-fembed-bitcode";
+
 			switch (Platform) {
 				case Platform.macOS:
 				case Platform.macOSFull:
@@ -290,19 +294,19 @@ namespace Embeddinator.ObjC
 					break;
 				case Platform.iOS:
 					build_infos = new BuildInfo[] {
-					new BuildInfo { Sdk = "iPhoneOS", Architectures = new string [] { "armv7", "armv7s", "arm64" }, SdkName = "iphoneos", MinVersion = "8.0", XamariniOSSDK = "MonoTouch.iphoneos.sdk", CompilerFlags = "-fembed-bitcode", LinkerFlags = "-fembed-bitcode" },
+					new BuildInfo { Sdk = "iPhoneOS", Architectures = new string [] { "armv7", "armv7s", "arm64" }, SdkName = "iphoneos", MinVersion = "8.0", XamariniOSSDK = "MonoTouch.iphoneos.sdk", CompilerFlags = bitcodeFlags, LinkerFlags = bitcodeFlags },
 					new BuildInfo { Sdk = "iPhoneSimulator", Architectures = new string [] { "i386", "x86_64" }, SdkName = "ios-simulator", MinVersion = "8.0", XamariniOSSDK = "MonoTouch.iphonesimulator.sdk" },
 				};
 					break;
 				case Platform.tvOS:
 					build_infos = new BuildInfo[] {
-					new BuildInfo { Sdk = "AppleTVOS", Architectures = new string [] { "arm64" }, SdkName = "tvos", MinVersion = "9.0", XamariniOSSDK = "Xamarin.AppleTVOS.sdk", CompilerFlags = "-fembed-bitcode", LinkerFlags = "-fembed-bitcode" },
+					new BuildInfo { Sdk = "AppleTVOS", Architectures = new string [] { "arm64" }, SdkName = "tvos", MinVersion = "9.0", XamariniOSSDK = "Xamarin.AppleTVOS.sdk", CompilerFlags = bitcodeFlags, LinkerFlags = bitcodeFlags },
 					new BuildInfo { Sdk = "AppleTVSimulator", Architectures = new string [] { "x86_64" }, SdkName = "tvos-simulator", MinVersion = "9.0", XamariniOSSDK = "Xamarin.AppleTVSimulator.sdk" },
 				};
 					break;
 				case Platform.watchOS:
 					build_infos = new BuildInfo[] {
-					new BuildInfo { Sdk = "WatchOS", Architectures = new string [] { "armv7k" }, SdkName = "watchos", MinVersion = "2.0", XamariniOSSDK = "Xamarin.WatchOS.sdk", CompilerFlags = "-fembed-bitcode", LinkerFlags = "-fembed-bitcode"  },
+					new BuildInfo { Sdk = "WatchOS", Architectures = new string [] { "armv7k" }, SdkName = "watchos", MinVersion = "2.0", XamariniOSSDK = "Xamarin.WatchOS.sdk", CompilerFlags = bitcodeFlags, LinkerFlags = bitcodeFlags  },
 					new BuildInfo { Sdk = "WatchSimulator", Architectures = new string [] { "i386" }, SdkName = "watchos-simulator", MinVersion = "2.0", XamariniOSSDK = "Xamarin.WatchSimulator.sdk" },
 				};
 					break;
