@@ -1457,6 +1457,15 @@
     XCTAssertEqualObjects(@"Mono", RefStr);
 }
 
+- (void) testKeywords {
+    Keywords_Keywords * keywords = [[Keywords_Keywords alloc] init];
+    [keywords assert];
+    [keywords auto];
+    [keywords method_with_c_keywordAuto:1];
+    [keywords method_with_java_keywordAssert:1];
+
+}
+
 #pragma clang diagnostic pop
 
 @end
