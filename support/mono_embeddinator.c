@@ -294,7 +294,7 @@ void mono_embeddinator_throw_exception(MonoObject *exception)
 {
 #if defined(__OBJC__) && defined(NATIVEEXCEPTION)
     xamarin_process_managed_exception(exception);
-#elif
+#else
     mono_embeddinator_error_t error;
     error.type = MONO_EMBEDDINATOR_EXCEPTION_THROWN;
     error.exception = (MonoException*) exception;
