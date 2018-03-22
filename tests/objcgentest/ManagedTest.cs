@@ -37,6 +37,14 @@ namespace ExecutionTests
 		[Test]
 		[TestCase (true)]
 		[TestCase (false)]
+		public void FSharp_macOSModern (bool debug)
+		{
+			RunManagedTests (new ManagedTestInfo (Platform.macOSModern, fsharp : true), debug: debug);
+		}
+
+		[Test]
+		[TestCase (true)]
+		[TestCase (false)]
 		public void macOSSystem (bool debug)
 		{
 			RunManagedTests (Platform.macOSSystem, debug: debug);
@@ -146,15 +154,16 @@ namespace ExecutionTests
 			public List<string> Defines { get; } = new List<string> ();
 			public int ManagedTestCount { get; }
 
-			public ManagedTestInfo (Platform platform)
+			public ManagedTestInfo (Platform platform, bool fsharp = false)
 			{
 				Platform = platform;
-				var xamariniOSTestCount = CountTests (Path.Combine (XcodeProjectGenerator.TestsRootDirectory, "objcgentest/xcodetemplate/ios/test/iosTests.m"));
-				var xamarinMacTestCount = CountTests (Path.Combine (XcodeProjectGenerator.TestsRootDirectory, "objcgentest/xcodetemplate/macos/test/macTests.m"));
-				var xamarintvOSTestCount = CountTests (Path.Combine (XcodeProjectGenerator.TestsRootDirectory, "objcgentest/xcodetemplate/tvos/test/tvosTests.m"));
 
-				ManagedTestCount = CountTests (Path.Combine (XcodeProjectGenerator.TestsRootDirectory, "objc-cli/libmanaged/Tests/Tests.m")); ;
+				ManagedTestCount = GetBaseTestCount (fsharp);
 				Defines.Add ("TEST_FRAMEWORK=1");
+
+				// There would be a lot of fsharp projects to clone to do them all...
+				if (fsharp && Platform != Platform.macOSModern)
+					throw new NotImplementedException ();
 
 				switch (platform) {
 				case Platform.macOSFull:
@@ -163,7 +172,7 @@ namespace ExecutionTests
 					Defines.Add ("XAMARIN_MAC=1");
 					Defines.Add ("XAMARIN_MAC_FULL=1");
 					Abi = "x86_64"; // FIXME: fat XM apps not supported yet
-					ManagedTestCount += xamarinMacTestCount;
+					ManagedTestCount += GetMacTestCount ();
 					return;
 				case Platform.macOSSystem:
 					Dlldir = "macos-system";
@@ -171,15 +180,21 @@ namespace ExecutionTests
 					Defines.Add ("XAMARIN_MAC=1");
 					Defines.Add ("XAMARIN_MAC_SYSTEM=1");
 					Abi = "x86_64"; // FIXME: fat XM apps not supported yet
-					ManagedTestCount += xamarinMacTestCount;
+					ManagedTestCount += GetMacTestCount ();
 					return;
 				case Platform.macOSModern:
-					Dlldir = "macos-modern";
-					Dllname = "managed-macos-modern.dll";
+					if (fsharp) {
+						Dlldir = "fsharp-macos";
+						Dllname = "fsharp-macos.dll";
+						Defines.Add ("XAMARIN_FSHARP=1");
+					} else {
+						Dlldir = "macos-modern";
+						Dllname = "managed-macos-modern.dll";
+						Defines.Add ("XAMARIN_MAC_MODERN=1");
+					}
 					Defines.Add ("XAMARIN_MAC=1");
-					Defines.Add ("XAMARIN_MAC_MODERN=1");
 					Abi = "x86_64"; // FIXME: fat XM apps not supported yet
-					ManagedTestCount += xamarinMacTestCount;
+					ManagedTestCount += GetMacTestCount (fsharp);
 					return;
 				case Platform.macOS:
 					Dlldir = "generic";
@@ -191,24 +206,28 @@ namespace ExecutionTests
 					Dllname = "managed-ios.dll";
 					Defines.Add ("XAMARIN_IOS=1");
 					Abi = "armv7,arm64,i386,x86_64";
-					ManagedTestCount += xamariniOSTestCount;
+					ManagedTestCount += GetIOSTestCount ();
 					return;
 				case Platform.tvOS:
 					Dlldir = "tvos";
 					Dllname = "managed-tvos.dll";
 					Defines.Add ("XAMARIN_TVOS=1");
 					Abi = "arm64,x86_64";
-					ManagedTestCount += xamarintvOSTestCount;
+					ManagedTestCount += GetTVTestCount ();
 					return;
 				default:
 					throw new NotImplementedException ();
 				}
 			}
 
-			int CountTests (string path)
-			{
-				return File.ReadAllLines (path).Count ((v) => System.Text.RegularExpressions.Regex.IsMatch (v, "^\\s*-\\s*[(]\\s*void\\s*[)]\\s*test"));
-			}
+			int GetBaseTestCount (bool fsharp = false) => CountTests (Path.Combine (XcodeProjectGenerator.TestsRootDirectory, "objc-cli/libmanaged/Tests/Tests.m"), fsharp);
+			int GetIOSTestCount () => CountTests (Path.Combine (XcodeProjectGenerator.TestsRootDirectory, "objcgentest/xcodetemplate/ios/test/iosTests.m"));
+			int GetMacTestCount (bool fsharp = false) => CountTests (Path.Combine (XcodeProjectGenerator.TestsRootDirectory, "objcgentest/xcodetemplate/macos/test/macTests.m"), fsharp);
+			int GetTVTestCount () => CountTests (Path.Combine (XcodeProjectGenerator.TestsRootDirectory, "objcgentest/xcodetemplate/tvos/test/tvosTests.m"));
+
+			const string TestRegex = "^\\s*-\\s*[(]\\s*void\\s*[)]\\s*test";
+
+			int CountTests (string path, bool fsharp = false) => File.ReadAllLines (path).Count ((v) => (v.Contains ("fsharp") == fsharp) && System.Text.RegularExpressions.Regex.IsMatch (v, TestRegex));
 		}
 
 

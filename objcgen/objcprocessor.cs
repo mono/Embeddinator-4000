@@ -170,6 +170,14 @@ namespace Embeddinator.ObjC {
 					return true;
 				}
 				break;
+			case "System.Collections":
+				switch (t.Name) {
+				case "IEqualityComparer": {
+						unsupported.Add (t);
+						return false;
+					}
+				}
+				break;
 			}
 
 			var base_type = t.BaseType;

@@ -10,6 +10,8 @@
 #include "managed-ios/managed-ios.h"
 #elif defined (XAMARIN_TVOS)
 #include "managed-tvos/managed-tvos.h"
+#elif defined (XAMARIN_FSHARP)
+#include "fsharp-macos/fsharp-macos.h"
 #else
 #include "managed/managed.h"
 #endif
@@ -22,6 +24,8 @@
 @end
 
 @implementation Tests
+
+#if !defined XAMARIN_FSHARP
 
 + (void)setUp {
 	[super setUp];
@@ -1361,5 +1365,7 @@
 }
 
 #pragma clang diagnostic pop
+
+#endif 
 
 @end
