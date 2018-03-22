@@ -388,6 +388,12 @@ namespace Embeddinator.ObjC
 							common_options.Append ("-DTOKENLOOKUP ");
 						}
 					}
+
+                    if (Extension)
+                    {
+                        common_options.Append("-fapplication-extension ");
+                    }
+
 					common_options.Append ("-fobjc-arc ");
 					common_options.Append ("-ObjC ");
 					common_options.Append ("-Wall ");
@@ -629,7 +635,8 @@ namespace Embeddinator.ObjC
 								mmp.Append ("--debug ");
 							mmp.Append ("-p "); // generate a plist
 							mmp.Append ($"--target-framework {GetTargetFramework ()} ");
-							mmp.Append ($"\"--link_flags=-force_load {Path.GetFullPath (sdk_output_file)}\" ");
+                            string extensionFlag = Extension ? "-fapplication-extension" : "";
+                            mmp.Append ($"\"--link_flags={extensionFlag} -force_load {Path.GetFullPath (sdk_output_file)}\" ");
 							if (!Utils.RunProcess ("/Library/Frameworks/Xamarin.Mac.framework/Versions/Current/bin/mmp", mmp.ToString (), out exitCode))
 								return exitCode;
 
