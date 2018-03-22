@@ -390,9 +390,7 @@ namespace Embeddinator.ObjC
 					}
 
 					if (Extension)
-					{
-						common_options.Append("-fapplication-extension ");
-					}
+						common_options.Append ("-fapplication-extension ");
 
 					common_options.Append ("-fobjc-arc ");
 					common_options.Append ("-ObjC ");
