@@ -1360,6 +1360,112 @@
 	XCTAssertNotEqual(42, [d hash], "Must not call instance Hash ()");
 }
 
+- (void)testAbstractClass {
+    Abstracts_AbstractClass * abs = [Abstracts_ConcreteAbstractClass create];
+    XCTAssertTrue([abs abstractMethod]);
+    XCTAssertTrue([Abstracts_AbstractClass processStaticAbstractAbstract:abs]);
+}
+
+- (void) testArraysReturn {
+    unsigned char bytes[] = { 1, 2, 3};
+    NSData * byteArray = [NSData dataWithBytes:bytes length:3];
+    XCTAssertEqual (6, [Arrays_Arr sumByteArrayArray:byteArray]);
+    
+    NSArray<NSNumber*> * i = [Arrays_Arr returnsIntArray];
+    XCTAssertEqual(3, [i count]);
+    XCTAssertEqual(@1, i[0]);
+    XCTAssertEqual(@2, i[1]);
+    XCTAssertEqual(@3, i[2]);
+    
+    NSArray<NSString*> * s = [Arrays_Arr returnsStringArray];
+    XCTAssertEqual(3, [i count]);
+    XCTAssertEqualObjects(@"1", s[0]);
+    XCTAssertEqualObjects(@"2", s[1]);
+    XCTAssertEqualObjects(@"3", s[2]);
+
+    // Broken
+    //NSArray<NSNumber*> * enumArray = @[@(Arrays_Arr_EnumA), @(Arrays_Arr_EnumB), @(Arrays_Arr_EnumC)];
+    //XCTAssertEqual(Arrays_Arr_EnumC, [Arrays_Arr enumArrayLastArray:enumArray]);
+    
+    Arrays_Arr * arr = [[Arrays_Arr alloc] init];
+    NSArray<Arrays_ValueHolder *> * valueHolderArray = [arr valueHolderArr];
+    XCTAssertEqual(3, [valueHolderArray count]);
+    XCTAssertEqual(1, [valueHolderArray[0] intValue]);
+    XCTAssertEqual(2, [valueHolderArray[1] intValue]);
+    XCTAssertEqual(3, [valueHolderArray[2] intValue]);
+    
+    NSArray<Arrays_ValueHolder *> * resultArray = [arr valueHolderArrMethodValhArr:valueHolderArray];
+    XCTAssertEqual(3, [resultArray count]);
+    XCTAssertEqual(1, [resultArray[0] intValue]);
+    XCTAssertEqual(2, [resultArray[1] intValue]);
+    XCTAssertEqual(3, [resultArray[2] intValue]);
+    
+    //NSArray<Arrays_ValueType *> * valueTypeArray = [arr valueTypeArr];
+    //XCTAssertEqual(3, [valueTypeArray count]);
+    //XCTAssertEqual(1, [valueTypeArray[0] intValue]);
+    //XCTAssertEqual(2, [valueTypeArray[1] intValue]);
+    //XCTAssertEqual(3, [valueTypeArray[2] intValue]);
+    
+    //NSArray<Arrays_ValueType *> * resultValueTypeArray = [arr valueTypeArrMethodValTypeArr:valueTypeArray];
+    //XCTAssertEqual(3, [resultValueTypeArray count]);
+    //XCTAssertEqual(1, [resultValueTypeArray[0] intValue]);
+    //XCTAssertEqual(2, [resultValueTypeArray[1] intValue]);
+    //XCTAssertEqual(3, [resultValueTypeArray[2] intValue]);
+}
+
+- (void) testBuiltinTypes {
+    BuiltinTypes * bt = [[BuiltinTypes alloc] init];
+    [bt returnsVoid];
+    XCTAssertEqual(true, [bt returnsBool]);
+    XCTAssertEqual(-5, [bt returnsSByte]);
+    XCTAssertEqual(5, [bt returnsByte]);
+    XCTAssertEqual(-5, [bt returnsShort]);
+    XCTAssertEqual(5, [bt returnsUShort]);
+    XCTAssertEqual(-5, [bt returnsInt]);
+    XCTAssertEqual(5, [bt returnsUInt]);
+    XCTAssertEqual(-5, [bt returnsLong]);
+    XCTAssertEqual(5, [bt returnsULong]);
+    XCTAssertEqual('a', [bt returnsChar]);
+    XCTAssertEqualObjects(@"Mono", [bt returnsString]);
+    
+    XCTAssertEqual(true, [bt passAndReturnsBoolV:true]);
+    XCTAssertEqual(-5, [bt passAndReturnsSByteV:-5]);
+    XCTAssertEqual(5, [bt passAndReturnsByteV:5]);
+    XCTAssertEqual(-5, [bt passAndReturnsShortV:-5]);
+    XCTAssertEqual(5, [bt passAndReturnsUShortV:5]);
+    XCTAssertEqual(-5, [bt passAndReturnsIntV:-5]);
+    XCTAssertEqual(5, [bt passAndReturnsUIntV:5]);
+    XCTAssertEqual(-5, [bt passAndReturnsLongV:-5]);
+    XCTAssertEqual(5, [bt passAndReturnsULongV:5]);
+    XCTAssertEqual('a', [bt passAndReturnsCharV:'a']);
+    XCTAssertEqualObjects(@"Mono", [bt passAndReturnsStringV:@"Mono"]);
+    
+    int OutInt = 0;
+    [bt passOutIntV:&OutInt];
+    XCTAssertEqual(5, OutInt);
+    
+    int RefInt = 0;
+    [bt passRefIntV:&RefInt];
+    XCTAssertEqual(10, RefInt);
+    
+    NSString * RefOut = nil;
+    [bt passOutStringV:&RefOut];
+    XCTAssertEqualObjects(@"Mono", RefOut);
+    
+    NSString * RefStr = @"monomono";
+    [bt passRefStringV:&RefStr];
+    XCTAssertEqualObjects(@"Mono", RefStr);
+}
+
+- (void) testKeywords {
+    Keywords_Keywords * keywords = [[Keywords_Keywords alloc] init];
+    [keywords assert];
+    [keywords auto];
+    [keywords method_with_c_keywordAuto:1];
+    [keywords method_with_java_keywordAssert:1];
+
+}
+
 #pragma clang diagnostic pop
 
 @end
