@@ -43,6 +43,8 @@ namespace Embeddinator.ObjC
 
 		public bool Extension { get; set; }
 
+		public bool NativeException { get; set; }
+
 		public bool Shared { get { return CompilationTarget == CompilationTarget.SharedLibrary; } }
 
 		public bool EnableLinker { get; set; }
@@ -416,6 +418,11 @@ namespace Embeddinator.ObjC
 							common_options.Append ("-DTOKENLOOKUP ");
 						}
 					}
+
+
+					if (NativeException)
+						common_options.Append ("-DNATIVEEXCEPTION ");
+
 					common_options.Append ("-fobjc-arc ");
 					common_options.Append ("-ObjC ");
 					common_options.Append ("-Wall ");
@@ -658,6 +665,8 @@ namespace Embeddinator.ObjC
 							mmp.Append ("-p "); // generate a plist
 							mmp.Append ($"--target-framework {GetTargetFramework ()} ");
 							mmp.Append ($"\"--link_flags=-force_load {Path.GetFullPath (sdk_output_file)}\" ");
+							if (NativeException)
+								mmp.Append ("--marshal-managed-exceptions=throwobjectivecexception ");
 							if (!Utils.RunProcess ("/Library/Frameworks/Xamarin.Mac.framework/Versions/Current/bin/mmp", mmp.ToString (), out exitCode))
 								return exitCode;
 
@@ -706,6 +715,8 @@ namespace Embeddinator.ObjC
 							mtouch.Append ($"--assembly-build-target=@all=framework={LibraryName}.framework ");
 							mtouch.Append ($"--target-framework {GetTargetFramework ()} ");
 							mtouch.Append ($"\"--gcc_flags=-force_load {Path.GetFullPath (sdk_output_file)}\" ");
+							if (NativeException)
+								mtouch.Append ("--marshal-managed-exceptions=throwobjectivecexception ");
 							if (!Utils.RunProcess ("/Library/Frameworks/Xamarin.iOS.framework/Versions/Current/bin/mtouch", mtouch.ToString (), out exitCode))
 								return exitCode;
 
