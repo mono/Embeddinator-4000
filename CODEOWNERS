@@ -1,0 +1,18 @@
+# Default Owners
+*			@chamons @spouliot @rolfbjarne @dalexsoto @jonathanpeppers  
+
+# Android
+.cake/			@jonathanpeppers
+binder/			@jonathanpeppers
+support/java/		@jonathanpeppers
+tests/android/		@jonathanpeppers
+/.travis.yml		@jonathanpeppers
+/appveyor.yml		@jonathanpeppers
+/build.cake		@jonathanpeppers
+/build.ps1		@jonathanpeppers
+/build.sh		@jonathanpeppers
+
+# XI/XM
+objcgen/		@chamons @spouliot @rolfbjarne @dalexsoto
+tests/objcgentest/	@chamons @spouliot @rolfbjarne @dalexsoto
+tests/objc-cli/		@chamons @spouliot @rolfbjarne @dalexsoto
