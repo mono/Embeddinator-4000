@@ -88,6 +88,10 @@ The dependency mentioned in the error message was found on the system, but it's 
 
 Could not create the symlink mentioned in the error message.
 
+<h3><a name="EM0017">EM0017: The bitcode option `X` is not valid.</h3>
+
+The tool does not support the bitcode option `X`. Use either default, true or false.
+
 <h3><a name="EM0026"/>EM0026 Could not parse the command line argument 'A': *</h3>
 
 The syntax given for the command line option `A` could not be parsed by the tool. It is likely incorrect, please check with the documentation or help for the correct syntax.

@@ -50,6 +50,8 @@ Generates target language bindings for interop with managed code.
 
       --gen=VALUE            target generator (C, C++, Obj-C, Java)
   -p, --platform=VALUE       target platform (iOS, macOS, Android, Windows)
+  -e, --extension            compiles as an extension safe api
+      --bitcode=VALUE        bitcode option (default, true, false)
   -o, --out, --outdir=VALUE  output directory
   -c, --compile              compiles the generated output
   -d, --debug                enables debug mode for generated native and
