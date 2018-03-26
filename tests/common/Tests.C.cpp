@@ -460,19 +460,21 @@ TEST_CASE("FSharpTypes.C", "[C][FSharp Types]") {
         managed_UserRecord* entry = g_array_index(userRecordArray.array, managed_UserRecord*, i);
         REQUIRE(strcmp(managed_UserRecord_get_UserDescription(entry), "Cherry") == 0);
     }
-    managed_UserRecord* resultUserRecord = managed_FSharp_useUserRecord(userRecord);
-    REQUIRE(strcmp(managed_UserRecord_get_UserDescription(resultUserRecord), "Test") == 0);
-    _Managed_UserStructArray userStructArray = managed_ArrayTest_getDefaultUserStructArray(10);
-    length = userStructArray.array->len;
-    REQUIRE(length == 10);
-    for (uint32_t i = 0; i < length; i++) {
-        managed_UserStruct* entry = g_array_index(userStructArray.array, managed_UserStruct*, i);
-        REQUIRE(strcmp(managed_UserStruct_get_UserDefinition(entry), "Fun!") == 0);
-    }
+
+    //managed_UserRecord* resultUserRecord = managed_FSharp_useUserRecord(userRecord);
+    //REQUIRE(strcmp(managed_UserRecord_get_UserDescription(resultUserRecord), "Test") == 0);
+
+    //_Managed_UserStructArray userStructArray = managed_ArrayTest_getDefaultUserStructArray(10);
+    //length = userStructArray.array->len;
+    //REQUIRE(length == 10);
+    //for (uint32_t i = 0; i < length; i++) {
+    //    managed_UserStruct* entry = g_array_index(userStructArray.array, managed_UserStruct*, i);
+    //    REQUIRE(strcmp(managed_UserStruct_get_UserDefinition(entry), "Fun!") == 0);
+    //}
     managed_UserStruct* userStruct = managed_FSharp_getDefaultUserStruct();
     REQUIRE(strcmp(managed_UserStruct_get_UserDefinition(userStruct), "Fun!") == 0);
-    managed_UserStruct* resultUserStruct = managed_FSharp_useUserStruct(userStruct);
-    REQUIRE(strcmp(managed_UserStruct_get_UserDefinition(resultUserStruct), "Fun!") == 0);
+    //managed_UserStruct* resultUserStruct = managed_FSharp_useUserStruct(userStruct);
+    //REQUIRE(strcmp(managed_UserStruct_get_UserDefinition(resultUserStruct), "Fun!") == 0);
 }
 
 TEST_CASE("FSharpModules.C", "[C][FSharp Modules]") {
