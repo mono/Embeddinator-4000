@@ -18,6 +18,7 @@ TVOS_MANAGED_DLL=$(TOP)/tests/managed/tvos/bin/$(CONFIG)/managed-tvos.dll
 MACOS_MODERN_MANAGED_DLL=$(TOP)/tests/managed/macos-modern/bin/$(CONFIG)/managed-macos-modern.dll
 MACOS_FULL_MANAGED_DLL=$(TOP)/tests/managed/macos-full/bin/$(CONFIG)/managed-macos-full.dll
 MACOS_SYSTEM_MANAGED_DLL=$(TOP)/tests/managed/macos-system/bin/$(CONFIG)/managed-macos-system.dll
+FSHARP_MANAGED_DLL=$(TOP)/tests/managed/fsharp-macos/bin/$(CONFIG)/fsharp-macos.dll
 
 ifeq ($(detected_OS),Darwin)
 ALL_MANAGED_DLLS = \
@@ -26,7 +27,8 @@ ALL_MANAGED_DLLS = \
 	$(TVOS_MANAGED_DLL) \
 	$(MACOS_MODERN_MANAGED_DLL) \
 	$(MACOS_FULL_MANAGED_DLL) \
-	$(MACOS_SYSTEM_MANAGED_DLL)
+	$(MACOS_SYSTEM_MANAGED_DLL) \
+	$(FSHARP_MANAGED_DLL)
 else
 ALL_MANAGED_DLLS = \
 	$(GENERIC_MANAGED_DLL)
@@ -42,6 +44,9 @@ MANAGED_DEPENDENCIES = \
 
 $(ALL_MANAGED_DLLS): $(MANAGED_DEPENDENCIES)
 	$(MSBUILD) $(wildcard $(abspath $(dir $@)../../*.csproj)) /p:Configuration=$(CONFIG)
+
+$(FSHARP_MANAGED_DLL): $(TOP)/tests/managed/fsharp-macos/fsharp-macos.fsproj
+	$(MSBUILD) $(wildcard $(abspath $(dir $@)../../*.fsproj)) /p:Configuration=$(CONFIG)
 
 # each project file wants to generate subscripts.cs, and running in parallel breaks badly.
 .NOTPARALLEL:

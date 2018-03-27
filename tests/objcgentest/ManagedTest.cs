@@ -37,6 +37,14 @@ namespace ExecutionTests
 		[Test]
 		[TestCase (true)]
 		[TestCase (false)]
+		public void FSharp_macOSModern (bool debug)
+		{
+			RunManagedTests (new ManagedTestInfo (Platform.macOSModern, fsharp : true), debug: debug);
+		}
+
+		[Test]
+		[TestCase (true)]
+		[TestCase (false)]
 		public void macOSSystem (bool debug)
 		{
 			RunManagedTests (Platform.macOSSystem, debug: debug);
@@ -137,74 +145,102 @@ namespace ExecutionTests
 			}
 		}
 
-		int CountTests (string path)
+		class ManagedTestInfo
 		{
-			return File.ReadAllLines (path).Count ((v) => System.Text.RegularExpressions.Regex.IsMatch (v, "^\\s*-\\s*[(]\\s*void\\s*[)]\\s*test"));
+			public Platform Platform { get; }
+			public string Dllname { get; }
+			public string Dlldir { get; }
+			public string Abi { get; }
+			public List<string> Defines { get; } = new List<string> ();
+			public int ManagedTestCount { get; }
+
+			public ManagedTestInfo (Platform platform, bool fsharp = false)
+			{
+				Platform = platform;
+
+				ManagedTestCount = GetBaseTestCount (fsharp);
+				Defines.Add ("TEST_FRAMEWORK=1");
+
+				// There would be a lot of fsharp projects to clone to do them all...
+				if (fsharp && Platform != Platform.macOSModern)
+					throw new NotImplementedException ();
+
+				switch (platform) {
+				case Platform.macOSFull:
+					Dlldir = "macos-full";
+					Dllname = "managed-macos-full.dll";
+					Defines.Add ("XAMARIN_MAC=1");
+					Defines.Add ("XAMARIN_MAC_FULL=1");
+					Abi = "x86_64"; // FIXME: fat XM apps not supported yet
+					ManagedTestCount += GetMacTestCount ();
+					return;
+				case Platform.macOSSystem:
+					Dlldir = "macos-system";
+					Dllname = "managed-macos-system.dll";
+					Defines.Add ("XAMARIN_MAC=1");
+					Defines.Add ("XAMARIN_MAC_SYSTEM=1");
+					Abi = "x86_64"; // FIXME: fat XM apps not supported yet
+					ManagedTestCount += GetMacTestCount ();
+					return;
+				case Platform.macOSModern:
+					if (fsharp) {
+						Dlldir = "fsharp-macos";
+						Dllname = "fsharp-macos.dll";
+						Defines.Add ("XAMARIN_FSHARP=1");
+					} else {
+						Dlldir = "macos-modern";
+						Dllname = "managed-macos-modern.dll";
+						Defines.Add ("XAMARIN_MAC_MODERN=1");
+					}
+					Defines.Add ("XAMARIN_MAC=1");
+					Abi = "x86_64"; // FIXME: fat XM apps not supported yet
+					ManagedTestCount += GetMacTestCount (fsharp);
+					return;
+				case Platform.macOS:
+					Dlldir = "generic";
+					Dllname = "managed.dll";
+					Abi = "i386,x86_64";
+					return;
+				case Platform.iOS:
+					Dlldir = "ios";
+					Dllname = "managed-ios.dll";
+					Defines.Add ("XAMARIN_IOS=1");
+					Abi = "armv7,arm64,i386,x86_64";
+					ManagedTestCount += GetIOSTestCount ();
+					return;
+				case Platform.tvOS:
+					Dlldir = "tvos";
+					Dllname = "managed-tvos.dll";
+					Defines.Add ("XAMARIN_TVOS=1");
+					Abi = "arm64,x86_64";
+					ManagedTestCount += GetTVTestCount ();
+					return;
+				default:
+					throw new NotImplementedException ();
+				}
+			}
+
+			int GetBaseTestCount (bool fsharp = false) => CountTests (Path.Combine (XcodeProjectGenerator.TestsRootDirectory, "objc-cli/libmanaged/Tests/Tests.m"), fsharp);
+			int GetIOSTestCount () => CountTests (Path.Combine (XcodeProjectGenerator.TestsRootDirectory, "objcgentest/xcodetemplate/ios/test/iosTests.m"));
+			int GetMacTestCount (bool fsharp = false) => CountTests (Path.Combine (XcodeProjectGenerator.TestsRootDirectory, "objcgentest/xcodetemplate/macos/test/macTests.m"), fsharp);
+			int GetTVTestCount () => CountTests (Path.Combine (XcodeProjectGenerator.TestsRootDirectory, "objcgentest/xcodetemplate/tvos/test/tvosTests.m"));
+
+			const string TestRegex = "^\\s*-\\s*[(]\\s*void\\s*[)]\\s*test";
+
+			int CountTests (string path, bool fsharp = false) => File.ReadAllLines (path).Count ((v) => (v.Contains ("fsharp") == fsharp) && System.Text.RegularExpressions.Regex.IsMatch (v, TestRegex));
 		}
+
 
 		void RunManagedTests (Platform platform, string test_destination = "", bool debug = true)
 		{
-			string dllname;
-			string dlldir;
-			string abi;
-			List<string> defines = new List<string> ();
-			var managedTestCount = CountTests (Path.Combine (XcodeProjectGenerator.TestsRootDirectory, "objc-cli/libmanaged/Tests/Tests.m"));
-			var xamariniOSTestCount = CountTests (Path.Combine (XcodeProjectGenerator.TestsRootDirectory, "objcgentest/xcodetemplate/ios/test/iosTests.m"));
-			var xamarinMacTestCount = CountTests (Path.Combine (XcodeProjectGenerator.TestsRootDirectory, "objcgentest/xcodetemplate/macos/test/macTests.m"));
-			var xamarintvOSTestCount = CountTests (Path.Combine (XcodeProjectGenerator.TestsRootDirectory, "objcgentest/xcodetemplate/tvos/test/tvosTests.m"));
+			RunManagedTests (new ManagedTestInfo (platform), test_destination, debug);
+		}
 
-			switch (platform) {
-			case Platform.macOSFull:
-				dlldir = "macos-full";
-				dllname = "managed-macos-full.dll";
-				defines.Add ("XAMARIN_MAC=1");
-				defines.Add ("XAMARIN_MAC_FULL=1");
-				abi = "x86_64"; // FIXME: fat XM apps not supported yet
-				managedTestCount += xamarinMacTestCount;
-				break;
-			case Platform.macOSSystem:
-				dlldir = "macos-system";
-				dllname = "managed-macos-system.dll";
-				defines.Add ("XAMARIN_MAC=1");
-				defines.Add ("XAMARIN_MAC_SYSTEM=1");
-				abi = "x86_64"; // FIXME: fat XM apps not supported yet
-				managedTestCount += xamarinMacTestCount;
-				break;
-			case Platform.macOSModern:
-				dlldir = "macos-modern";
-				dllname = "managed-macos-modern.dll";
-				defines.Add ("XAMARIN_MAC=1");
-				defines.Add ("XAMARIN_MAC_MODERN=1");
-				abi = "x86_64"; // FIXME: fat XM apps not supported yet
-				managedTestCount += xamarinMacTestCount;
-				break;
-			case Platform.macOS:
-				dlldir = "generic";
-				dllname = "managed.dll";
-				abi = "i386,x86_64";
-				break;
-			case Platform.iOS:
-				dlldir = "ios";
-				dllname = "managed-ios.dll";
-				defines.Add ("XAMARIN_IOS=1");
-				abi = "armv7,arm64,i386,x86_64";
-				managedTestCount += xamariniOSTestCount;
-				break;
-			case Platform.tvOS:
-				dlldir = "tvos";
-				dllname = "managed-tvos.dll";
-				defines.Add ("XAMARIN_TVOS=1");
-				abi = "arm64,x86_64";
-				managedTestCount += xamarintvOSTestCount;
-				break;
-			default:
-				throw new NotImplementedException ();
-			}
-			defines.Add ("TEST_FRAMEWORK=1");
-
+		void RunManagedTests (ManagedTestInfo test, string test_destination = "", bool debug = true)
+		{
 			var tmpdir = Cache.CreateTemporaryDirectory ();
 			var configuration = debug ? "Debug" : "Release";
-			var dll_path = Path.Combine (XcodeProjectGenerator.TestsRootDirectory, "managed", dlldir, "bin", configuration, dllname);
+			var dll_path = Path.Combine (XcodeProjectGenerator.TestsRootDirectory, "managed", test.Dlldir, "bin", configuration, test.Dllname);
 
 			// This will build all the managed.dll variants, which is easier than calculating the relative path _as the makefile sees it_ to pass as the target.
 			Asserts.RunProcess ("make", $"all CONFIG={configuration} -C {Utils.Quote (Path.Combine (XcodeProjectGenerator.TestsRootDirectory, "managed"))}", "build " + Path.GetFileName (dll_path));
@@ -218,18 +254,18 @@ namespace ExecutionTests
 			args.Add ("-c");
 			args.Add ($"--outdir={outdir}");
 			args.Add ("--target=framework");
-			args.Add ($"--platform={platform}");
-			args.Add ($"--abi={abi}");
+			args.Add ($"--platform={test.Platform}");
+			args.Add ($"--abi={test.Abi}");
 			Asserts.Generate ("generate", args.ToArray ());
 
 			var framework_path = Path.Combine (outdir, Path.GetFileNameWithoutExtension (dll_path) + ".framework");
-			var projectDirectory = XcodeProjectGenerator.Generate (platform, tmpdir, projectName, framework_path, defines: defines.ToArray ());
+			var projectDirectory = XcodeProjectGenerator.Generate (test.Platform, tmpdir, projectName, framework_path, defines: test.Defines.ToArray ());
 
 			string output;
 			var builddir = Path.Combine (tmpdir, "xcode-build-dir");
 			Asserts.RunProcess ("xcodebuild", $"test -project {Utils.Quote (projectDirectory)} -scheme Tests {test_destination} CONFIGURATION_BUILD_DIR={Utils.Quote (builddir)}", out output, "run xcode tests");
 			// assert the number of tests passed, so that we can be sure we actually ran all the tests. Otherwise it's very easy to ignore when a bug is causing tests to not be built.
-			Assert.That (output, Does.Match ($"Test Suite 'All tests' passed at .*\n\t Executed {managedTestCount} tests, with 0 failures"), "test count");
+			Assert.That (output, Does.Match ($"Test Suite 'All tests' passed at .*\n\t Executed {test.ManagedTestCount} tests, with 0 failures"), "test count");
 		}
 	}
 
