@@ -8,7 +8,7 @@ support/java/		@jonathanpeppers
 tests/android/		@jonathanpeppers
 /.travis.yml		@jonathanpeppers
 /appveyor.yml		@jonathanpeppers
-/build.cake		@jonathanpeppers
+*.cake		@jonathanpeppers
 /build.ps1		@jonathanpeppers
 /build.sh		@jonathanpeppers
 
