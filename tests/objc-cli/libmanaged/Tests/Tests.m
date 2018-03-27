@@ -107,6 +107,11 @@
 	// beside chaining this can detect (possible, it's fine) leaks (e.g. of CGHandle)
 	id sup2 = [[Exceptions_Super alloc] initWithBroken:true];
 	XCTAssertNil (sup2, "broken (exception thrown in managed code)");
+    
+#if NATIVEEXCEPTION
+    Exceptions_MethodThrows * i = [[Exceptions_MethodThrows alloc] init];
+    XCTAssertThrows ([i throws]);
+#endif
 }
 
 - (void)testConstructors {

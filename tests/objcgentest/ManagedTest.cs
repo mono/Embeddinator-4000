@@ -39,7 +39,15 @@ namespace ExecutionTests
 		[TestCase (false)]
 		public void FSharp_macOSModern (bool debug)
 		{
-			RunManagedTests (new ManagedTestInfo (Platform.macOSModern, fsharp : true), debug: debug);
+			RunManagedTests (new ManagedTestInfo (Platform.macOSModern, ManagedTestVariant.FSharp), debug: debug);
+		}
+
+		[Test]
+		[TestCase (true)]
+		[TestCase (false)]
+		public void ManagedException_macOSModern (bool debug)
+		{
+			RunManagedTests (new ManagedTestInfo (Platform.macOSModern, ManagedTestVariant.ManagedExceptions), debug: debug, single_test: "Tests/Tests/testExceptions");
 		}
 
 		[Test]
@@ -145,6 +153,8 @@ namespace ExecutionTests
 			}
 		}
 
+		enum ManagedTestVariant { None, FSharp, ManagedExceptions }
+
 		class ManagedTestInfo
 		{
 			public Platform Platform { get; }
@@ -153,9 +163,11 @@ namespace ExecutionTests
 			public string Abi { get; }
 			public List<string> Defines { get; } = new List<string> ();
 			public int ManagedTestCount { get; }
+			public string AdditionalGeneratorArgs { get; } = null;
 
-			public ManagedTestInfo (Platform platform, bool fsharp = false)
+			public ManagedTestInfo (Platform platform, ManagedTestVariant type = ManagedTestVariant.None)
 			{
+				bool fsharp = type == ManagedTestVariant.FSharp;
 				Platform = platform;
 
 				ManagedTestCount = GetBaseTestCount (fsharp);
@@ -164,6 +176,11 @@ namespace ExecutionTests
 				// There would be a lot of fsharp projects to clone to do them all...
 				if (fsharp && Platform != Platform.macOSModern)
 					throw new NotImplementedException ();
+
+				if (type == ManagedTestVariant.ManagedExceptions) {
+					Defines.Add ("NATIVEEXCEPTION");
+					AdditionalGeneratorArgs = "--nativeexception";
+				}
 
 				switch (platform) {
 				case Platform.macOSFull:
@@ -231,12 +248,12 @@ namespace ExecutionTests
 		}
 
 
-		void RunManagedTests (Platform platform, string test_destination = "", bool debug = true)
+		void RunManagedTests (Platform platform, string test_destination = "", bool debug = true, string single_test = null)
 		{
-			RunManagedTests (new ManagedTestInfo (platform), test_destination, debug);
+			RunManagedTests (new ManagedTestInfo (platform), test_destination, debug, single_test);
 		}
 
-		void RunManagedTests (ManagedTestInfo test, string test_destination = "", bool debug = true)
+		void RunManagedTests (ManagedTestInfo test, string test_destination = "", bool debug = true, string single_test = null)
 		{
 			var tmpdir = Cache.CreateTemporaryDirectory ();
 			var configuration = debug ? "Debug" : "Release";
@@ -256,6 +273,9 @@ namespace ExecutionTests
 			args.Add ("--target=framework");
 			args.Add ($"--platform={test.Platform}");
 			args.Add ($"--abi={test.Abi}");
+			if (test.AdditionalGeneratorArgs != null)
+				args.Add (test.AdditionalGeneratorArgs);
+
 			Asserts.Generate ("generate", args.ToArray ());
 
 			var framework_path = Path.Combine (outdir, Path.GetFileNameWithoutExtension (dll_path) + ".framework");
@@ -263,9 +283,13 @@ namespace ExecutionTests
 
 			string output;
 			var builddir = Path.Combine (tmpdir, "xcode-build-dir");
-			Asserts.RunProcess ("xcodebuild", $"test -project {Utils.Quote (projectDirectory)} -scheme Tests {test_destination} CONFIGURATION_BUILD_DIR={Utils.Quote (builddir)}", out output, "run xcode tests");
+			string testName = single_test != null ? $"-only-testing:{single_test}" : "";
+			Asserts.RunProcess ("xcodebuild", $"test -project {Utils.Quote (projectDirectory)} -scheme Tests {test_destination} {testName} CONFIGURATION_BUILD_DIR={Utils.Quote (builddir)}", out output, "run xcode tests");
 			// assert the number of tests passed, so that we can be sure we actually ran all the tests. Otherwise it's very easy to ignore when a bug is causing tests to not be built.
-			Assert.That (output, Does.Match ($"Test Suite 'All tests' passed at .*\n\t Executed {test.ManagedTestCount} tests, with 0 failures"), "test count");
+			if (single_test == null)
+				Assert.That (output, Does.Match ($"Test Suite 'All tests' passed at .*\n\t Executed {test.ManagedTestCount} tests, with 0 failures"), "test count");
+			else
+				Assert.That (output, Does.Match ($"Test Suite 'Selected tests' passed at .*\n\t Executed 1 test, with 0 failures"), "test count");
 		}
 	}
 

@@ -51,4 +51,12 @@ namespace Exceptions {
 		{
 		}
 	}
+
+	public class MethodThrows 
+	{
+		public void Throws ()
+		{
+			throw new NotImplementedException ();	
+		}
+	}
 }
