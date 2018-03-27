@@ -8,7 +8,8 @@
   
     nuget
     {
-      "Mono.Cecil:0.9.6.4"
+      "Mono.Cecil:0.9.6.4",
+      "Mono.TextTransform:1.0.0"
     }
 
     links
