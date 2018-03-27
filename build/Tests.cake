@@ -12,7 +12,7 @@ Task("Build-Managed")
     .Does(() =>
     {
         MSBuild("./tests/managed/generic/managed-generic.csproj", settings =>
-            settings.SetConfiguration(configuration).SetVerbosity(Verbosity.Minimal));
+            settings.SetConfiguration(configuration));
     });
 
 Task("Build-Android")
@@ -21,7 +21,7 @@ Task("Build-Android")
     .Does(() =>
     {
         MSBuild("./tests/managed/android/managed-android.csproj", settings =>
-            settings.SetConfiguration(configuration).SetPlatformTarget(PlatformTarget.MSIL).SetVerbosity(Verbosity.Minimal));
+            settings.SetConfiguration(configuration).SetPlatformTarget(PlatformTarget.MSIL));
     });
 
 Task("Build-FSharp-Android")
@@ -30,7 +30,7 @@ Task("Build-FSharp-Android")
     .Does(() =>
     {
         MSBuild("./tests/managed/fsharp-android/fsharp-android.fsproj", settings =>
-            settings.SetConfiguration(configuration).SetPlatformTarget(PlatformTarget.MSIL).SetVerbosity(Verbosity.Minimal));
+            settings.SetConfiguration(configuration).SetPlatformTarget(PlatformTarget.MSIL));
     });
 
 Task("Build-FSharp-Generic")
@@ -39,7 +39,7 @@ Task("Build-FSharp-Generic")
     .Does(()=>
     {
         MSBuild("./tests/managed/fsharp-generic/fsharp-generic.fsproj", settings =>
-            settings.SetConfiguration(configuration).SetPlatformTarget(PlatformTarget.MSIL).SetVerbosity(Verbosity.Minimal));
+            settings.SetConfiguration(configuration).SetPlatformTarget(PlatformTarget.MSIL));
     });
 
 Task("Build-PCL")
@@ -48,7 +48,7 @@ Task("Build-PCL")
     .Does(() =>
     {
         MSBuild("./tests/managed/pcl/managed-pcl.csproj", settings =>
-            settings.SetConfiguration(configuration).SetPlatformTarget(PlatformTarget.MSIL).SetVerbosity(Verbosity.Minimal));
+            settings.SetConfiguration(configuration).SetPlatformTarget(PlatformTarget.MSIL));
     });
 
 Task("Build-NetStandard")
@@ -58,7 +58,7 @@ Task("Build-NetStandard")
     {
         var project = "./tests/managed/netstandard/managed-netstandard.csproj";
         DotNetCoreRestore(project);
-        MSBuild(project, settings => settings.SetConfiguration(configuration).SetPlatformTarget(PlatformTarget.MSIL).SetVerbosity(Verbosity.Minimal));
+        MSBuild(project, settings => settings.SetConfiguration(configuration).SetPlatformTarget(PlatformTarget.MSIL));
     });
 
 Task("Build-CSharp-Tests")
@@ -66,7 +66,7 @@ Task("Build-CSharp-Tests")
     .IsDependentOn("Build-Managed")
     .Does(() =>
     {
-        MSBuild("./tests/MonoEmbeddinator4000.Tests/MonoEmbeddinator4000.Tests.csproj", settings => settings.SetConfiguration(configuration).SetVerbosity(Verbosity.Minimal));
+        MSBuild("./tests/MonoEmbeddinator4000.Tests/MonoEmbeddinator4000.Tests.csproj", settings => settings.SetConfiguration(configuration));
     });
 
 Task("Run-CSharp-Tests")
@@ -109,7 +109,7 @@ Task("Build-C-Tests")
         // Execute the build files.
         if (IsRunningOnWindows())
             MSBuild(mkDir + File("mk.sln"), settings =>
-                settings.SetConfiguration(configuration).SetVerbosity(Verbosity.Minimal)
+                settings.SetConfiguration(configuration)
                         .SetPlatformTarget(PlatformTarget.Win32));
         else
         {
