@@ -33,7 +33,7 @@ Task("Build-Binder")
     .IsDependentOn("NuGet-Restore")
     .Does(() =>
     {
-        MSBuild("./build/projects/Embeddinator-4000.csproj", settings => settings.SetConfiguration(configuration).SetVerbosity(Verbosity.Minimal));
+        MSBuild("./build/projects/Embeddinator-4000.csproj", settings => settings.SetConfiguration(configuration));
     });
 
 Task("Generate-Project-Files")
