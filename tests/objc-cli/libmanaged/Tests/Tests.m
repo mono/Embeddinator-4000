@@ -270,6 +270,9 @@
 	Structs_Point* z = [Structs_Point zero];
 	XCTAssert ([z x] == 0.0f, "x 4");
 	XCTAssert ([z y] == 0.0f, "y 4");
+
+	NSArray<Structs_Point*>* points = [Structs_Array points];
+	XCTAssert ([points count] == 3, "count 0");
 }
 
 - (void) testEnums {

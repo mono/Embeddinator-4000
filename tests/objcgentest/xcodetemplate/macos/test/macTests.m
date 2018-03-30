@@ -44,11 +44,10 @@
     //managed_FSharp_UserRecord * resultUserRecord = [managed_FSharp useUserRecordUserRecord:userRecord];
     //XCTAssertEqualObjects(@"Test", [resultUserRecord userDescription]);
     
-    // https://github.com/mono/Embeddinator-4000/issues/631
-    //NSArray<managed_FSharp_UserStruct *> * userStructArray = [managed_FSharp_ArrayTest getDefaultUserStructArrayCount:10];
-    //XCTAssertEqual (10, [userRecordArray count]);
-    //for (managed_FSharp_UserStruct * entry in userStructArray)
-    //    XCTAssertEqualObjects(@"Fun!", [entry userDefinition]);
+    NSArray<managed_FSharp_UserStruct *> * userStructArray = [managed_FSharp_ArrayTest getDefaultUserStructArrayCount:10];
+    XCTAssertEqual (10, [userRecordArray count]);
+    for (managed_FSharp_UserStruct * entry in userStructArray)
+        XCTAssertEqualObjects(@"Fun!", [entry userDefinition]);
 
     managed_FSharp_UserStruct * userStruct = [managed_FSharp getDefaultUserStruct];
     XCTAssertEqualObjects(@"Fun!", [userStruct userDefinition]);
