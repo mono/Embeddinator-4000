@@ -38,4 +38,10 @@ namespace Structs {
 			return new Point (left.X - right.X, left.Y - right.Y);
 		}
 	}
+
+	public class Array 
+	{
+		public static Point [] Points => new Point [] { new Point (0, 0), new Point (1, 1), new Point (2, 2) };
+	}
+
 }

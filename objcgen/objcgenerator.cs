@@ -1079,6 +1079,12 @@ namespace Embeddinator.ObjC {
 			implementation.Indent--;
 			implementation.WriteLine ("int __resarrlength = mono_array_length (__resarr);");
 
+			if (typecode == TypeCode.Object && t.IsValueType) {
+				implementation.WriteLine ("MonoClass* _arrayclass = mono_object_get_class (__resarr);");
+				implementation.WriteLine ("MonoClass* _arrayelemclass = mono_class_get_element_class (_arrayclass);");
+				implementation.WriteLine ("int32_t __esize = mono_array_element_size (_arrayclass);");
+			}
+
 			if (typecode != TypeCode.Byte) {
 				implementation.WriteLine ("__strong id * __resarrbuf = (id __strong *) calloc (__resarrlength, sizeof (id));");
 				implementation.WriteLine ("id __resobj;");
@@ -1136,7 +1142,12 @@ namespace Embeddinator.ObjC {
 				var tname = NameGenerator.GetTypeName (t);
 				if (HasProtocol (t))
 					tname = "__" + tname + "Wrapper";
-				implementation.WriteLine ("MonoObject* __resarrval = mono_array_get (__resarr, MonoObject *, __residx);");
+				if (!t.IsValueType) {
+					implementation.WriteLine ("MonoObject* __resarrval = mono_array_get (__resarr, MonoObject *, __residx);");
+				} else {
+					implementation.WriteLine ("void* __ea = mono_array_addr_with_size (__resarr, __esize, __residx);");
+					implementation.WriteLine ("MonoObject* __resarrval = mono_value_box (__mono_context.domain, _arrayelemclass, __ea);");
+				}
 				implementation.WriteLine ("if (__resarrval) {");
 				implementation.Indent++;
 				implementation.WriteLine ($"{tname}* __tmpobj = [[{tname} alloc] initForSuper];");
