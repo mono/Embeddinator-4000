@@ -31,6 +31,10 @@ When a managed type overrides `Equals(Object)` or `GetHashCode` then it generall
 
 In such case the generator overrides the [`isEqual:`](https://developer.apple.com/reference/objectivec/1418956-nsobject/1418795-isequal?language=objc) method and [`hash`](https://developer.apple.com/reference/objectivec/1418956-nsobject/1418859-hash?language=objc) property defined in the [`NSObject` protocol](https://developer.apple.com/reference/objectivec/1418956-nsobject?language=objc). This allows the custom managed implementation to be used from ObjC code transparently.
 
+### Exceptions support
+
+Passing `--nativeexception` as an argument to objcgen will convert managed exceptions into ObjC exceptions that can be caught and processed. 
+
 ### Comparison
 
 Managed types that implement `IComparable` or it's generic version `IComparable<T>` will produce ObjC friendly methods that returns a `NSComparisonResult` and accept a `nil` argument. This makes the generated API more friendly to ObjC developers, e.g.
