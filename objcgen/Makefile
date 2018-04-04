@@ -2,7 +2,7 @@ all: bin/Debug/objcgen.exe shellcheck
 
 -include Make.config.inc
 
-PACKAGE_VERSION=0.3.0
+PACKAGE_VERSION=0.4.0
 PACKAGE_FULLVERSION=$(PACKAGE_VERSION).$(COMMIT_DISTANCE)
 
 Make.config.inc: Makefile
@@ -27,31 +27,19 @@ else
 endif
 
 E4K_FRAMEWORK_DIR = /Library/Frameworks/Xamarin.Embeddinator-4000.framework
-FRAMEWORK_DIR = _build/$(E4K_FRAMEWORK_DIR)
-PATHS_DIR = _build/etc/paths.d
-INSTALLER_FILES = Xamarin.Embeddinator-4000-$(PACKAGE_FULLVERSION).pkg
+NUGET_DIR = _build/
 
-package:: bin/Debug/objcgen.exe Make.config.inc
-	mkdir -p $(FRAMEWORK_DIR)/Commands/
-	mkdir -p $(FRAMEWORK_DIR)/Versions/$(PACKAGE_FULLVERSION)/bin
-	mkdir -p $(PATHS_DIR)
-	echo "${E4K_FRAMEWORK_DIR}/Commands" >> "${PATHS_DIR}/embeddinator-4000-commands"
-	ln -fs $(PACKAGE_FULLVERSION) $(FRAMEWORK_DIR)/Versions/Current
-	cp bin/Debug/objcgen.{exe,pdb} $(FRAMEWORK_DIR)/Versions/Current/bin/
-	cp bin/Debug/Mono.Options.dll $(FRAMEWORK_DIR)/Versions/Current/bin/
-	cp bin/Debug/IKVM.Reflection.dll $(FRAMEWORK_DIR)/Versions/Current/bin/
-	cp script/objcgen  $(FRAMEWORK_DIR)/Commands/
-	chmod +x $(FRAMEWORK_DIR)/Commands/objcgen
+nuget-prep:: bin/Debug/objcgen.exe Make.config.inc
+	mkdir -p $(NUGET_DIR)
+	cp bin/Debug/objcgen.{exe,pdb} $(NUGET_DIR)
+	cp bin/Debug/Mono.Options.dll $(NUGET_DIR)
+	cp bin/Debug/IKVM.Reflection.dll $(NUGET_DIR)
+	cp script/objcgen  $(NUGET_DIR)
+	chmod +x $(NUGET_DIR)objcgen
 
-clean-package::
+nuget::
+	cd .. && ./build.sh -t Create-Package
+
+clean-nuget::
 	rm -rf _build/
-	rm -rf _installer/
 	rm Make.config.inc
-
-$(INSTALLER_FILES): package
-	rm -rf _installer/
-	mkdir -p _installer/ROOT/
-	cp -R _build/ _installer/ROOT/
-	pkgbuild --root _installer/ROOT --identifier com.xamarin.embeddinator-4000 --version $(PACKAGE_FULLVERSION) $(INSTALLER_FILES)
-
-installer:: $(INSTALLER_FILES)

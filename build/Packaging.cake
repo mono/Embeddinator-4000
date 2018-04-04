@@ -2,17 +2,25 @@
 
 var version = Argument("version", "0.4.0");
 
-Task("Create-Package")
-    .IsDependentOn("Build-Binder")
+Task("Build-ObjC")
     .Does(() =>
     {
-        var objcgenBuildDir = Directory("./objcgen/bin/") + Directory(configuration);
+        StartProcess("make", new ProcessSettings {
+        Arguments = new ProcessArgumentBuilder().Append ("-C").Append ("objcgen/").Append ("nuget-prep")
+	});
+    });
+
+Task("Create-Package")
+    .IsDependentOn("Build-Binder")
+    .IsDependentOn("Download-Xamarin-Android")
+    .IsDependentOn("Build-ObjC")
+    .Does(() =>
+    {
+        var objcgenBuildDir = Directory("./objcgen/_build/");
 
         var files = new []
         {
-            new NuSpecContent { Source = objcgenBuildDir.ToString() + "/*.exe", Target = "tools/" },
-            new NuSpecContent { Source = objcgenBuildDir.ToString() + "/*.dll", Target = "tools/" },
-            new NuSpecContent { Source = objcgenBuildDir.ToString() + "/*.pdb", Target = "tools/" },
+            new NuSpecContent { Source = objcgenBuildDir.ToString() + "/*", Target = "tools/" },
             new NuSpecContent { Source = buildDir.ToString() + "/*.exe", Target = "tools/" },
             new NuSpecContent { Source = buildDir.ToString() + "/*.dll", Target = "tools/" },
             new NuSpecContent { Source = buildDir.ToString() + "/*.pdb", Target = "tools/" },

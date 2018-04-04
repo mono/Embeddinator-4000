@@ -2,4 +2,4 @@
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-/Library/Frameworks/Mono.framework/Commands/mono --debug $DIR/../Versions/Current/bin/objcgen.exe "$@"
+/Library/Frameworks/Mono.framework/Commands/mono --debug $DIR/objcgen.exe "$@"
