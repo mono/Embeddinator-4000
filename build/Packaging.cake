@@ -5,11 +5,13 @@ var version = Argument("version", "0.4.0");
 Task("Build-ObjC")
     .Does(() =>
     {
-        var exitCode = StartProcess("make", new ProcessSettings {
-            Arguments = new ProcessArgumentBuilder().Append ("-C").Append ("objcgen/").Append ("nuget-prep")
-        });
-        if (exitCode != 0)
-            throw new Exception ($"make nuget-prep in objcgen/ somehow failed: {exitCode}");
+        if (!IsRunningOnWindows ()) {
+            var exitCode = StartProcess("make", new ProcessSettings {
+                Arguments = new ProcessArgumentBuilder().Append ("-C").Append ("objcgen/").Append ("nuget-prep")
+            });
+            if (exitCode != 0)
+                throw new Exception ($"make nuget-prep in objcgen/ somehow failed: {exitCode}");
+        }
     });
 
 Task("Create-Package")
