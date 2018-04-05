@@ -2,7 +2,7 @@ all: bin/Debug/objcgen.exe shellcheck
 
 -include Make.config.inc
 
-PACKAGE_VERSION=0.4.0
+PACKAGE_VERSION := $(shell grep "var version" ../build/Packaging.cake | cut -d \" -f 4)
 PACKAGE_FULLVERSION=$(PACKAGE_VERSION).$(COMMIT_DISTANCE)
 
 Make.config.inc: Makefile
@@ -39,6 +39,9 @@ nuget-prep:: bin/Debug/objcgen.exe Make.config.inc
 
 nuget::
 	cd .. && ./build.sh -t Create-Package
+
+nuget-install:: nuget
+	cp ../build/Embeddinator-4000.$(PACKAGE_VERSION).nupkg ~/nuget
 
 clean-nuget::
 	rm -rf _build/
