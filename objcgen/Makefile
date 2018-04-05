@@ -43,3 +43,8 @@ nuget::
 clean-nuget::
 	rm -rf _build/
 	rm Make.config.inc
+
+clean:: clean-nuget
+	msbuild objcgen.csproj /t:clean
+	rm -rf ./bin
+	rm -rf ./obj
