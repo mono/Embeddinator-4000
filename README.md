@@ -24,7 +24,7 @@ and Java (Android and regular Java), across Windows, Linux and macOS platforms.
 
 ## Getting Started
 
-Check out our [documentation to get started](https://mono.github.io/Embeddinator-4000/).
+Check out our [documentation to get started](https://docs.microsoft.com/en-us/xamarin/tools/dotnet-embedding/index).
 
 ## Community
 
@@ -34,12 +34,12 @@ Feel free to join us at our [#managed-interop](https://gitter.im/managed-interop
 
 - Clone this repository 
 - Initialize/update submodules: `git submodule update --recursive --init`
-- Open the solution file `Embeddinator-4000.sln` with Visual Studio or Xamarin Studio 
-- Build (F7)
+- Open the solution file `Embeddinator-4000.sln` with Visual Studio or Visual Studio For Mac
+- Build
 
 The Android/C portions of the project can also be built with [Cake](https://cakebuild.net/) using the build.ps1 / build.sh scripts.
 
-The Objective-C poritions of the project can be built with `make` in `objcgen`.
+The Objective-C portions of the project can be built with `make` in `objcgen`.
 
 ### Nuget
 
@@ -51,9 +51,9 @@ To generate the nuget use can use either (they both invoke the same build proces
 
 ## Usage
 
-The getting started [documentation](https://mono.github.io/Embeddinator-4000/) walks through basic usage of the Embeddinator. 
+The getting started [documentation](https://docs.microsoft.com/en-us/xamarin/tools/dotnet-embedding/index) walks through basic usage of the Embeddinator. 
 
-More details on platform specifc invocations can be found [here](Usage.md).
+More details on platform specific invocations can be found [here](Usage.md).
 
 
 ## Development

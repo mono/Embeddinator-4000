@@ -4,7 +4,7 @@ Given the task of processing arbitrary .NET assemblies and binding them to multi
 
 It is very easy for untested changes to regress previously working behavior. All new binding features should have both managed and unmanaged test to validate that they continue to work. 
 
-In the event that binding features are landed without test coverage on all supported platforms, Github Issues should be opened to track the testing defect.
+In the event that binding features are landed without test coverage on all supported platforms, [Github Issues](https://github.com/mono/Embeddinator-4000/issues) should be opened to track the testing defect.
 
 The "managed" tests test the core binding functionality are come in three parts:
 

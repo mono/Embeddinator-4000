@@ -2,20 +2,20 @@
 
 Code generators by their nature of generating code that will later be compiled can be difficult to trace through and understand. 
 
-The Objective-C backend covers a number of different platforms (macOS, iOS, tvOS, etc) and packaging techniques (static library, dylib, frameworks). 
+The Objective-C backend covers a number of different platforms (macOS, iOS, tvOS, etc). For all platforms, other than macOS without Xamarin.Mac, building frameworks is the default and supported packaging technique. Static libraries and dylib are available on macOS without Xamarin.Mac.
 
-This document will provide a high level roadmap of the components of `objcgen` and how they fit together. As the Embeddinator is a developing product, limitations and areas for future improvement will be noted at the end.
+This document will provide a high level roadmap of the components of `objcgen` and how they fit together.
 
 ### Flow of Execution
 
 - Executation begins in the [driver](driver.cs) which handles a few tasks:
-    - 	Use Mono.Options to parse command line arguments
+    - 	Use [Mono.Options](https://github.com/xamarin/XamarinComponents/tree/master/XPlat/Mono.Options) to parse command line arguments
     -  Setup error handling in case of later crashes/exceptions
     -  In the common "generate" action case, instance an [embedder](embedder.cs) and configure it based on command line arguments
-    -  If compilation is requested then the [driver](driver.cs) invokes Compile () on the [embedder](embedder.cs) post generation 
+    -  If compilation is requested then the [driver](driver.cs) invokes `Compile ()` on the [embedder](embedder.cs) post generation 
 -  The [embedder](embedder.cs) drives code generation and packaging by:
     -  Validating settings passed in by [driver](driver.cs) are valid based on platform specific rules
-    -  Use IKVM to load the .NET assembly in question for processing via reflection.
+    -  Use [IKVM](https://github.com/mono/ikvm-fork) to load the .NET assembly in question for processing via reflection.
         -  Also configure IKVM to look for BCL and Facades from the appropriate SDK directory
     -  Instance a [ObjCProcessor](objcprocessor.cs) which reflects the library extracting needed information.
     -  Instance a [ObjCGenerator](objcgenerator.cs) which uses the ProcessedAssembly data to generate the native Objective-C bindings.
@@ -29,25 +29,13 @@ This document will provide a high level roadmap of the components of `objcgen` a
 -  This [postprocessor](objcgenerator-postprocessor.cs) analyzes each catagory looking for items that will cause trouble later in generation\compilation or produce suboptimal bindings:
 	- Names that will produce identical selectors or shadow important pre-existing Objective-C selectors
 		- Duplication detection is done via the [Type Mapper](TypeMapper.cs).
-	- [Operator Overloads](OperatorOverloads.cs) can often be exposed in more friendly names that `op_Addition` and are renamed where possible. Where both "friendly" named and operator methods exist, we expose only one copy.
+	- [Operator Overloads](OperatorOverloads.cs) can often be exposed in more friendly names than `op_Addition` and are renamed where possible. Where both "friendly" named and operator methods exist, we expose only one copy.
 	- Each ["processed"](processedtypes.cs) data structure is then "frozen" so that we can cache generated data (such as names) only after no additional changes will occur. Processed types should now be considered effectively immutable.
 - Now that we have a hierarchy of  ["processed"](processedtypes.cs) data types, we can finally enter the [ObjCGenerator](objcgenerator.cs).
 	- [SourceWriters](sourcewriter.cs) are created for headers/private headers/implementations to buffer text until it is written to disk and readably handle indentation.
-	- After writing the standard introduction parts to each file, each assembly is procssed in turn.
+	- After writing the standard introduction parts to each file, each assembly is processed in turn.
 	- Each Enum/Protocol/Type/Extension from that assembly is then generated in turn, each from a GenerateFoo method. 
 		- Some but not all Generation methods depend on "helpers" such as [ProtocolHelper](protocolhelper.cs) which help generate correct code.
 		- [NameGenerator](NameGenerator.cs) contains the mapping between C# and Objective-C names for types/arguments.
 - If compilation is requested then the [Embedder's](embedder.cs) Compile () generates and executes clang invocations.
     - Special post processing occurs in some target types, frameworks for example, and may involve moving files / lipo / etc
-
-
-### Areas for improvements (Update this docuemnt if fixed)
-- [Driver](driver.cs) shouldn't invoke Compile, should be job of [embedder](embedder.cs).
-    - Actually the compile logic is involved, maybe a seperate component?
-- Divide [embedder](embedder.cs) into more focused / smaller parts.
-- Why do we have an abstract [processor](processor.cs) base class for [ObjCProcessor](objcprocessor.cs) with only one implementation? Desire to share code or unneeded abstraction?
-- The [postprocessor](objcgenerator-postprocessor.cs) should really have a name not tied to the generator, since it's a step _before_ generation.
-- [ObjCGenerator](objcgenerator.cs) also has a base type of Generator with one implementation.
-- Fully extract specific generation logic into helpers and write tests (so we can test them outside of the entire chain).
-- Our capitalization in file names is inconsistent. are things `NameGenerator.cs` or `namegenerator.cs`
-- [ObjCGenerator](objcgenerator.cs) is _huge_ and difficult to scroll through.
