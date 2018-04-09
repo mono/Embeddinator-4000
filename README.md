@@ -58,8 +58,12 @@ More details on platform specific invocations can be found [here](Usage.md).
 
 ## Development
 
+The [contributing guide](Contributing.md) covers a number of areas to consider when contributing to Embeddinator-4000.
+
 A number of internal documentation files exist describing the project and internal structure of Embeddinator:
 
 - [General Project Structure](ProjectStructure.md)
 - [Automated Tests](tests/Tests.md)
 - [Objective-C Generator Internals](objcgen/Internals.md)
+
+
