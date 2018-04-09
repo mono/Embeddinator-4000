@@ -15,5 +15,5 @@ The "managed" tests test the core binding functionality are come in three parts:
 
 - Beyond the "managed" tests, a few specialized test projects exist as well:
     - **MonoEmbeddinator4000.Tests** - Contains a number of Android specific tests as well
-    - **leaktest** - A specialized leak checking test using leak-at-exit.c to hunt for unmanaged leaks from the mono runtime.
+    - **leaktest** - A [test](tests/leaktest/README.md) that uses Apple's [leaks](https://developer.apple.com/legacy/library/documentation/Darwin/Reference/ManPages/man1/leaks.1.html) to search for memory leaks.
     - **managedwarn** - Along with objcgentest/ObjCGenErrWarnTests.cs used to test a number of tool warning scenarios.
