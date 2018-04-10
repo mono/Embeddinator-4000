@@ -24,7 +24,7 @@ and Java (Android and regular Java), across Windows, Linux and macOS platforms.
 
 ## Getting Started
 
-Check out our [documentation to get started](https://mono.github.io/Embeddinator-4000/)
+Check out our [documentation to get started](https://docs.microsoft.com/en-us/xamarin/tools/dotnet-embedding/index).
 
 ## Community
 
@@ -32,39 +32,38 @@ Feel free to join us at our [#managed-interop](https://gitter.im/managed-interop
 
 ## Building
 
-Clone this repository and initialize/update submodules as well as solution depends on them.
+- Clone this repository 
+- Initialize/update submodules: `git submodule update --recursive --init`
+- Open the solution file `Embeddinator-4000.sln` with Visual Studio or Visual Studio For Mac
+- Build
 
-Open the solution file `Embeddinator-4000.sln` with Visual Studio or Xamarin Studio and press F7.
+The Android/C portions of the project can also be built with [Cake](https://cakebuild.net/) using the build.ps1 / build.sh scripts.
+
+The Objective-C portions of the project can be built with `make` in `objcgen`.
+
+### Nuget
+
+To generate the nuget use can use either (they both invoke the same build process):
+
+- `make nuget` in `objcgen`
+- [Cake](https://cakebuild.net/) :`./build.sh -t Create-Package`
+
 
 ## Usage
 
-To generate bindings for a managed library you invoke the `Embeddinator-4000.exe` command line tool.
+The getting started [documentation](https://docs.microsoft.com/en-us/xamarin/tools/dotnet-embedding/index) walks through basic usage of the Embeddinator. 
 
-_Important: please follow the instructions in `objcgen`'s [README](https://github.com/mono/Embeddinator-4000/blob/objc/objcgen/README.md) to use the new and improved Objective-C generator (will eventually fusion with `Embeddinator-4000.exe`)._
+More details on platform specific invocations can be found [here](Usage.md).
 
-If you do not pass any arguments, you will get a list of the tool options:
 
-```
-Embeddinator-4000.exe [options]+ ManagedAssembly.dll
-Generates target language bindings for interop with managed code.
+## Development
 
-      --gen=VALUE            target generator (C, C++, Obj-C, Java)
-  -p, --platform=VALUE       target platform (iOS, macOS, Android, Windows)
-  -o, --out, --outdir=VALUE  output directory
-  -c, --compile              compiles the generated output
-  -d, --debug                enables debug mode for generated native and
-                               managed code
-  -t, --target=VALUE         compilation target (static, shared, app)
-      --dll, --shared        compiles as a shared library
-      --static               compiles as a static library
-      --vs=VALUE             Visual Studio version for compilation: 2012, 2013,
-                               2015, 2017, Latest (defaults to Latest)
-  -v, --verbose              generates diagnostic verbose output
-  -h, --help                 show this message and exit
-```
+The [contributing guide](Contributing.md) covers a number of areas to consider when contributing to Embeddinator-4000.
 
-To generate C bindings for a `Xamarin.Foo.dll` assembly you would call
-the tool like:
+A number of internal documentation files exist describing the project and internal structure of Embeddinator:
 
-`Embeddinator-4000.exe -gen=c -out=foo Xamarin.Foo.dll`
+- [General Project Structure](ProjectStructure.md)
+- [Automated Tests](tests/Tests.md)
+- [Objective-C Generator Internals](objcgen/Internals.md)
+
 
