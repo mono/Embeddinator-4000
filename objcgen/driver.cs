@@ -36,13 +36,6 @@ namespace Embeddinator.ObjC
 		ObjectiveC,
 	}
 
-	public enum BitcodeOption
-	{
-		Default,
-		True,
-		False,
-	}
-
 	public static class Driver
 	{
 		public static Embedder CurrentEmbedder { get; private set; }
