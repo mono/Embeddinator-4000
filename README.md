@@ -37,13 +37,35 @@ Feel free to join us at our [#managed-interop](https://gitter.im/managed-interop
 - Open the solution file `Embeddinator-4000.sln` with Visual Studio or Visual Studio For Mac
 - Build
 
+If you prefer to build from the command line Cake or Make can be used to build instead of Visual Studio For Mac. 
+
+### Cake
+
 The Android/C portions of the project can also be built with [Cake](https://cakebuild.net/) using the build.ps1 / build.sh scripts.
+
+On OS X, you can setup your environment for Android by running a shell script:
+
+```
+./build.sh -t Generate-Android -v diagnostic
+```
+
+On Windows, in Powershell:
+
+```
+.\build.ps1 -t Generate-Android -v diagnostic
+```
+
+This will download a master build of Xamarin.Android and extract it into `/external/Xamarin.Android`. 
+
+`Embeddinator-4000.exe` will be compiled to `build/lib/Release`. The Cake script will also run Embeddinator against a test assembly, so you can be sure your system is setup properly.
+
+### Makefile
 
 The Objective-C portions of the project can be built with `make` in `objcgen`.
 
-### Nuget
+### Nuget Generation
 
-To generate the nuget use can use either (they both invoke the same build process):
+To generate the nuget one can use either (they both invoke the same build process):
 
 - `make nuget` in `objcgen`
 - [Cake](https://cakebuild.net/) :`./build.sh -t Create-Package`
