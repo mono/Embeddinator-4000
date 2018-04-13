@@ -123,7 +123,7 @@ namespace Embeddinator.ObjC
 					BitcodeOption = false;
 					break;
 				default:
-				    throw new EmbeddinatorException (17, true, $"The bitcode option `{value}` is not valid.");
+					throw new EmbeddinatorException (17, true, $"The bitcode option `{value}` is not valid.");
 			}
 		}
 
