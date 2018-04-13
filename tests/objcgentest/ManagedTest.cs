@@ -51,6 +51,12 @@ namespace ExecutionTests
 		}
 
 		[Test]
+		public void macOS_Extension ()
+		{
+			RunManagedTests (Platform.macOSModern, debug: true, additionalArgs: "--extension");
+		}
+
+		[Test]
 		[TestCase (true)]
 		[TestCase (false)]
 		public void iOS_simulator (bool debug)
@@ -142,7 +148,7 @@ namespace ExecutionTests
 			return File.ReadAllLines (path).Count ((v) => System.Text.RegularExpressions.Regex.IsMatch (v, "^\\s*-\\s*[(]\\s*void\\s*[)]\\s*test"));
 		}
 
-		void RunManagedTests (Platform platform, string test_destination = "", bool debug = true)
+		void RunManagedTests (Platform platform, string test_destination = "", bool debug = true, string additionalArgs = "")
 		{
 			string dllname;
 			string dlldir;
@@ -220,6 +226,8 @@ namespace ExecutionTests
 			args.Add ("--target=framework");
 			args.Add ($"--platform={platform}");
 			args.Add ($"--abi={abi}");
+			if (additionalArgs.Length > 0)
+				args.Add (additionalArgs);
 			Asserts.Generate ("generate", args.ToArray ());
 
 			var framework_path = Path.Combine (outdir, Path.GetFileNameWithoutExtension (dll_path) + ".framework");
