@@ -109,9 +109,9 @@ namespace Embeddinator.ObjC
 			}
 		}
 
-		public void SetBitcode(string value)
+		public void SetBitcode (string value)
 		{
-			switch (value.ToLowerInvariant())
+			switch (value.ToLowerInvariant ())
 			{
 				case "default":
 					BitcodeOption = null;
@@ -123,7 +123,7 @@ namespace Embeddinator.ObjC
 					BitcodeOption = false;
 					break;
 				default:
-				    throw new EmbeddinatorException(17, true, $"The bitcode option `{value}` is not valid.");
+				    throw new EmbeddinatorException (17, true, $"The bitcode option `{value}` is not valid.");
 			}
 		}
 
@@ -663,7 +663,7 @@ namespace Embeddinator.ObjC
 							mmp.Append ("-p "); // generate a plist
 							mmp.Append ($"--target-framework {GetTargetFramework ()} ");
 							string extensionFlag = Extension ? "-fapplication-extension" : "";
-                            mmp.Append ($"--link_flags={extensionFlag} -force_load {Utils.Quote (Path.GetFullPath (sdk_output_file))} ");
+							mmp.Append ($"--link_flags={extensionFlag} -force_load {Utils.Quote (Path.GetFullPath (sdk_output_file))} ");
 							if (!Utils.RunProcess ("/Library/Frameworks/Xamarin.Mac.framework/Versions/Current/bin/mmp", mmp.ToString (), out exitCode))
 								return exitCode;
 
