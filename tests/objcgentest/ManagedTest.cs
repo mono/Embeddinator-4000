@@ -210,7 +210,6 @@ namespace ExecutionTests
 
 			var tmpdir = Cache.CreateTemporaryDirectory ();
 			var configuration = debug ? "Debug" : "Release";
-
 			var dll_path = Path.Combine (XcodeProjectGenerator.TestsRootDirectory, "managed", dlldir, "bin", configuration, dllname);
 
 			// This will build all the managed.dll variants, which is easier than calculating the relative path _as the makefile sees it_ to pass as the target.
