@@ -223,7 +223,6 @@ namespace ExecutionTests
 				dll_path = dll_path_with_spaces;
 			}
 
-
 			var outdir = tmpdir + "/out";
 			var projectName = "foo";
 			var args = new List<string> ();
