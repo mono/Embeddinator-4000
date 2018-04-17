@@ -497,7 +497,7 @@ namespace Embeddinator.ObjC
 							// Archive all the .o files into a .a
 							var archive_options = new StringBuilder ("ar cru ");
 							var static_ofile = Path.Combine (archOutputDirectory, output_file);
-							archive_options.Append (static_ofile).Append (" ");
+							archive_options.Append (Utils.Quote (static_ofile)).Append (" ");
 							lipo_files.Add (static_ofile);
 							foreach (var objfile in object_files)
 								archive_options.Append (objfile).Append (" ");
@@ -663,7 +663,7 @@ namespace Embeddinator.ObjC
 							mmp.Append ("-p "); // generate a plist
 							mmp.Append ($"--target-framework {GetTargetFramework ()} ");
 							string extensionFlag = Extension ? "-fapplication-extension" : "";
-							string forceLoad = $"-force_load {Path.GetFullPath (sdk_output_file)}";
+							string forceLoad = $"-force_load \\\"{Path.GetFullPath (sdk_output_file)}\\\"";
 							mmp.Append ($"--link_flags=\"{extensionFlag + " " + forceLoad}\"");
 							if (!Utils.RunProcess ("/Library/Frameworks/Xamarin.Mac.framework/Versions/Current/bin/mmp", mmp.ToString (), out exitCode))
 								return exitCode;
