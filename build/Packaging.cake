@@ -1,6 +1,6 @@
 #!mono .cake/Cake/Cake.exe
 
-var version = Argument("version", "0.4.0");
+var version = Argument("version", "0.5.0");
 
 Task("Build-ObjC")
     .Does(() =>
