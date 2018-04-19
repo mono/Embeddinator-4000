@@ -44,6 +44,8 @@ namespace Embeddinator.ObjC
 		public bool Extension { get; set; }
 
 		public bool NativeException { get; set; }
+		
+		public bool? BitcodeOption { get; set; }
 
 		public bool Shared { get { return CompilationTarget == CompilationTarget.SharedLibrary; } }
 
@@ -106,6 +108,24 @@ namespace Embeddinator.ObjC
 					break;
 				default:
 					throw new EmbeddinatorException (4, true, $"The target `{value}` is not valid.");
+			}
+		}
+
+		public void SetBitcode (string value)
+		{
+			switch (value.ToLowerInvariant ())
+			{
+				case "default":
+					BitcodeOption = null;
+					break;
+				case "true":
+					BitcodeOption = true;
+					break;
+				case "false":
+					BitcodeOption = false;
+					break;
+				default:
+					throw new EmbeddinatorException (17, true, $"The bitcode option `{value}` is not valid.");
 			}
 		}
 
@@ -301,6 +321,15 @@ namespace Embeddinator.ObjC
 			}
 		}
 
+		string GetBitcodeFlag (bool defaultsToEnable)
+		{
+			const string option = "-fembed-bitcode";
+			if (BitcodeOption == null)
+				return defaultsToEnable ? option : string.Empty;
+			else
+				return  BitcodeOption == true ? option : string.Empty;
+		}
+
 		public int Compile ()
 		{
 			Console.WriteLine ("Compiling binding code...");
@@ -320,19 +349,19 @@ namespace Embeddinator.ObjC
 					break;
 				case Platform.iOS:
 					build_infos = new BuildInfo[] {
-					new BuildInfo { Sdk = "iPhoneOS", Architectures = new string [] { "armv7", "armv7s", "arm64" }, SdkName = "iphoneos", MinVersion = "8.0", XamariniOSSDK = "MonoTouch.iphoneos.sdk" },
+					new BuildInfo { Sdk = "iPhoneOS", Architectures = new string [] { "armv7", "armv7s", "arm64" }, SdkName = "iphoneos", MinVersion = "8.0", XamariniOSSDK = "MonoTouch.iphoneos.sdk", CompilerFlags = GetBitcodeFlag(defaultsToEnable: false), LinkerFlags = GetBitcodeFlag(defaultsToEnable: false) },
 					new BuildInfo { Sdk = "iPhoneSimulator", Architectures = new string [] { "i386", "x86_64" }, SdkName = "ios-simulator", MinVersion = "8.0", XamariniOSSDK = "MonoTouch.iphonesimulator.sdk" },
 				};
 					break;
 				case Platform.tvOS:
 					build_infos = new BuildInfo[] {
-					new BuildInfo { Sdk = "AppleTVOS", Architectures = new string [] { "arm64" }, SdkName = "tvos", MinVersion = "9.0", XamariniOSSDK = "Xamarin.AppleTVOS.sdk", CompilerFlags = "-fembed-bitcode", LinkerFlags = "-fembed-bitcode" },
+					new BuildInfo { Sdk = "AppleTVOS", Architectures = new string [] { "arm64" }, SdkName = "tvos", MinVersion = "9.0", XamariniOSSDK = "Xamarin.AppleTVOS.sdk", CompilerFlags = GetBitcodeFlag(defaultsToEnable: true), LinkerFlags = GetBitcodeFlag(defaultsToEnable: true) },
 					new BuildInfo { Sdk = "AppleTVSimulator", Architectures = new string [] { "x86_64" }, SdkName = "tvos-simulator", MinVersion = "9.0", XamariniOSSDK = "Xamarin.AppleTVSimulator.sdk" },
 				};
 					break;
 				case Platform.watchOS:
 					build_infos = new BuildInfo[] {
-					new BuildInfo { Sdk = "WatchOS", Architectures = new string [] { "armv7k" }, SdkName = "watchos", MinVersion = "2.0", XamariniOSSDK = "Xamarin.WatchOS.sdk", CompilerFlags = "-fembed-bitcode", LinkerFlags = "-fembed-bitcode"  },
+					new BuildInfo { Sdk = "WatchOS", Architectures = new string [] { "armv7k" }, SdkName = "watchos", MinVersion = "2.0", XamariniOSSDK = "Xamarin.WatchOS.sdk", CompilerFlags = GetBitcodeFlag(defaultsToEnable: true), LinkerFlags = GetBitcodeFlag(defaultsToEnable: true) },
 					new BuildInfo { Sdk = "WatchSimulator", Architectures = new string [] { "i386" }, SdkName = "watchos-simulator", MinVersion = "2.0", XamariniOSSDK = "Xamarin.WatchSimulator.sdk" },
 				};
 					break;
@@ -419,9 +448,11 @@ namespace Embeddinator.ObjC
 						}
 					}
 
-
 					if (NativeException)
 						common_options.Append ("-DNATIVEEXCEPTION ");
+
+					if (Extension)
+						common_options.Append ("-fapplication-extension ");
 
 					common_options.Append ("-fobjc-arc ");
 					common_options.Append ("-ObjC ");
@@ -499,7 +530,7 @@ namespace Embeddinator.ObjC
 							// Archive all the .o files into a .a
 							var archive_options = new StringBuilder ("ar cru ");
 							var static_ofile = Path.Combine (archOutputDirectory, output_file);
-							archive_options.Append (static_ofile).Append (" ");
+							archive_options.Append (Utils.Quote (static_ofile)).Append (" ");
 							lipo_files.Add (static_ofile);
 							foreach (var objfile in object_files)
 								archive_options.Append (objfile).Append (" ");
@@ -664,9 +695,13 @@ namespace Embeddinator.ObjC
 								mmp.Append ("--debug ");
 							mmp.Append ("-p "); // generate a plist
 							mmp.Append ($"--target-framework {GetTargetFramework ()} ");
-							mmp.Append ($"\"--link_flags=-force_load {Path.GetFullPath (sdk_output_file)}\" ");
+							string extensionFlag = Extension ? "-fapplication-extension" : "";
+							string forceLoad = $"-force_load \\\"{Path.GetFullPath (sdk_output_file)}\\\"";
+							mmp.Append ($"--link_flags=\"{extensionFlag + " " + forceLoad}\"");
+
 							if (NativeException)
 								mmp.Append ("--marshal-managed-exceptions=throwobjectivecexception ");
+
 							if (!Utils.RunProcess ("/Library/Frameworks/Xamarin.Mac.framework/Versions/Current/bin/mmp", mmp.ToString (), out exitCode))
 								return exitCode;
 
