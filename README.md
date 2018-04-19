@@ -88,4 +88,3 @@ A number of internal documentation files exist describing the project and intern
 - [Automated Tests](tests/Tests.md)
 - [Objective-C Generator Internals](objcgen/Internals.md)
 
-
