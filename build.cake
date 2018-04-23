@@ -16,8 +16,13 @@ Task("Clean")
         CleanDirectory("./build/obj");
         CleanDirectories("./tests/common/c");
         CleanDirectories("./tests/common/mk");
-        CleanDirectories(GetDirectories("./tests/**/obj"));
-        CleanDirectories(GetDirectories("./tests/**/bin"));
+
+        DeleteDirectories(GetDirectories("./tests/**/obj"), new DeleteDirectorySettings {
+		Recursive = true,
+	});
+        DeleteDirectories(GetDirectories("./tests/**/bin"), new DeleteDirectorySettings {
+		Recursive = true,
+	});
         CleanDirectories(GetDirectories("./tests/android/**/build"));
     });
 
