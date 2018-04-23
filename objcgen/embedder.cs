@@ -697,7 +697,7 @@ namespace Embeddinator.ObjC
 							mmp.Append ($"--target-framework {GetTargetFramework ()} ");
 							string extensionFlag = Extension ? "-fapplication-extension" : "";
 							string forceLoad = $"-force_load \\\"{Path.GetFullPath (sdk_output_file)}\\\"";
-							mmp.Append ($"--link_flags=\"{extensionFlag + " " + forceLoad}\"");
+							mmp.Append ($"--link_flags=\"{extensionFlag + " " + forceLoad}\" ");
 
 							if (NativeException)
 								mmp.Append ("--marshal-managed-exceptions=throwobjectivecexception ");
