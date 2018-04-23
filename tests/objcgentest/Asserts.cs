@@ -3,7 +3,6 @@
 using NUnit.Framework;
 
 using Embeddinator.ObjC;
-using System.IO;
 
 namespace DriverTest
 {
@@ -50,28 +49,12 @@ namespace DriverTest
 			Assert.Fail ($"Executing '{filename} {arguments}' failed with exit code {exitCode}: {message}");
 		}
 
-		static string RunRedirectOutput (Action action)
-		{
-			using (MemoryStream memory = new MemoryStream ()) {
-				using (var outputStream = new StreamWriter (memory)) {
-					Console.SetOut (outputStream);
-					Console.SetError (outputStream);
-					action ();
-					return System.Text.Encoding.UTF8.GetString (memory.ToArray ());
-				}
-			}
-		}
-
 		public static void Generate (string message, params string [] arguments)
 		{
-			int rv = 0;
-			string output = RunRedirectOutput (() => {
-				rv = Driver.Main2 (arguments);
-			});
-
+			var rv = Driver.Main2 (arguments);
 			if (rv == 0)
 				return;
-			Assert.Fail ($"Generation failed with exit code {rv}: {message}\n{output}");
+			Assert.Fail ($"Generation failed with exit code {rv}: {message}");
 		}
 	}
 }
