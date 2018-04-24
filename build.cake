@@ -17,12 +17,8 @@ Task("Clean")
         CleanDirectories("./tests/common/c");
         CleanDirectories("./tests/common/mk");
 
-        DeleteDirectories(GetDirectories("./tests/**/obj"), new DeleteDirectorySettings {
-		Recursive = true,
-	});
-        DeleteDirectories(GetDirectories("./tests/**/bin"), new DeleteDirectorySettings {
-		Recursive = true,
-	});
+        DeleteDirectories(GetDirectories("./tests/**/obj"), new DeleteDirectorySettings { Recursive = true });
+        DeleteDirectories(GetDirectories("./tests/**/bin"), new DeleteDirectorySettings { Recursive = true });
         CleanDirectories(GetDirectories("./tests/android/**/build"));
     });
 
