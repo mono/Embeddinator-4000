@@ -61,6 +61,7 @@ namespace Embeddinator.ObjC
 				{ "c|compile", "Compiles the generated output", v => embedder.CompileCode = true },
 				{ "e|extension", "Compiles the generated output as extension safe api", v => embedder.Extension = true },
 				{ "nativeexception", "Compiles the generated output to throw native exceptions (Apple only)", v => embedder.NativeException = true },
+				{ "bitcode=", "Compiles the generated output with bitcode (default, true, false)", v => embedder.SetBitcode (v) },
 				{ "d|debug", "Build the native library with debug information.", v => embedder.Debug = true },
 				{ "gen=", $"Target generator (default {embedder.TargetLanguage})", v => embedder.SetTarget (v) },
 				{ "abi=", "A comma-separated list of ABIs to compile. If not specified, all ABIs applicable to the selected platform will be built. Valid values (also depends on platform): i386, x86_64, armv7, armv7s, armv7k, arm64.", (v) =>
