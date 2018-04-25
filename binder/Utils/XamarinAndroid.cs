@@ -141,10 +141,8 @@ namespace Embeddinator
                     return GetFullPath(Combine(GetDirectoryName(javaBin), "../.."));
             }
 
-            if (string.IsNullOrEmpty(home))
-                throw new Exception("Cannot find Java SDK: JAVA_HOME environment variable is not set.");
-
-            return string.Empty;
+            //Last resort use AndroidSdk, which requires the Android SDK but has logic for finding Java on all platforms
+            return AndroidSdk.JavaSdkPath;
         });
 
         public static string JavaSdkPath => javaSdkPath.Value;
