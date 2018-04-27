@@ -106,8 +106,7 @@ namespace Xamarin.Android.Tools
 		protected static bool ValidateRuntime (string loc)
 		{
 			return !string.IsNullOrWhiteSpace (loc) &&
-				(File.Exists (Path.Combine (loc, DebugRuntime)) ||    // Normal/expected
-				 File.Exists (Path.Combine (loc, ClassParseExe)) ||    // Normal/expected
+				(File.Exists (Path.Combine (loc, ClassParseExe)) ||    // Normal/expected
 				 File.Exists (Path.Combine (loc, "Xamarin.Android.Common.targets"))); //VS on Windows
 		}
 

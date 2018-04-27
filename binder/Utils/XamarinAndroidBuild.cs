@@ -25,7 +25,7 @@ namespace Embeddinator
         static ProjectRootElement CreateProject()
         {
             var monoDroidPath = XamarinAndroid.Path;
-            var msBuildPath = Path.Combine(monoDroidPath, "lib", "xbuild", "Xamarin", "Android");
+            var msBuildPath = Path.Combine(XamarinAndroid.CombineToXamarinAndroidLibPath(monoDroidPath), "xbuild", "Xamarin", "Android");
             if (!msBuildPath.EndsWith(Path.DirectorySeparatorChar.ToString(), StringComparison.OrdinalIgnoreCase))
                 msBuildPath = msBuildPath + Path.DirectorySeparatorChar;
 
@@ -42,6 +42,7 @@ namespace Embeddinator
 
         static void ResolveAssemblies(ProjectTargetElement target, List<IKVM.Reflection.Assembly> assemblies)
         {
+            target.DependsOnTargets = "_SetLatestTargetFrameworkVersion";
             var resolveAssemblies = target.AddTask("ResolveAssemblies");
             var assemblyPaths = assemblies.Select(a => a.Location).ToList();
             //NOTE: [Export] requires Mono.Android.Export.dll
@@ -76,6 +77,7 @@ namespace Embeddinator
             var manifestPath = Path.Combine(androidDir, "AndroidManifest.xml");
             var packageName = Generators.JavaGenerator.GetNativeLibPackageName(mainAssembly);
             var project = CreateProject();
+            project.AddProperty ("TargetFrameworkRootPath", Path.Combine (XamarinAndroid.CombineToXamarinAndroidLibPath (XamarinAndroid.Path), "xbuild-frameworks"));
             var target = project.AddTarget("Build");
 
             //ResolveAssemblies Task
@@ -178,6 +180,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
             GenerateAndroidManifest(assemblies, manifestPath, false);
 
             var project = CreateProject();
+            project.AddProperty ("TargetFrameworkRootPath", Path.Combine (XamarinAndroid.CombineToXamarinAndroidLibPath (XamarinAndroid.Path), "xbuild-frameworks"));
             var target = project.AddTarget("Build");
 
             //ResolveAssemblies Task
@@ -200,6 +203,7 @@ $@"<?xml version=""1.0"" encoding=""utf-8""?>
             resolveLibraryProject.SetParameter("Assemblies", "@(ResolvedUserAssemblies)");
             resolveLibraryProject.SetParameter("AssemblyIdentityMapFile", Path.Combine(intermediateDir, LibraryProjectDir, "map.cache"));
             resolveLibraryProject.SetParameter("CacheFile", Path.Combine(intermediateDir, "libraryprojectimports.cache"));
+            resolveLibraryProject.SetParameter("DesignTimeBuild", "False");
             resolveLibraryProject.SetParameter("UseShortFileNames", "False");
             resolveLibraryProject.SetParameter("ImportsDirectory", ImportsDirectory);
             resolveLibraryProject.SetParameter("OutputDirectory", intermediateDir);

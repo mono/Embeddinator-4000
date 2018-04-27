@@ -8,9 +8,9 @@ namespace Xamarin.Android.Tools
 	class MonoDroidSdkUnix : MonoDroidSdkBase
 	{
 		readonly static string[] RuntimeToFrameworkPaths = new[]{
-			Path.Combine ("..", "..", "..", ".xamarin.android", "lib", "xbuild-frameworks", "MonoAndroid"),
-			Path.Combine ("..", "xbuild-frameworks", "MonoAndroid"),
-			Path.Combine ("..", "mono", "2.1"),
+			Path.Combine ("..", "..", "..", "..", ".xamarin.android", "lib", "xamarin.android", "xbuild-frameworks", "MonoAndroid"),
+			Path.Combine ("..", "..", "..", "xbuild-frameworks", "MonoAndroid"),
+			Path.Combine ("..", "..", "mono", "2.1"),
 		};
 
 		readonly static string[] SearchPaths = {
@@ -24,7 +24,7 @@ namespace Xamarin.Android.Tools
 		{
 			string monoAndroidPath = Environment.GetEnvironmentVariable ("MONO_ANDROID_PATH");
 			if (!string.IsNullOrEmpty (monoAndroidPath)) {
-				string libMandroid = Path.Combine (monoAndroidPath, "lib", "mandroid");
+				string libMandroid = Path.Combine (monoAndroidPath, "lib", "xamarin.android", "xbuild", "Xamarin", "Android");
 				if (Directory.Exists (libMandroid)) {
 					if (ValidateRuntime (libMandroid))
 						return libMandroid;
@@ -46,8 +46,9 @@ namespace Xamarin.Android.Tools
 
 		protected override bool ValidateBin (string binPath)
 		{
-			return !string.IsNullOrWhiteSpace (binPath) &&
-				File.Exists (Path.Combine (binPath, GeneratorScript));
+			return true;// it won't be used at all.
+			//return !string.IsNullOrWhiteSpace (binPath) &&
+			//	File.Exists (Path.Combine (binPath, GeneratorScript));
 		}
 
 		protected override string FindFramework (string runtimePath)
@@ -72,15 +73,15 @@ namespace Xamarin.Android.Tools
 
 		protected override string FindBin (string runtimePath)
 		{
-			string binPath = Path.GetFullPath (Path.Combine (runtimePath, "..", "..", "bin"));
-			if (File.Exists (Path.Combine (binPath, GeneratorScript)))
+			string binPath = Path.GetFullPath (Path.Combine (runtimePath, "..", "..", "..", "..", "..", "bin"));
+			//if (File.Exists (Path.Combine (binPath, GeneratorScript)))
 				return binPath;
-			return null;
+			//return null;
 		}
 
 		protected override string FindInclude (string runtimePath)
 		{
-			string includeDir = Path.GetFullPath (Path.Combine (runtimePath, "..", "..", "include"));
+                        string includeDir = Path.GetFullPath (Path.Combine (runtimePath, "..", "..", "..", "..", "..", "include"));
 			if (Directory.Exists (includeDir))
 				return includeDir;
 			return null;
