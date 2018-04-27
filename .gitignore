@@ -40,6 +40,8 @@ bindings.m
 packages
 .nuget/.nugetapikey
 /tests/android/**/.project
+.gradle/
+.idea/
 
 ### Xcode ###
 DerivedData/

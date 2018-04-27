@@ -98,11 +98,11 @@ void Gradle(string args)
 {
     if (IsRunningOnWindows())
     {
-        Exec("cmd.exe", "/c gradlew.bat " + args, "./tests/android");
+        Exec("cmd.exe", "/c gradlew.bat --stacktrace " + args, "./tests/android");
     }
     else
     {
-        Exec("./tests/android/gradlew", args, "./tests/android");
+        Exec("./tests/android/gradlew", "--stacktrace " + args, "./tests/android");
     }
 }
 
