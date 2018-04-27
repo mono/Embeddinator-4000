@@ -14,9 +14,9 @@ namespace Embeddinator
     /// </summary>
     static class XamarinAndroid
     {
-        public const string TargetFrameworkVersion = "v7.0";
+        public const string TargetFrameworkVersion = "v8.0";
         public const string MinSdkVersion = "9";
-        public const int TargetSdkVersion = 24;
+        public const int TargetSdkVersion = 26;
         public const string JavaVersion = "1.8";
 
         static readonly Lazy<AndroidSdkInfo> androidSdk = new Lazy<AndroidSdkInfo>(() => new AndroidSdkInfo(AndroidSdkLogger));

@@ -66,6 +66,13 @@ Task("AppVeyor")
     .IsDependentOn("Run-C-Tests")
     .IsDependentOn("Build-Java-Tests");
 
+Task("Jenkins")
+    .IsDependentOn("Build-Binder")
+    .IsDependentOn("Android-Tests")
+    .IsDependentOn("Build-CSharp-Tests")
+    .IsDependentOn("Run-C-Tests")
+    .IsDependentOn("Build-Java-Tests");
+
 Task("Travis")
     .IsDependentOn("Build-Binder")
     .IsDependentOn("Build-CSharp-Tests")

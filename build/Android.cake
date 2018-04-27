@@ -32,8 +32,8 @@ Task("Download-Xamarin-Android")
             //Root directory of zip will contain {artifact} as directory name
             Unzip(temp, temp.GetDirectory());
 
-            //Move bin/Release to final directory in ./external/Xamarin.Android
-            MoveDirectory(Directory(tempDir) + Directory("./bin/Release"), xamarinPath);
+            //Copy bin/Release to final directory in ./external/Xamarin.Android
+            CopyDirectory(Directory(tempDir) + Directory("./bin/Release"), xamarinPath);
 
             //There are some additional files we don't need for Embeddinator
             //Removing them should make our distribution smaller 875.6MB -> 277.2MB (92.7MB compressed)
@@ -43,7 +43,7 @@ Task("Download-Xamarin-Android")
             foreach (var directory in GetDirectories("./external/Xamarin.Android/lib/xbuild-frameworks/MonoAndroid/*"))
             {
                 var name = directory.GetDirectoryName();
-                if (!name.EndsWith("v1.0") && !name.EndsWith("v2.3") && !name.EndsWith("v7.0"))
+                if (!name.EndsWith("v1.0") && !name.EndsWith("v2.3") && !name.EndsWith("v8.0"))
                     DeleteDirectory(directory, true);
             }
         }
