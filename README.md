@@ -4,8 +4,8 @@
 |---------------------------|-----------------------------|
 | [![windows-vs-x86][1]][2] | [![osx-clang-x86][3]][4]
 
-[1]: https://ci.appveyor.com/api/projects/status/lnmi5dh2ukm1n79o/branch/master?svg=true
-[2]: https://ci.appveyor.com/project/tritao/embeddinator-4000/branch/master
+[1]: https://jenkins.mono-project.com/view/Xamarin.MaciOS/job/embeddinator-4000-windows/badge/icon
+[2]: https://jenkins.mono-project.com/view/Xamarin.MaciOS/job/embeddinator-4000-windows/
 [3]: https://travis-ci.org/mono/Embeddinator-4000.svg?branch=master
 [4]: https://travis-ci.org/mono/Embeddinator-4000
 

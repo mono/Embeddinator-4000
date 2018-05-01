@@ -42,6 +42,8 @@ packages
 /tests/android/**/.project
 .gradle/
 .idea/
+*.obj
+UpgradeLog*.htm
 
 ### Xcode ###
 DerivedData/
