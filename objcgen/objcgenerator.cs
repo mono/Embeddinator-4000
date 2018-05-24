@@ -864,7 +864,7 @@ namespace Embeddinator.ObjC {
 			implementation.WriteLineUnindented ("#if TOKENLOOKUP");
 			implementation.WriteLine ($"__field = mono_class_get_field ({managed_type_name}_class, 0x{fi.MetadataToken:X8});");
 			implementation.WriteLineUnindented ("#else");
-			implementation.WriteLine ($"const char __field_name [] = \"{fi.Name}\";");
+			implementation.WriteLine ($"static const char __field_name [] = \"{fi.Name}\";");
 			implementation.WriteLine ($"__field = mono_class_get_field_from_name ({managed_type_name}_class, __field_name);");
 			implementation.WriteLineUnindented ("#endif");
 			implementation.Indent--;
@@ -898,7 +898,7 @@ namespace Embeddinator.ObjC {
 			implementation.WriteLineUnindented ("#if TOKENLOOKUP");
 			implementation.WriteLine ($"__field = mono_class_get_field ({managed_type_name}_class, 0x{fi.MetadataToken:X8});");
 			implementation.WriteLineUnindented ("#else");
-			implementation.WriteLine ($"const char __field_name [] = \"{fi.Name}\";");
+			implementation.WriteLine ($"static const char __field_name [] = \"{fi.Name}\";");
 			implementation.WriteLine ($"__field = mono_class_get_field_from_name ({managed_type_name}_class, __field_name);");
 			implementation.WriteLineUnindented ("#endif");
 			implementation.Indent--;
