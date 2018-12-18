@@ -344,13 +344,13 @@ namespace Embeddinator.ObjC
 				case Platform.macOSModern:
 				case Platform.macOSSystem:
 					build_infos = new BuildInfo[] {
-					new BuildInfo { Sdk = "MacOSX", Architectures = new string [] { "i386", "x86_64" }, SdkName = "macosx", MinVersion = "10.7" },
+					new BuildInfo { Sdk = "MacOSX", Architectures = new string [] { "x86_64" }, SdkName = "macosx", MinVersion = "10.7" },
 				};
 					break;
 				case Platform.iOS:
 					build_infos = new BuildInfo[] {
 					new BuildInfo { Sdk = "iPhoneOS", Architectures = new string [] { "armv7", "armv7s", "arm64" }, SdkName = "iphoneos", MinVersion = "8.0", XamariniOSSDK = "MonoTouch.iphoneos.sdk", CompilerFlags = GetBitcodeFlag(defaultsToEnable: false), LinkerFlags = GetBitcodeFlag(defaultsToEnable: false) },
-					new BuildInfo { Sdk = "iPhoneSimulator", Architectures = new string [] { "i386", "x86_64" }, SdkName = "ios-simulator", MinVersion = "8.0", XamariniOSSDK = "MonoTouch.iphonesimulator.sdk" },
+					new BuildInfo { Sdk = "iPhoneSimulator", Architectures = new string [] { "x86_64" }, SdkName = "ios-simulator", MinVersion = "8.0", XamariniOSSDK = "MonoTouch.iphonesimulator.sdk" },
 				};
 					break;
 				case Platform.tvOS:
@@ -362,7 +362,7 @@ namespace Embeddinator.ObjC
 				case Platform.watchOS:
 					build_infos = new BuildInfo[] {
 					new BuildInfo { Sdk = "WatchOS", Architectures = new string [] { "armv7k" }, SdkName = "watchos", MinVersion = "2.0", XamariniOSSDK = "Xamarin.WatchOS.sdk", CompilerFlags = GetBitcodeFlag(defaultsToEnable: true), LinkerFlags = GetBitcodeFlag(defaultsToEnable: true) },
-					new BuildInfo { Sdk = "WatchSimulator", Architectures = new string [] { "i386" }, SdkName = "watchos-simulator", MinVersion = "2.0", XamariniOSSDK = "Xamarin.WatchSimulator.sdk" },
+					new BuildInfo { Sdk = "WatchSimulator", Architectures = new string [] { "x86_64" }, SdkName = "watchos-simulator", MinVersion = "2.0", XamariniOSSDK = "Xamarin.WatchSimulator.sdk" },
 				};
 					break;
 				default:
