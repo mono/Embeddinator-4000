@@ -285,6 +285,9 @@ namespace Embeddinator.ObjC
 			}
 		}
 
+		XcodeVersionCheck versionCheck = new XcodeVersionCheck ();
+		Version XcodeVersion => versionCheck.GetVersion (XcodeApp);
+
 		class BuildInfo
 		{
 			public string Sdk;
@@ -343,8 +346,14 @@ namespace Embeddinator.ObjC
 				case Platform.macOSFull:
 				case Platform.macOSModern:
 				case Platform.macOSSystem:
+					string[] macArchs = null;
+					if (Driver.CurrentEmbedder.XcodeVersion >= new Version (10, 0))
+						macArchs = new string[] { "x86_64" };
+					else
+						macArchs = new string[] { "i386", "x86_64" };
+
 					build_infos = new BuildInfo[] {
-					new BuildInfo { Sdk = "MacOSX", Architectures = new string [] { "i386", "x86_64" }, SdkName = "macosx", MinVersion = "10.7" },
+					new BuildInfo { Sdk = "MacOSX", Architectures = macArchs, SdkName = "macosx", MinVersion = "10.7" },
 				};
 					break;
 				case Platform.iOS:
