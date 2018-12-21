@@ -182,7 +182,7 @@ string GetJavaSdkPath()
     }
     else if (FileExists("/usr/libexec/java_home"))
     {
-        javaHome = CaptureProcessOutput("/usr/libexec/java_home");
+        javaHome = CaptureProcessOutput("/usr/libexec/java_home", "-v 1.8");
     }
     else
     {
