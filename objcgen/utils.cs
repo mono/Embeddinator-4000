@@ -150,7 +150,7 @@ namespace Embeddinator.ObjC
 		{
 			string version_plist = GetXcodeVersionPath (xcode_path);
 			if (version_plist == null)
-				throw new InvalidOperationException ("Unable to find version information for xcode: " + xcode_path);
+				throw new InvalidOperationException ("Unable to find version information for Xcode: " + xcode_path);
 
 			return GetPListStringValue (version_plist, "CFBundleShortVersionString");
 		}
