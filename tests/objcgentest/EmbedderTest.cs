@@ -24,7 +24,7 @@ namespace DriverTest
 				valid = "armv7, armv7s, arm64, i386, x86_64";
 				break;
 			case Platform.macOS:
-				valid = "i386, x86_64";
+				valid = "x86_64";
 				break;
 			case Platform.tvOS:
 				valid = "arm64, x86_64";

@@ -127,7 +127,7 @@ namespace Embeddinator
         {
             // If we are running on macOS, invoke java_home to figure out Java path.
             if (Platform.IsMacOS)
-                return Helpers.Invoke("/usr/libexec/java_home", null, null).StandardOutput.Trim();
+                return Helpers.Invoke("/usr/libexec/java_home", $"-v {JavaVersion}").StandardOutput.Trim();
     
             string home = Environment.GetEnvironmentVariable("JAVA_HOME");
             if (!string.IsNullOrEmpty(home))

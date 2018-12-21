@@ -135,4 +135,70 @@ namespace Embeddinator.ObjC
 			File.Copy (source, target, true);
 		}
 	}
+
+	class XcodeVersionCheck
+	{
+		Version version;
+		public Version GetVersion (string path)
+		{
+			if (version == null)
+				version = Version.Parse (GetXcodeVersion (path));
+			return version;
+		}
+
+		static string GetXcodeVersion (string xcode_path)
+		{
+			string version_plist = GetXcodeVersionPath (xcode_path);
+			if (version_plist == null)
+				throw new InvalidOperationException ("Unable to find version information for Xcode: " + xcode_path);
+
+			return GetPListStringValue (version_plist, "CFBundleShortVersionString");
+		}
+
+		static string GetXcodeVersionPath (string xcode_path)
+		{
+			var version_plist = Path.Combine (xcode_path, "Contents/version.plist");
+			if (File.Exists (version_plist))
+				return version_plist;
+
+			version_plist = Path.Combine (xcode_path, "..", "version.plist");
+			if (File.Exists (version_plist))
+				return version_plist;
+
+			return null;
+		}
+
+		static string GetPListStringValue (string plist, string key)
+		{
+			var settings = new System.Xml.XmlReaderSettings ();
+			settings.DtdProcessing = System.Xml.DtdProcessing.Ignore;
+			var doc = new System.Xml.XmlDocument ();
+			using (var fs = new StringReader (ReadPListAsXml (plist))) {
+				using (var reader = System.Xml.XmlReader.Create (fs, settings)) {
+					doc.Load (reader);
+					return doc.DocumentElement.SelectSingleNode ($"//dict/key[text()='{key}']/following-sibling::string[1]/text()").Value;
+				}
+			}
+		}
+
+		public static string ReadPListAsXml (string path)
+		{
+			string tmpfile = null;
+			try {
+				tmpfile = Path.GetTempFileName ();
+				File.Copy (path, tmpfile, true);
+				using (var process = new System.Diagnostics.Process ()) {
+					process.StartInfo.FileName = "plutil";
+					process.StartInfo.Arguments = $"-convert xml1 {Utils.Quote (tmpfile)}";
+					process.Start ();
+					process.WaitForExit ();
+					return File.ReadAllText (tmpfile);
+				}
+			}
+			finally {
+				if (tmpfile != null)
+					File.Delete (tmpfile);
+			}
+		}
+	}
 }

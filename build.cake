@@ -1,5 +1,5 @@
 #!mono .cake/Cake/Cake.exe
-#tool "nuget:?package=NUnit.ConsoleRunner"
+#tool "nuget:?package=NUnit.ConsoleRunner&version=3.6.1"
 
 var target = Argument("target", "Default");
 var configuration = Argument("configuration", "Release");

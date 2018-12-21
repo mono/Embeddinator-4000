@@ -73,7 +73,7 @@ test-xctest-leaks: ../leaktest/bin/Debug/leaktest.exe $(MANAGED_DLL) debug/libma
 	mono --debug ../leaktest/bin/Debug/leaktest.exe `xcrun -f xctest` -XCTest All $(abspath libmanaged/Tests.xctest)
 
 libLeakCheckAtExit.dylib: leak-at-exit.c
-	clang -arch i386 -arch x86_64 -shared $< -o $@
+	clang -arch x86_64 -shared $< -o $@
 
 test-static: test-static-macos test-static-ios test-static-tvos test-static-watchos
 

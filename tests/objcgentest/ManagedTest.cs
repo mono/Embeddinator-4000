@@ -222,7 +222,7 @@ namespace ExecutionTests
 				case Platform.macOS:
 					Dlldir = "generic";
 					Dllname = "managed.dll";
-					Abi = "i386,x86_64";
+					Abi = "x86_64";
 					return;
 				case Platform.iOS:
 					Dlldir = "ios";
