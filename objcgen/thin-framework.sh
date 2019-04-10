@@ -67,7 +67,7 @@ while PLATFORM=$(/usr/libexec/PlistBuddy -c "Print :CFBundleSupportedPlatforms:$
 	if [[ $PLATFORM == *Simulator* ]]; then
 		/usr/libexec/PlistBuddy -c "Remove :CFBundleSupportedPlatforms:$C" "$OUT_FRAMEWORK/Info.plist"
 	else
-		let C++ || true
+		(( C++ ))
 	fi
 done
 
