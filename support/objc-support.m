@@ -50,6 +50,10 @@ NSComparisonResult mono_embeddinator_compare_to (MonoEmbedObject *object, MonoMe
 	return (NSComparisonResult) *((int*)__unbox);
 }
 
+#define MANAGED_REF_BIT (1 << 31)
+#define GCHANDLE_WEAK (1 << 30)
+#define GCHANDLE_MASK (MANAGED_REF_BIT | GCHANDLE_WEAK)
+
 MonoObject* mono_embeddinator_get_object (id native, bool assertOnFailure)
 {
 	if (![native respondsToSelector:@selector (xamarinGetGCHandle)]) {
@@ -59,6 +63,7 @@ MonoObject* mono_embeddinator_get_object (id native, bool assertOnFailure)
 		abort ();
 	}
 	long gchandle = (long) [native performSelector:@selector (xamarinGetGCHandle)];
+	gchandle &= ~GCHANDLE_MASK;
 	return mono_gchandle_get_target (gchandle);
 }
 
