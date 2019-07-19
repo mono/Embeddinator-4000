@@ -353,7 +353,7 @@ namespace Embeddinator.ObjC
 						macArchs = new string[] { "i386", "x86_64" };
 
 					build_infos = new BuildInfo[] {
-					new BuildInfo { Sdk = "MacOSX", Architectures = macArchs, SdkName = "macosx", MinVersion = "10.7" },
+					new BuildInfo { Sdk = "MacOSX", Architectures = macArchs, SdkName = "macosx", MinVersion = "10.9" },
 				};
 					break;
 				case Platform.iOS:
