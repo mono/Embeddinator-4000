@@ -18,10 +18,9 @@ Task("Download-Xamarin-Android")
 
         Console.WriteLine("Downloading Xamarin.Android SDK, this will take a while...");
 
-        //We can also update this URL later from here: https://jenkins.mono-project.com/view/Xamarin.Android/job/xamarin-android/lastSuccessfulBuild/Azure/
+        // From https://jenkins.mono-project.com/view/Xamarin.Android/job/xamarin-android-freestyle/682/Azure/
         var artifact = "oss-xamarin.android_v8.0.0.37_Darwin-x86_64_HEAD_376f684";
-        var buildId = 682;
-        var url = $"https://jenkins.mono-project.com/view/Xamarin.Android/job/xamarin-android/{buildId}/Azure/processDownloadRequest/xamarin-android/{artifact}.zip";
+        var url = $"https://xamjenkinsartifact.azureedge.net/xamarin-android/xamarin-android/{artifact}.zip";
         var temp = DownloadFile(url);
         var tempDir = temp.GetDirectory() + "/" + artifact;
         try
