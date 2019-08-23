@@ -22,7 +22,7 @@ if [ "$OS" == "Darwin" ]; then
 		OPEN_JDK_FILENAME=microsoft_dist_openjdk_1.8.0.25.zip
 		JAVA8_DIR=/Library/Java/JavaVirtualMachines/jdk1.8.0_152.jdk/
 		wget $OPEN_JDK_URL/$OPEN_JDK_FILENAME
-		unzip $OPEN_JDK_FILENAME -d $JAVA8_DIR
+		sudo unzip $OPEN_JDK_FILENAME -d $JAVA8_DIR
 	fi
 
 	/usr/libexec/java_home -V
