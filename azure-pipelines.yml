@@ -1,0 +1,42 @@
+# https://aka.ms/yaml
+
+name: $(BuildID)
+
+trigger:
+- master
+
+variables:
+  Mono.Windows.Url: https://download.mono-project.com/archive/6.0.0/windows-installer/mono-6.0.0.319-gtksharp-2.12.45-win32-0.msi
+  SdkManager.Windows: 'C:\Program Files (x86)\Android\android-sdk\tools\bin\sdkmanager'
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+
+jobs:
+
+- job: windows
+  pool:
+    name: Hosted VS2017
+    demands: msbuild
+  steps:
+  - powershell: |
+      echo y | & "$(SdkManager.Windows)" ndk-bundle
+    displayName: install Android NDK
+  - powershell: |
+      Invoke-WebRequest $(Mono.Windows.Url) -OutFile mono.msi -Verbose
+      Start-Process msiexec -Wait -ArgumentList '/i mono.msi /quiet /l*v mono.log'
+      Get-Content mono.log
+    displayName: install mono
+  - powershell: |
+      .\build.ps1 -t Jenkins -v diagnostic
+    displayName: build and test
+
+- job: mac
+  pool:
+    name: Hosted macOS
+    demands: msbuild
+  steps:
+  - bash: |
+      source build/SetupCI.sh
+    displayName: setup ci
+  - bash: |
+      ./build.sh -t Travis -v diagnostic
+    displayName: build and test

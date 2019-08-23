@@ -687,15 +687,12 @@ namespace Embeddinator
             var libName = $"lib{name}.so";
             var ndkPath = XamarinAndroid.AndroidSdk.AndroidNdkPath;
 
-            foreach (var abi in new[] { "armeabi", "armeabi-v7a", "arm64-v8a", "x86", "x86_64" })
+            foreach (var abi in new[] { "armeabi-v7a", "arm64-v8a", "x86", "x86_64" })
             {
                 string extra = string.Empty;
                 AndroidTargetArch targetArch;
                 switch (abi)
                 {
-                    case "armeabi":
-                        targetArch = AndroidTargetArch.Arm;
-                        break;
                     case "armeabi-v7a":
                         targetArch = AndroidTargetArch.Arm;
                         extra = " -march=armv7-a -mfloat-abi=softfp -mfpu=vfpv3-d16";
@@ -715,8 +712,17 @@ namespace Embeddinator
                         throw new NotImplementedException();
                 }
 
+                bool isLLVM = false;
                 var clangBin = NdkUtil.GetNdkClangBin(Path.Combine(ndkPath, "toolchains"), targetArch);
-                var systemInclude = NdkUtil.GetNdkPlatformIncludePath(ndkPath, targetArch, XamarinAndroid.ApiLevel);
+                if (string.IsNullOrEmpty(clangBin)) {
+                    clangBin = NdkUtil.GetNdkClangBin(Path.Combine(ndkPath, "toolchains", "llvm"), targetArch);
+                    isLLVM = true;
+                }
+                if (string.IsNullOrEmpty (clangBin))
+                {
+                    throw new Exception($"Unable to find NDK toolchain for {abi}!");
+                }
+                var systemInclude = NdkUtil.GetNdkPlatformIncludePath(ndkPath, targetArch, XamarinAndroid.ApiLevel, isLLVM);
                 var monoDroidPath = Path.Combine(XamarinAndroid.LibraryPath, abi);
                 var abiDir = Path.Combine(Options.OutputDir, "android", "jni", abi);
                 var outputPath = Path.Combine(abiDir, libName);
@@ -731,9 +737,14 @@ namespace Embeddinator
                     $"-I\"{monoPath}\"",
                     $"-L\"{monoDroidPath}\" -lmonosgen-2.0 -lmono-android.release",
                     string.Join(" ", files.ToList()),
-                    "--std=c99",
+                    "--std=c11",
+                    "-fPIC",
                     $"-shared -o {outputPath}",
                 };
+                if (isLLVM)
+                {
+                    args.Add($"--target={NdkUtil.GetLlvmToolchainTarget(targetArch, XamarinAndroid.ApiLevel)}");
+                }
 
                 var invocation = string.Join(" ", args);
                 var output = Invoke(clangBin, invocation);
