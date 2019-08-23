@@ -15,8 +15,8 @@ jdk:
 install:
   - source build/SetupCI.sh
 
-script: |
-  which java
-  java --version
-  echo $JAVA_HOME
-  ./build.sh -t Travis -v diagnostic
+script:
+  - which java
+  - java --version
+  - echo $JAVA_HOME
+  - ./build.sh -t Travis -v diagnostic
