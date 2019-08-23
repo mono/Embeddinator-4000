@@ -16,11 +16,11 @@ mono:
   - latest
 
 install:
-  - mono --version
   - which java
   - java -version
   - echo $JAVA_HOME
   - source build/SetupCI.sh
 
 script:
+  - mono --version
   - ./build.sh -t Travis -v diagnostic
