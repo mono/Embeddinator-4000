@@ -48,9 +48,19 @@ namespace Xamarin.Android.Tasks
             throw new Exception($"C compiler for target {arch} was not found. Tried paths: \"{string.Join("; ", toolPaths)}\"");
         }
 
-        public static string GetNdkPlatformIncludePath(string androidNdkPath, AndroidTargetArch arch, int level)
+        public static string GetNdkPlatformIncludePath(string androidNdkPath, AndroidTargetArch arch, int level, bool isLLVM)
         {
-            string path = Path.Combine(androidNdkPath, "platforms", "android-" + level, "arch-" + GetPlatformArch(arch));
+            string path;
+            if (isLLVM)
+            {
+                var toolchainDir = Path.Combine(androidNdkPath, "toolchains", "llvm", "prebuilt");
+                var machineDir = Directory.GetDirectories(Path.Combine(toolchainDir)).First();
+                path = Path.Combine(machineDir, "sysroot");
+            }
+            else
+            {
+                path = Path.Combine(androidNdkPath, "platforms", "android-" + level, "arch-" + GetPlatformArch(arch));
+            }
             if (!Directory.Exists(path))
                 throw new InvalidOperationException(String.Format("Platform header files for target {0} and API Level {1} was not found. Expected path is \"{2}\"", arch, level, path));
             return path;
@@ -86,6 +96,10 @@ namespace Xamarin.Android.Tasks
         {
             if (!Directory.Exists(toolchainsPath))
                 throw new Exception($"Missing Android NDK toolchains directory '{toolchainsPath}'. Please install the Android NDK.");
+            if (string.Compare(Path.GetFileName(toolchainsPath), "llvm", StringComparison.OrdinalIgnoreCase) == 0)
+            {
+                return new[] { toolchainsPath };
+            }
             switch (arch)
             {
                 case AndroidTargetArch.Arm:
@@ -125,17 +139,39 @@ namespace Xamarin.Android.Tasks
             }
         }
 
+        public static string GetLlvmToolchainTarget (AndroidTargetArch arch, int apiLevel)
+        {
+            switch (arch)
+            {
+                case AndroidTargetArch.Arm:
+                    return $"armv7a-linux-androideabi{apiLevel}";
+                case AndroidTargetArch.Arm64:
+                    return $"aarch64-linux-android{apiLevel}";
+                case AndroidTargetArch.X86:
+                    return $"i686-linux-android{apiLevel}";
+                case AndroidTargetArch.X86_64:
+                    return $"x86_64-linux-android{apiLevel}";
+                default:
+                    return string.Empty;
+            }
+        }
+
         public static string GetNdkClangBin(string toolchainsPath, AndroidTargetArch arch)
         {
-            var toolChainDir = GetNdkToolchainDirectories(toolchainsPath, arch).First();
-            var machineDir = Directory.GetDirectories(Path.Combine(toolChainDir, "prebuilt")).First();
+            foreach (var toolChainDir in GetNdkToolchainDirectories(toolchainsPath, arch))
+            {
+                var machineDir = Directory.GetDirectories(Path.Combine(toolChainDir, "prebuilt")).First();
 
-            var executableSuffix = Platform.IsWindows ? ".exe" : string.Empty;
-            var gcc = Path.Combine(machineDir, "bin", GetNdkToolchainPrefix(arch) + "gcc" + executableSuffix);
-            if (File.Exists(gcc))
-                return gcc;
+                var executableSuffix = Platform.IsWindows ? ".exe" : string.Empty;
+                var gcc = Path.Combine(machineDir, "bin", GetNdkToolchainPrefix(arch) + "gcc" + executableSuffix);
+                if (File.Exists(gcc))
+                    return gcc;
 
-            throw new Exception($"Unable to find NDK toolchain for {arch}!");
+                var clang = Path.Combine(machineDir, "bin", "clang" + executableSuffix);
+                if (File.Exists(clang))
+                    return clang;
+            }
+            return null;
         }
 
         static bool GetNdkToolchainRelease(string androidNdkPath, out string version)

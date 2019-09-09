@@ -89,7 +89,9 @@ typedef struct _GString GString;
 
 /* utils/mono-publib.h */
 typedef int32_t	mono_bool;
+#ifndef _WIN32
 typedef uint16_t mono_unichar2;
+#endif
 
 /* metadata/image.h */
 typedef struct _MonoAssembly MonoAssembly;

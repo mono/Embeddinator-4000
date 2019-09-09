@@ -89,7 +89,7 @@ if(!$PSScriptRoot){
 $TOOLS_DIR = Join-Path $PSScriptRoot ".cake"
 $NUGET_EXE = Join-Path $PSScriptRoot ".cake/nuget.exe"
 $CAKE_EXE = Join-Path $TOOLS_DIR "Cake/Cake.exe"
-$NUGET_URL = "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe"
+$NUGET_URL = "https://dist.nuget.org/win-x86-commandline/v4.7.3/nuget.exe"
 $PACKAGES_CONFIG = Join-Path $TOOLS_DIR "packages.config"
 $PACKAGES_CONFIG_MD5 = Join-Path $TOOLS_DIR "packages.config.md5sum"
 

@@ -11,8 +11,7 @@ Task("Build-Managed")
     .IsDependentOn("NuGet-Restore")
     .Does(() =>
     {
-        MSBuild("./tests/managed/generic/managed-generic.csproj", settings =>
-            settings.SetConfiguration(configuration));
+        MSBuild("./tests/managed/generic/managed-generic.csproj", MSBuildSettings());
     });
 
 Task("Build-Android")
@@ -20,8 +19,7 @@ Task("Build-Android")
     .IsDependentOn("NuGet-Restore")
     .Does(() =>
     {
-        MSBuild("./tests/managed/android/managed-android.csproj", settings =>
-            settings.SetConfiguration(configuration).SetPlatformTarget(PlatformTarget.MSIL));
+        MSBuild("./tests/managed/android/managed-android.csproj", MSBuildSettings().SetPlatformTarget(PlatformTarget.MSIL));
     });
 
 Task("Build-FSharp-Android")
@@ -29,8 +27,7 @@ Task("Build-FSharp-Android")
     .IsDependentOn("NuGet-Restore")
     .Does(() =>
     {
-        MSBuild("./tests/managed/fsharp-android/fsharp-android.fsproj", settings =>
-            settings.SetConfiguration(configuration).SetPlatformTarget(PlatformTarget.MSIL));
+        MSBuild("./tests/managed/fsharp-android/fsharp-android.fsproj", MSBuildSettings().SetPlatformTarget(PlatformTarget.MSIL));
     });
 
 Task("Build-FSharp-Generic")
@@ -38,8 +35,7 @@ Task("Build-FSharp-Generic")
     .IsDependentOn("NuGet-Restore")
     .Does(()=>
     {
-        MSBuild("./tests/managed/fsharp-generic/fsharp-generic.fsproj", settings =>
-            settings.SetConfiguration(configuration).SetPlatformTarget(PlatformTarget.MSIL));
+        MSBuild("./tests/managed/fsharp-generic/fsharp-generic.fsproj", MSBuildSettings().SetPlatformTarget(PlatformTarget.MSIL));
     });
 
 Task("Build-PCL")
@@ -47,8 +43,7 @@ Task("Build-PCL")
     .IsDependentOn("NuGet-Restore")
     .Does(() =>
     {
-        MSBuild("./tests/managed/pcl/managed-pcl.csproj", settings =>
-            settings.SetConfiguration(configuration).SetPlatformTarget(PlatformTarget.MSIL));
+        MSBuild("./tests/managed/pcl/managed-pcl.csproj", MSBuildSettings().SetPlatformTarget(PlatformTarget.MSIL));
     });
 
 Task("Build-NetStandard")
@@ -58,7 +53,7 @@ Task("Build-NetStandard")
     {
         var project = "./tests/managed/netstandard/managed-netstandard.csproj";
         DotNetCoreRestore(project);
-        MSBuild(project, settings => settings.SetConfiguration(configuration).SetPlatformTarget(PlatformTarget.MSIL));
+        MSBuild(project, MSBuildSettings().SetPlatformTarget(PlatformTarget.MSIL));
     });
 
 Task("Build-CSharp-Tests")
@@ -66,7 +61,7 @@ Task("Build-CSharp-Tests")
     .IsDependentOn("Build-Managed")
     .Does(() =>
     {
-        MSBuild("./tests/MonoEmbeddinator4000.Tests/MonoEmbeddinator4000.Tests.csproj", settings => settings.SetConfiguration(configuration));
+        MSBuild("./tests/MonoEmbeddinator4000.Tests/MonoEmbeddinator4000.Tests.csproj", MSBuildSettings());
     });
 
 Task("Run-CSharp-Tests")
@@ -108,9 +103,7 @@ Task("Build-C-Tests")
 
         // Execute the build files.
         if (IsRunningOnWindows())
-            MSBuild(mkDir + File("mk.sln"), settings =>
-                settings.SetConfiguration(configuration)
-                        .SetPlatformTarget(PlatformTarget.Win32));
+            MSBuild(mkDir + File("mk.sln"), MSBuildSettings().SetPlatformTarget(PlatformTarget.Win32));
         else
         {
             var envVars = new Dictionary<string, string> ();
