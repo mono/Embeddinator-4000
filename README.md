@@ -1,14 +1,5 @@
 ![Embeddinator-4000 Logo](e4000-logo.png)
 
-| Windows                   | macOS                       |
-|---------------------------|-----------------------------|
-| [![windows-vs-x86][1]][2] | [![osx-clang-x86][3]][4]
-
-[1]: https://jenkins.mono-project.com/view/Xamarin.MaciOS/job/embeddinator-4000-windows/badge/icon
-[2]: https://jenkins.mono-project.com/view/Xamarin.MaciOS/job/embeddinator-4000-windows/
-[3]: https://travis-ci.org/mono/Embeddinator-4000.svg?branch=master
-[4]: https://travis-ci.org/mono/Embeddinator-4000
-
 Embeddinator-4000 is a tool to turn existing .NET libraries into
 libraries that can be consumed by other languages.   
 

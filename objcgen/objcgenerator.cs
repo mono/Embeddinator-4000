@@ -333,7 +333,7 @@ namespace Embeddinator.ObjC {
 
 					if (ctor.Unavailable) {
 						headers.WriteLine ("/** This initializer is not available as it was not re-exposed from the base type");
-						headers.WriteLine (" *  For more details consult https://github.com/mono/Embeddinator-4000/blob/master/docs/ObjC.md#constructors-vs-initializers");
+						headers.WriteLine (" *  For more details consult https://github.com/mono/Embeddinator-4000/blob/main/docs/ObjC.md#constructors-vs-initializers");
 						headers.WriteLine (" */");
 						headers.WriteLine ($"- (nullable instancetype){name} NS_UNAVAILABLE;");
 						headers.WriteLine ();
