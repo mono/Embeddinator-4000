@@ -332,7 +332,7 @@ namespace Embeddinator.Generators
             else
                 Write("{0} {1}(", method.ReturnType, GetMethodIdentifier(method));
 
-            var @params = method.Parameters.Where(m => !m.IsImplicit);
+            var @params = method.Parameters.Where(p => !p.IsImplicit && p.IsGenerated);
             Write("{0}", TypePrinter.VisitParameters(@params, hasNames: true));
 
             Write(")");
@@ -382,7 +382,7 @@ namespace Embeddinator.Generators
                 @params.Add("__object");
 
             int paramIndex = 0;
-            foreach (var param in method.Parameters.Where(m => !m.IsImplicit))
+            foreach (var param in method.Parameters.Where(p => !p.IsImplicit && p.IsGenerated))
             {
                 var marshal = new JavaMarshalManagedToNative(Context)
                 {

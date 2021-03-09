@@ -272,6 +272,14 @@ TEST_CASE("Methods.C", "[C][Methods]") {
     REQUIRE(Methods_Collection_get_Count(collection) == 0);
 }
 
+TEST_CASE("Operators.C", "[C][Operators]") {
+    Overloads_ConflictingOperatorOverload* o = Overloads_ConflictingOperatorOverload_new();
+    REQUIRE(Overloads_ConflictingOperatorOverload_op_Explicit_Byte(o) == 0);
+    REQUIRE(Overloads_ConflictingOperatorOverload_op_Explicit_Int32(o) == 1);
+    REQUIRE(Overloads_ConflictingOperatorOverload_op_Implicit_Int16(o) == 2);
+    REQUIRE(Overloads_ConflictingOperatorOverload_op_Implicit_Int64(o) == 3);
+}
+
 TEST_CASE("Structs.C", "[C][Structs]") {
     Structs_Point* p1 = Structs_Point_new(1.0f, -1.0f);
     REQUIRE(Structs_Point_get_X(p1) == 1.0f);

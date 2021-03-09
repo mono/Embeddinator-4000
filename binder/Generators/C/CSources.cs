@@ -198,7 +198,14 @@ namespace Embeddinator.Generators
             WriteLine($"{classLookupId}();");
 
             var classId = $"class_{@class.QualifiedName}";
-            WriteLine($"{methodId} = mono_embeddinator_lookup_method({methodNameId}, {classId});");
+
+            var isReturnTypeOverloaded = method.OperatorKind == CXXOperatorKind.Conversion ||
+                method.OperatorKind == CXXOperatorKind.ExplicitConversion;
+
+            if (isReturnTypeOverloaded)
+                WriteLine($"{methodId} = mono_embeddinator_lookup_method_ret(\"{method.ManagedReturnTypeName()}\", {methodNameId}, {classId});");
+            else
+                WriteLine($"{methodId} = mono_embeddinator_lookup_method({methodNameId}, {classId});");
 
             WriteCloseBraceIndent();
         }
@@ -259,7 +266,7 @@ namespace Embeddinator.Generators
             GenerateMethodInitialization(method);
             NewLineIfNeeded();
 
-            var paramsToMarshal = method.Parameters.Where(p => !p.IsImplicit);
+            var paramsToMarshal = method.Parameters.Where(p => !p.IsImplicit && p.IsGenerated);
             var numParamsToMarshal = paramsToMarshal.Count();
 
             var argsId = "0";

@@ -150,11 +150,8 @@ namespace Embeddinator.Generators
 
         public static string GetMethodIdentifier(Method method)
         {
-            var methodName = (method.IsConstructor || method.IsDestructor) ?
-                method.Name : method.OriginalName;
-
             var @class = method.Namespace as Class;
-            var name = $"{@class.QualifiedName}_{methodName}";
+            var name = $"{@class.QualifiedName}_{method.Name}";
 
             var associated = method.AssociatedDeclaration ?? method;
 
@@ -178,7 +175,7 @@ namespace Embeddinator.Generators
 
             Write($"{retType} {GetMethodIdentifier(method)}(");
 
-            Write(CTypePrinter.VisitParameters(method.Parameters));
+            Write(CTypePrinter.VisitParameters(method.Parameters.Where(p => p.IsGenerated)));
 
             Write(")");
         }

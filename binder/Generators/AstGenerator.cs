@@ -41,6 +41,11 @@ namespace Embeddinator.Generators
             // Replace + with / since that's what mono_class_from_name expects for nested types.
             return managedName.Replace("+", "/");
         }
+
+        public static string ManagedReturnTypeName(this Method decl)
+        {
+            return ASTGenerator.ManagedReturnTypeNames[decl];
+        }
     }
 
     public class ASTGenerator
@@ -51,6 +56,9 @@ namespace Embeddinator.Generators
         private Assembly CurrentAssembly;
 
         public static Dictionary<Declaration, string> ManagedNames
+            = new Dictionary<Declaration, string>();
+
+        public static Dictionary<Declaration, string> ManagedReturnTypeNames
             = new Dictionary<Declaration, string>();
 
         public static Dictionary<TranslationUnit, Assembly> ManagedAssemblies
@@ -422,14 +430,24 @@ namespace Embeddinator.Generators
                 @params.Add(param);
             }
 
-            return string.Format("{0}:{1}({2})", method.DeclaringType.FullName,
-                method.Name, string.Join(",", @params));
+            var name = $"{method.DeclaringType.FullName}:{method.Name}({string.Join(",", @params)})";
+
+            if (method.IsExplicitOrImplicitOperator())
+            {
+                var methodInfo = method as MethodInfo;
+                name = $"{GetInternalTypeName(methodInfo.ReturnType)} {name}";
+            }
+
+            return name;
         }
 
         Method VisitMethod(MethodInfo methodInfo)
         {
             var method = VisitMethodBase(methodInfo);
             method.ReturnType = VisitType(methodInfo.ReturnType);
+
+            if (methodInfo.IsExplicitOrImplicitOperator())
+                ManagedReturnTypeNames[method] = GetInternalTypeName(methodInfo.ReturnType);
 
             if (method.ReturnType.Type == null
              || method.ReturnType.Type is UnsupportedType)
@@ -612,6 +630,20 @@ namespace Embeddinator.Generators
             method.IsVirtual = methodBase.IsVirtual;
             method.IsPure = methodBase.IsAbstract;
 
+            // Check for C# operator methods.
+            if (methodBase.IsSpecialName && methodBase.Name.StartsWith("op", StringComparison.Ordinal))
+            {
+                switch(methodBase.Name)
+                {
+                case "op_Explicit":
+                    method.OperatorKind = CXXOperatorKind.ExplicitConversion;
+                    break;
+                case "op_Implicit":
+                    method.OperatorKind = CXXOperatorKind.Conversion;
+                    break;
+                }
+            }
+
             var accessMask = (methodBase.Attributes & MethodAttributes.MemberAccessMask);
             method.Access = ConvertMemberAttributesToAccessSpecifier(accessMask);
 
@@ -747,6 +779,24 @@ namespace Embeddinator.Generators
             ManagedNames[property] = $"{propertyInfo.DeclaringType.FullName}:{propertyInfo.Name}";
 
             return property;
+        }
+    }
+
+    public static class MethodExtensions {
+
+        public static bool IsExplicitOrImplicitOperator(this IKVM.Reflection.MethodBase method)
+        {
+            if (!method.IsSpecialName)
+                return false;
+
+            switch (method.Name)
+            {
+            case "op_Explicit":
+            case "op_Implicit":
+                return true;
+            default:
+                return false;
+            }
         }
     }
 

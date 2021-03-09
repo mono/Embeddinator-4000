@@ -88,7 +88,8 @@ namespace Embeddinator.Generators
 
             var returnTypeName = method.ReturnType.Visit(TypePrinter);
             Write($"public {returnTypeName} {GetCMethodIdentifier(method)}(");
-            Write(TypePrinter.VisitParameters(method.Parameters, hasNames: true).ToString());
+            var parameters = method.Parameters.Where(p => p.IsGenerated);
+            Write(TypePrinter.VisitParameters(parameters, hasNames: true).ToString());
             Write(");");
 
             TypePrinter.PopContext();
