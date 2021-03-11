@@ -478,7 +478,7 @@ namespace Embeddinator.ObjC
 						case Platform.macOSSystem:
 						case Platform.macOSModern:
 						case Platform.macOSFull:
-							common_options.Append ("-I/Library/Frameworks/Xamarin.Mac.framework/Versions/Current/include ");
+							common_options.Append ("-I/Library/Frameworks/Xamarin.Mac.framework/Versions/Current/SDKs/Xamarin.macOS.sdk/include ");
 							common_options.Append ("-DXAMARIN_MAC ");
 							break;
 						case Platform.iOS:
