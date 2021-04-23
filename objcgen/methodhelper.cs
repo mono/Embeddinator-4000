@@ -74,7 +74,7 @@ namespace Embeddinator.ObjC {
 			implementation.Indent++;
 			implementation.WriteLine ($"__method = mono_get_method (__{AssemblySafeName}_image, 0x{MetadataToken:X8}, {ObjCTypeName}_class);");
 			implementation.WriteLineUnindented ("#else");
-			implementation.WriteLine ($"const char __method_name [] = \"{ManagedTypeName}:{MonoSignature}\";");
+			implementation.WriteLine ($"static const char __method_name [] = \"{ManagedTypeName}:{MonoSignature}\";");
 			implementation.WriteLine ($"__method = mono_embeddinator_lookup_method (__method_name, {ObjCTypeName}_class);");
 			implementation.Indent--;
 			implementation.WriteLineUnindented ("#endif");
